@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.web.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./apps/ourvoice-admin/tsconfig.json"
+    },
+    {
+      "path": "./apps/ourvoice-app/tsconfig.json"
+    }
+  ]
+}

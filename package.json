@@ -1,0 +1,53 @@
+{
+  "name": "ourvoice",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@7.22.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "description": "Safe digital space for workplace-related discussion",
+  "main": "index.js",
+  "scripts": {
+    "dev:apps": "pnpm --recursive --parallel --stream --filter './apps/**' dev",
+    "build:apps": "pnpm --recursive --parallel --stream --filter './apps/**' build",
+    "typecheck:apps": "pnpm --recursive --parallel --stream --filter './apps/**' typecheck",
+    "analyze:apps": "pnpm --recursive --parallel --stream --filter './apps/**' analyze",
+    "info:apps": "pnpm --recursive --parallel --stream --filter './apps/**' info",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .vue,.js,.ts,.jsx,.tsx --max-warnings 0 . && pretty-quick --check",
+    "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . && pretty-quick",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Our-Voice-Inc/ourvoice.git"
+  },
+  "author": "aarepuu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Our-Voice-Inc/ourvoice/issues"
+  },
+  "homepage": "https://github.com/Our-Voice-Inc/ourvoice#readme",
+  "devDependencies": {
+    "@iconify-json/mdi": "latest",
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "@pinia/nuxt": "latest",
+    "@types/node": "latest",
+    "@vueuse/nuxt": "latest",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-prettier": "latest",
+    "nuxt": "^3.0.0",
+    "pinia": "latest",
+    "prettier": "latest",
+    "pretty-quick": "latest",
+    "typescript": "latest",
+    "vue": "latest",
+    "vue-tsc": "latest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
