@@ -4,7 +4,6 @@ importers:
 
   .:
     specifiers:
-      '@iconify-json/mdi': latest
       '@nuxtjs/eslint-config-typescript': latest
       '@pinia/nuxt': latest
       '@types/node': latest
@@ -20,7 +19,6 @@ importers:
       vue: latest
       vue-tsc: latest
     devDependencies:
-      '@iconify-json/mdi': 1.1.41
       '@nuxtjs/eslint-config-typescript': 12.0.0_iukboom6ndih5an6iafl45j2fe
       '@pinia/nuxt': 0.4.6_prq2uz4lho2pwp6irk4cfkrxwu
       '@types/node': 18.11.18
@@ -413,16 +411,6 @@ packages:
 
   /@humanwhocodes/object-schema/1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
-    dev: true
-
-  /@iconify-json/mdi/1.1.41:
-    resolution: {integrity: sha512-nMT3k6cH48qi66m2mYDOh4YPW3BgSD+VLNXP7Z3LHNgKoGVLpA76AKWzYGshhyprebBGNXAk+72mlLLQSIojzQ==}
-    dependencies:
-      '@iconify/types': 2.0.0
-    dev: true
-
-  /@iconify/types/2.0.0:
-    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
     dev: true
 
   /@ioredis/commands/1.2.0:
