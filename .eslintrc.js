@@ -1,15 +1,16 @@
 module.exports = {
+  root: true,
   env: {
     es6: true,
     browser: true,
     node: true,
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['@typescript-eslint', 'prettier', 'import', 'simple-import-sort'],
   extends: [
     'eslint:recommended',
     '@nuxtjs/eslint-config-typescript',
     'plugin:@typescript-eslint/recommended',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   overrides: [
     {
@@ -33,14 +34,43 @@ module.exports = {
       rules: {
         'no-console': 'off',
         'import/no-unresolved': 'off',
-        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'on',
       },
     },
   ],
   rules: {
+    // imports
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          ['^\\u0000'],
+          ['^node:'],
+          ['(?<=\\u0000)$', '^'],
+          ['^\\..*\\u0000$', '^\\.'],
+        ],
+      },
+    ],
+    'simple-import-sort/exports': 'error',
     // ts
-    '@typescript-eslint/no-explicit-any': 'off',
-
+    '@typescript-eslint/no-explicit-any': 'on',
+    '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
+    '@typescript-eslint/consistent-type-imports': [
+      'error',
+      { prefer: 'type-imports', disallowTypeAnnotations: false },
+    ],
+    '@typescript-eslint/ban-types': [
+      'error',
+      {
+        types: {
+          '{}': false,
+        },
+        extendDefaults: true,
+      },
+    ],
     // vue
     'vue/require-default-prop': 'off',
     'vue/multi-word-component-names': 'off',

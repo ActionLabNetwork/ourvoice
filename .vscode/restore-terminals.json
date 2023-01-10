@@ -1,0 +1,43 @@
+{
+  "artificialDelayMilliseconds": 300,
+  "keepExistingTerminalsOpen": false,
+  "runOnStartup": true,
+  "terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "GIT",
+          "commands": ["git status"],
+          "shouldRunCommands": true
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "API",
+          "commands": ["cd apps/ourvoice-api/", "clear"],
+          "shouldRunCommands": true
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "ADMIN",
+          "commands": ["cd apps/ourvoice-admin/", "clear"],
+          "shouldRunCommands": true
+        }
+      ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "APP",
+          "commands": ["cd apps/ourvoice-app/", "clear"],
+          "shouldRunCommands": true
+        }
+      ]
+    }
+  ]
+}

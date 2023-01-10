@@ -13,5 +13,8 @@
     {
       "path": "./apps/ourvoice-app/tsconfig.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "types": ["node", "jest"]
+  }
 }
