@@ -38,6 +38,15 @@
           "shouldRunCommands": true
         }
       ]
+    },
+    {
+      "splitTerminals": [
+        {
+          "name": "PORTAL",
+          "commands": ["cd apps/ourvoice-portal/", "clear"],
+          "shouldRunCommands": true
+        }
+      ]
     }
   ]
 }

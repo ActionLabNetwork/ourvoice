@@ -12,6 +12,9 @@
     },
     {
       "path": "./apps/ourvoice-app/tsconfig.json"
+    },
+    {
+      "path": "./apps/ourvoice-portal/tsconfig.json"
     }
   ],
   "compilerOptions": {
