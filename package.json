@@ -11,7 +11,7 @@
   "main": "index.js",
   "scripts": {
     "dev:apps": "pnpm --recursive --parallel --stream --filter './apps/**' dev",
-    "prepare": "pnpm git-hooks",
+    "prepare": "pnpm simple-git-hooks",
     "build:apps": "pnpm --recursive --parallel --stream --filter './apps/**' build",
     "typecheck:apps": "pnpm --recursive --parallel --stream --filter './apps/**' typecheck",
     "analyze:apps": "pnpm --recursive --parallel --stream --filter './apps/**' analyze",
