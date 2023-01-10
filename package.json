@@ -11,10 +11,12 @@
   "main": "index.js",
   "scripts": {
     "dev:apps": "pnpm --recursive --parallel --stream --filter './apps/**' dev",
+    "prepare": "pnpm git-hooks",
     "build:apps": "pnpm --recursive --parallel --stream --filter './apps/**' build",
     "typecheck:apps": "pnpm --recursive --parallel --stream --filter './apps/**' typecheck",
     "analyze:apps": "pnpm --recursive --parallel --stream --filter './apps/**' analyze",
     "info:apps": "pnpm --recursive --parallel --stream --filter './apps/**' info",
+    "clean": "rimraf **/coverage **/dist **/node_modules",
     "dev:app": "pnpm --filter ./apps/ourvoice-app dev",
     "build:app": "pnpm --filter ./apps/ourvoice-app build",
     "preview:app": "pnpm --filter ./apps/ourvoice-app preview",
@@ -25,6 +27,14 @@
     "lint": "eslint --ext .vue,.js,.ts,.jsx,.tsx --max-warnings 0 . && pretty-quick --check",
     "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . && pretty-quick",
     "preinstall": "npx only-allow pnpm"
+  },
+  "git-hooks": {
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "pnpm tsx scripts/verify-commit.ts $1"
+  },
+  "lint-staged": {
+    "*.md": "prettier --write",
+    "*.{ts,vue}": "eslint --fix"
   },
   "repository": {
     "type": "git",
@@ -48,6 +58,7 @@
     "pinia": "latest",
     "prettier": "latest",
     "pretty-quick": "latest",
+    "rimraf": "^3.0.2",
     "typescript": "latest",
     "vue": "latest",
     "vue-tsc": "latest"
