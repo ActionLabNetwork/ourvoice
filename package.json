@@ -28,7 +28,7 @@
     "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . && pretty-quick",
     "preinstall": "npx only-allow pnpm"
   },
-  "git-hooks": {
+  "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
     "commit-msg": "pnpm tsx scripts/verify-commit.ts $1"
   },
@@ -59,6 +59,7 @@
     "prettier": "latest",
     "pretty-quick": "latest",
     "rimraf": "^3.0.2",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "latest",
     "vue": "latest",
     "vue-tsc": "latest"
