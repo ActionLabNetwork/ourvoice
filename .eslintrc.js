@@ -34,7 +34,10 @@ module.exports = {
       rules: {
         'no-console': 'off',
         'import/no-unresolved': 'off',
-        '@typescript-eslint/no-unused-vars': 'on',
+        '@typescript-eslint/no-unused-vars': [
+          'warn',
+          { ignoreRestSiblings: true },
+        ],
       },
     },
   ],
@@ -56,7 +59,7 @@ module.exports = {
     ],
     'simple-import-sort/exports': 'error',
     // ts
-    '@typescript-eslint/no-explicit-any': 'on',
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
     '@typescript-eslint/consistent-type-imports': [
       'error',
