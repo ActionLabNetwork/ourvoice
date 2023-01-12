@@ -13,6 +13,7 @@
         A safe space for employees and community members to anonymously discuss
         issues and concerns about their work environments.
       </p>
+      <p>There are {{ data?.posts?.length || 0 }} posts.</p>
       <div class="flex justify-center flex-wrap gap-6">
         <button type="button" class="btn btn-purple btn-hover">Login</button>
       </div>
@@ -27,3 +28,15 @@
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+const query = gql`
+  {
+    posts {
+      id
+      title
+    }
+  }
+`
+const { data } = await useAsyncQuery(query)
+</script>
