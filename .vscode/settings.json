@@ -24,5 +24,8 @@
     "node_modules": true,
     "tmp": true
   },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
   "typescript.inlayHints.enumMemberValues.enabled": true
 }

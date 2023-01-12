@@ -1,0 +1,5 @@
+#Dev DB
+db/data
+db/data_old
+db_old
+*.env
