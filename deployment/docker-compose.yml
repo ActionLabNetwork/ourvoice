@@ -7,7 +7,7 @@ networks:
     driver: bridge
 
 services:
-# Postgresql DB
+  # Postgresql DB
   db:
     image: postgres:15-alpine
     container_name: ourvoice-app-db
@@ -23,7 +23,49 @@ services:
       - ${POSTGRES_DB_PORT}:5432
     networks:
       - backend
+  # auth db
+  authdb:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_USER: ${AUTH_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AUTH_POSTGRES_DB}
+    volumes:
+      - ${AUTH_POSTGRES_DB_LOCATION}:/var/lib/postgresql/data
+    ports:
+      - ${AUTH_POSTGRES_DB_PORT}:5432
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "'${AUTH_POSTGRES_DB}'"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+  # auth manager    
+  supertokens:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:4.3
+    container_name: supertokens
+    depends_on:
+      authdb:
+        condition: service_healthy
+    ports:
+      - 3567:3567
+    environment:
+      POSTGRESQL_CONNECTION_URI: "postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@authdb:5432/${AUTH_POSTGRES_DB}"
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db:
     name: backend
+  authdb:
+    name: auth

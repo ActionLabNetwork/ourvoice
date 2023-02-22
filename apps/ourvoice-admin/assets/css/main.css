@@ -23,3 +23,30 @@
 .card-hover {
   @apply hover:bg-ourvoice-purple;
 }
+
+.clickable-text {
+  color: rgb(0, 118, 255);
+  cursor: pointer;
+}
+
+.divider {
+  height: 0.3px;
+  width: 100%;
+  background-color: rgb(221, 221, 221);
+}
+
+.divider-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.divider-text {
+  margin-left: 12px;
+  margin-right: 12px;
+  color: rgb(101, 101, 101);
+  flex: 1 1 0%;
+}
