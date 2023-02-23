@@ -107,3 +107,6 @@ dist
 deployment/db
 deployment/db/*
 deployment/db_old
+
+# OS
+.DS_Store
