@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.clickable-text {
+  color: rgb(0, 118, 255);
+  cursor: pointer;
+}
+
 .btn {
   @apply shadow-md py-3 px-6 rounded-md transition duration-300;
 }

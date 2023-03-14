@@ -1,13 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './components/**/*.{js,vue,ts}',
-    './layouts/**/*.vue',
-    './pages/**/*.vue',
-    './plugins/**/*.{js,ts}',
-    './nuxt.config.{js,ts}',
-    './app.vue',
-  ],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -15,11 +8,11 @@ module.exports = {
         'ourvoice-red': '#FA5959',
         'ourvoice-blue': '#242A45',
         'ourvoice-grey': '#9194A2',
-        'ourvoice-white': '#f7f7f7',
-      },
+        'ourvoice-white': '#f7f7f7'
+      }
     },
     fontFamily: {
-      Poppins: ['Poppins, sans-serif'],
+      Poppins: ['Poppins, sans-serif']
     },
     container: {
       center: true,
@@ -27,9 +20,9 @@ module.exports = {
       screens: {
         lg: '1124px',
         xl: '1124px',
-        '2xl': '1124px',
-      },
-    },
+        '2xl': '1124px'
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 }
