@@ -26,10 +26,10 @@ export class SupertokensService {
           emailDelivery: {
             service: new SMTPService({
               smtpSettings: {
-                host: 'sandbox.smtp.mailtrap.io',
-                authUsername: '45b6fe1a310740',
-                password: 'b650a5745ae26b',
-                port: 2525,
+                host: config.smtpSettings.host,
+                authUsername: config.smtpSettings.user,
+                password: config.smtpSettings.password,
+                port: config.smtpSettings.port || 2525,
                 from: {
                   name: 'OurVoice',
                   email: 'no-reply@ourvoice.app',

@@ -23,6 +23,7 @@ export class AuthModule implements NestModule {
     connectionURI,
     apiKey,
     appInfo,
+    smtpSettings,
   }: AuthModuleConfig): DynamicModule {
     return {
       providers: [
@@ -30,6 +31,7 @@ export class AuthModule implements NestModule {
           useValue: {
             appInfo,
             connectionURI,
+            smtpSettings,
             apiKey,
           },
           provide: ConfigInjectionToken,
