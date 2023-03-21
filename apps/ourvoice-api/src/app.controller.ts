@@ -18,6 +18,7 @@ export class AppController {
   @UseGuards(new AuthGuard())
   async getTest(@Session() session: SessionContainer): Promise<string> {
     // TODO: magic
+    console.log(session);
     return 'magic';
   }
 
@@ -26,9 +27,9 @@ export class AppController {
   async getSessioninfo(@Session() session: SessionContainer): Promise<string> {
     // TODO: magic
     return JSON.stringify({
-      sessionHandle: session!.getHandle(),
-      userId: session!.getUserId(),
-      accessTokenPayload: session!.getAccessTokenPayload(),
+      sessionHandle: session?.getHandle(),
+      userId: session?.getUserId(),
+      accessTokenPayload: session?.getAccessTokenPayload(),
     });
   }
 }

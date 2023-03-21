@@ -31,7 +31,7 @@
     "start:api": "pnpm --filter ./apps/ourvoice-api start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .vue,.js,.ts,.jsx,.tsx --max-warnings 0 . && pretty-quick --check",
-    "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . && pretty-quick",
+    "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . --ignore-path .gitignore && pretty-quick",
     "preinstall": "npx only-allow pnpm"
   },
   "simple-git-hooks": {

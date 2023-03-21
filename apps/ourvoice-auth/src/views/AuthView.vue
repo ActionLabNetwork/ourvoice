@@ -159,7 +159,7 @@ export default defineComponent({
     goToSignIn() {
       this.isSignIn = true
     },
-    signIn: async function (_: Event) {
+    signIn: async function () {
       const response = await EmailPassword.signIn({
         formFields: [
           {
@@ -206,7 +206,7 @@ export default defineComponent({
           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         )
     },
-    signUp: async function (_: Event) {
+    signUp: async function () {
       const response = await EmailPassword.signUp({
         formFields: [
           {
@@ -242,7 +242,7 @@ export default defineComponent({
       this.handleRedirect()
     },
 
-    sendMagicLink: async function (_: Event) {
+    sendMagicLink: async function () {
       if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         window.alert('Organisation does not match')
         return
@@ -272,12 +272,12 @@ export default defineComponent({
 
       if (this.mode === 'emailpassword') {
         if (this.isSignIn) {
-          this.signIn(e)
+          this.signIn()
         } else {
-          this.signUp(e)
+          this.signUp()
         }
       } else {
-        this.sendMagicLink(e)
+        this.sendMagicLink()
       }
     },
     checkForSession: async function () {
