@@ -33,10 +33,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
-import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
 
-const apiPort = import.meta.env.VUE_APP_API_PORT || 3001
+const apiPort = import.meta.env.VUE_APP_API_PORT || 3000
 const apiDomain = import.meta.env.VUE_APP_API_URL || `http://localhost:${apiPort}`
+
+const authURL = import.meta.env.VITE_APP_AUTH_URL || 'http://localhost:3020'
 
 export default defineComponent({
   data() {
@@ -49,14 +50,14 @@ export default defineComponent({
   },
   methods: {
     signOut: async function () {
-      await EmailPassword.signOut()
-      window.location.assign('/auth')
+      await Session.signOut()
+      window.location.href = authURL
     },
 
     checkForSession: async function () {
       if (!(await Session.doesSessionExist())) {
         // since a session does not exist, we send the user to the login page.
-        return window.location.assign('/auth')
+        window.location.href = authURL
       }
       const userId = await Session.getUserId()
       // this will render the UI
@@ -70,7 +71,7 @@ export default defineComponent({
       if (response.status === 401) {
         // this means that the session has expired and the
         // user needs to relogin.
-        window.location.assign('/auth')
+        window.location.href = authURL
         return
       }
 

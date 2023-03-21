@@ -1,22 +1,29 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import SuperTokens from 'supertokens-web-js'
+import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
+import Passwordless from 'supertokens-web-js/recipe/passwordless'
+import Session from 'supertokens-web-js/recipe/session'
 
-import supertokens from 'supertokens-node';
-import { SupertokensExceptionFilter } from './auth/auth.filter';
-import { ConfigService } from '@nestjs/config';
+import App from './App.vue'
+import router from './router'
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  app.enableCors({
-    origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
-    allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
-    credentials: true,
-  });
+SuperTokens.init({
+  appInfo: {
+    apiDomain: 'http://localhost:3000',
+    apiBasePath: '/auth',
+    appName: 'OurVoice'
+  },
+  recipeList: [
+    EmailPassword.init(),
+    Passwordless.init(),
+    Session.init({ sessionTokenFrontendDomain: '.localhost' })
+  ]
+})
 
-  app.useGlobalFilters(new SupertokensExceptionFilter());
+const app = createApp(App)
 
-  await app.listen(configService.get('PORT'));
-}
+app.use(createPinia())
+app.use(router)
 
-bootstrap();
+app.mount('#app')

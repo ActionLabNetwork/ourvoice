@@ -4,7 +4,7 @@
       <div v-if="error" class="error-container">
         <div class="error-message">{{ errorMessage }}</div>
       </div>
-      <div class="auth-form-content-container">
+      <div v-if="mode === 'emailpassword'" class="auth-form-content-container">
         <div v-if="isSignIn" class="form-title">Sign In</div>
         <div v-else class="form-title">Sign Up</div>
         <div class="sign-in-up-text-container">
@@ -70,7 +70,35 @@
           </div>
         </form>
       </div>
-      <div v-if="isSignIn">
+      <div v-else class="auth-form-content-container">
+        <div class="form-title">Sign In or Sign Up</div>
+
+        <form autocomplete="on" novalidate @submit="onSubmitPressed">
+          <div class="input-section-container" :class="emailError ? 'error' : ''">
+            <div class="input-label">Email</div>
+            <div class="input-container">
+              <div class="input-wrapper" :class="emailError ? 'error' : ''">
+                <input
+                  v-model="email"
+                  autocomplete="email"
+                  class="input"
+                  type="email"
+                  name="email"
+                  placeholder="Email address"
+                />
+              </div>
+            </div>
+            <div v-if="emailError" class="input-error">
+              {{ `${emailError}` }}
+            </div>
+          </div>
+
+          <div class="input-section-container">
+            <button type="submit" class="button">CONTINUE</button>
+          </div>
+        </form>
+      </div>
+      <div v-if="isSignIn && mode === 'emailpassword'">
         <router-link :to="{ path: `/auth/reset-password` }"> Forgot Password? </router-link>
       </div>
       <div style="margin-bottom: 10px" />
@@ -80,13 +108,19 @@
 
 <script lang="ts">
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
+import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import Session from 'supertokens-web-js/recipe/session'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
-const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
-const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
+// const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
+// const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
+
+const redirect: ManageRedirectStateService = new ManageRedirectStateService()
+const organisation = import.meta.env.VITE_APP_ORG
 
 export default defineComponent({
+  props: ['mode'],
   data() {
     return {
       // we allow the user to switch between sign in and sign up view
@@ -107,16 +141,12 @@ export default defineComponent({
   },
 
   mounted() {
-    // if there is an "error" query param on this page, it means that
-    // social login has failed for some reason. See the AuthCallbackView.vue file
-    // for more context on this
     const params = new URLSearchParams(window.location.search)
 
     if (params.has('error')) {
       this.errorMessage = 'Something went wrong'
       this.error = true
     }
-
     // this redirects the user to the HomeView.vue component if a session
     // already exists.
     this.checkForSession()
@@ -167,7 +197,7 @@ export default defineComponent({
       // login is successful, and we redirect the user to the home page.
       // Note that session cookies are added automatically and nothing needs to be
       // done here about them.
-      window.location.assign('/')
+      this.handleRedirect()
     },
     validateEmail(email: string) {
       return email
@@ -208,7 +238,30 @@ export default defineComponent({
       // signup is successful, and we redirect the user to the home page.
       // Note that session cookies are added automatically and nothing needs to be
       // done here about them.
-      window.location.assign('/')
+      // window.location.assign('/')
+      this.handleRedirect()
+    },
+
+    sendMagicLink: async function (_: Event) {
+      if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
+        window.alert('Organisation does not match')
+        return
+      }
+      try {
+        await Passwordless.createCode({
+          email: this.email
+        })
+        // Magic link sent successfully.
+        window.alert('Please check your email for the magic link')
+      } catch (err: any) {
+        if (err.isSuperTokensGeneralError === true) {
+          // this may be a custom error message sent from the API by you,
+          // or if the input email / phone number is not valid.
+          window.alert(err.message)
+        } else {
+          window.alert('Oops! Something went wrong.')
+        }
+      }
     },
     onSubmitPressed: function (e: Event) {
       e.preventDefault()
@@ -217,16 +270,28 @@ export default defineComponent({
       this.emailError = ''
       this.passwordError = ''
 
-      if (this.isSignIn) {
-        this.signIn(e)
+      if (this.mode === 'emailpassword') {
+        if (this.isSignIn) {
+          this.signIn(e)
+        } else {
+          this.signUp(e)
+        }
       } else {
-        this.signUp(e)
+        this.sendMagicLink(e)
       }
     },
     checkForSession: async function () {
       if (await Session.doesSessionExist()) {
         // since a session already exists, we redirect the user to the HomeView.vue component
-        window.location.assign('/')
+        // window.location.assign('/')
+        this.handleRedirect()
+      }
+    },
+    handleRedirect: function () {
+      if (redirect.exists()) {
+        const redirectTo = redirect.get()
+        redirect.purge()
+        window.location.href = redirectTo
       }
     }
   }
