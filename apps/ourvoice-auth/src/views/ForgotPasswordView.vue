@@ -116,7 +116,7 @@ export default defineComponent({
             throw new Error('Password reset token has expired, please go back to the sign in page')
           }
           // password reset successful.
-          window.location.assign('/auth')
+          window.location.assign('/signinWithEmailPassword')
         } catch (e: any) {
           this.errorMessage = e.message
           this.error = true

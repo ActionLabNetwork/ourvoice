@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import VerifyView from '../views/VerifyView.vue'
+import VerifyEmailView from '../views/VerifyEmailView.vue'
 import AuthView from '../views/AuthView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
@@ -55,6 +56,11 @@ const router = createRouter({
       path: '/auth/verify',
       name: 'verify',
       component: VerifyView
+    },
+    {
+      path: '/auth/verify-email',
+      name: 'verifyemail',
+      component: VerifyEmailView
     }
   ]
 })

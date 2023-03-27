@@ -13,6 +13,7 @@ async function bootstrap() {
 
   // TODO: add website domain
   const whitelist: string[] = [
+    'http://localhost:3000',
     'http://localhost:3010',
     'http://localhost:3020',
     'http://localhost:3030',
@@ -21,7 +22,7 @@ async function bootstrap() {
   app.enableCors({
     // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      if (origin && whitelist.indexOf(origin) !== -1) {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(

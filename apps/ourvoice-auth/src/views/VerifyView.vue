@@ -7,9 +7,6 @@ import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
-// const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
-// const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
-
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 
 export default defineComponent({

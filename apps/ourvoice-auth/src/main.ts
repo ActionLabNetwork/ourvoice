@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import SuperTokens from 'supertokens-web-js'
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
+import EmailVerification from 'supertokens-web-js/recipe/emailverification'
 import Session from 'supertokens-web-js/recipe/session'
 
 import App from './App.vue'
@@ -17,6 +18,7 @@ SuperTokens.init({
   recipeList: [
     EmailPassword.init(),
     Passwordless.init(),
+    EmailVerification.init(),
     Session.init({ sessionTokenFrontendDomain: '.localhost' })
   ]
 })

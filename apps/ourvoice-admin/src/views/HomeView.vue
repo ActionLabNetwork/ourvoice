@@ -33,6 +33,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
+import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
 const apiPort = import.meta.env.VUE_APP_API_PORT || 3000
 const apiDomain = import.meta.env.VUE_APP_API_URL || `http://localhost:${apiPort}`
@@ -59,10 +60,22 @@ export default defineComponent({
         // since a session does not exist, we send the user to the login page.
         window.location.href = authURL
       }
-      const userId = await Session.getUserId()
-      // this will render the UI
-      this.session = true
-      this.userId = userId
+      let validationErrors = await Session.validateClaims()
+
+      if (validationErrors.length === 0) {
+        // user has verified their email address
+        const userId = await Session.getUserId()
+        // this will render the UI
+        this.session = true
+        this.userId = userId
+      } else {
+        for (const err of validationErrors) {
+          if (err.validatorId === EmailVerificationClaim.id) {
+            // email is not verified
+            window.alert('Session Information:\n' + JSON.stringify(err, null, 2))
+          }
+        }
+      }
     },
 
     callAPI: async function () {
