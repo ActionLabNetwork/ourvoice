@@ -110,6 +110,8 @@
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import Session from 'supertokens-web-js/recipe/session'
+import { sendVerificationEmail } from 'supertokens-web-js/recipe/emailverification'
+
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
@@ -239,7 +241,29 @@ export default defineComponent({
       // Note that session cookies are added automatically and nothing needs to be
       // done here about them.
       // window.location.assign('/')
-      this.handleRedirect()
+      // this.handleRedirect()
+      this.sendVerificationEmail()
+    },
+
+    sendVerificationEmail: async function () {
+      try {
+        let response = await sendVerificationEmail()
+        if (response.status === 'EMAIL_ALREADY_VERIFIED_ERROR') {
+          // This can happen if the info about email verification in the session was outdated.
+          // Redirect the user to the home page
+          this.handleRedirect()
+        } else {
+          // email was sent successfully.
+          window.alert('Please check your email and click the link in it')
+        }
+      } catch (err: any) {
+        if (err.isSuperTokensGeneralError === true) {
+          // this may be a custom error message sent from the API by you.
+          window.alert(err.message)
+        } else {
+          window.alert('Oops! Something went wrong.')
+        }
+      }
     },
 
     sendMagicLink: async function () {

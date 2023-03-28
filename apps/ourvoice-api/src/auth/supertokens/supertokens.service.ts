@@ -12,6 +12,8 @@ import Dashboard from 'supertokens-node/recipe/dashboard';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
+import { addRoleToUser } from '../roles.service';
+
 @Injectable()
 export class SupertokensService {
   constructor(@Inject(ConfigInjectionToken) private config: AuthModuleConfig) {
@@ -43,7 +45,8 @@ export class SupertokensService {
 
                     // // These are the input form fields values that the user used while signing up
                     const formFields = input.formFields;
-                    // TODO: post sign up logic
+                    // TODO: add user role to all registered users
+                    addRoleToUser(id);
                   }
                   return response;
                 },

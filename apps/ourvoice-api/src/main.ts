@@ -5,6 +5,7 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
+import { createRole } from './auth/roles.service';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -38,6 +39,10 @@ async function bootstrap() {
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
 
+  //TODO: initiate roles based on config yml/json
+  await createRole('user');
+  await createRole('moderator');
+  await createRole('admin');
   await app.listen(configService.get('PORT') as number);
 }
 

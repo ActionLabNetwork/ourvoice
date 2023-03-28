@@ -1,22 +1,23 @@
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 
-async function createRole() {
+export async function createRole(name: string, permissions: string[] = []) {
   /**
    * You can choose to give multiple or no permissions when creating a role
    * createNewRoleOrAddPermissions("user", []) - No permissions
    * createNewRoleOrAddPermissions("user", ["read", "write"]) - Multiple permissions
    */
-  const response = await UserRoles.createNewRoleOrAddPermissions('user', [
-    'read',
-  ]);
+  const response = await UserRoles.createNewRoleOrAddPermissions(
+    name,
+    permissions,
+  );
 
   if (response.createdNewRole === false) {
     // The role already exists
   }
 }
 
-async function addRoleToUser(userId: string) {
+export async function addRoleToUser(userId: string) {
   const response = await UserRoles.addRoleToUser(userId, 'user');
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
@@ -29,12 +30,12 @@ async function addRoleToUser(userId: string) {
   }
 }
 
-async function getRolesForUser(userId: string) {
+export async function getRolesForUser(userId: string): Promise<string[]> {
   const response = await UserRoles.getRolesForUser(userId);
-  const roles: string[] = response.roles;
+  return response.roles;
 }
 
-async function getUsersThatHaveRole(role: string) {
+export async function getUsersThatHaveRole(role: string): Promise<string[]> {
   const response = await UserRoles.getUsersThatHaveRole(role);
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
@@ -42,10 +43,12 @@ async function getUsersThatHaveRole(role: string) {
     return;
   }
 
-  const users: string[] = response.users;
+  return response.users;
 }
 
-async function removeRoleFromUserAndTheirSession(session: SessionContainer) {
+export async function removeRoleFromUserAndTheirSession(
+  session: SessionContainer,
+) {
   const response = await UserRoles.removeUserRole(session.getUserId(), 'user');
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
