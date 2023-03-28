@@ -38,7 +38,7 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 const apiPort = import.meta.env.VUE_APP_API_PORT || 3000
 const apiDomain = import.meta.env.VUE_APP_API_URL || `http://localhost:${apiPort}`
 
-const authURL = import.meta.env.VITE_APP_AUTH_URL || 'http://localhost:3020'
+const authURL = import.meta.env.VITE_APP_AUTH_URL || 'http://localhost:3020/auth'
 
 export default defineComponent({
   data() {
@@ -72,7 +72,7 @@ export default defineComponent({
         for (const err of validationErrors) {
           if (err.validatorId === EmailVerificationClaim.id) {
             // email is not verified
-            window.alert('Session Information:\n' + JSON.stringify(err, null, 2))
+            window.location.href = authURL
           }
         }
       }

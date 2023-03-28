@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import SuperTokens from 'supertokens-web-js'
 import Session from 'supertokens-web-js/recipe/session'
+import EmailVerification from 'supertokens-web-js/recipe/emailverification'
 
 import App from './App.vue'
 import router from './router'
@@ -15,7 +16,7 @@ SuperTokens.init({
     apiBasePath: '/auth',
     appName: 'OurVoice'
   },
-  recipeList: [Session.init({ sessionTokenFrontendDomain: '.localhost' })]
+  recipeList: [Session.init({ sessionTokenFrontendDomain: '.localhost' }), EmailVerification.init()]
 })
 
 const app = createApp(App)

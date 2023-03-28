@@ -1,10 +1,49 @@
 <template>
   <div class="auth-container">
-    <div class="auth-form-container">
+    <div v-if="processing" class="fill">
+      <div class="spinner">
+        <svg version="1.1" viewBox="25 25 50 50">
+          <circle
+            cx="50"
+            cy="50"
+            r="20"
+            fill="none"
+            strokeWidth="20"
+            stroke="rgb(255, 155, 51)"
+            strokeLinecap="round"
+            strokeDashoffset="0"
+            strokeDasharray="200, 200"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="0 50 50"
+              to="360 50 50"
+              dur="4s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="stroke-dashoffset"
+              values="0;-30;-124"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="stroke-dasharray"
+              values="0,200;110,200;110,200"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </svg>
+      </div>
+    </div>
+    <div v-else class="auth-form-container">
       <div v-if="error" class="error-container">
         <div class="error-message">{{ errorMessage }}</div>
       </div>
-      <div v-if="mode === 'emailpassword'" class="auth-form-content-container">
+      <div v-if="mode === 'emailpassword' && !needsVerifying" class="auth-form-content-container">
         <div v-if="isSignIn" class="form-title">Sign In</div>
         <div v-else class="form-title">Sign Up</div>
         <div class="sign-in-up-text-container">
@@ -70,7 +109,7 @@
           </div>
         </form>
       </div>
-      <div v-else class="auth-form-content-container">
+      <div v-if="mode === 'passwordless' && !needsVerifying" class="auth-form-content-container">
         <div class="form-title">Sign In or Sign Up</div>
 
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
@@ -98,8 +137,20 @@
           </div>
         </form>
       </div>
-      <div v-if="isSignIn && mode === 'emailpassword'">
+      <div v-if="isSignIn && mode === 'emailpassword' && !needsVerifying" class="faded-link">
         <router-link :to="{ path: `/auth/reset-password` }"> Forgot Password? </router-link>
+      </div>
+      <div v-if="needsVerifying" class="auth-form-content-container">
+        <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
+        <div class="form-title">Verify your email address</div>
+        <p>
+          To confirm your email address, <strong>click on the link</strong> in the email we sent
+          you.
+        </p>
+        <div class="divider-container"></div>
+        <span class="clickable-text" v-on:click="sendVerificationEmail">Resend Email</span>
+        <div class="divider-container"></div>
+        <span v-on:click="signOut" class="faded-link">Logout</span>
       </div>
       <div style="margin-bottom: 10px" />
     </div>
@@ -112,6 +163,7 @@ import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import Session from 'supertokens-web-js/recipe/session'
 import { sendVerificationEmail } from 'supertokens-web-js/recipe/emailverification'
 
+import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
@@ -138,7 +190,10 @@ export default defineComponent({
 
       // any error states specific to the input fields.
       emailError: '',
-      passwordError: ''
+      passwordError: '',
+
+      processing: false,
+      needsVerifying: false
     }
   },
 
@@ -160,6 +215,10 @@ export default defineComponent({
     },
     goToSignIn() {
       this.isSignIn = true
+    },
+    signOut: async function () {
+      await Session.signOut()
+      this.handleRedirect()
     },
     signIn: async function () {
       const response = await EmailPassword.signIn({
@@ -221,7 +280,6 @@ export default defineComponent({
           }
         ]
       })
-
       if (response.status === 'FIELD_ERROR') {
         response.formFields.forEach((item) => {
           if (item.id === 'email') {
@@ -254,20 +312,22 @@ export default defineComponent({
           this.handleRedirect()
         } else {
           // email was sent successfully.
-          window.alert('Please check your email and click the link in it')
+          this.needsVerifying = true
+          this.processing = false
         }
       } catch (err: any) {
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you.
-          window.alert(err.message)
+          console.log(err.message)
         } else {
-          window.alert('Oops! Something went wrong.')
+          console.log('Oops! Something went wrong.')
         }
       }
     },
 
     sendMagicLink: async function () {
       if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
+        this.processing = false
         window.alert('Organisation does not match')
         return
       }
@@ -276,8 +336,10 @@ export default defineComponent({
           email: this.email
         })
         // Magic link sent successfully.
+        this.processing = false
         window.alert('Please check your email for the magic link')
       } catch (err: any) {
+        this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
@@ -294,6 +356,8 @@ export default defineComponent({
       this.emailError = ''
       this.passwordError = ''
 
+      this.processing = true
+
       if (this.mode === 'emailpassword') {
         if (this.isSignIn) {
           this.signIn()
@@ -306,9 +370,20 @@ export default defineComponent({
     },
     checkForSession: async function () {
       if (await Session.doesSessionExist()) {
-        // since a session already exists, we redirect the user to the HomeView.vue component
-        // window.location.assign('/')
-        this.handleRedirect()
+        // session exists but checking if verification is needed
+        let validationErrors = await Session.validateClaims()
+
+        if (validationErrors.length === 0) {
+          // user has verified their email address
+          this.handleRedirect()
+        } else {
+          for (const err of validationErrors) {
+            if (err.validatorId === EmailVerificationClaim.id) {
+              // email is not verified
+              this.needsVerifying = true
+            }
+          }
+        }
       }
     },
     handleRedirect: function () {
@@ -316,6 +391,8 @@ export default defineComponent({
         const redirectTo = redirect.get()
         redirect.purge()
         window.location.href = redirectTo
+      } else {
+        window.location.assign('/auth')
       }
     }
   }
@@ -367,75 +444,9 @@ export default defineComponent({
   padding-top: 40px;
 }
 
-.providerButtonLeft {
-  width: 40px;
-}
-
-.providerButtonLogo {
-  height: 30px;
-  display: flex;
-  border-right: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.providerButtonLogoCenter {
+.emailIcon {
   margin: auto;
 }
-
-.providerButtonText {
-  margin: auto;
-  text-align: center;
-  justify-content: center;
-  -webkit-box-pack: center;
-  font-weight: inherit;
-}
-
-.providerContainer {
-  padding-top: 9px;
-  padding-bottom: 9px;
-}
-
-.providerButton {
-  width: 100%;
-  min-height: 34px;
-  display: flex;
-  flex-direction: row;
-  padding: 2px 0px;
-  transition: all 0.4s ease 0s;
-  cursor: pointer;
-  height: auto !important;
-  border-radius: 6px;
-  border-width: 1px;
-  font-weight: 700;
-  color: white;
-}
-
-.providerGithub {
-  border-color: black;
-  background-color: black;
-}
-
-.providerGithub:hover {
-  filter: brightness(1.1);
-}
-
-.providerGoogle {
-  border-color: rgb(234, 55, 33);
-  background-color: rgb(234, 55, 33);
-}
-
-.providerGoogle:hover {
-  filter: brightness(0.95);
-}
-
-.providerApple {
-  border-color: rgb(7, 9, 60);
-  background-color: rgb(1, 0, 48);
-}
-
-.providerApple:hover {
-  filter: brightness(1.1);
-}
-
 .input-section-container {
   display: flex;
   flex-direction: column;
@@ -515,7 +526,7 @@ form {
   filter: brightness(0.95);
 }
 
-.forgot-password-link {
+.faded-link {
   padding-left: 3px;
   padding-right: 3px;
   cursor: pointer;
@@ -565,5 +576,22 @@ form {
   100% {
     transform: translateY(0px);
   }
+}
+
+.fill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.spinner {
+  width: 80px;
+  height: auto;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  margin: 0 auto;
 }
 </style>

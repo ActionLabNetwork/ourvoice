@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import VerifyView from '../views/VerifyView.vue'
 import VerifyEmailView from '../views/VerifyEmailView.vue'
 import AuthView from '../views/AuthView.vue'
@@ -13,11 +12,11 @@ const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView
-    },
+    // {
+    //   path: '/',
+    //   name: 'home',
+    //   component: HomeView
+    // },
     {
       path: '/auth',
       name: 'auth',

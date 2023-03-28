@@ -97,7 +97,6 @@ export default defineComponent({
     // this function checks if a session exists, and if not,
     // it will redirect to the login screen.
     this.checkForSession()
-    this.callAPI()
   }
 })
 </script>
