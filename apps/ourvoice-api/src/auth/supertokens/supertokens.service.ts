@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Logger, Inject, Injectable } from '@nestjs/common';
 import supertokens from 'supertokens-node';
 import Session from 'supertokens-node/recipe/session';
 import EmailVerification from 'supertokens-node/recipe/emailverification';
@@ -16,6 +16,8 @@ import { addRoleToUser } from '../roles.service';
 
 @Injectable()
 export class SupertokensService {
+  private readonly logger = new Logger('SupertokensService');
+
   constructor(@Inject(ConfigInjectionToken) private config: AuthModuleConfig) {
     supertokens.init({
       appInfo: config.appInfo,
@@ -90,6 +92,39 @@ export class SupertokensService {
                 // secure: true,
               },
             }),
+          },
+          override: {
+            apis: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                consumeCodePOST: async (input) => {
+                  if (originalImplementation.consumeCodePOST === undefined) {
+                    throw Error('Should never come here');
+                  }
+
+                  // First we call the original implementation of consumeCodePOST.
+                  const response = await originalImplementation.consumeCodePOST(
+                    input,
+                  );
+
+                  // Post sign up response, we check if it was successful
+                  if (response.status === 'OK') {
+                    const { id, email, phoneNumber } = response.user;
+
+                    if (response.createdNewUser) {
+                      Passwordless.updateUser({
+                        userId: id,
+                        email: 'anonymous',
+                      });
+                      this.logger.log('Passwordless Signup');
+                    } else {
+                      this.logger.log('Passwordless Login');
+                    }
+                  }
+                  return response;
+                },
+              };
+            },
           },
         }),
         Dashboard.init({

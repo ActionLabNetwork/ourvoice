@@ -1,6 +1,6 @@
 <template>
   <div class="auth-container">
-    <div v-if="processing" class="fill">
+    <div v-if="processing" class="auth-form-container">
       <div class="spinner">
         <svg version="1.1" viewBox="25 25 50 50">
           <circle
@@ -43,7 +43,10 @@
       <div v-if="error" class="error-container">
         <div class="error-message">{{ errorMessage }}</div>
       </div>
-      <div v-if="mode === 'emailpassword' && !needsVerifying" class="auth-form-content-container">
+      <div
+        v-if="recepie === 'emailpassword' && !needsVerifying"
+        class="auth-form-content-container"
+      >
         <div v-if="isSignIn" class="form-title">Sign In</div>
         <div v-else class="form-title">Sign Up</div>
         <div class="sign-in-up-text-container">
@@ -109,7 +112,7 @@
           </div>
         </form>
       </div>
-      <div v-if="mode === 'passwordless' && !needsVerifying" class="auth-form-content-container">
+      <div v-if="recepie === 'passwordless' && !needsVerifying" class="auth-form-content-container">
         <div class="form-title">Sign In or Sign Up</div>
 
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
@@ -137,20 +140,36 @@
           </div>
         </form>
       </div>
-      <div v-if="isSignIn && mode === 'emailpassword' && !needsVerifying" class="faded-link">
+      <div v-if="isSignIn && recepie === 'emailpassword' && !needsVerifying" class="faded-link">
         <router-link :to="{ path: `/auth/reset-password` }"> Forgot Password? </router-link>
       </div>
       <div v-if="needsVerifying" class="auth-form-content-container">
         <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-        <div class="form-title">Verify your email address</div>
-        <p>
-          To confirm your email address, <strong>click on the link</strong> in the email we sent
-          you.
-        </p>
+        <div class="form-title" v-html="verifyTitle"></div>
+        <p v-html="verifyText"></p>
         <div class="divider-container"></div>
-        <span class="clickable-text" v-on:click="sendVerificationEmail">Resend Email</span>
+        <span
+          v-if="recepie === 'emailpassword' && !isVerify"
+          class="clickable-text"
+          v-on:click="sendVerificationEmail"
+          >Resend Email</span
+        >
+        <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
+        <span v-else class="clickable-text" v-on:click="resendMagicLink">Resend link</span>
+        <span
+          v-if="recepie === 'emailpassword' && !isVerify"
+          class="clickable-text"
+          v-on:click="sendVerificationEmail"
+          >Resend Email</span
+        >
         <div class="divider-container"></div>
-        <span v-on:click="signOut" class="faded-link">Logout</span>
+        <span
+          v-if="recepie === 'emailpassword' && !isVerify"
+          v-on:click="signOut"
+          class="faded-link"
+          >Logout</span
+        >
+        <span v-else v-on:click="reset" class="faded-link">Change email</span>
       </div>
       <div style="margin-bottom: 10px" />
     </div>
@@ -172,6 +191,7 @@ import { defineComponent } from 'vue'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const organisation = import.meta.env.VITE_APP_ORG
+const appURL = import.meta.env.VITE_APP_APP_URL
 
 export default defineComponent({
   props: ['mode'],
@@ -179,6 +199,8 @@ export default defineComponent({
     return {
       // we allow the user to switch between sign in and sign up view
       isSignIn: true,
+
+      isVerify: false,
 
       // this will store the email and password entered by the user.
       email: '',
@@ -193,11 +215,37 @@ export default defineComponent({
       passwordError: '',
 
       processing: false,
-      needsVerifying: false
+      needsVerifying: false,
+
+      // Countdown timer
+      period: 15,
+      timer: 0,
+      recepie: 'emailpassword'
     }
   },
-
+  watch: {
+    email: {
+      handler: function () {
+        this.error = false
+      },
+      deep: true
+    }
+  },
+  computed: {
+    verifyTitle() {
+      return this.recepie == 'emailpassword' ? 'Verify your email address' : 'Link sent!'
+    },
+    verifyText() {
+      return this.recepie == 'emailpassword'
+        ? 'To confirm your email address, <strong>click on the link</strong> in the email we sent you.'
+        : `We sent a link to <strong>${this.email}</strong> </br>Click the link to login or sign up`
+    },
+    counter() {
+      return this.period.toString().length === 1 ? `0${this.period}` : this.period
+    }
+  },
   mounted() {
+    this.recepie = this.mode
     const params = new URLSearchParams(window.location.search)
 
     if (params.has('error')) {
@@ -207,9 +255,28 @@ export default defineComponent({
     // this redirects the user to the HomeView.vue component if a session
     // already exists.
     this.checkForSession()
+    this.hasInitialMagicLinkBeenSent()
   },
 
   methods: {
+    hasInitialMagicLinkBeenSent: async function () {
+      if (await Passwordless.getLoginAttemptInfo()) {
+        this.needsVerifying = true
+        this.isVerify = true
+        this.recepie = 'passwordless'
+        redirect.set(appURL)
+      }
+    },
+    startTimer() {
+      this.period = 15
+      this.timer = setInterval(() => {
+        if (!this.period) this.stopTimer()
+        this.period -= 1
+      }, 1000)
+    },
+    stopTimer() {
+      clearInterval(this.timer)
+    },
     goToSignUp() {
       this.isSignIn = false
     },
@@ -219,6 +286,19 @@ export default defineComponent({
     signOut: async function () {
       await Session.signOut()
       this.handleRedirect()
+    },
+    reset() {
+      this.isSignIn = true
+      this.email = ''
+      this.password = ''
+      this.error = false
+      this.errorMessage = 'Something went wrong'
+      this.emailError = ''
+      this.passwordError = ''
+      this.processing = false
+      this.needsVerifying = false
+      this.period = 15
+      this.isVerify = false
     },
     signIn: async function () {
       const response = await EmailPassword.signIn({
@@ -239,6 +319,7 @@ export default defineComponent({
         // so we show an appropriate error message to the user
         this.errorMessage = 'Invalid credentials'
         this.error = true
+        this.processing = false
         return
       }
 
@@ -252,6 +333,7 @@ export default defineComponent({
             this.passwordError = item.error
           }
         })
+        this.processing = false
         return
       }
 
@@ -318,34 +400,69 @@ export default defineComponent({
       } catch (err: any) {
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you.
-          console.log(err.message)
+          this.errorMessage = err.message
+          this.error = true
         } else {
-          console.log('Oops! Something went wrong.')
+          this.errorMessage = 'Oops! Something went wrong.'
+          this.error = true
         }
       }
     },
 
     sendMagicLink: async function () {
-      if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
-        this.processing = false
-        window.alert('Organisation does not match')
-        return
-      }
+      // if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
+      //   this.processing = false
+      //   window.alert('Organisation does not match')
+      //   return
+      // }
       try {
         await Passwordless.createCode({
           email: this.email
         })
         // Magic link sent successfully.
         this.processing = false
-        window.alert('Please check your email for the magic link')
+        this.needsVerifying = true
+        this.startTimer()
       } catch (err: any) {
         this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
-          window.alert(err.message)
+          this.errorMessage = err.message
+          this.error = true
         } else {
-          window.alert('Oops! Something went wrong.')
+          this.errorMessage = 'Oops! Something went wrong.'
+          this.error = true
+        }
+      }
+    },
+
+    resendMagicLink: async function () {
+      this.processing = true
+      try {
+        let response = await Passwordless.resendCode()
+
+        if (response.status === 'RESTART_FLOW_ERROR') {
+          // this can happen if the user has already successfully logged in into
+          // another device whilst also trying to login to this one.
+          window.location.assign('/signinWithoutPassword')
+        } else {
+          // Magic link resent successfully.
+          this.processing = false
+          this.needsVerifying = true
+          this.isVerify = false
+          this.startTimer()
+        }
+      } catch (err: any) {
+        this.processing = false
+        if (err.isSuperTokensGeneralError === true) {
+          // this may be a custom error message sent from the API by you,
+          // or if the input email / phone number is not valid.
+          this.errorMessage = err.message
+          this.error = true
+        } else {
+          this.errorMessage = 'Oops! Something went wrong.'
+          this.error = true
         }
       }
     },
@@ -358,7 +475,7 @@ export default defineComponent({
 
       this.processing = true
 
-      if (this.mode === 'emailpassword') {
+      if (this.recepie === 'emailpassword') {
         if (this.isSignIn) {
           this.signIn()
         } else {
@@ -538,9 +655,19 @@ form {
   margin-top: 10px;
 }
 
+.faded-text {
+  padding-left: 3px;
+  padding-right: 3px;
+  line-height: 26px;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.4px;
+  color: rgb(101, 101, 101);
+  margin-top: 10px;
+}
+
 .error-container {
   display: flex;
-  position: absolute;
   width: calc(100% - 24px);
   background-color: #ffcdd2;
   justify-content: center;
