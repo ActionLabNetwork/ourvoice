@@ -13,9 +13,7 @@
         about their work environments.
       </p>
       <div v-if="!session" class="flex justify-center flex-wrap gap-6">
-        <button type="button" class="btn btn-purple btn-hover">
-          <a :href="authURL">Login</a>
-        </button>
+        <a :href="authURL"><button type="button" class="btn btn-purple btn-hover">Login</button></a>
       </div>
     </div>
     <!-- Image -->

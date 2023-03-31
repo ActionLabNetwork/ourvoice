@@ -40,9 +40,6 @@
       </div>
     </div>
     <div v-else class="auth-form-container">
-      <div v-if="error" class="error-container">
-        <div class="error-message">{{ errorMessage }}</div>
-      </div>
       <div
         v-if="recepie === 'emailpassword' && !needsVerifying"
         class="auth-form-content-container"
@@ -62,7 +59,9 @@
         <div class="divider-container">
           <div class="divider" />
         </div>
-
+        <div v-if="error" class="error-container">
+          <div class="error-message">{{ errorMessage }}</div>
+        </div>
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
           <div class="input-section-container" :class="emailError ? 'error' : ''">
             <div class="input-label">Email</div>
@@ -115,6 +114,15 @@
       <div v-if="recepie === 'passwordless' && !needsVerifying" class="auth-form-content-container">
         <div class="form-title">Sign In or Sign Up</div>
 
+        <div class="divider-container">
+          <div class="divider" />
+        </div>
+
+        <div v-if="error" class="error-container">
+          <div class="error-message">{{ errorMessage }}</div>
+        </div>
+
+        <div class="divider-container"></div>
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
           <div class="input-section-container" :class="emailError ? 'error' : ''">
             <div class="input-label">Email</div>
@@ -144,34 +152,35 @@
         <router-link :to="{ path: `/auth/reset-password` }"> Forgot Password? </router-link>
       </div>
       <div v-if="needsVerifying" class="auth-form-content-container">
-        <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-        <div class="form-title" v-html="verifyTitle"></div>
-        <p v-html="verifyText"></p>
-        <div class="divider-container"></div>
-        <span
-          v-if="recepie === 'emailpassword' && !isVerify"
-          class="clickable-text"
-          v-on:click="sendVerificationEmail"
-          >Resend Email</span
-        >
-        <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-        <span v-else class="clickable-text" v-on:click="resendMagicLink">Resend link</span>
-        <span
-          v-if="recepie === 'emailpassword' && !isVerify"
-          class="clickable-text"
-          v-on:click="sendVerificationEmail"
-          >Resend Email</span
-        >
-        <div class="divider-container"></div>
-        <span
-          v-if="recepie === 'emailpassword' && !isVerify"
-          v-on:click="signOut"
-          class="faded-link"
-          >Logout</span
-        >
-        <span v-else v-on:click="reset" class="faded-link">Change email</span>
+        <div class="conformation">
+          <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
+          <div class="form-title" v-html="verifyTitle"></div>
+          <p v-html="verifyText" class="form-subtitle"></p>
+          <span
+            v-if="recepie === 'emailpassword' && !isVerify"
+            class="resend-button"
+            v-on:click="sendVerificationEmail"
+            >Resend Email</span
+          >
+          <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
+          <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+          <span
+            v-if="recepie === 'emailpassword' && !isVerify"
+            class="resend-button"
+            v-on:click="sendVerificationEmail"
+            >Resend Email</span
+          >
+          <div class="divider-container"></div>
+          <span
+            v-if="recepie === 'emailpassword' && !isVerify"
+            v-on:click="signOut"
+            class="faded-link"
+            >Logout</span
+          >
+          <span v-else v-on:click="reset" class="faded-link">Change email</span>
+        </div>
+        <div style="margin-bottom: 10px" />
       </div>
-      <div style="margin-bottom: 10px" />
     </div>
   </div>
 </template>
@@ -238,7 +247,9 @@ export default defineComponent({
     verifyText() {
       return this.recepie == 'emailpassword'
         ? 'To confirm your email address, <strong>click on the link</strong> in the email we sent you.'
-        : `We sent a link to <strong>${this.email}</strong> </br>Click the link to login or sign up`
+        : `We sent a link to <strong> ${
+            this.email !== '' ? this.email : 'your email'
+          } </strong> </br>Click the link to login or sign up`
     },
     counter() {
       return this.period.toString().length === 1 ? `0${this.period}` : this.period
@@ -249,7 +260,7 @@ export default defineComponent({
     const params = new URLSearchParams(window.location.search)
 
     if (params.has('error')) {
-      this.errorMessage = 'Something went wrong'
+      this.errorMessage = params.get('error') || 'Something went wrong'
       this.error = true
     }
     // this redirects the user to the HomeView.vue component if a session
@@ -287,7 +298,7 @@ export default defineComponent({
       await Session.signOut()
       this.handleRedirect()
     },
-    reset() {
+    reset: async function () {
       this.isSignIn = true
       this.email = ''
       this.password = ''
@@ -410,11 +421,11 @@ export default defineComponent({
     },
 
     sendMagicLink: async function () {
-      // if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
-      //   this.processing = false
-      //   window.alert('Organisation does not match')
-      //   return
-      // }
+      if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
+        this.processing = false
+        window.alert('Organisation does not match')
+        return
+      }
       try {
         await Passwordless.createCode({
           email: this.email
@@ -539,6 +550,16 @@ export default defineComponent({
   background-color: white;
 }
 
+.resend-button {
+  padding-left: 3px;
+  padding-right: 3px;
+  color: rgb(0, 118, 255);
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.16px;
+  line-height: 26px;
+}
+
 .form-title {
   font-size: 24px;
   line-height: 40px;
@@ -546,6 +567,10 @@ export default defineComponent({
   font-weight: 800;
   margin-bottom: 2px;
   color: rgb(34, 34, 34);
+}
+
+.form-subtitle {
+  margin-bottom: 10px;
 }
 
 .sign-in-up-text-container {
@@ -676,7 +701,6 @@ form {
   padding-bottom: 2px;
   margin-left: 12px;
   margin-right: 12px;
-  margin-top: 4px;
   border-radius: 6px;
   box-sizing: border-box;
   border-width: 1px;
@@ -703,15 +727,6 @@ form {
   100% {
     transform: translateY(0px);
   }
-}
-
-.fill {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
 }
 
 .spinner {
