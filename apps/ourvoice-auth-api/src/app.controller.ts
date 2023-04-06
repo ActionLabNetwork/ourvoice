@@ -25,7 +25,6 @@ export class AppController {
   @Get('sessioninfo')
   @UseGuards(new AuthGuard())
   async getSessioninfo(@Session() session: SessionContainer): Promise<string> {
-    // TODO: magic
     return JSON.stringify({
       sessionHandle: session?.getHandle(),
       userId: session?.getUserId(),

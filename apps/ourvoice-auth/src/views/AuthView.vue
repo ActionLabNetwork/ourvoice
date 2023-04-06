@@ -419,7 +419,8 @@ export default defineComponent({
     sendMagicLink: async function () {
       if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         this.processing = false
-        window.alert('Organisation does not match')
+        this.errorMessage = 'Organisation does not match'
+        this.error = true
         return
       }
       try {

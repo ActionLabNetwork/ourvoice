@@ -43,11 +43,8 @@ export class SupertokensService {
 
                   // Post sign up response, we check if it was successful
                   if (response.status === 'OK') {
-                    const { id, email } = response.user;
-
-                    // // These are the input form fields values that the user used while signing up
-                    const formFields = input.formFields;
-                    // TODO: add user role to all registered users
+                    const id = response.user.id;
+                    // add `user` role to all registered users
                     addRoleToUser(id);
                   }
                   return response;
@@ -96,6 +93,32 @@ export class SupertokensService {
                 // secure: true,
               },
             }),
+          },
+          override: {
+            apis: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                consumeCodePOST: async (input) => {
+                  if (originalImplementation.consumeCodePOST === undefined) {
+                    throw Error('Should never come here');
+                  }
+                  // First we call the original implementation of consumeCodePOST.
+                  const response = await originalImplementation.consumeCodePOST(
+                    input,
+                  );
+
+                  // Post sign up response, we check if it was successful
+                  if (response.status === 'OK') {
+                    const { id, email, phoneNumber } = response.user;
+                    if (response.createdNewUser) {
+                      // add `user` role to all registered users
+                      addRoleToUser(id);
+                    }
+                  }
+                  return response;
+                },
+              };
+            },
           },
         }),
         Dashboard.init({
