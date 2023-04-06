@@ -14,8 +14,8 @@ async function bootstrap() {
 
   // TODO: add website domain
   const whitelist: string[] = [
-    'http://localhost:3000',
-    'http://localhost:3010',
+    'http://localhost:3001',
+    'http://localhost:3030',
     'http://localhost:3020',
   ];
 

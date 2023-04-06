@@ -36,8 +36,7 @@ import Session from 'supertokens-web-js/recipe/session'
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
-const apiPort = import.meta.env.VUE_APP_API_PORT || 3000
-const apiDomain = import.meta.env.VUE_APP_API_URL || `http://localhost:${apiPort}`
+const apiDomain = import.meta.env.VITE_APP_AUTH_API || `http://localhost:3001`
 
 export default defineComponent({
   data() {

@@ -35,10 +35,11 @@ import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
-const apiPort = import.meta.env.VUE_APP_API_PORT || 3000
-const apiDomain = import.meta.env.VUE_APP_API_URL || `http://localhost:${apiPort}`
+const apiURL = import.meta.env.VITE_APP_API_URL || `http://localhost:3000`
 
-const authURL = import.meta.env.VITE_APP_AUTH_URL || 'http://localhost:3020/auth'
+const authURL =
+  import.meta.env.VITE_APP_AUTH_URL + '/signinWithEmailPassword' ||
+  'http://localhost:3030/signinWithEmailPassword'
 
 export default defineComponent({
   data() {
@@ -79,7 +80,7 @@ export default defineComponent({
     },
 
     callAPI: async function () {
-      const response = await fetch(`${apiDomain}/sessioninfo`)
+      const response = await fetch(`${apiURL}/sessioninfo`)
 
       if (response.status === 401) {
         // this means that the session has expired and the

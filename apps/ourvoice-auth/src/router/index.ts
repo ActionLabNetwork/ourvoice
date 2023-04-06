@@ -12,13 +12,8 @@ const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView
-    // },
     {
-      path: '/auth',
+      path: '/',
       name: 'auth',
       component: AuthView,
       // TODO: might want to use a query parameter for this
@@ -36,7 +31,7 @@ const router = createRouter({
     {
       path: '/signinWithoutPassword',
       name: 'passwordless',
-      redirect: '/auth'
+      redirect: '/'
     },
     {
       path: '/signinWithEmailPassword',
@@ -44,20 +39,20 @@ const router = createRouter({
       beforeEnter: () => {
         redirect.set(adminURL)
       },
-      redirect: '/auth'
+      redirect: '/'
     },
     {
-      path: '/auth/reset-password',
+      path: '/reset-password',
       name: 'resetPassword',
       component: ForgotPasswordView
     },
     {
-      path: '/auth/verify',
+      path: '/verify',
       name: 'verify',
       component: VerifyView
     },
     {
-      path: '/auth/verify-email',
+      path: '/verify-email',
       name: 'verifyemail',
       component: VerifyEmailView
     }

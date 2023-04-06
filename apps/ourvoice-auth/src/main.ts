@@ -11,15 +11,18 @@ import router from './router'
 
 SuperTokens.init({
   appInfo: {
-    apiDomain: 'http://localhost:3000',
-    apiBasePath: '/auth',
-    appName: 'OurVoice'
+    appName: `${import.meta.env.VITE_APP_NAME || 'OurVoice Auth'}`,
+    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL || 'http://localhost:3000'}`,
+    apiBasePath: `${import.meta.env.VITE_APP_AUTH_API_BASE_PATH || '/auth'}`
   },
   recipeList: [
     EmailPassword.init(),
     Passwordless.init(),
     EmailVerification.init(),
-    Session.init({ sessionTokenFrontendDomain: '.localhost' })
+    Session.init({
+      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN || '.localhost'}`,
+      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN || '.localhost'}`
+    })
   ]
 })
 
