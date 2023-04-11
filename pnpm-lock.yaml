@@ -7412,7 +7412,7 @@ packages:
       pretty-format: 28.1.3
       slash: 3.0.0
       strip-json-comments: 3.1.1
-      ts-node: 10.9.1_sipmc4wmi34nvyw2fuyyotjn6y
+      ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -11106,7 +11106,7 @@ packages:
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 28.1.3_nvadb4ngcuh2lyv22apfdo6nc4
+      jest: 28.1.3_zfha7dvnw4nti6zkbsmhmn6xo4
       jest-util: 28.1.3
       json5: 2.2.3
       lodash.memoize: 4.1.2

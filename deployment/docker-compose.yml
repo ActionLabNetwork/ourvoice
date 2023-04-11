@@ -63,9 +63,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack-s3
+    ports:
+      - '4510-4559:4510-4559'
+      - '4566:4566'
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - PERSISTENCE=1
+      - DOCKER_HOST=unix:///var/run/docker.sock      
+    volumes:
+      - ./init/aws:/etc/localstack/init/ready.d      
+      - ${S3_VOLUME_LOCATION:-./volume}:/var/lib/localstack      
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db:
     name: backend
   authdb:
     name: auth
+  localstack:
+    name: s3

@@ -95,6 +95,32 @@ export class SupertokensService {
             }),
           },
           override: {
+            functions: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+
+                // here we are only overriding the function that's responsible
+                // for signing in / up a user.
+                createCode: async function (input) {
+                  // TODO: create custom code generation logic
+                  // or call the default behaviour as show below
+                  // See steps:
+                  // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/createCode.ts
+                  // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/CreateCodeAPI.java
+                  // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L62
+                  return await originalImplementation.createCode(input);
+                },
+                consumeCode: async function (input) {
+                  // TODO: create custom code consumption logic
+                  // or call the default behaviour as show below
+                  // See steps:
+                  // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/consumeCode.ts
+                  // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/ConsumeCodeAPI.java
+                  // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L165
+                  return await originalImplementation.consumeCode(input);
+                },
+              };
+            },
             apis: (originalImplementation) => {
               return {
                 ...originalImplementation,
@@ -106,7 +132,6 @@ export class SupertokensService {
                   const response = await originalImplementation.consumeCodePOST(
                     input,
                   );
-
                   // Post sign up response, we check if it was successful
                   if (response.status === 'OK') {
                     const { id, email, phoneNumber } = response.user;
