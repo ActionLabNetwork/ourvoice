@@ -162,14 +162,10 @@
             v-on:click="sendVerificationEmail"
             >Resend Email</span
           >
-          <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-          <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
-          <span
-            v-if="recepie === 'emailpassword' && !isVerify"
-            class="resend-button"
-            v-on:click="sendVerificationEmail"
-            >Resend Email</span
-          >
+          <div v-else>
+            <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
+            <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+          </div>
           <div class="divider-container"></div>
           <span
             v-if="recepie === 'emailpassword' && !isVerify"
@@ -423,7 +419,8 @@ export default defineComponent({
     sendMagicLink: async function () {
       if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         this.processing = false
-        window.alert('Organisation does not match')
+        this.errorMessage = 'Organisation does not match'
+        this.error = true
         return
       }
       try {

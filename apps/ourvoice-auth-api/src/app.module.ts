@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
       apiKey: `${process.env.SUPERTOKENS_API_KEY}`,
       appInfo: {
         // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
-        appName: `${process.env.SUPERTOKENS_APP_NAME}` || 'Ourvoice API',
+        appName: `${process.env.SUPERTOKENS_APP_NAME}` || 'Ourvoice Auth API',
         apiDomain:
           `${process.env.SUPERTOKENS_API_DOMAIN}` || 'http://localhost:3001',
         apiBasePath: `${process.env.SUPERTOKENS_API_BASE_PATH}` || '/auth',

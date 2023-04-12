@@ -7,16 +7,19 @@ import EmailVerification from 'supertokens-web-js/recipe/emailverification'
 import App from './App.vue'
 import router from './router'
 
-const apiPort = import.meta.env.VITE_APP_API_PORT || 3000
-const apiDomain = import.meta.env.VITE_APP_API_URL || `http://localhost:${apiPort}`
-
 SuperTokens.init({
   appInfo: {
-    apiDomain: apiDomain,
-    apiBasePath: '/auth',
-    appName: 'OurVoice'
+    appName: `${import.meta.env.VITE_APP_NAME || 'OurVoice APP'}`,
+    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL || 'http://localhost:3001'}`,
+    apiBasePath: `${import.meta.env.VITE_APP_AUTH_API_BASE || '/auth'}`
   },
-  recipeList: [Session.init({ sessionTokenFrontendDomain: '.localhost' }), EmailVerification.init()]
+  recipeList: [
+    Session.init({
+      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN || '.localhost'}`,
+      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN || '.localhost'}`
+    }),
+    EmailVerification.init()
+  ]
 })
 
 const app = createApp(App)

@@ -103,10 +103,13 @@ dist
 # TernJS port file
 .tern-port
 
-#Dev DB
+# Dev DBs
 deployment/db
 deployment/db/*
 deployment/db_old
+
+# Localstack (s3)
+deployment/s3
 
 # OS
 .DS_Store
