@@ -1,0 +1,11 @@
+deployment: 'ourvoice.app'
+roles:
+  - user
+  - moderator
+  - admin
+auth:
+  - EmailPassword
+  - Passwordless
+  - Verify
+  - Dashboard
+

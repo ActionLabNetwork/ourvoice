@@ -12,9 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // TODO: add website domain
+  // TODO: add website domains
   const whitelist: string[] = [
-    'http://localhost:3000',
+    configService.get('ORIGIN'), // app itself
     'http://localhost:3010',
     'http://localhost:3020',
   ];
@@ -38,10 +38,6 @@ async function bootstrap() {
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
 
-  //TODO: initiate roles based on config yml/json
-  await createRole('user');
-  await createRole('moderator');
-  await createRole('admin');
   await app.listen(configService.get('PORT') as number);
 }
 

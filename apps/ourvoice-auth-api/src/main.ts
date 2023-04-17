@@ -12,10 +12,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // TODO: add website domain
+  // TODO: add admin and app addresses to list
   const whitelist: string[] = [
-    'http://localhost:3001',
-    'http://localhost:3030',
+    configService.get('SUPERTOKENS_API_DOMAIN'),
+    configService.get('SUPERTOKENS_WEBSITE_DOMAIN'),
     'http://localhost:3020',
     'http://localhost:3010',
   ];
@@ -38,11 +38,10 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-
-  //TODO: initiate roles based on config yml/json
-  await createRole('user');
-  await createRole('moderator');
-  await createRole('admin');
+  // create user roles
+  configService
+    .get<string[]>('roles')
+    .map(async (role) => await createRole(role));
   await app.listen(configService.get('PORT') as number);
 }
 
