@@ -64,9 +64,7 @@ import deployment from './config/deployment';
             password: configService.get<string>('SMTP_PASSWORD'),
           },
           authModules: configService.get<AuthOptions[]>('auth'),
-          cookieDomain:
-            configService.get<string>('SUPERTOKENS_COOKIE_DOMAIN') ||
-            'localhost',
+          cookieDomain: configService.get<string>('SUPERTOKENS_COOKIE_DOMAIN'),
         };
       },
     }),
