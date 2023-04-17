@@ -23,6 +23,22 @@ services:
       - ${POSTGRES_DB_PORT}:5432
     networks:
       - backend
+  premoderation-db:
+    image: postgres:15-alpine
+    container_name: ourvoice-db-premoderation
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB_PREMODERATION}
+    volumes:
+      # mount db volume to the container
+      - ${POSTGRES_DB_PREMODERATION_LOCATION}:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_DB_PREMODERATION_PORT}:5432
+    networks:
+      - backend
+
   # auth db
   authdb:
     image: 'postgres:latest'
@@ -38,12 +54,12 @@ services:
       - backend
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "'${AUTH_POSTGRES_DB}'"]
+      test: ['CMD-SHELL', 'pg_isready', '-d', "'${AUTH_POSTGRES_DB}'"]
       interval: 30s
       timeout: 60s
       retries: 5
       start_period: 80s
-  # auth manager    
+  # auth manager
   supertokens:
     image: registry.supertokens.io/supertokens/supertokens-postgresql:4.3
     container_name: supertokens
@@ -53,7 +69,7 @@ services:
     ports:
       - 3567:3567
     environment:
-      POSTGRESQL_CONNECTION_URI: "postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@authdb:5432/${AUTH_POSTGRES_DB}"
+      POSTGRESQL_CONNECTION_URI: 'postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@authdb:5432/${AUTH_POSTGRES_DB}'
     networks:
       - backend
     restart: unless-stopped
@@ -73,15 +89,17 @@ services:
       - SERVICES=s3
       - DEBUG=1
       - PERSISTENCE=1
-      - DOCKER_HOST=unix:///var/run/docker.sock      
+      - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - ./init/aws:/etc/localstack/init/ready.d      
-      - ${S3_VOLUME_LOCATION:-./volume}:/var/lib/localstack      
+      - ./init/aws:/etc/localstack/init/ready.d
+      - ${S3_VOLUME_LOCATION:-./volume}:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db:
     name: backend
+  premoderation-db:
+    name: premoderation
   authdb:
     name: auth
   localstack:
