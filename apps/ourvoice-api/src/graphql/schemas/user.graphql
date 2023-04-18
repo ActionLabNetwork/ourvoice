@@ -1,0 +1,54 @@
+type Query {
+  user(id: Int!): User
+  users: [User!]!
+}
+
+type Mutation {
+  createUser(data: UserCreateInput!): User!
+  updateUser(id: Int!, data: UserUpdateInput!): User!
+  deleteUser(id: Int!): User!
+}
+
+type User {
+  id: Int!
+  orgId: Int!
+  hash: String!
+  title: String
+  nickname: String
+  type: UserType!
+  active: Boolean
+  createdAt: DateTime
+  disabledAt: DateTime
+  updatedAt: DateTime
+  verifiedAt: DateTime
+  comments: [Comment!]!
+  posts: [Post!]!
+}
+
+type UserType {
+  id: Int!
+  type: String!
+  users: [User!]!
+}
+
+input UserCreateInput {
+  orgId: Int!
+  hash: String!
+  title: String
+  nickname: String
+  typeId: Int!
+  active: Boolean
+  disabledAt: DateTime
+  verifiedAt: DateTime
+}
+
+input UserUpdateInput {
+  orgId: Int
+  hash: String
+  title: String
+  nickname: String
+  typeId: Int
+  active: Boolean
+  disabledAt: DateTime
+  verifiedAt: DateTime
+}

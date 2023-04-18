@@ -1,0 +1,39 @@
+type Query {
+  category(id: Int!): Category
+  categories: [Category!]!
+}
+
+type Mutation {
+  createCategory(data: CategoryCreateInput!): Category!
+  updateCategory(id: Int!, data: CategoryUpdateInput!): Category!
+  deleteCategory(id: Int!): Category!
+}
+
+type Category {
+  id: Int!
+  name: String!
+  description: String
+  weight: Int!
+  active: Boolean!
+  createdAt: DateTime
+  disabledAt: DateTime
+  parent: Category
+  children: [Category!]!
+  posts: [Post!]!
+}
+
+input CategoryCreateInput {
+  name: String!
+  description: String
+  weight: Int
+  active: Boolean
+  parentId: Int
+}
+
+input CategoryUpdateInput {
+  name: String
+  description: String
+  weight: Int
+  active: Boolean
+  parentId: Int
+}
