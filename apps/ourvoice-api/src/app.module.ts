@@ -1,3 +1,6 @@
+import { PostModule } from './modules/post/post.module';
+import { PostService } from './modules/post/post.service';
+import { PostController } from './modules/post/post.controller';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -30,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
         password: `${process.env.SMTP_PASSWORD}`,
       },
     }),
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],

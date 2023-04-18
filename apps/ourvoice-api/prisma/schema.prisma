@@ -63,7 +63,7 @@ model Post {
 
 model Category {
   id          Int     @id @default(autoincrement())
-  name        String
+  name        String  @unique
   description String?
   weight      Int     @default(0)
   active      Boolean @default(true)

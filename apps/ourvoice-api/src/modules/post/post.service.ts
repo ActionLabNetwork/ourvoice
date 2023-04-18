@@ -1,3 +1,5 @@
+import { PostCreateDto } from './dto/post-create.dto';
+import { PostUpdateDto } from './dto/post-update.dto';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Post } from '@prisma/client';
 import { PostRepository } from './post.repository';
@@ -6,8 +8,12 @@ import { PostRepository } from './post.repository';
 export class PostService {
   constructor(private postRepository: PostRepository) {}
 
-  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
-    return this.postRepository.createPost(data);
+  async createPost(data: PostCreateDto): Promise<Post> {
+    const postData = {
+      ...data,
+      author: { connect: { id: data.authorId } },
+    };
+    return this.postRepository.createPost(postData);
   }
 
   async getPostById(id: number): Promise<Post> {
@@ -18,7 +24,7 @@ export class PostService {
     return this.postRepository.getPostsByCategories(categoryNames);
   }
 
-  async updatePost(id: number, data: Prisma.PostUpdateInput): Promise<Post> {
+  async updatePost(id: number, data: PostUpdateDto): Promise<Post> {
     return this.postRepository.updatePost(id, data);
   }
 

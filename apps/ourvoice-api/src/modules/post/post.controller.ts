@@ -1,12 +1,17 @@
+import { PostUpdateDto } from './dto/post-update.dto';
+import { PostCreateDto } from './dto/post-create.dto';
 import {
   Body,
   Controller,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Post as PostModel } from '@prisma/client';
 import { PostService } from './post.service';
@@ -16,33 +21,34 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  async createPost(@Body() data: any): Promise<PostModel> {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async createPost(@Body() data: PostCreateDto): Promise<PostModel> {
     return this.postService.createPost(data);
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string): Promise<PostModel> {
-    return this.postService.getPostById(Number(id));
+  async getPostById(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
+    return this.postService.getPostById(id);
   }
 
   @Get()
   async getPostsByCategories(
-    @Query('categories') categories: string,
+    @Query('categories') categories: string[],
   ): Promise<PostModel[]> {
-    const categoryNames = categories.split(',');
-    return this.postService.getPostsByCategories(categoryNames);
+    return this.postService.getPostsByCategories(categories);
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updatePost(
-    @Param('id') id: string,
-    @Body() data: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: PostUpdateDto,
   ): Promise<PostModel> {
-    return this.postService.updatePost(Number(id), data);
+    return this.postService.updatePost(id, data);
   }
 
   @Delete(':id')
-  async deletePost(@Param('id') id: string): Promise<PostModel> {
-    return this.postService.deletePost(Number(id));
+  async deletePost(@Param('id', ParseIntPipe) id: number): Promise<PostModel> {
+    return this.postService.deletePost(id);
   }
 }
