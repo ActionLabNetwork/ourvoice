@@ -1,6 +1,4 @@
 import { PostModule } from './modules/post/post.module';
-import { PostService } from './modules/post/post.service';
-import { PostController } from './modules/post/post.controller';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -8,6 +6,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
+import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
+import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -31,6 +33,16 @@ import { AuthModule } from './auth/auth.module';
         port: Number(process.env.SMTP_PORT),
         user: `${process.env.SMTP_USER}`,
         password: `${process.env.SMTP_PASSWORD}`,
+      },
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        path: join(process.cwd(), 'src/graphql.ts'),
+        outputAs: 'class',
       },
     }),
     PostModule,
