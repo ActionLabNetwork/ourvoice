@@ -10,6 +10,14 @@ async function clearDatabase() {
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
   await prisma.userType.deleteMany();
+
+  // Reset autoincrement IDs
+  await prisma.$executeRaw`ALTER SEQUENCE "Vote_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Comment_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Post_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Category_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "User_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "UserType_id_seq" RESTART WITH 1;`;
 }
 
 async function main() {
@@ -152,6 +160,23 @@ async function main() {
       weight: 1,
       parent: { connect: { id: category1.id } },
       active: true,
+    },
+  });
+
+  const post4 = await prisma.post.create({
+    data: {
+      title: 'Post 4',
+      content: 'This is the content of post 4',
+      file: 'https://example.com/file4.jpg',
+      moderated: true,
+      published: true,
+      votesUp: 0,
+      votesDown: 0,
+      author: { connect: { id: user3.id } },
+      createdAt: new Date('2023-04-15T10:00:00Z'),
+      categories: {
+        connect: [{ id: category1.id }, { id: category2.id }],
+      },
     },
   });
 
