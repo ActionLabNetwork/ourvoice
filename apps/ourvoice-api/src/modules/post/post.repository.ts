@@ -14,7 +14,11 @@ export class PostRepository {
     return this.prisma.post.findUnique({ where: { id } });
   }
 
-  async getPostsByCategories(categoryNames: string[]): Promise<Post[]> {
+  async getPostsByCategories(
+    categoryNames: string[],
+    skip: number,
+    take: number,
+  ): Promise<Post[]> {
     return await this.prisma.post.findMany({
       where: {
         categories: {
@@ -29,6 +33,8 @@ export class PostRepository {
       include: {
         categories: true,
       },
+      skip,
+      take,
     });
   }
 

@@ -1,6 +1,6 @@
 import { PostCreateDto } from 'src/modules/post/dto/post-create.dto';
 import { PostUpdateDto } from 'src/modules/post/dto/post-update.dto';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
 
 @Resolver('Post')
@@ -13,8 +13,12 @@ export class PostResolver {
   }
 
   @Query()
-  async postsByCategories(@Args('categories') categories: string[]) {
-    return this.postService.getPostsByCategories(categories);
+  async postsByCategories(
+    @Args('categories', { type: () => [String] }) categories: string[],
+    @Args('skip', { type: () => Int, defaultValue: 0 }) skip: number,
+    @Args('take', { type: () => Int, defaultValue: 10 }) take: number,
+  ) {
+    return this.postService.getPostsByCategories(categories, skip, take);
   }
 
   @Mutation()

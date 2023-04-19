@@ -20,8 +20,12 @@ export class PostService {
     return this.postRepository.getPostById(id);
   }
 
-  async getPostsByCategories(categoryNames: string[]): Promise<Post[]> {
-    return this.postRepository.getPostsByCategories(categoryNames);
+  async getPostsByCategories(
+    categoryNames: string[],
+    skip: number,
+    take: number,
+  ): Promise<Post[]> {
+    return this.postRepository.getPostsByCategories(categoryNames, skip, take);
   }
 
   async updatePost(id: number, data: PostUpdateDto): Promise<Post> {

@@ -15,7 +15,11 @@ export class CategoryRepository {
     return this.prisma.category.findUnique({ where: { id } });
   }
 
-  async getCategoriesByNames(name: string[]): Promise<Category[]> {
+  async getCategoriesByNames(
+    name: string[],
+    skip: number,
+    take: number,
+  ): Promise<Category[]> {
     return this.prisma.category.findMany({
       where: {
         name: {
@@ -23,6 +27,8 @@ export class CategoryRepository {
           mode: 'insensitive',
         },
       },
+      skip,
+      take,
     });
   }
 

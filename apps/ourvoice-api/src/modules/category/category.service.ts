@@ -15,8 +15,12 @@ export class CategoryService {
     return this.categoryRepository.getCategoryById(id);
   }
 
-  async getCategoriesByNames(name: string[]): Promise<Category[]> {
-    return this.categoryRepository.getCategoriesByNames(name);
+  async getCategoriesByNames(
+    name: string[],
+    skip: number,
+    take: number,
+  ): Promise<Category[]> {
+    return this.categoryRepository.getCategoriesByNames(name, skip, take);
   }
 
   async updateCategory(id: number, data: CategoryUpdateDto): Promise<Category> {
