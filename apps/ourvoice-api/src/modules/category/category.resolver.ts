@@ -1,7 +1,6 @@
+import { CategoryCreateInput, CategoryUpdateInput } from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Category } from '@prisma/client';
-import { CategoryCreateDto } from './dto/category-create.dto';
-import { CategoryUpdateDto } from './dto/category-update.dto';
 import { CategoryService } from './category.service';
 
 @Resolver('Category')
@@ -26,7 +25,7 @@ export class CategoryResolver {
 
   @Mutation()
   async createCategory(
-    @Args('data') data: CategoryCreateDto,
+    @Args('data') data: CategoryCreateInput,
   ): Promise<Category> {
     return this.categoryService.createCategory(data);
   }
@@ -34,7 +33,7 @@ export class CategoryResolver {
   @Mutation()
   async updateCategory(
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: CategoryUpdateDto,
+    @Args('data') data: CategoryUpdateInput,
   ): Promise<Category> {
     return this.categoryService.updateCategory(id, data);
   }

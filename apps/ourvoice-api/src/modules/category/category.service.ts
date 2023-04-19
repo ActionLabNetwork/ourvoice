@@ -1,5 +1,4 @@
-import { CategoryUpdateDto } from './dto/category-update.dto';
-import { CategoryCreateDto } from './dto/category-create.dto';
+import { CategoryCreateInput, CategoryUpdateInput } from './../../graphql';
 import { CategoryRepository } from './category.repository';
 import { Injectable } from '@nestjs/common';
 import { Category } from '@prisma/client';
@@ -7,7 +6,7 @@ import { Category } from '@prisma/client';
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async createCategory(data: CategoryCreateDto): Promise<Category> {
+  async createCategory(data: CategoryCreateInput): Promise<Category> {
     return this.categoryRepository.createCategory(data);
   }
 
@@ -23,7 +22,10 @@ export class CategoryService {
     return this.categoryRepository.getCategoriesByNames(name, skip, take);
   }
 
-  async updateCategory(id: number, data: CategoryUpdateDto): Promise<Category> {
+  async updateCategory(
+    id: number,
+    data: CategoryUpdateInput,
+  ): Promise<Category> {
     return this.categoryRepository.update(id, data);
   }
 

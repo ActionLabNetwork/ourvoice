@@ -1,5 +1,4 @@
-import { PostCreateDto } from 'src/modules/post/dto/post-create.dto';
-import { PostUpdateDto } from 'src/modules/post/dto/post-update.dto';
+import { PostCreateInput, PostUpdateInput } from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
 
@@ -22,12 +21,15 @@ export class PostResolver {
   }
 
   @Mutation()
-  async createPost(@Args('data') data: PostCreateDto) {
+  async createPost(@Args('data') data: PostCreateInput) {
     return this.postService.createPost(data);
   }
 
   @Mutation()
-  async updatePost(@Args('id') id: number, @Args('data') data: PostUpdateDto) {
+  async updatePost(
+    @Args('id') id: number,
+    @Args('data') data: PostUpdateInput,
+  ) {
     return this.postService.updatePost(id, data);
   }
 
