@@ -7,22 +7,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class CategoryCreateInput {
-    name: string;
-    description?: Nullable<string>;
-    weight?: Nullable<number>;
-    active?: Nullable<boolean>;
-    parentId?: Nullable<number>;
-}
-
-export class CategoryUpdateInput {
-    name?: Nullable<string>;
-    description?: Nullable<string>;
-    weight?: Nullable<number>;
-    active?: Nullable<boolean>;
-    parentId?: Nullable<number>;
-}
-
 export class CommentCreateInput {
     content: string;
     moderated?: Nullable<boolean>;
@@ -66,6 +50,18 @@ export class VoteCreateInput {
     postId: number;
 }
 
+export class CategoryCreateInput {
+    name: string;
+    description?: Nullable<string>;
+    parentId?: Nullable<number>;
+}
+
+export class CategoryUpdateInput {
+    name?: Nullable<string>;
+    description?: Nullable<string>;
+    parentId?: Nullable<number>;
+}
+
 export class PostCreateInput {
     title?: Nullable<string>;
     content: string;
@@ -91,10 +87,6 @@ export class PostUpdateInput {
 }
 
 export abstract class IQuery {
-    abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
-
-    abstract categories(): Category[] | Promise<Category[]>;
-
     abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
 
     abstract comments(): Comment[] | Promise<Comment[]>;
@@ -105,18 +97,16 @@ export abstract class IQuery {
 
     abstract users(): User[] | Promise<User[]>;
 
+    abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
+
+    abstract categoriesByNames(names: string[]): Category[] | Promise<Category[]>;
+
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
     abstract postsByCategories(categories: string[]): Post[] | Promise<Post[]>;
 }
 
 export abstract class IMutation {
-    abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
-
-    abstract updateCategory(id: number, data: CategoryUpdateInput): Category | Promise<Category>;
-
-    abstract deleteCategory(id: number): Category | Promise<Category>;
-
     abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
 
     abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
@@ -135,24 +125,17 @@ export abstract class IMutation {
 
     abstract deleteVote(id: number): Vote | Promise<Vote>;
 
+    abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
+
+    abstract updateCategory(id: number, data: CategoryUpdateInput): Category | Promise<Category>;
+
+    abstract deleteCategory(id: number): Category | Promise<Category>;
+
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
     abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
-}
-
-export class Category {
-    id: number;
-    name: string;
-    description?: Nullable<string>;
-    weight: number;
-    active: boolean;
-    createdAt?: Nullable<DateTime>;
-    disabledAt?: Nullable<DateTime>;
-    parent?: Nullable<Category>;
-    children: Category[];
-    posts: Post[];
 }
 
 export class Comment {
@@ -197,6 +180,19 @@ export class Vote {
     voteType: string;
     user: User;
     post: Post;
+}
+
+export class Category {
+    id: number;
+    name: string;
+    description?: Nullable<string>;
+    weight: number;
+    active: boolean;
+    createdAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    parent?: Nullable<Category>;
+    children: Category[];
+    posts: Post[];
 }
 
 export class Post {

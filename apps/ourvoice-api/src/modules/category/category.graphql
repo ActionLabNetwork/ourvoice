@@ -1,6 +1,6 @@
 type Query {
   category(id: Int!): Category
-  categories: [Category!]!
+  categoriesByNames(names: [String!]!): [Category!]!
 }
 
 type Mutation {
@@ -25,15 +25,11 @@ type Category {
 input CategoryCreateInput {
   name: String!
   description: String
-  weight: Int
-  active: Boolean
   parentId: Int
 }
 
 input CategoryUpdateInput {
   name: String
   description: String
-  weight: Int
-  active: Boolean
   parentId: Int
 }

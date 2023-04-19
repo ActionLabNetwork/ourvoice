@@ -1,12 +1,12 @@
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
 import { Injectable } from '@nestjs/common';
-import { Prisma, Post } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { PostRepository } from './post.repository';
 
 @Injectable()
 export class PostService {
-  constructor(private postRepository: PostRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async createPost(data: PostCreateDto): Promise<Post> {
     const postData = {

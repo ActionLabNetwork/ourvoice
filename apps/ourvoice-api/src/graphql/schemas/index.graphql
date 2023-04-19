@@ -1,6 +1,6 @@
 #import "./user.graphql"
 # import "../../modules/post/post.graphql"
-# import "./category.graphql"
+# import "../../modules/category/category.graphql"
 # import "./comment.graphql"
 # import "./vote.graphql"
 # import "./datetime.graphql"

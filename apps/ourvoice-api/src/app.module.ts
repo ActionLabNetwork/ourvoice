@@ -1,3 +1,4 @@
+import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -46,6 +47,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       },
     }),
     PostModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

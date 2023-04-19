@@ -4,7 +4,7 @@ import { Post, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async createPost(data: Prisma.PostCreateInput) {
     return this.prisma.post.create({ data });
