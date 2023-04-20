@@ -164,6 +164,9 @@ importers:
       '@apollo/server':
         specifier: ^4.6.0
         version: 4.6.0(graphql@16.6.0)
+      '@golevelup/ts-jest':
+        specifier: ^0.3.5
+        version: 0.3.5
       '@nestjs/apollo':
         specifier: ^11.0.5
         version: 11.0.5(@apollo/server@4.6.0)(@apollo/subgraph@2.4.1)(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)(@nestjs/graphql@11.0.5)(graphql@16.6.0)
@@ -220,8 +223,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.4(chokidar@3.5.3)(typescript@4.9.4)
       '@nestjs/testing':
-        specifier: ^9.0.0
-        version: 9.2.1(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)(@nestjs/platform-express@9.2.1)
+        specifier: ^9.4.0
+        version: 9.4.0(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)(@nestjs/platform-express@9.2.1)
       '@types/express':
         specifier: ^4.17.13
         version: 4.17.15
@@ -1674,6 +1677,10 @@ packages:
       vue: 3.2.45
     dev: false
 
+  /@golevelup/ts-jest@0.3.5:
+    resolution: {integrity: sha512-Ul4+JsIcKSwzqM78ZwGU9xNvisNoPnHVNEwHK+t8s/WpQVOx+f8W61SIi6OcPpnkyFqyEHGBkOmTGXj3nRQwbg==}
+    dev: false
+
   /@graphql-tools/merge@8.4.0(graphql@16.6.0):
     resolution: {integrity: sha512-3XYCWe0d3I4F1azNj1CdShlbHfTIfiDgj00R9uvFH8tHKh7i1IWN3F7QQYovcHKhayaR6zPok3YYMESYQcBoaA==}
     peerDependencies:
@@ -2410,8 +2417,8 @@ packages:
       tslib: 2.4.1
     dev: true
 
-  /@nestjs/testing@9.2.1(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)(@nestjs/platform-express@9.2.1):
-    resolution: {integrity: sha512-lemXZdRSuqoZ87l0orCrS/c7gqwxeduIFOd21g9g2RUeQ4qlWPegbQDKASzbfC28klPyrgJLW4MNq7uv2JwV8w==}
+  /@nestjs/testing@9.4.0(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)(@nestjs/platform-express@9.2.1):
+    resolution: {integrity: sha512-xZWp363P4otcebg++gSjUcdCfTK0RorORzyFq3aLaSAQOlq8kxfFDRIKzEATR4aOUfqTMMsAA8lhnMJWf35N6A==}
     peerDependencies:
       '@nestjs/common': ^9.0.0
       '@nestjs/core': ^9.0.0
@@ -2426,7 +2433,7 @@ packages:
       '@nestjs/common': 9.4.0(class-transformer@0.5.1)(class-validator@0.14.0)(reflect-metadata@0.1.13)(rxjs@7.8.0)
       '@nestjs/core': 9.4.0(@nestjs/common@9.4.0)(@nestjs/platform-express@9.2.1)(reflect-metadata@0.1.13)(rxjs@7.8.0)
       '@nestjs/platform-express': 9.2.1(@nestjs/common@9.4.0)(@nestjs/core@9.4.0)
-      tslib: 2.4.1
+      tslib: 2.5.0
     dev: true
 
   /@netlify/functions@1.4.0:
