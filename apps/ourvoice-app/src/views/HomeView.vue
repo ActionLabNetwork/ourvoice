@@ -39,6 +39,7 @@ const authURL =
   'http://localhost:3030/signinWithoutPassword'
 
 export default defineComponent({
+  props: ['deployment'],
   data() {
     return {
       // if session is false, we show a blank screen
@@ -90,6 +91,7 @@ export default defineComponent({
   },
 
   mounted() {
+    console.log(this.deployment)
     // this function checks if a session exists, and if not,
     // it will redirect to the login screen.
     this.checkForSession()

@@ -5,7 +5,6 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
-import { createRole } from './auth/roles.service';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {

@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import imgUrl from '@/public/img/ourvoice_logo.svg'
+import imgUrl from '@/assets/img/ourvoice_logo.svg'
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent({

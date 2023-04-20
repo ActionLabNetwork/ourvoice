@@ -22,10 +22,10 @@
 <script lang="ts">
 import type { SystemPropertyType } from '@/types'
 import type { Ref } from 'vue'
-import imgUrl1 from '@/public/img/anonymity.png'
-import imgUrl3 from '@/public/img/moderation.png'
-import imgUrl2 from '@/public/img/slow_convo.png'
-import imgUrl4 from '@/public/img/validation.png'
+import imgUrl1 from '@/assets/img/anonymity.png'
+import imgUrl3 from '@/assets/img/moderation.png'
+import imgUrl2 from '@/assets/img/slow_convo.png'
+import imgUrl4 from '@/assets/img/validation.png'
 import { defineComponent, ref } from 'vue'
 
 import SystemProperty from './SystemProperty.vue'

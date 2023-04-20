@@ -40,8 +40,8 @@
 </template>
 
 <script lang="ts">
+import imgUrl from '@/assets/img/try_it.png'
 import Modal from '@/components/utils/Modal.vue'
-import imgUrl from '@/public/img/try_it.png'
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

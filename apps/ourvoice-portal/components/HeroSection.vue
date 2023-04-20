@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import imgUrl from '@/public/img/hero_image.png'
+import imgUrl from '@/assets/img/hero_image.png'
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent({

@@ -141,10 +141,10 @@ export class SupertokensService {
                 );
                 // Post sign up response, we check if it was successful
                 if (response.status === 'OK') {
-                  const { id, email, phoneNumber } = response.user;
+                  // const { id, email, phoneNumber } = response.user;
                   if (response.createdNewUser) {
                     // add `user` role to all registered users
-                    addRoleToUser(id);
+                    addRoleToUser(response.user.id);
                   }
                 }
                 return response;

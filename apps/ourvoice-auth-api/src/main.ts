@@ -18,11 +18,14 @@ async function bootstrap() {
     configService.get('SUPERTOKENS_WEBSITE_DOMAIN'),
     'http://localhost:3020',
     'http://localhost:3010',
+    'http://demo.localhost:3010',
+    'http://www.demo.localhost:3010',
   ];
-
+  // TODO : use regex for all deployment names
   app.enableCors({
     // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
+      console.log(origin);
       if (!origin || whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
