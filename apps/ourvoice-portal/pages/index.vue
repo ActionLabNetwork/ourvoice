@@ -1,5 +1,5 @@
 <template>
-  <div class>
+  <div>
     <!-- Navigation -->
     <header>
       <NavigationBar :index="index" />
