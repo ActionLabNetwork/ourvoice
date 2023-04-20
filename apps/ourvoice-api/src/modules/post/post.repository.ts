@@ -22,7 +22,7 @@ export class PostRepository {
     return await this.prisma.post.findMany({
       where: {
         categories: {
-          every: {
+          some: {
             name: {
               in: categoryNames,
               mode: 'insensitive',

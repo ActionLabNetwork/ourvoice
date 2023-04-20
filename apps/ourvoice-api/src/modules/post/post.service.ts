@@ -8,12 +8,10 @@ export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
   async createPost(data: PostCreateInput): Promise<Post> {
-    const { authorId, categoryIds: categories } = data;
-    delete data.authorId;
-    delete data.categoryIds;
+    const { authorId, categoryIds: categories, ...restData } = data;
 
     const postData = {
-      ...data,
+      ...restData,
       author: { connect: { id: authorId } },
       categories: {
         connect: categories.map((id) => ({ id })),
