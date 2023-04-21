@@ -9,35 +9,52 @@
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
           <div class="mb-6">
             <label for="title" class="block text-gray-700 mb-2 text-md">Title</label>
-            <input
-              id="title"
-              v-model="title"
-              type="text"
-              placeholder="Share your thoughts anonymously"
-              class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200 font-semibold"
-            />
+            <div class="flex">
+              <span class="bg-gray-200 p-2 rounded-l-md">
+                <font-awesome-icon :icon="['fas', 'heading']" class="icon-color" />
+              </span>
+              <input
+                v-model="title"
+                type="text"
+                id="title"
+                placeholder="Share your thoughts anonymously"
+                class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200 font-semibold"
+              />
+            </div>
           </div>
           <div class="mb-6">
-            <label class="block text-gray-700 text-md mb-2">Content</label>
+            <label for="content" class="block text-gray-700 text-md mb-2">Content</label>
             <textarea
+              id="content"
               v-model="content"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
               placeholder="I have an idea for improving..."
+              @input="updateCharacterCount"
             ></textarea>
+            <div class="flex flex-col text-right">
+              <span class="text-gray-500">{{ characterCount }} / 50</span>
+              <span class="text-red-500">{{ contentError }}</span>
+            </div>
           </div>
           <div class="mb-6">
-            <label class="block text-gray-700 text-md mb-2">Categories</label>
-            <Multiselect v-model="selectedCategories" :options="categories" mode="tags" :searchable="true" required :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+            <label for="categories" class="block text-gray-700 text-md mb-2">Categories</label>
+            <Multiselect id="categories" v-model="selectedCategories" :options="categories" mode="tags" :searchable="true" required :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
           </div>
           <div class="mb-6">
-            <label class="block text-gray-700 text-md mb-2">Attachments</label>
-            <input
-              @change="updateAttachments"
-              type="file"
-              class="w-full mt-1 border border-solid border-gray-300 rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
-              multiple
-            />
+            <label for="attachments" class="block text-gray-700 text-md mb-2">Attachments</label>
+            <div class="flex">
+              <span class="bg-gray-200 px-2 py-3 rounded-l-md">
+                <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />
+              </span>
+              <input
+                @change="updateAttachments"
+                type="file"
+                id="attachments"
+                class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
+                multiple
+                />
+            </div>
           </div>
           <div class="flex justify-end">
             <button
@@ -57,6 +74,8 @@
 import { ref } from 'vue';
 import Multiselect from '@vueform/multiselect';
 
+const postCharacterLimit = 50;
+
 export default {
   components: { Multiselect },
   setup() {
@@ -66,6 +85,13 @@ export default {
     const categories = ref(['Technology', 'Business', 'Design', 'Science', 'Health']);
     const selectedCategories = ref<string[]>([])
     const attachments = ref<FileList | null>(null);
+    const characterCount = ref(0)
+    const contentError = ref('')
+
+    const updateCharacterCount = () => {
+      characterCount.value = content.value.length
+      contentError.value = content.value.length > postCharacterLimit ? `Content must not exceed ${postCharacterLimit} characters.` : '';
+    }
 
     const updateAttachments = (event: Event) => {
       const files = (event.target as HTMLInputElement).files;
@@ -93,6 +119,9 @@ export default {
       categories,
       selectedCategories,
       attachments,
+      updateCharacterCount,
+      characterCount,
+      contentError,
       updateAttachments,
       submitForm,
     };
@@ -112,5 +141,14 @@ export default {
   --ms-tag-color: #2563EB;
   --ms-border-color-active: var(--form-brand-blue);
   --ms-ring-width: 0;
+}
+</style>
+<style scoped>
+.icon-color {
+  color: #5c5e61;
+}
+
+input[type="file"] {
+  cursor: pointer;
 }
 </style>
