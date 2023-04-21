@@ -39,7 +39,7 @@
           </div>
           <div class="mb-6">
             <label for="categories" class="block text-gray-700 text-md mb-2">Categories</label>
-            <Multiselect id="categories" v-model="selectedCategories" :options="categories" mode="tags" :searchable="true" required :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+            <Multiselect id="categories" v-model="selectedCategories" :options="categories.data.map(({ name }) => name)" mode="tags" :searchable="true" required :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
           </div>
           <div class="mb-6">
             <label for="attachments" class="block text-gray-700 text-md mb-2">Attachments</label>
@@ -71,18 +71,39 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import Multiselect from '@vueform/multiselect';
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
 
 const postCharacterLimit = 50;
+
+interface CategoriesObjType {
+  data: { id: number, name: string }[];
+  loading: boolean;
+  error: Error | undefined
+}
 
 export default {
   components: { Multiselect },
   setup() {
+    const { onResult } = useQuery<{ categories: { id: number, name: string }[] }>(gql`
+      query {
+        categories {
+          id
+          name
+        }
+      }
+    `)
+
     const title = ref('');
     const content = ref('');
     const category = ref('');
-    const categories = ref(['Technology', 'Business', 'Design', 'Science', 'Health']);
+    const categories = reactive<CategoriesObjType>({
+      data: [],
+      loading: false,
+      error: undefined
+    })
     const selectedCategories = ref<string[]>([])
     const attachments = ref<FileList | null>(null);
     const characterCount = ref(0)
@@ -111,6 +132,12 @@ export default {
       category.value = '';
       attachments.value = null;
     };
+
+    onResult(({ data, loading, error }) => {
+      categories.data = data.categories.map(({ id, name }) => ({ id, name }))
+      categories.loading = loading
+      categories.error = error
+    });
 
     return {
       title,
