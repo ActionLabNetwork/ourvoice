@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const prisma = new PrismaClient();
 
@@ -21,181 +23,111 @@ async function clearDatabase() {
 }
 
 async function main() {
+  console.log('Seeding database...');
   await clearDatabase();
 
+  const seedDataPath = join(__dirname, 'seed-data.json');
+  const seedData = JSON.parse(readFileSync(seedDataPath, 'utf-8'));
+
   // User Types
-  const userTypeAdmin = await prisma.userType.create({
-    data: { type: 'Admin' },
-  });
-  const userTypeModerator = await prisma.userType.create({
-    data: { type: 'Moderator' },
-  });
-  const userTypeUser = await prisma.userType.create({ data: { type: 'User' } });
+  const userTypeData = seedData.userTypes;
+  const userTypes = [];
+  for (const data of userTypeData) {
+    const userType = await prisma.userType.create({ data });
+    userTypes.push(userType);
+  }
 
   // Users
-  const user1 = await prisma.user.create({
-    data: {
-      orgId: 1,
-      hash: 'user1hash',
-      title: 'User 1',
-      nickname: 'user1',
-      type: { connect: { id: userTypeAdmin.id } },
-      active: true,
-    },
-  });
-
-  const user2 = await prisma.user.create({
-    data: {
-      orgId: 2,
-      hash: 'user2hash',
-      title: 'User 2',
-      nickname: 'user2',
-      type: { connect: { id: userTypeModerator.id } },
-      active: true,
-    },
-  });
-
-  const user3 = await prisma.user.create({
-    data: {
-      orgId: 3,
-      hash: 'user3hash',
-      title: 'User 3',
-      nickname: 'user3',
-      type: { connect: { id: userTypeUser.id } },
-      active: true,
-    },
-  });
-
-  // Posts
-  const post1 = await prisma.post.create({
-    data: {
-      title: 'Post 1',
-      content: 'This is the content of post 1',
-      file: 'https://example.com/file1.jpg',
-      moderated: true,
-      published: true,
-      votesUp: 5,
-      votesDown: 1,
-      author: { connect: { id: user1.id } },
-      createdAt: new Date('2023-04-13T10:00:00Z'),
-    },
-  });
-
-  const post2 = await prisma.post.create({
-    data: {
-      title: 'Post 2',
-      content: 'This is the content of post 2',
-      file: 'https://example.com/file2.jpg',
-      moderated: true,
-      published: true,
-      votesUp: 2,
-      votesDown: 0,
-      author: { connect: { id: user2.id } },
-      createdAt: new Date('2023-04-13T11:00:00Z'),
-    },
-  });
-
-  const post3 = await prisma.post.create({
-    data: {
-      title: 'Post 3',
-      content: 'This is the content of post 3',
-      file: 'https://example.com/file3.jpg',
-      moderated: false,
-      published: false,
-      votesUp: 0,
-      votesDown: 0,
-      author: { connect: { id: user3.id } },
-      createdAt: new Date('2023-04-14T10:00:00Z'),
-    },
-  });
-
-  // Comments
-  const comment1 = await prisma.comment.create({
-    data: {
-      content: 'This is a comment on post 1',
-      moderated: true,
-      published: true,
-      author: { connect: { id: user1.id } },
-      post: { connect: { id: post1.id } },
-      createdAt: new Date('2023-04-13T10:30:00Z'),
-    },
-  });
-
-  const comment2 = await prisma.comment.create({
-    data: {
-      content: 'This is a comment on post 2',
-      moderated: true,
-      published: true,
-      author: { connect: { id: user2.id } },
-      post: { connect: { id: post2.id } },
-      createdAt: new Date('2023-04-13T11:30:00Z'),
-    },
-  });
-
-  const comment3 = await prisma.comment.create({
-    data: {
-      content: 'This is a reply to comment 1',
-      moderated: false,
-      published: false,
-      author: { connect: { id: user1.id } },
-      post: { connect: { id: post1.id } },
-      parent: { connect: { id: comment1.id } },
-      createdAt: new Date('2023-04-14T10:30:00Z'),
-    },
-  });
+  const userData = seedData.users;
+  const users = [];
+  for (const data of userData) {
+    const { typeId, ...rest } = data;
+    const user = await prisma.user.create({
+      data: { ...rest, type: { connect: { id: typeId } } },
+    });
+    users.push(user);
+  }
 
   // Categories
-  const category1 = await prisma.category.create({
-    data: {
-      name: 'Category 1',
-      description: 'This is the description of Category 1',
-      weight: 2,
-      active: true,
-    },
-  });
-
-  const category2 = await prisma.category.create({
-    data: {
-      name: 'Category 2',
-      weight: 1,
-      parent: { connect: { id: category1.id } },
-      active: true,
-    },
-  });
-
-  const post4 = await prisma.post.create({
-    data: {
-      title: 'Post 4',
-      content: 'This is the content of post 4',
-      file: 'https://example.com/file4.jpg',
-      moderated: true,
-      published: true,
-      votesUp: 0,
-      votesDown: 0,
-      author: { connect: { id: user3.id } },
-      createdAt: new Date('2023-04-15T10:00:00Z'),
-      categories: {
-        connect: [{ id: category1.id }, { id: category2.id }],
+  const categoryData = seedData.categories;
+  const categories = [];
+  for (const data of categoryData) {
+    const category = await prisma.category.create({
+      data: {
+        ...data,
+        parent: data.parentId ? { connect: { id: data.parentId } } : undefined,
       },
-    },
-  });
+    });
+    categories.push(category);
+  }
+
+  // Posts
+  const postData = seedData.posts;
+  const posts = [];
+  for (const data of postData) {
+    const author = users.find((user) => user.id === data.authorId);
+    const categoriesToConnect = data.categories
+      ? data.categories.map((categoryId) => {
+          return { id: categoryId };
+        })
+      : [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { authorId, ...rest } = data;
+    const post = await prisma.post.create({
+      data: {
+        ...rest,
+        author: { connect: { id: author.id } },
+        categories: {
+          connect: categoriesToConnect,
+        },
+      },
+    });
+    posts.push(post);
+  }
+
+  // Comments
+  const commentData = seedData.comments;
+  const comments = [];
+  for (const data of commentData) {
+    const author = users.find((user) => user.id === data.authorId);
+    const post = posts.find((post) => post.id === data.postId);
+    const parentComment = comments.find(
+      (comment) => comment.id === data.parentId,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { authorId, postId, parentId, ...rest } = data;
+    const comment = await prisma.comment.create({
+      data: {
+        ...rest,
+        author: { connect: { id: author.id } },
+        post: { connect: { id: post.id } },
+        parent: parentComment
+          ? { connect: { id: parentComment.id } }
+          : undefined,
+      },
+    });
+    comments.push(comment);
+  }
 
   // Votes
-  const vote1 = await prisma.vote.create({
-    data: {
-      user: { connect: { id: user1.id } },
-      post: { connect: { id: post1.id } },
-      voteType: 'UPVOTE',
-    },
-  });
+  const voteData = seedData.votes;
+  for (const data of voteData) {
+    const user = users.find((user) => user.id === data.userId);
+    const post = posts.find((post) => post.id === data.postId);
 
-  const vote2 = await prisma.vote.create({
-    data: {
-      user: { connect: { id: user2.id } },
-      post: { connect: { id: post1.id } },
-      voteType: 'DOWNVOTE',
-    },
-  });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId, postId, ...rest } = data;
+    await prisma.vote.create({
+      data: {
+        ...rest,
+        user: { connect: { id: user.id } },
+        post: { connect: { id: post.id } },
+      },
+    });
+  }
+  console.log('Done seeding database.');
 }
 
 main()
