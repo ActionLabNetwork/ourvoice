@@ -1,4 +1,9 @@
-import { CategoryCreateInput, CategoryUpdateInput } from './../../graphql';
+import {
+  CategoriesFilterInput,
+  CategoryCreateInput,
+  CategoryUpdateInput,
+  PaginationInput,
+} from './../../graphql';
 import { CategoryRepository } from './category.repository';
 import { Injectable } from '@nestjs/common';
 import { Category } from '@prisma/client';
@@ -12,6 +17,13 @@ export class CategoryService {
 
   async getCategoryById(id: number): Promise<Category> {
     return this.categoryRepository.getCategoryById(id);
+  }
+
+  async getCategories(
+    filter: CategoriesFilterInput,
+    pagination: PaginationInput,
+  ): Promise<Category[]> {
+    return this.categoryRepository.getCategories(filter, pagination);
   }
 
   async getCategoriesByNames(

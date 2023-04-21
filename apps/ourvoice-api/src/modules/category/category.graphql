@@ -1,5 +1,9 @@
 type Query {
   category(id: Int!): Category
+  categories(
+    filter: CategoriesFilterInput
+    pagination: PaginationInput
+  ): [Category!]!
   categoriesByNames(names: [String!]!): [Category!]!
 }
 
@@ -22,6 +26,11 @@ type Category {
   posts: [Post!]!
 }
 
+type PageInfo {
+  endCursor: Int
+  hasNextPage: Boolean
+}
+
 input CategoryCreateInput {
   name: String!
   description: String
@@ -32,4 +41,21 @@ input CategoryUpdateInput {
   name: String
   description: String
   parentId: Int
+}
+
+input CategoriesFilterInput {
+  name: String
+  description: String
+  weight: Int
+  active: Boolean
+  parentId: Int
+  createdAfter: DateTime
+  createdBefore: DateTime
+  disabledAfter: DateTime
+  disabledBefore: DateTime
+}
+
+input PaginationInput {
+  cursor: Int
+  limit: Int!
 }
