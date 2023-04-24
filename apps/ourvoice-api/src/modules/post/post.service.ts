@@ -1,4 +1,9 @@
-import { PostCreateInput, PostUpdateInput } from './../../graphql';
+import {
+  PaginationInput,
+  PostCreateInput,
+  PostsFilterInput,
+  PostUpdateInput,
+} from './../../graphql';
 import { Injectable } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PostRepository } from './post.repository';
@@ -22,6 +27,13 @@ export class PostService {
 
   async getPostById(id: number): Promise<Post> {
     return this.postRepository.getPostById(id);
+  }
+
+  async getPosts(
+    filter: PostsFilterInput,
+    pagination: PaginationInput,
+  ): Promise<Post[]> {
+    return this.postRepository.getPosts(filter, pagination);
   }
 
   async getPostsByCategories(

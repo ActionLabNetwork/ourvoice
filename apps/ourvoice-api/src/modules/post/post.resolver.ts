@@ -1,4 +1,9 @@
-import { PostCreateInput, PostUpdateInput } from './../../graphql';
+import {
+  PaginationInput,
+  PostCreateInput,
+  PostsFilterInput,
+  PostUpdateInput,
+} from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
 
@@ -9,6 +14,14 @@ export class PostResolver {
   @Query()
   async post(@Args('id') id: number) {
     return this.postService.getPostById(id);
+  }
+
+  @Query()
+  async posts(
+    @Args('filter', { nullable: true }) filter?: PostsFilterInput,
+    @Args('pagination', { nullable: true }) pagination?: PaginationInput,
+  ) {
+    return this.postService.getPosts(filter, pagination);
   }
 
   @Query()

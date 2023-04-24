@@ -1,5 +1,9 @@
 type Query {
   post(id: Int!): Post
+  posts(
+    filter: PostsFilterInput
+    pagination: PaginationInput
+  ): [Post!]!
   postsByCategories(categories: [String!]!): [Post!]!
 }
 
@@ -50,4 +54,31 @@ input PostUpdateInput {
   votesUp: Int
   authorId: Int
   categoryIds: [Int!]
+}
+
+input PostsFilterInput {
+  title: String
+  content: String
+  moderated: Boolean
+  published: Boolean
+  votesDown: Int
+  votesUp: Int
+  authorId: Int
+  categoryIds: [Int!]
+  createdAfter: DateTime
+  createdBefore: DateTime
+  moderatedAfter: DateTime
+  moderatedBefore: DateTime
+  publishedAfter: DateTime
+  publishedBefore: DateTime
+}
+
+type PageInfo {
+  endCursor: Int
+  hasNextPage: Boolean
+}
+
+input PaginationInput {
+  cursor: Int
+  limit: Int!
 }
