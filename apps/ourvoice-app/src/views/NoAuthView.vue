@@ -1,7 +1,7 @@
-<template lang="">
-  <div class="mx-auto p-5 bg-gray-200 min-w-full">
-    <CreatePost />
-  </div>
+<template>
+    <div class="mx-auto p-5 w-full min-h-screen bg-gray-200 overflow-y-scroll">
+      <CreatePost />
+    </div>
 </template>
 
 <script lang="ts">

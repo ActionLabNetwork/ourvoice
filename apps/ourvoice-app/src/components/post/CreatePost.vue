@@ -4,64 +4,86 @@
       <div
         class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto"
       >
-        <form @submit.prevent="submitForm" class="space-y-6">
+        <!-- Form for creating new post -->
+        <form @submit.prevent="handleFormSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
-          <div class="flex flex-col space-y-2">
-            <label for="title" class="block text-gray-700 mb-1 font-semibold">Title</label>
-            <div class="flex">
+
+          <!-- Title input field -->
+          <FormInput id="title" labelText="Title" :error="titleError">
+            <template #icon>
               <span class="bg-gray-200 p-2 rounded-l-md">
                 <font-awesome-icon :icon="['fas', 'heading']" class="icon-color" />
               </span>
-              <input
+            </template>
+            <input
                 v-model="title"
                 type="text"
                 id="title"
                 placeholder="Share your thoughts anonymously"
                 class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200 font-semibold text-gray-800"
-              />
-            </div>
-          </div>
-          <div class="flex flex-col space-y-2">
-            <label for="content" class="block text-gray-700 font-semibold mb-1">Content</label>
+            />
+          </FormInput>
+
+          <!-- Content text area-->
+          <FormInput id="content" labelText="Content" :error="contentError">
             <textarea
               id="content"
               v-model="content"
-              class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
+              class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-12 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
               placeholder="I have an idea for improving..."
               @input="updateCharacterCount"
             ></textarea>
-            <div class="flex flex-row-reverse justify-between text-sm">
-              <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / 50</span>
-              <span class="text-red-500">{{ contentError }}</span>
-            </div>
+
+            <!-- Character count and error message -->
+            <template #info>
+              <div class="flex flex-row-reverse justify-between text-sm">
+                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / 50</span>
+              </div>
+            </template>
+          </FormInput>
+
+          <!-- Categories input field -->
+          <div v-if="!categoriesData.loading" class="flex flex-col space-y-2">
+              <label for="categories" class="block text-gray-700 font-semibold mb-1">Categories</label>
+              <Multiselect id="categories" v-model="selectedCategories" :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
+              mode="tags" :searchable="true" :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+
+              <!-- Show error message if there's an error fetching categories -->
+              <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
+                {{ categoriesData.errorMessage }}
+              </div>
           </div>
-          <div class="flex flex-col space-y-2">
-            <label for="categories" class="block text-gray-700 font-semibold mb-1">Categories</label>
-            <Multiselect id="categories" v-model="selectedCategories" :options="categoriesData.data.map(({ name }) => name)" mode="tags" :searchable="true" required :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+          <div v-else>
+            <p class="font-semibold text-gray-500">Loading categories...</p>
           </div>
-          <div class="flex flex-col space-y-2">
-            <label for="attachments" class="block text-gray-700 font-semibold mb-1">Attachments</label>
-            <div class="flex">
+
+          <!-- Attachments input field -->
+          <FormInput id="attachments" labelText="Attachments" :error="attachmentsError">
+            <template #icon>
               <span class="bg-gray-200 px-2 py-3 rounded-l-md">
                 <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />
               </span>
-              <input
-                @change="updateAttachments"
-                type="file"
-                id="attachments"
-                class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
-                multiple
-                />
-            </div>
-            <div class="mt-2">
-              <p class="font-semibold text-sm mb-1">Uploaded Attachments:</p>
-              <ul class="list-inside list-disc">
-                <li v-for="(attachment, index) in attachments" :key="index" class="text-sm">{{ attachment.name }}</li>
-              </ul>
-            </div>
+            </template>
+            <input
+              @change="updateAttachments"
+              type="file"
+              id="attachments"
+              class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
+              multiple
+            />
+          </FormInput>
+
+          <!-- Uploaded Attachments -->
+          <div class="mt-2">
+            <p class="font-semibold text-sm mb-1">Uploaded Attachments:</p>
+            <ul class="list-inside list-disc">
+              <li v-for="(attachment, index) in attachments" :key="index" class="text-sm">{{ attachment.name }}</li>
+            </ul>
           </div>
-          <div class="flex justify-end">
+
+          <!-- Submit button -->
+          <div v-if="!categoriesData.loading" class="flex justify-end">
             <button
               type="submit"
               :disabled="!isValidForm"
@@ -70,6 +92,9 @@
               Create Post
             </button>
           </div>
+          <div v-else>
+            <p class="font-semibold text-gray-500">Please wait while categories are loading...</p>
+          </div>
         </form>
       </div>
     </div>
@@ -77,43 +102,48 @@
 </template>
 
 <script lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, computed } from 'vue';
 import Multiselect from '@vueform/multiselect';
-import { useQuery } from '@vue/apollo-composable'
-import gql from 'graphql-tag'
+import FormInput from '@/components/inputs/FormInput.vue'
+import { useCategoriesStore } from '@/stores/categories';
+import gql from 'graphql-tag';
+import { useMutation } from '@vue/apollo-composable';
 
 const postCharacterLimit = 50;
 
-interface CategoriesObjType {
-  data: { id: number, name: string }[];
-  loading: boolean;
-  error: Error | undefined
-}
+const CREATE_POST_MUTATION = gql`
+  mutation CreatePost($data: PostCreateInput!) {
+    createPost(data: $data) {
+      id
+      title
+      content
+    }
+  }
+`
 
 export default {
-  components: { Multiselect },
+  components: { FormInput, Multiselect },
   setup() {
-    const { onResult } = useQuery<{ categories: { id: number, name: string }[] }>(gql`
-      query {
-        categories {
-          id
-          name
-        }
-      }
-    `)
+    // Fetch categories and initial state
+    const categoriesStore = useCategoriesStore()
+    categoriesStore.fetchCategories()
 
+    const { mutate } = useMutation(CREATE_POST_MUTATION)
+
+    // Form fields
     const title = ref('');
     const content = ref('');
-    const categoriesData = reactive<CategoriesObjType>({
-      data: [],
-      loading: false,
-      error: undefined
-    })
     const selectedCategories = ref<string[]>([])
     const attachments = ref<FileList | null>(null);
     const characterCount = ref(0)
-    const contentError = ref('')
 
+    // Errors
+    const titleError = ref('')
+    const contentError = ref('')
+    const attachmentsError = ref('')
+
+    // Check if the form is valid
+    // TODO: Add more complex validation here. Maybe use Vuelidate/VeeValidate?
     const isValidForm = computed(() => {
       const hasTitle = !!title.value
       const hasContent = !!content.value
@@ -123,6 +153,7 @@ export default {
       return hasTitle && hasContent && !hasContentError && hasCategories
     })
 
+    // Update character count and validate content length
     const updateCharacterCount = () => {
       characterCount.value = content.value.length
       contentError.value = content.value.length > postCharacterLimit ? `Content must not exceed ${postCharacterLimit} characters.` : '';
@@ -133,12 +164,27 @@ export default {
       attachments.value = files ? files : null
     }
 
-    const submitForm = () => {
+    // Handle Form submission
+    const handleFormSubmit = async () => {
+      if (!isValidForm.value) return;
+
+      const data = {
+        title: title.value,
+        content: content.value,
+        categories: selectedCategories.value,
+        attachments: attachments.value,
+      };
+
       // Perform form validation, data processing, and API calls here.
-      console.log("Title:", title.value);
-      console.log("Content:", content.value);
-      console.log("Categories:", selectedCategories.value);
-      console.log("Attachments:", attachments.value);
+      console.log('Title:', data.title)
+      console.log('Content:', data.content)
+      console.log('Categories:', data.categories)
+      console.log('Attachments:', data.attachments)
+
+      // TODO: Replace authorId with the actual user ID when integrating with auth.
+      await mutate({
+        data: { title: data.title, content: data.content, categoryIds: data.categories, authorId: 1 }
+      })
 
       // After successfully submitting the form, reset the form fields
       title.value = '';
@@ -147,24 +193,20 @@ export default {
       attachments.value = null;
     };
 
-    onResult(({ data, loading, error }) => {
-      categoriesData.data = data.categories.map(({ id, name }) => ({ id, name }))
-      categoriesData.loading = loading
-      categoriesData.error = error
-    });
-
     return {
       title,
       content,
-      categoriesData,
+      categoriesData: categoriesStore,
       selectedCategories,
       attachments,
       updateCharacterCount,
       characterCount,
+      titleError,
       contentError,
+      attachmentsError,
       isValidForm,
       updateAttachments,
-      submitForm,
+      handleFormSubmit,
     };
   },
 };
