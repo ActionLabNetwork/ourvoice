@@ -107,7 +107,16 @@ import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories';
 import gql from 'graphql-tag';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+
+interface PresignedUrlResponse {
+  key: string;
+  url: string;
+}
+
+interface GetPresignedUrlsResponse {
+  getPresignedUrls: PresignedUrlResponse[];
+}
 
 const postCharacterLimit = 50;
 
@@ -121,6 +130,41 @@ const CREATE_POST_MUTATION = gql`
   }
 `
 
+const GET_PRESIGNED_URLS = gql`
+  query GetPresignedUrls($bucket: String!, $keys: [String!]!, $expiresIn: Int!) {
+    getPresignedUrls(bucket: $bucket, keys: $keys, expiresIn: $expiresIn) {
+      key
+      url
+    }
+  }
+`;
+
+const SAVE_FILE_METADATA_MUTATION = gql`
+  mutation SaveFileMetadata($bucket: String!, $key: String!) {
+    saveFileMetadata(bucket: $bucket, key: $key)
+  }
+`;
+
+async function uploadFileUsingPresignedUrl(presignedUrlObj: { url: string, key: string }, file: File) {
+  const { url } = presignedUrlObj;
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Error uploading file to S3');
+    }
+  } catch (error) {
+    console.error('Error uploading file using presigned URL:', error);
+    throw error;
+  }
+}
+
 export default {
   components: { FormInput, Multiselect },
   setup() {
@@ -128,7 +172,9 @@ export default {
     const categoriesStore = useCategoriesStore()
     categoriesStore.fetchCategories()
 
-    const { mutate } = useMutation(CREATE_POST_MUTATION)
+    const { refetch } = useQuery(GET_PRESIGNED_URLS, {});
+    const { mutate: createPost } = useMutation(CREATE_POST_MUTATION)
+    const { mutate: saveFileMetadata } = useMutation(SAVE_FILE_METADATA_MUTATION);
 
     // Form fields
     const title = ref('');
@@ -136,6 +182,7 @@ export default {
     const selectedCategories = ref<string[]>([])
     const attachments = ref<FileList | null>(null);
     const characterCount = ref(0)
+    const presignedUrls = ref<PresignedUrlResponse[]>([])
 
     // Errors
     const titleError = ref('')
@@ -159,9 +206,20 @@ export default {
       contentError.value = content.value.length > postCharacterLimit ? `Content must not exceed ${postCharacterLimit} characters.` : '';
     }
 
-    const updateAttachments = (event: Event) => {
+    const updateAttachments = async (event: Event) => {
       const files = (event.target as HTMLInputElement).files;
       attachments.value = files ? files : null
+
+      if (!files) return;
+
+      // Generate unique keys for each attachment
+      const keys = Array.from(files).map((file, index) => `user123/${Date.now()}_${index}_${file.name}`);
+
+      console.log({ keys })
+
+      const response = await refetch({ bucket: 'example-bucket', keys, expiresIn: 300 });
+      presignedUrls.value = response?.data.getPresignedUrls ?? [];
+      console.log("Presigned URLs:", presignedUrls.value);
     }
 
     // Handle Form submission
@@ -180,10 +238,34 @@ export default {
       console.log('Content:', data.content)
       console.log('Categories:', data.categories)
       console.log('Attachments:', data.attachments)
+      console.log('Files:', presignedUrls.value.map(({ key }) => key))
+
+      // Upload files to S3 using the presigned URLs
+      if (attachments.value && presignedUrls.value.length > 0) {
+        try {
+          const uploadPromises = presignedUrls.value.map((presignedUrl, index) =>
+            attachments.value && uploadFileUsingPresignedUrl(presignedUrl, attachments.value[index])
+          );
+
+          await Promise.all(uploadPromises);
+
+          // // Save file metadata in the database after successful upload
+          // const metadataSavePromises = presignedUrls.value.map(presignedUrl =>
+          //   saveFileMetadata({ bucket: 'example-bucket', key: presignedUrl.key })
+          // );
+
+          // await Promise.all(metadataSavePromises);
+        } catch (error) {
+          console.error('Error uploading files using presigned URLs:', error);
+          // Handle error accordingly (e.g., show an error message to the user)
+        }
+      }
 
       // TODO: Replace authorId with the actual user ID when integrating with auth.
-      await mutate({
-        data: { title: data.title, content: data.content, categoryIds: data.categories, authorId: 1 }
+      await createPost({
+        data: {
+          title: data.title, content: data.content, categoryIds: data.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
+        }
       })
 
       // After successfully submitting the form, reset the form fields
