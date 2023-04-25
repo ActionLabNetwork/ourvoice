@@ -6,6 +6,8 @@ import {
 } from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
+import { s3 } from 'src/config/s3-config';
+import { generatePresignedUrl } from 'src/services/s3-service';
 
 @Resolver('Post')
 export class PostResolver {
@@ -33,6 +35,21 @@ export class PostResolver {
     return this.postService.getPostsByCategories(categories, skip, take);
   }
 
+  @Query()
+  async getPresignedUrls(
+    @Args('bucket') bucket: string,
+    @Args('keys', { type: () => [String] }) keys: string[],
+    @Args('expiresIn') expiresIn: number,
+  ) {
+    const urls = await Promise.all(
+      keys.map(async (key) => {
+        const url = await generatePresignedUrl(s3, bucket, key, expiresIn);
+        return { url, key };
+      }),
+    );
+    return urls;
+  }
+
   @Mutation()
   async createPost(@Args('data') data: PostCreateInput) {
     return this.postService.createPost(data);
@@ -49,5 +66,15 @@ export class PostResolver {
   @Mutation()
   async deletePost(@Args('id') id: number) {
     return this.postService.deletePost(id);
+  }
+
+  @Mutation()
+  async saveFileMetadata(
+    @Args('bucket') bucket: string,
+    @Args('key') key: string,
+  ) {
+    // Implement logic for storing file metadata in your preferred data store (e.g., a database)
+    // For demonstration purposes, simply return a success message
+    return `File metadata saved for file ${key} in bucket ${bucket}`;
   }
 }

@@ -42,7 +42,7 @@ model Post {
   id        Int     @id @default(autoincrement())
   title     String?
   content   String  @db.VarChar(255)
-  file      String?
+  files     Json?
   moderated Boolean @default(false)
   published Boolean @default(false)
   votesDown Int     @default(0)

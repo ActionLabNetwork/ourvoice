@@ -1,23 +1,22 @@
 type Query {
   post(id: Int!): Post
-  posts(
-    filter: PostsFilterInput
-    pagination: PaginationInput
-  ): [Post!]!
+  posts(filter: PostsFilterInput, pagination: PaginationInput): [Post!]!
   postsByCategories(categories: [String!]!): [Post!]!
+  getPresignedUrls(bucket: String!, keys: [String!]!, expiresIn: Int!): [PresignedUrl!]!
 }
 
 type Mutation {
   createPost(data: PostCreateInput!): Post!
   updatePost(id: Int!, data: PostUpdateInput!): Post!
   deletePost(id: Int!): Post!
+  saveFileMetadata(bucket: String!, key: String!): String!
 }
 
 type Post {
   id: Int!
   title: String
   content: String!
-  file: String
+  files: [String!]
   moderated: Boolean!
   published: Boolean!
   votesDown: Int!
@@ -35,7 +34,7 @@ type Post {
 input PostCreateInput {
   title: String
   content: String!
-  file: String
+  files: [String!]
   moderated: Boolean
   published: Boolean
   votesDown: Int
@@ -47,7 +46,7 @@ input PostCreateInput {
 input PostUpdateInput {
   title: String
   content: String
-  file: String
+  files: [String!]
   moderated: Boolean
   published: Boolean
   votesDown: Int
@@ -81,4 +80,9 @@ type PageInfo {
 input PaginationInput {
   cursor: Int
   limit: Int!
+}
+
+type PresignedUrl {
+  url: String!
+  key: String!
 }
