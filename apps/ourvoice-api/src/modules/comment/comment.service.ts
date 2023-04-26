@@ -17,6 +17,10 @@ export class CommentService {
     return this.commentRepository.createComment(commentData);
   }
 
+  async getAllComments(): Promise<Comment[]> {
+    return this.commentRepository.getAllComments();
+  }
+
   async getCommentById(id: number): Promise<Comment> {
     return this.commentRepository.getCommentById(id);
   }

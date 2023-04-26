@@ -11,6 +11,11 @@ export class CommentResolver {
     return this.commentService.getCommentById(id);
   }
 
+  @Query()
+  async comments() {
+    return this.commentService.getAllComments();
+  }
+
   @Mutation()
   async createComment(@Args('data') data: CommentCreateInput) {
     return this.commentService.createComment(data);
