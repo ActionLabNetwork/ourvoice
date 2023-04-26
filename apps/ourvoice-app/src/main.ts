@@ -1,3 +1,4 @@
+import { apolloClient } from './graphql/client/index'
 import { createApp, provide, h } from 'vue'
 import { createPinia } from 'pinia'
 import SuperTokens from 'supertokens-web-js'
@@ -7,7 +8,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
 import { DefaultApolloClient } from '@vue/apollo-composable'
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
 
 import App from './App.vue'
 import router from './router'
@@ -29,17 +29,6 @@ SuperTokens.init({
 
 // Set up fontawesome
 library.add(faHeading, faPaperclip)
-
-// Set up GraphQL client
-const httpLink = createHttpLink({
-  uri: `${import.meta.env.VITE_APP_API_URL}/graphql` || 'http://localhost:3000/graphql'
-})
-
-// Create the apollo client
-const apolloClient = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache()
-})
 
 const app = createApp({
   setup() {

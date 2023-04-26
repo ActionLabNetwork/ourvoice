@@ -1,8 +1,10 @@
+import { apolloClient } from './../graphql/client/index'
 import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
 import { CREATE_POST_MUTATION } from './../graphql/mutations/createPost'
 import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
-import { useQuery, useMutation } from '@vue/apollo-composable'
+import { provideApolloClient, useQuery, useMutation } from '@vue/apollo-composable'
+import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 
 export interface Post {
   id: number
@@ -33,6 +35,8 @@ export interface PostsState {
   errorMessage: string | undefined
 }
 
+provideApolloClient(apolloClient)
+
 export const usePostsStore = defineStore('posts', {
   state: (): PostsState => ({
     data: [],
@@ -58,21 +62,43 @@ export const usePostsStore = defineStore('posts', {
       })
     },
 
+    async getPresignedUrls(bucket: string, keys: string[], expiresIn: number) {
+      const { onResult, onError } = useQuery(GET_PRESIGNED_URLS_QUERY, {
+        bucket,
+        keys,
+        expiresIn
+      })
+
+      return new Promise((resolve, reject) => {
+        onResult(({ data, loading }) => {
+          if (!loading) {
+            resolve(data.getPresignedUrls)
+          }
+        })
+
+        onError((error) => {
+          reject(error)
+        })
+      })
+    },
+
     async createPost({
       title,
       content,
       categoryIds,
+      files,
       authorId
     }: {
       title: string
       content: string
-      categoryIds: number[]
+      categoryIds: string[]
+      files: string[]
       authorId: number
     }) {
       const { mutate } = useMutation(CREATE_POST_MUTATION)
 
       await mutate({
-        data: { title, content, categoryIds, authorId }
+        data: { title, content, categoryIds, files, authorId }
       })
     },
 

@@ -38,49 +38,31 @@
             <!-- Character count and error message -->
             <template #info>
               <div class="flex flex-row-reverse justify-between text-sm">
-                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / 50</span>
+                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / {{ createPostCharacterLimit }}</span>
               </div>
             </template>
           </FormInput>
 
           <!-- Categories input field -->
           <div v-if="!categoriesData.loading" class="flex flex-col space-y-2">
-              <label for="categories" class="block text-gray-700 font-semibold mb-1">Categories</label>
-              <Multiselect id="categories" v-model="selectedCategories" :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
-              mode="tags" :searchable="true" :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+            <label for="categories" class="block text-gray-700 font-semibold mb-1">Categories</label>
+            <Multiselect id="categories" v-model="selectedCategories" :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
+            mode="tags" :searchable="true" :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
 
-              <!-- Show error message if there's an error fetching categories -->
-              <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
-                {{ categoriesData.errorMessage }}
-              </div>
+            <!-- Show error message if there's an error fetching categories -->
+            <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
+              {{ categoriesData.errorMessage }}
+            </div>
           </div>
           <div v-else>
             <p class="font-semibold text-gray-500">Loading categories...</p>
           </div>
 
           <!-- Attachments input field -->
-          <FormInput id="attachments" labelText="Attachments" :error="attachmentsError">
-            <template #icon>
-              <span class="bg-gray-200 px-2 py-3 rounded-l-md">
-                <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />
-              </span>
-            </template>
-            <input
-              @change="updateAttachments"
-              type="file"
-              id="attachments"
-              class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
-              multiple
-            />
-          </FormInput>
+          <AttachmentInput :attachmentsError="attachmentsError" @update:attachments="updateAttachments" />
 
           <!-- Uploaded Attachments -->
-          <div class="mt-2">
-            <p class="font-semibold text-sm mb-1">Uploaded Attachments:</p>
-            <ul class="list-inside list-disc">
-              <li v-for="(attachment, index) in attachments" :key="index" class="text-sm">{{ attachment.name }}</li>
-            </ul>
-          </div>
+          <AttachmentList v-if="attachments" :attachments="attachments" />
 
           <!-- Submit button -->
           <div v-if="!categoriesData.loading" class="flex justify-end">
@@ -106,81 +88,33 @@ import { ref, computed } from 'vue';
 import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories';
-import gql from 'graphql-tag';
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import AttachmentInput from '../inputs/AttachmentInput.vue';
+import AttachmentList from '../inputs/AttachmentList.vue';
+import { createPostCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
+import { usePostsStore } from '@/stores/posts';
+import { uploadFileUsingPresignedUrl } from '@/services/s3-service';
+
 
 interface PresignedUrlResponse {
   key: string;
   url: string;
 }
 
-interface GetPresignedUrlsResponse {
-  getPresignedUrls: PresignedUrlResponse[];
-}
-
-const postCharacterLimit = 50;
-
-const CREATE_POST_MUTATION = gql`
-  mutation CreatePost($data: PostCreateInput!) {
-    createPost(data: $data) {
-      id
-      title
-      content
-    }
-  }
-`
-
-const GET_PRESIGNED_URLS = gql`
-  query GetPresignedUrls($bucket: String!, $keys: [String!]!, $expiresIn: Int!) {
-    getPresignedUrls(bucket: $bucket, keys: $keys, expiresIn: $expiresIn) {
-      key
-      url
-    }
-  }
-`;
-
-const SAVE_FILE_METADATA_MUTATION = gql`
-  mutation SaveFileMetadata($bucket: String!, $key: String!) {
-    saveFileMetadata(bucket: $bucket, key: $key)
-  }
-`;
-
-async function uploadFileUsingPresignedUrl(presignedUrlObj: { url: string, key: string }, file: File) {
-  const { url } = presignedUrlObj;
-  try {
-    const response = await fetch(url, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Error uploading file to S3');
-    }
-  } catch (error) {
-    console.error('Error uploading file using presigned URL:', error);
-    throw error;
-  }
-}
-
 export default {
-  components: { FormInput, Multiselect },
+  components: { AttachmentInput, AttachmentList, FormInput, Multiselect },
   setup() {
     // Fetch categories and initial state
     const categoriesStore = useCategoriesStore()
     categoriesStore.fetchCategories()
 
-    const { refetch } = useQuery(GET_PRESIGNED_URLS, {});
-    const { mutate: createPost } = useMutation(CREATE_POST_MUTATION)
-    const { mutate: saveFileMetadata } = useMutation(SAVE_FILE_METADATA_MUTATION);
+    const postsStore = usePostsStore()
 
     // Form fields
     const title = ref('');
     const content = ref('');
     const selectedCategories = ref<string[]>([])
     const attachments = ref<FileList | null>(null);
+    const attachmentsInputRef = ref<HTMLInputElement | null>(null)
     const characterCount = ref(0)
     const presignedUrls = ref<PresignedUrlResponse[]>([])
 
@@ -203,7 +137,7 @@ export default {
     // Update character count and validate content length
     const updateCharacterCount = () => {
       characterCount.value = content.value.length
-      contentError.value = content.value.length > postCharacterLimit ? `Content must not exceed ${postCharacterLimit} characters.` : '';
+      contentError.value = content.value.length > createPostCharacterLimit ? `Content must not exceed ${createPostCharacterLimit} characters.` : '';
     }
 
     const updateAttachments = async (event: Event) => {
@@ -215,11 +149,8 @@ export default {
       // Generate unique keys for each attachment
       const keys = Array.from(files).map((file, index) => `user123/${Date.now()}_${index}_${file.name}`);
 
-      console.log({ keys })
-
-      const response = await refetch({ bucket: 'example-bucket', keys, expiresIn: 300 });
-      presignedUrls.value = response?.data.getPresignedUrls ?? [];
-      console.log("Presigned URLs:", presignedUrls.value);
+      const response = await postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
+      presignedUrls.value = response as { key: string; url: string; }[] ?? []
     }
 
     // Handle Form submission
@@ -233,13 +164,6 @@ export default {
         attachments: attachments.value,
       };
 
-      // Perform form validation, data processing, and API calls here.
-      console.log('Title:', data.title)
-      console.log('Content:', data.content)
-      console.log('Categories:', data.categories)
-      console.log('Attachments:', data.attachments)
-      console.log('Files:', presignedUrls.value.map(({ key }) => key))
-
       // Upload files to S3 using the presigned URLs
       if (attachments.value && presignedUrls.value.length > 0) {
         try {
@@ -248,24 +172,15 @@ export default {
           );
 
           await Promise.all(uploadPromises);
-
-          // // Save file metadata in the database after successful upload
-          // const metadataSavePromises = presignedUrls.value.map(presignedUrl =>
-          //   saveFileMetadata({ bucket: 'example-bucket', key: presignedUrl.key })
-          // );
-
-          // await Promise.all(metadataSavePromises);
         } catch (error) {
           console.error('Error uploading files using presigned URLs:', error);
-          // Handle error accordingly (e.g., show an error message to the user)
+          // TODO: Handle error accordingly (e.g., show an error message to the user)
         }
       }
 
       // TODO: Replace authorId with the actual user ID when integrating with auth.
-      await createPost({
-        data: {
-          title: data.title, content: data.content, categoryIds: data.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
-        }
+      await postsStore.createPost({
+        title: data.title, content: data.content, categoryIds: data.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
       })
 
       // After successfully submitting the form, reset the form fields
@@ -273,6 +188,8 @@ export default {
       content.value = '';
       selectedCategories.value = [];
       attachments.value = null;
+
+      if (attachmentsInputRef.value) attachmentsInputRef.value.value = '';
     };
 
     return {
@@ -283,6 +200,7 @@ export default {
       attachments,
       updateCharacterCount,
       characterCount,
+      createPostCharacterLimit,
       titleError,
       contentError,
       attachmentsError,

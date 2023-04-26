@@ -6,22 +6,6 @@ export const CREATE_POST_MUTATION = gql`
       id
       title
       content
-      createdAt
-      updatedAt
-      author {
-        id
-        nickname
-      }
-      categories {
-        id
-        name
-      }
-      comments {
-        id
-        content
-      }
-      votesUp
-      votesDown
     }
   }
 `
