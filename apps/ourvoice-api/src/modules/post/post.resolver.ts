@@ -67,14 +67,4 @@ export class PostResolver {
   async deletePost(@Args('id') id: number) {
     return this.postService.deletePost(id);
   }
-
-  @Mutation()
-  async saveFileMetadata(
-    @Args('bucket') bucket: string,
-    @Args('key') key: string,
-  ) {
-    // Implement logic for storing file metadata in your preferred data store (e.g., a database)
-    // For demonstration purposes, simply return a success message
-    return `File metadata saved for file ${key} in bucket ${bucket}`;
-  }
 }

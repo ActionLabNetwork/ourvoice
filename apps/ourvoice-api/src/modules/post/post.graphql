@@ -9,7 +9,6 @@ type Mutation {
   createPost(data: PostCreateInput!): Post!
   updatePost(id: Int!, data: PostUpdateInput!): Post!
   deletePost(id: Int!): Post!
-  saveFileMetadata(bucket: String!, key: String!): String!
 }
 
 type Post {
