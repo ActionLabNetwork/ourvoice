@@ -5,11 +5,11 @@ name: CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "main" ]
     paths-ignore:
       - 'deployment/**'
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev", "main" ]
     paths-ignore:
       - 'deployment/**'
 

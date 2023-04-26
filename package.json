@@ -37,6 +37,7 @@
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
+    "pre-push": "pnpm tsx scripts/prevent-push-to-main.ts",
     "commit-msg": "pnpm tsx scripts/verify-commit.ts $1"
   },
   "lint-staged": {
