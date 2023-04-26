@@ -91,7 +91,7 @@ export const usePostsStore = defineStore('posts', {
     }: {
       title: string
       content: string
-      categoryIds: string[]
+      categoryIds: number[]
       files: string[]
       authorId: number
     }) {

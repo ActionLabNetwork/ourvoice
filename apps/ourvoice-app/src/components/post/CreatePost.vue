@@ -5,61 +5,81 @@
         class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto"
       >
         <!-- Form for creating new post -->
-        <form @submit.prevent="handleFormSubmit" class="space-y-6">
+        <form @submit="onSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
 
           <!-- Title input field -->
-          <FormInput id="title" labelText="Title" :error="titleError">
+          <FormInput id="title" labelText="Title" name="title" labelSpan="required">
             <template #icon>
               <span class="bg-gray-200 p-2 rounded-l-md">
                 <font-awesome-icon :icon="['fas', 'heading']" class="icon-color" />
               </span>
             </template>
-            <input
+            <Field
                 v-model="title"
                 type="text"
                 id="title"
+                name="title"
                 placeholder="Share your thoughts anonymously"
                 class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200 font-semibold text-gray-800"
+                :rules="'validateTitle'"
             />
           </FormInput>
 
           <!-- Content text area-->
-          <FormInput id="content" labelText="Content" :error="contentError">
-            <textarea
+          <FormInput id="content" labelText="Content" name="content"  labelSpan="required">
+            <Field
+              as="textarea"
               id="content"
+              name="content"
               v-model="content"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-12 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
               placeholder="I have an idea for improving..."
               @input="updateCharacterCount"
-            ></textarea>
+              :rules="'validateContent'"
+            ></Field>
 
             <!-- Character count and error message -->
             <template #info>
               <div class="flex flex-row-reverse justify-between text-sm">
-                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / {{ createPostCharacterLimit }}</span>
+                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / {{ createPostContentCharacterLimit }}</span>
               </div>
             </template>
           </FormInput>
 
           <!-- Categories input field -->
-          <div v-if="!categoriesData.loading" class="flex flex-col space-y-2">
-            <label for="categories" class="block text-gray-700 font-semibold mb-1">Categories</label>
-            <Multiselect id="categories" v-model="selectedCategories" :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
-            mode="tags" :searchable="true" :caret="true" placeholder="Select categories" class="px-4 multiselect-blue" />
+          <FormInput v-if="!categoriesData.loading" id="categories" name="categories" labelText="Categories" labelSpan="select 1 to 3">
+            <Field id="categories" name="categories" :rules="'validateCategories'" v-slot="{ field }">
+              <Multiselect
+                id="categories"
+                v-model="selectedCategories"
+                :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
+                mode="tags"
+                :searchable="true"
+                :caret="true"
+                placeholder="Select categories"
+                class="px-4 multiselect-blue"
+                v-bind="field"
+              />
+            </Field>
 
             <!-- Show error message if there's an error fetching categories -->
             <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
               {{ categoriesData.errorMessage }}
             </div>
-          </div>
+          </FormInput>
           <div v-else>
             <p class="font-semibold text-gray-500">Loading categories...</p>
           </div>
 
           <!-- Attachments input field -->
-          <AttachmentInput :attachmentsError="attachmentsError" @update:attachments="updateAttachments" />
+          <Field id="attachments" name="attachments" :rules="'validateAttachments'" v-slot="{ field }">
+            <AttachmentInput
+              :attachmentsError="attachmentsError" @update:attachments="updateAttachments"
+              v-bind="field"
+            />
+          </Field>
 
           <!-- Uploaded Attachments -->
           <AttachmentList v-if="attachments" :attachments="attachments" />
@@ -90,10 +110,11 @@ import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories';
 import AttachmentInput from '../inputs/AttachmentInput.vue';
 import AttachmentList from '../inputs/AttachmentList.vue';
-import { createPostCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
+import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
 import { usePostsStore } from '@/stores/posts';
 import { uploadFileUsingPresignedUrl } from '@/services/s3-service';
-
+import { Field, defineRule, useForm } from 'vee-validate';
+import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
 
 interface PresignedUrlResponse {
   key: string;
@@ -101,13 +122,15 @@ interface PresignedUrlResponse {
 }
 
 export default {
-  components: { AttachmentInput, AttachmentList, FormInput, Multiselect },
+  components: { AttachmentInput, AttachmentList, Field, FormInput, Multiselect },
   setup() {
     // Fetch categories and initial state
     const categoriesStore = useCategoriesStore()
     categoriesStore.fetchCategories()
 
     const postsStore = usePostsStore()
+
+    const { handleSubmit, resetForm, setFieldValue, setFieldError, errors } = useForm()
 
     // Form fields
     const title = ref('');
@@ -123,21 +146,10 @@ export default {
     const contentError = ref('')
     const attachmentsError = ref('')
 
-    // Check if the form is valid
-    // TODO: Add more complex validation here. Maybe use Vuelidate/VeeValidate?
-    const isValidForm = computed(() => {
-      const hasTitle = !!title.value
-      const hasContent = !!content.value
-      const hasContentError = !!contentError.value
-      const hasCategories = !!selectedCategories.value.length
-
-      return hasTitle && hasContent && !hasContentError && hasCategories
-    })
-
     // Update character count and validate content length
     const updateCharacterCount = () => {
       characterCount.value = content.value.length
-      contentError.value = content.value.length > createPostCharacterLimit ? `Content must not exceed ${createPostCharacterLimit} characters.` : '';
+      contentError.value = content.value.length > createPostContentCharacterLimit ? `Content must not exceed ${createPostContentCharacterLimit} characters.` : '';
     }
 
     const updateAttachments = async (event: Event) => {
@@ -153,22 +165,24 @@ export default {
       presignedUrls.value = response as { key: string; url: string; }[] ?? []
     }
 
+    // Define form validation rules
+    defineRule('validateTitle', validateTitle)
+    defineRule('validateContent', validateContent)
+    defineRule('validateCategories', validateCategories)
+    defineRule('validateAttachments', validateAttachments)
+
+    // Check if form is valid
+    const isValidForm = computed(() => {
+      return Object.keys(errors.value).length === 0
+    })
+
     // Handle Form submission
-    const handleFormSubmit = async () => {
-      if (!isValidForm.value) return;
-
-      const data = {
-        title: title.value,
-        content: content.value,
-        categories: selectedCategories.value,
-        attachments: attachments.value,
-      };
-
+    const onSubmit = handleSubmit(async (values) => {
       // Upload files to S3 using the presigned URLs
-      if (attachments.value && presignedUrls.value.length > 0) {
+      if (values.attachments && presignedUrls.value.length > 0) {
         try {
           const uploadPromises = presignedUrls.value.map((presignedUrl, index) =>
-            attachments.value && uploadFileUsingPresignedUrl(presignedUrl, attachments.value[index])
+            values.attachments && uploadFileUsingPresignedUrl(presignedUrl, values.attachments[index])
           );
 
           await Promise.all(uploadPromises);
@@ -180,17 +194,20 @@ export default {
 
       // TODO: Replace authorId with the actual user ID when integrating with auth.
       await postsStore.createPost({
-        title: data.title, content: data.content, categoryIds: data.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
+        title: values.title, content: values.content, categoryIds: values.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
       })
 
       // After successfully submitting the form, reset the form fields
-      title.value = '';
-      content.value = '';
-      selectedCategories.value = [];
-      attachments.value = null;
+      resetForm()
+      selectedCategories.value = []
+      setFieldValue('categories', [])
+      setFieldError('categories', undefined)
 
+      attachments.value = null;
       if (attachmentsInputRef.value) attachmentsInputRef.value.value = '';
-    };
+
+      characterCount.value = 0
+    })
 
     return {
       title,
@@ -200,13 +217,13 @@ export default {
       attachments,
       updateCharacterCount,
       characterCount,
-      createPostCharacterLimit,
+      createPostContentCharacterLimit,
       titleError,
       contentError,
       attachmentsError,
-      isValidForm,
       updateAttachments,
-      handleFormSubmit,
+      isValidForm,
+      onSubmit
     };
   },
 };
