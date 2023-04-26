@@ -22,11 +22,9 @@ if (protectedBranch.includes(currentBranch)) {
 
 if (developmentBranch.includes(currentBranch)) {
   console.log(
-    `  ${colors.bgGreen(colors.white(' SUCESS '))} ${colors.green(
+    `  ${colors.bgGreen(colors.white(' SUCCESS '))} ${colors.green(
       `Pushed to development branch`
     )}
     `
   )
-
-  process.exit(1)
 }
