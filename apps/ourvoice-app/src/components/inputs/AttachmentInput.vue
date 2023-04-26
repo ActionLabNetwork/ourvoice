@@ -1,5 +1,5 @@
 <template>
-  <FormInput id="attachments" labelText="Attachments" :error="attachmentsError">
+  <FormInput id="attachments" labelText="Attachments" :error="attachmentsError" labelSpan="optional">
     <template #icon>
       <span class="bg-gray-200 px-2 py-3 rounded-l-md">
         <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />

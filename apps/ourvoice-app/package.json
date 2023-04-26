@@ -25,6 +25,7 @@
     "graphql-tag": "^2.12.6",
     "pinia": "^2.0.34",
     "supertokens-web-js": "^0.5.0",
+    "vee-validate": "^4.8.6",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
