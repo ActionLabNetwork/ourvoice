@@ -1,12 +1,16 @@
+import { execSync } from 'node:child_process'
+
 import colors from 'picocolors'
 
-const currentBranch = `git rev-parse --abbrev-ref HEAD`
+function determineCurrentBranch(): string {
+  return execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' })
+}
 const protectedBranch = ['main', 'master']
 const developmentBranch = ['dev', 'development']
+const branch = determineCurrentBranch().trim()
+console.log(`Current branch is ${branch}`)
 
-console.log(`Current branch is ${currentBranch}`)
-
-if (protectedBranch.includes(currentBranch)) {
+if (protectedBranch.includes(branch)) {
   console.error(
     `  ${colors.bgRed(colors.white(' ERROR '))} ${colors.red(
       `Direct push to main/master is not allowed`
@@ -20,7 +24,7 @@ if (protectedBranch.includes(currentBranch)) {
   process.exit(1)
 }
 
-if (developmentBranch.includes(currentBranch)) {
+if (developmentBranch.includes(branch)) {
   console.log(
     `  ${colors.bgGreen(colors.white(' SUCCESS '))} ${colors.green(
       `Pushed to development branch`
