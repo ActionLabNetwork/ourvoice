@@ -1,0 +1,3 @@
+// Run the following command if you are getting a cors error when uploading files to the s3 bucket in localstack. Don't forget to replace <<bucket-name>> with your bucket name.
+
+awslocal s3api put-bucket-cors --bucket <<bucket-name>> --cors-configuration file://s3-config.json
