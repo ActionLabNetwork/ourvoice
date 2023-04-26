@@ -1,11 +1,32 @@
-const preventPushToMain = `branch=\`git symbolic-ref HEAD\`
-if [ "$branch" = "refs/heads/main" ]; then
-    echo "\n🚫\\033[31mDirect push to master is not allowed.\\033[0m"
-    exit 1
-fi`
+import colors from 'picocolors'
 
-const acknowledgePushToDev = `branch=\`git symbolic-ref HEAD\`
-if [ "$branch" = "refs/heads/dev" ]; then
-    echo "\n👌\\033[32mPushed to the Development branch succesfully.\\033[32m"
-    exit 1
-fi`
+const currentBranch = `git rev-parse --abbrev-ref HEAD`
+const protectedBranch = ['main', 'master']
+const developmentBranch = ['dev', 'development']
+
+console.log(`Current branch is ${currentBranch}`)
+
+if (protectedBranch.includes(currentBranch)) {
+  console.error(
+    `  ${colors.bgRed(colors.white(' ERROR '))} ${colors.red(
+      `Direct push to main/master is not allowed`
+    )}
+    ${colors.red(
+      `Please create a pull request and merge to development branch after review.`
+    )}
+  `
+  )
+
+  process.exit(1)
+}
+
+if (developmentBranch.includes(currentBranch)) {
+  console.log(
+    `  ${colors.bgGreen(colors.white(' SUCESS '))} ${colors.green(
+      `Pushed to development branch`
+    )}
+    `
+  )
+
+  process.exit(1)
+}
