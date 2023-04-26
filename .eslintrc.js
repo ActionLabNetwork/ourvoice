@@ -5,10 +5,13 @@ module.exports = {
     browser: true,
     node: true,
   },
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: 'module',
+  },
   plugins: ['@typescript-eslint', 'prettier', 'import', 'simple-import-sort'],
   extends: [
     'eslint:recommended',
-    '@nuxtjs/eslint-config-typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],

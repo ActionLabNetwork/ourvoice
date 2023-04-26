@@ -1,23 +1,41 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.web.json"
-    },
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./apps/ourvoice-admin/tsconfig.json"
-    },
-    {
-      "path": "./apps/ourvoice-app/tsconfig.json"
-    },
-    {
-      "path": "./apps/ourvoice-portal/tsconfig.json"
-    }
-  ],
+  // "files": [],
+  // "references": [
+  //   {
+  //     "path": "./tsconfig.web.json"
+  //   },
+  //   {
+  //     "path": "./tsconfig.node.json"
+  //   },
+  //   {
+  //     "path": "./apps/ourvoice-admin/tsconfig.json"
+  //   },
+  //   {
+  //     "path": "./apps/ourvoice-app/tsconfig.json"
+  //   },
+  //   {
+  //     "path": "./apps/ourvoice-portal/tsconfig.json"
+  //   }
+  // ],
   "compilerOptions": {
-    "types": ["node", "jest"]
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "noImplicitThis": true,
+    "strict": true,
+    // "preserveValueImports": true,
+    "verbatimModuleSyntax": true,
+    // "importHelpers": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "types": ["node", "jest", "jest-extended"]
   }
 }

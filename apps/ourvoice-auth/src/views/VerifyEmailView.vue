@@ -5,7 +5,6 @@
 <script lang="ts">
 import { verifyEmail } from 'supertokens-web-js/recipe/emailverification'
 import Session from 'supertokens-web-js/recipe/session'
-import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
 const adminURL = import.meta.env.VITE_APP_ADMIN_URL
