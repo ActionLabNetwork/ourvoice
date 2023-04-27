@@ -59,7 +59,6 @@
     "@pinia/nuxt": "^0.4.9",
     "@types/node": "^18.16.1",
     "@vueuse/nuxt": "^9.13.0",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-define-config": "^1.19.0",
@@ -81,10 +80,5 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }

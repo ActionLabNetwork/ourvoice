@@ -95,7 +95,7 @@ async function main() {
     },
   });
 
-  const post3 = await prisma.post.create({
+  await prisma.post.create({
     data: {
       title: 'Post 3',
       content: 'This is the content of post 3',
@@ -149,7 +149,7 @@ async function main() {
   });
 
   // Post Moderation
-  const postModeration1 = await prisma.postModeration.create({
+  await prisma.postModeration.create({
     data: {
       decision: Decision.ACCEPTED,
       reason: 'This post looks good',
@@ -158,7 +158,7 @@ async function main() {
     },
   });
 
-  const postModeration2 = await prisma.postModeration.create({
+  await prisma.postModeration.create({
     data: {
       decision: Decision.REJECTED,
       reason: 'This post violates our community guidelines',
@@ -168,7 +168,7 @@ async function main() {
   });
 
   // Comment Moderation
-  const commentModeration1 = await prisma.commentModeration.create({
+  await prisma.commentModeration.create({
     data: {
       decision: Decision.ACCEPTED,
       reason: 'This comment is helpful',
@@ -177,7 +177,7 @@ async function main() {
     },
   });
 
-  const commentModeration2 = await prisma.commentModeration.create({
+  await prisma.commentModeration.create({
     data: {
       decision: Decision.REJECTED,
       reason: 'This comment is inappropriate',
@@ -187,7 +187,7 @@ async function main() {
   });
 
   // Comment to Comment
-  const commentToComment = await prisma.comment.create({
+  await prisma.comment.create({
     data: {
       content: 'This is a reply to comment 3',
       status: 'PENDING',
