@@ -53,7 +53,7 @@
     {
       "title": "Post 1",
       "content": "This is the content of post 1",
-      "file": "https://example.com/file1.jpg",
+      "files": ["https://example.com/file1.jpg"],
       "moderated": true,
       "published": true,
       "votesUp": 5,
@@ -65,7 +65,7 @@
     {
       "title": "Post 2",
       "content": "This is the content of post 2",
-      "file": "https://example.com/file2.jpg",
+      "files": ["https://example.com/file2.jpg"],
       "moderated": true,
       "published": true,
       "votesUp": 2,
@@ -77,7 +77,7 @@
     {
       "title": "Post 3",
       "content": "This is the content of post 3",
-      "file": "https://example.com/file3.jpg",
+      "files": ["https://example.com/file3.jpg"],
       "moderated": false,
       "published": false,
       "votesUp": 0,
