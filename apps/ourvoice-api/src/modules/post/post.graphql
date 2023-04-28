@@ -13,7 +13,7 @@ type Mutation {
 
 type Post {
   id: Int!
-  title: String
+  title: String!
   content: String!
   files: [String!]
   moderated: Boolean!
@@ -31,7 +31,7 @@ type Post {
 }
 
 input PostCreateInput {
-  title: String
+  title: String!
   content: String!
   files: [String!]
   moderated: Boolean
