@@ -5,44 +5,112 @@ name: CI
 
 on:
   push:
-    branches: [ "dev", "main" ]
+    branches: ["dev", "main"]
     paths-ignore:
-      - 'deployment/**'
+      - "deployment/**"
   pull_request:
-    branches: [ "dev", "main" ]
+    branches: ["dev", "main"]
     paths-ignore:
-      - 'deployment/**'
+      - "deployment/**"
 
 permissions:
   contents: read
 
 jobs:
   lint:
-      name: Lint code
+    name: Lint code
 
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-      strategy:
-        matrix:
-          node-version: [18.x]
+    strategy:
+      matrix:
+        node-version: [18.x]
 
-      steps:
-        - name: Repository checkout
-          uses: actions/checkout@v3.5.2
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v3.5.2
 
-        - name: Install pnpm
-          uses: pnpm/action-setup@v2.2.4
-          with:
-            version: 8
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
 
-        - name: Use Node.js ${{ matrix.node-version }}
-          uses: actions/setup-node@v3.6.0
-          with:
-            node-version: ${{ matrix.node-version }}
-            cache: 'pnpm'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
 
-        - name: Install dependencies
-          run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-        - name: Lint
-          run: pnpm lint
+      - name: Lint
+        run: pnpm lint
+
+  # API auth
+  api-auth:
+    name: Auth API (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
+
+    runs-on: ubuntu-latest
+
+    needs: lint
+
+    env:
+      DB_AUTH_TEST_SYSTEM_DRIVER: postgres
+      DB_AUTH_TEST_SYSTEM_HOST: localhost
+      DB_AUTH_TEST_SYSTEM_PORT: 5432
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        postgres-version: [15]
+        supertokens-version: [4.3]
+
+    services:
+      authdb:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: supertokens_user
+          POSTGRES_PASSWORD: somePassword
+          POSTGRES_DB: supertokens
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      # auth manager
+      supertokens:
+        image: registry.supertokens.io/supertokens/supertokens-postgresql:${{ matrix.supertokens-version }}
+        env:
+          POSTGRESQL_CONNECTION_URI: "postgresql://supertokens_user:somePassword@authdb:5432/supertokens"
+        options: >-
+          --health-cmd "bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep `Hello`'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 3567:3567
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v3.5.2
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: API - dummy end-to-end tests
+        working-directory: apps/ourvoice-auth-api
+        run: pnpm test:e2e
