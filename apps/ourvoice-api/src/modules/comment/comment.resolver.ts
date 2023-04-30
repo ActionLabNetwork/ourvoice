@@ -1,4 +1,9 @@
-import { CommentCreateInput, CommentUpdateInput } from './../../graphql';
+import {
+  CommentCreateInput,
+  CommentUpdateInput,
+  CommentsFilterInput,
+  PaginationInput,
+} from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommentService } from 'src/modules/comment/comment.service';
 
@@ -12,8 +17,11 @@ export class CommentResolver {
   }
 
   @Query()
-  async comments() {
-    return this.commentService.getAllComments();
+  async comments(
+    @Args('filter', { nullable: true }) filter?: CommentsFilterInput,
+    @Args('pagination', { nullable: true }) pagination?: PaginationInput,
+  ) {
+    return this.commentService.getComments(filter, pagination);
   }
 
   @Mutation()

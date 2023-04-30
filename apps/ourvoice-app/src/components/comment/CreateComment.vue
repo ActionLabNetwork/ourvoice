@@ -62,6 +62,7 @@
             <textarea
               id="comment-content"
               required
+              maxlength="255"
               v-model="content"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
@@ -93,7 +94,6 @@ import { useCommentsStore } from '@/stores/comments'
 import { ref } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import { createPostContentCharacterLimit } from '@/constants/post'
-import { storeToRefs } from 'pinia'
 
 export default {
   components: {
@@ -138,6 +138,7 @@ export default {
       selectedComment.value = undefined
       selectedPost.value = undefined
       content.value = ''
+      characterCount.value = 0
     }
 
     //Errors

@@ -1,6 +1,9 @@
 type Query {
   comment(id: Int!): Comment
-  comments: [Comment!]!
+  comments(
+    filter: CommentsFilterInput
+    pagination: PaginationInput
+  ): [Comment!]!
 }
 
 type Mutation {
@@ -37,4 +40,31 @@ input CommentUpdateInput {
   content: String
   moderated: Boolean
   published: Boolean
+}
+
+input CommentsFilterInput {
+  content: String
+  moderated: Boolean
+  published: Boolean
+  authorId: Int
+  postId: Int
+  parentId: Int
+  createdAfter: DateTime
+  createdBefore: DateTime
+  moderatedAfter: DateTime
+  moderatedBefore: DateTime
+  publishedAfter: DateTime
+  publishedBefore: DateTime
+  disabledAfter: DateTime
+  disabledBefore: DateTime
+}
+
+type PageInfo {
+  endCursor: Int
+  hasNextPage: Boolean
+}
+
+input PaginationInput {
+  page: Int
+  perPage: Int
 }

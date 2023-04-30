@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import gql from 'graphql-tag'
+import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 
 export interface CommentsState {
   data: { id: number; content: string }[]
@@ -19,16 +20,7 @@ export const useCommentsStore = defineStore('comments', {
 
   actions: {
     async fetchComments() {
-      const { onResult, onError } = useQuery(
-        gql`
-          query {
-            comments {
-              id
-              content
-            }
-          }
-        `
-      )
+      const { onResult, onError } = useQuery(GET_COMMENTS_QUERY)
 
       onResult(({ data, loading }) => {
         this.data = data.comments
@@ -54,16 +46,7 @@ export const useCommentsStore = defineStore('comments', {
       parentId: number | undefined
       authorId: number
     }) {
-      const { mutate } = useMutation(
-        gql`
-          mutation CreateComment($data: CommentCreateInput!) {
-            createComment(data: $data) {
-              id
-              content
-            }
-          }
-        `
-      )
+      const { mutate } = useMutation(CREATE_COMMENT_MUTATION)
       await mutate({
         data: {
           content,

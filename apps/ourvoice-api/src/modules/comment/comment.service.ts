@@ -1,4 +1,9 @@
-import { CommentCreateInput, CommentUpdateInput } from './../../graphql';
+import {
+  CommentCreateInput,
+  CommentsFilterInput,
+  CommentUpdateInput,
+  PaginationInput,
+} from './../../graphql';
 import { Injectable } from '@nestjs/common';
 import { Comment } from '@prisma/client';
 import { CommentRepository } from './comment.repository';
@@ -18,8 +23,11 @@ export class CommentService {
     return this.commentRepository.createComment(commentData);
   }
 
-  async getAllComments(): Promise<Comment[]> {
-    return this.commentRepository.getAllComments();
+  async getComments(
+    filter: CommentsFilterInput,
+    pagination: PaginationInput,
+  ): Promise<Comment[]> {
+    return this.commentRepository.getComments(filter, pagination);
   }
 
   async getCommentById(id: number): Promise<Comment> {
