@@ -41,10 +41,24 @@
               :searchable="true"
               required
               :caret="true"
-              placeholder="Select comment"
+              placeholder="Select a comment"
               class="px-4"
             />
-            <input
+            <Multiselect
+              v-else
+              id="posts"
+              v-model="selectedPost"
+              valueProp="id"
+              label="title"
+              :options="postsData.data"
+              mode="single"
+              :searchable="true"
+              required
+              :caret="true"
+              placeholder="Select a post"
+              class="px-4"
+            />
+            <!-- <input
               v-else
               v-model="selectedPost"
               id="post-id"
@@ -53,7 +67,7 @@
               min="1"
               placeholder="Enter Post ID"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
-            />
+            /> -->
           </div>
           <div class="mb-6">
             <label for="comment-content" class="block text-gray-700 text-lg font-semibold mb-1"
@@ -91,6 +105,7 @@
 
 <script lang="ts">
 import { useCommentsStore } from '@/stores/comments'
+import { usePostsStore } from '@/stores/posts'
 import { ref } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import { createPostContentCharacterLimit } from '@/constants/post'
@@ -102,7 +117,9 @@ export default {
   setup() {
     // Fetch comments and initial state
     const commentsStore = useCommentsStore()
+    const postsStore = usePostsStore()
     commentsStore.fetchComments()
+    postsStore.fetchPosts()
 
     // Form fields
     const commentFor = ref('comment')
@@ -155,6 +172,7 @@ export default {
 
     return {
       commentsData: commentsStore,
+      postsData: postsStore,
       content,
       submitForm,
       selectedComment,
