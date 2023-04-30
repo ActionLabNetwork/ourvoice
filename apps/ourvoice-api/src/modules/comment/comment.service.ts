@@ -8,11 +8,12 @@ export class CommentService {
   constructor(private readonly commentRepository: CommentRepository) {}
 
   async createComment(data: CommentCreateInput): Promise<Comment> {
-    const { authorId, ...restData } = data;
-
+    const { authorId, postId, parentId, ...restData } = data;
     const commentData = {
       ...restData,
       author: { connect: { id: authorId } },
+      post: postId ? { connect: { id: postId } } : undefined,
+      parent: parentId ? { connect: { id: parentId } } : undefined,
     };
     return this.commentRepository.createComment(commentData);
   }

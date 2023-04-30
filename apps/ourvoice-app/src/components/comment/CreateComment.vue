@@ -33,7 +33,7 @@
             <Multiselect
               v-if="commentFor === 'comment'"
               id="comments"
-              v-model="selectedComments"
+              v-model="selectedComment"
               valueProp="id"
               label="content"
               :options="commentsData.data"
@@ -49,6 +49,8 @@
               v-model="selectedPost"
               id="post-id"
               type="number"
+              required
+              min="1"
               placeholder="Enter Post ID"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
             />
@@ -59,15 +61,16 @@
             >
             <textarea
               id="comment-content"
+              required
               v-model="content"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
-              placeholder="I have a comment for ..."
+              placeholder="I have a comment"
               @input="updateCharacterCount"
             ></textarea>
             <div class="flex flex-col text-right">
               <span :class="contentError ? 'text-red-500' : 'text-green-500'"
-                >{{ characterCount }} /{{ createPostCharacterLimit }}</span
+                >{{ characterCount }} /{{ createPostContentCharacterLimit }}</span
               >
             </div>
           </div>
@@ -89,7 +92,8 @@
 import { useCommentsStore } from '@/stores/comments'
 import { ref } from 'vue'
 import Multiselect from '@vueform/multiselect'
-import { createPostCharacterLimit } from '@/constants/post'
+import { createPostContentCharacterLimit } from '@/constants/post'
+import { storeToRefs } from 'pinia'
 
 export default {
   components: {
@@ -102,21 +106,37 @@ export default {
 
     // Form fields
     const commentFor = ref('comment')
-    const selectedComments = ref(null)
-    const selectedPost = ref(null)
+    const selectedComment = ref(undefined)
+    const selectedPost = ref(undefined)
     const content = ref<string>('')
     const characterCount = ref(0)
 
-    const submitForm = () => {
+    const submitForm = async () => {
       //Todo: Perform validation and api call here
-      console.log('selectedComments:', selectedComments.value)
+      console.log('selectedComment:', selectedComment.value)
       console.log('selectedPost:', selectedPost.value)
       console.log('commentFor:', commentFor.value)
       console.log('content:', content.value)
+      console.log(commentFor.value === 'post')
+      //Create comment
+      await commentsStore
+        .createComment({
+          content: content.value,
+          postId: commentFor.value === 'post' ? selectedPost.value : undefined,
+          parentId: commentFor.value === 'comment' ? selectedComment.value : undefined,
+          //Todo: Get authorId from auth
+          authorId: 1
+        })
+        .then(() => {
+          console.log('Comment created successfully')
+        })
+        .catch((error) => {
+          console.log('Error creating comment', error)
+        })
 
-      //Rest form
-      selectedComments.value = null
-      selectedPost.value = null
+      //Rest form after successfully submitting the form
+      selectedComment.value = undefined
+      selectedPost.value = undefined
       content.value = ''
     }
 
@@ -127,8 +147,8 @@ export default {
     const updateCharacterCount = () => {
       characterCount.value = content.value.length
       contentError.value =
-        content.value.length > createPostCharacterLimit
-          ? `Content must not exceed ${createPostCharacterLimit} characters.`
+        content.value.length > createPostContentCharacterLimit
+          ? `Content must not exceed ${createPostContentCharacterLimit} characters.`
           : ''
     }
 
@@ -136,13 +156,13 @@ export default {
       commentsData: commentsStore,
       content,
       submitForm,
-      selectedComments,
+      selectedComment,
       selectedPost,
       commentFor,
       updateCharacterCount,
       characterCount,
       contentError,
-      createPostCharacterLimit
+      createPostContentCharacterLimit
     }
   }
 }
