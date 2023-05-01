@@ -36,7 +36,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
         password: `${process.env.SMTP_PASSWORD}`,
       },
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot({
       driver: ApolloDriver,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
@@ -44,6 +44,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class',
+        watch: true,
       },
     }),
     PostModule,
