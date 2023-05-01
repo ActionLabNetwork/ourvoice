@@ -156,6 +156,7 @@ export default {
       selectedPost.value = undefined
       content.value = ''
       characterCount.value = 0
+      location.reload()
     }
 
     //Errors
