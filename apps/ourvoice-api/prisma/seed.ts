@@ -23,7 +23,6 @@ async function clearDatabase() {
 }
 
 async function main() {
-  console.log('Seeding database...');
   await clearDatabase();
 
   const seedDataPath = join(__dirname, 'seed-data.json');
@@ -127,14 +126,18 @@ async function main() {
       },
     });
   }
-  console.log('Done seeding database.');
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+export const seedMainDb = async () => {
+  await main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+};
+
+// Uncomment this to seed using ts-node
+// seedMainDb();

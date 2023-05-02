@@ -19,11 +19,14 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:integration": "NODE_ENV=test pnpm prisma:migrate:main:test && pnpm prisma:generate:main:test && jest --runInBand --config ./test/jest.integration.config.ts",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:migrate:main": "prisma migrate dev --schema ./prisma/schema.prisma",
     "prisma:migrate:premoderation": "prisma migrate dev --schema ./prisma-premoderation/schema.prisma",
+    "prisma:migrate:main:test": "NODE_ENV=test prisma migrate dev --schema ./prisma/test/schema.prisma",
     "prisma:generate:main": "prisma generate --schema ./prisma/schema.prisma",
-    "prisma:generate:premoderation": "prisma generate --schema ./prisma-premoderation/schema.prisma"
+    "prisma:generate:premoderation": "prisma generate --schema ./prisma-premoderation/schema.prisma",
+    "prisma:generate:main:test": "NODE_ENV=test prisma generate --schema ./prisma/test/schema.prisma"
   },
   "dependencies": {
     "@apollo/server": "^4.6.0",

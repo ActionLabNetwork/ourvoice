@@ -30,23 +30,28 @@
   "categories": [
     {
       "name": "Work Environment",
-      "description": "Discuss the work environment and facilities"
+      "description": "Discuss the work environment and facilities",
+      "createdAt": "2023-04-13T10:00:00Z"
     },
     {
       "name": "Management",
-      "description": "Share feedback about management and leadership"
+      "description": "Share feedback about management and leadership",
+      "createdAt": "2023-04-13T10:00:00Z"
     },
     {
       "name": "Policies",
-      "description": "Discuss company policies and procedures"
+      "description": "Discuss company policies and procedures",
+      "createdAt": "2023-04-13T10:00:00Z"
     },
     {
       "name": "Career Growth",
-      "description": "Talk about career development and growth opportunities"
+      "description": "Talk about career development and growth opportunities",
+      "createdAt": "2023-04-13T10:00:00Z"
     },
     {
       "name": "Teamwork",
-      "description": "Discuss teamwork and collaboration within the company"
+      "description": "Discuss teamwork and collaboration within the company",
+      "createdAt": "2023-04-13T10:00:00Z"
     }
   ],
   "posts": [

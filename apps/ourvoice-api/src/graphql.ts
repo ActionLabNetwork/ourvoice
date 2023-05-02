@@ -75,7 +75,7 @@ export class CategoriesFilterInput {
 }
 
 export class PaginationInput {
-    cursor: number;
+    cursor?: Nullable<number>;
     limit: number;
 }
 
@@ -120,6 +120,11 @@ export class PostsFilterInput {
     publishedBefore?: Nullable<DateTime>;
 }
 
+export class PostPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
 export abstract class IQuery {
     abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
 
@@ -139,9 +144,9 @@ export abstract class IQuery {
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
-    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 
-    abstract postsByCategories(categories: string[]): Post[] | Promise<Post[]>;
+    abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 }
@@ -271,8 +276,14 @@ export class PostEdge {
 
 export class PostConnection {
     totalCount?: Nullable<number>;
-    pageInfo: PageInfo;
+    pageInfo: PostPageInfo;
     edges?: Nullable<Nullable<PostEdge>[]>;
+}
+
+export class PostPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
 }
 
 export type DateTime = any;
