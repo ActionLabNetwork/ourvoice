@@ -20,10 +20,18 @@
             >
             <input
               id="name"
+              v-model="form.name"
               type="text"
               name="name"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-ourvoice-grey py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              @input="v$.name.$reset()"
+              @blur="v$.name.$touch()"
             />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.name.$error" class="text-xs text-red-500">
+                {{ v$.name.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-screen md:w-1/2">
@@ -33,10 +41,18 @@
             >
             <input
               id="email"
+              v-model="form.email"
               type="email"
               name="email"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-ourvoice-grey py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              @input="v$.email.$reset()"
+              @blur="v$.email.$touch()"
             />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.email.$error" class="text-xs text-red-500">
+                {{ v$.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-full">
@@ -46,16 +62,24 @@
             >
             <textarea
               id="message"
+              v-model="form.message"
               name="message"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-ourvoice-grey py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-            ></textarea>
+              @input="v$.message.$reset()"
+              @blur="v$.message.$touch()"
+            />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.message.$error" class="text-xs text-red-500">
+                {{ v$.message.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-full">
           <button
             type="button"
             class="flex mx-auto btn btn-purple btn-hover"
-            @click="recaptcha"
+            @click="submitForm"
           >
             Submit
           </button>
@@ -75,6 +99,14 @@
 </template>
 
 <script lang="ts">
+import useVuelidate from '@vuelidate/core'
+import {
+  email,
+  helpers,
+  maxLength,
+  minLength,
+  required,
+} from '@vuelidate/validators'
 import { defineComponent } from 'vue'
 import { useReCaptcha, VueReCaptcha } from 'vue-recaptcha-v3'
 
@@ -82,26 +114,51 @@ export default defineComponent({
   name: 'ContactSection',
 
   setup() {
+    const config = useRuntimeConfig()
     const { vueApp } = useNuxtApp()
     vueApp.use(VueReCaptcha, {
-      // TODO: Add site key for recaptcha
-      siteKey: '',
+      siteKey: config.public.recaptchaSiteKey,
     })
-
     const recaptchaInstance = useReCaptcha()
 
-    const recaptcha = async () => {
-      // (optional) Wait until recaptcha has been loaded.
-      await recaptchaInstance?.recaptchaLoaded()
+    const form = reactive({
+      name: '',
+      email: '',
+      message: '',
+    })
+    const customEmailValidator = helpers.withMessage('Not a valid email', email)
+    const customRequiredValidator = helpers.withMessage(
+      'This field is required',
+      required
+    )
+    const rules = {
+      name: { customRequiredValidator, maxLength: maxLength(200) },
+      email: { customRequiredValidator, customEmailValidator },
+      message: {
+        customRequiredValidator,
+        minLength: minLength(10),
+        maxLength: maxLength(1000),
+      },
+    }
+    const v$ = useVuelidate(rules, form)
 
-      // Execute reCAPTCHA with action "login".
-      const token = await recaptchaInstance?.executeRecaptcha('submit')
-      console.log(token)
-      // Do stuff with the received token.
+    const submitForm = async () => {
+      if (!recaptchaInstance) {
+        return
+      }
+      await recaptchaInstance.recaptchaLoaded()
+      const token = await recaptchaInstance.executeRecaptcha('submit')
+
+      v$.value.$touch()
+      if (v$.value.$error) return
+
+      console.log(`Posting form with recaptcha token ${token}`)
     }
 
     return {
-      recaptcha,
+      submitForm,
+      form,
+      v$,
     }
   },
 })

@@ -140,6 +140,8 @@ importers:
       '@fortawesome/fontawesome-svg-core': ^6.3.0
       '@fortawesome/free-solid-svg-icons': ^6.3.0
       '@fortawesome/vue-fontawesome': ^3.0.3
+      '@vuelidate/core': ^2.0.2
+      '@vuelidate/validators': ^2.0.2
       autoprefixer: ^10.4.13
       postcss: ^8.4.21
       tailwindcss: ^3.2.4
@@ -149,6 +151,8 @@ importers:
       '@fortawesome/fontawesome-svg-core': 6.3.0
       '@fortawesome/free-solid-svg-icons': 6.3.0
       '@fortawesome/vue-fontawesome': 3.0.3_fajrs5oiypeclsgadewh5glkz4
+      '@vuelidate/core': 2.0.2_vue@3.2.45
+      '@vuelidate/validators': 2.0.2_vue@3.2.45
       vue: 3.2.45
       vue-recaptcha-v3: 2.0.1_vue@3.2.45
     devDependencies:
@@ -2726,6 +2730,32 @@ packages:
 
   /@vue/shared/3.2.45:
     resolution: {integrity: sha512-Ewzq5Yhimg7pSztDV+RH1UDKBzmtqieXQlpTVm2AwraoRL/Rks96mvd8Vgi7Lj+h+TH8dv7mXD3FRZR3TUvbSg==}
+
+  /@vuelidate/core/2.0.2_vue@3.2.45:
+    resolution: {integrity: sha512-aG1OZWv6xVws3ljyKy/pyxq1rdZZ2ryj+FEREcC9d4GP4qOvNHHZUl/NQxa0Bck3Ooc0RfXU8vwCA9piRoWy6w==}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.2.45
+      vue-demi: 0.13.11_vue@3.2.45
+    dev: false
+
+  /@vuelidate/validators/2.0.2_vue@3.2.45:
+    resolution: {integrity: sha512-6y6QLoK567XVmaLP3Paf1vkg6K2zO6xax3yTyczy1RnJ4PsLDLLGzP1PFzSpwb16aw4CKduBgI63HvIuctJhQg==}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.2.45
+      vue-demi: 0.13.11_vue@3.2.45
+    dev: false
 
   /@vueuse/core/9.10.0_vue@3.2.45:
     resolution: {integrity: sha512-CxMewME07qeuzuT/AOIQGv0EhhDoojniqU6pC3F8m5VC76L47UT18DcX88kWlP3I7d3qMJ4u/PD8iSRsy3bmNA==}
@@ -10014,7 +10044,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.45
-    dev: true
 
   /vue-devtools-stub/0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
