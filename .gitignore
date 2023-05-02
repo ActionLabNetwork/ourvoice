@@ -115,6 +115,3 @@ deployment/s3
 
 # OS
 .DS_Store
-
-# GraphQL Generated Typings
-apps/ourvoice-api/src/graphql.ts
