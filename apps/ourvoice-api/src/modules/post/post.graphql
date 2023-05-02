@@ -1,8 +1,12 @@
 type Query {
   post(id: Int!): Post
-  posts(filter: PostsFilterInput, pagination: PaginationInput): [Post!]!
-  postsByCategories(categories: [String!]!): [Post!]!
-  getPresignedUrls(bucket: String!, keys: [String!]!, expiresIn: Int!): [PresignedUrl!]!
+  posts(filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
+  postsByCategories(categories: [String!]!, filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
+  getPresignedUrls(
+    bucket: String!
+    keys: [String!]!
+    expiresIn: Int!
+  ): [PresignedUrl!]!
 }
 
 type Mutation {
@@ -71,17 +75,29 @@ input PostsFilterInput {
   publishedBefore: DateTime
 }
 
-type PageInfo {
-  endCursor: Int
-  hasNextPage: Boolean
-}
-
-input PaginationInput {
-  cursor: Int
-  limit: Int!
-}
-
 type PresignedUrl {
   url: String!
   key: String!
+}
+
+input PostPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PostConnection {
+  totalCount: Int
+  pageInfo: PostPageInfo!
+  edges: [PostEdge]
+}
+
+type PostPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
 }

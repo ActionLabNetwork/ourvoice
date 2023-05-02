@@ -1,7 +1,8 @@
 import { PrismaService } from '../../database/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
-import { PostsFilterInput, PaginationInput } from 'src/graphql';
+import { PostsFilterInput, PostPaginationInput } from 'src/graphql';
+import { cursorToNumber } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class PostRepository {
@@ -12,13 +13,16 @@ export class PostRepository {
   }
 
   async getPostById(id: number) {
-    return this.prisma.post.findUnique({ where: { id } });
+    return this.prisma.post.findUnique({
+      where: { id },
+      include: { categories: true },
+    });
   }
 
   async getPosts(
-    filter: PostsFilterInput,
-    pagination: PaginationInput,
-  ): Promise<Post[]> {
+    filter?: PostsFilterInput,
+    pagination?: PostPaginationInput,
+  ): Promise<{ totalCount: number; posts: Post[] }> {
     const {
       title,
       content,
@@ -71,6 +75,8 @@ export class PostRepository {
       where.publishedAt['lte'] = publishedBefore;
     }
 
+    const totalCount = await this.prisma.post.count({ where });
+
     const posts = await this.prisma.post.findMany({
       where,
       include: {
@@ -80,17 +86,19 @@ export class PostRepository {
         votes: true,
       },
       skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor ? { id: pagination.cursor } : undefined,
+      cursor: pagination?.cursor
+        ? { id: cursorToNumber(pagination.cursor.toString()) }
+        : undefined,
       take: pagination?.limit ?? 10,
     });
 
-    return posts;
+    return { totalCount, posts };
   }
 
   async getPostsByCategories(
     categoryNames: string[],
-    skip: number,
-    take: number,
+    filter?: PostsFilterInput,
+    pagination?: PostPaginationInput,
   ): Promise<Post[]> {
     return await this.prisma.post.findMany({
       where: {
@@ -106,16 +114,33 @@ export class PostRepository {
       include: {
         categories: true,
       },
-      skip,
-      take,
     });
   }
 
   async updatePost(id: number, data: Prisma.PostUpdateInput) {
-    return this.prisma.post.update({ where: { id }, data });
+    const postExists = await this.prisma.post.findUnique({ where: { id } });
+
+    if (!postExists) {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
+
+    return this.prisma.post.update({
+      where: { id },
+      data,
+      include: { categories: true },
+    });
   }
 
   async deletePost(id: number) {
-    return this.prisma.post.delete({ where: { id } });
+    const postExists = await this.prisma.post.findUnique({ where: { id } });
+
+    if (!postExists) {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
+
+    return this.prisma.post.delete({
+      where: { id },
+      include: { categories: true },
+    });
   }
 }

@@ -1,5 +1,9 @@
-import { PaginationInput } from './../../graphql';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { PostPaginationInput } from './../../graphql';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PostRepository } from './post.repository';
 import { PostCreateDto } from './dto/post-create.dto';
@@ -7,6 +11,7 @@ import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { PostsFilterDto } from './dto/posts-filter.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
+import { numberToCursor } from 'src/utils/cursor-pagination';
 
 @Injectable()
 export class PostService {
@@ -37,9 +42,18 @@ export class PostService {
   }
 
   async getPosts(
-    filter: PostsFilterDto,
-    pagination: PaginationInput,
-  ): Promise<Post[]> {
+    filter?: PostsFilterDto,
+    pagination?: PostPaginationInput,
+  ): Promise<{
+    totalCount: number;
+    edges: { node: Post; cursor: string }[];
+    pageInfo: {
+      startCursor: string;
+      endCursor: string;
+      hasNextPage: boolean;
+    };
+  }> {
+    // Validate filters
     if (filter) {
       const postsFilterDto = plainToClass(PostsFilterDto, filter);
       const errors = await validate(postsFilterDto);
@@ -49,15 +63,36 @@ export class PostService {
       }
     }
 
-    return this.postRepository.getPosts(filter, pagination);
+    // Handle pagination
+    const { totalCount, posts } = await this.postRepository.getPosts(
+      filter,
+      pagination,
+    );
+
+    const edges = posts.map((post) => ({
+      node: post,
+      cursor: numberToCursor(post.id),
+    }));
+
+    const pageInfo = {
+      startCursor: edges.length > 0 ? edges[0].cursor : null,
+      endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      hasNextPage: posts.length < totalCount,
+    };
+
+    return { totalCount, edges, pageInfo };
   }
 
   async getPostsByCategories(
     categoryNames: string[],
-    skip: number,
-    take: number,
+    filter?: PostsFilterDto,
+    pagination?: PostPaginationInput,
   ): Promise<Post[]> {
-    return this.postRepository.getPostsByCategories(categoryNames, skip, take);
+    return this.postRepository.getPostsByCategories(
+      categoryNames,
+      filter,
+      pagination,
+    );
   }
 
   async updatePost(id: number, data: PostUpdateDto): Promise<Post> {
@@ -67,10 +102,21 @@ export class PostService {
     if (errors.length > 0) {
       throw new BadRequestException(errors);
     }
+
+    const existingPost = await this.postRepository.getPostById(id);
+    if (!existingPost) {
+      throw new NotFoundException(`Post with id ${id} not found`);
+    }
+
     return this.postRepository.updatePost(id, data);
   }
 
   async deletePost(id: number): Promise<Post> {
+    const existingPost = await this.postRepository.getPostById(id);
+    if (!existingPost) {
+      throw new NotFoundException(`Post with id ${id} not found`);
+    }
+
     return this.postRepository.deletePost(id);
   }
 }

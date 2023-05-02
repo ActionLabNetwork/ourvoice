@@ -5,14 +5,17 @@ import {
   IsInt,
   ArrayMinSize,
   ArrayNotEmpty,
+  Length,
 } from 'class-validator';
 
 export class PostUpdateDto {
   @IsOptional()
+  @Length(1, 100)
   @IsString()
   title?: string;
 
   @IsOptional()
+  @Length(1, 255)
   @IsString()
   content?: string;
 

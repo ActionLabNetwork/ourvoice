@@ -1,5 +1,5 @@
 import {
-  PaginationInput,
+  PostPaginationInput,
   PostCreateInput,
   PostsFilterInput,
   PostUpdateInput,
@@ -21,18 +21,27 @@ export class PostResolver {
   @Query()
   async posts(
     @Args('filter', { nullable: true }) filter?: PostsFilterInput,
-    @Args('pagination', { nullable: true }) pagination?: PaginationInput,
+    @Args('pagination', { nullable: true }) pagination?: PostPaginationInput,
   ) {
-    return this.postService.getPosts(filter, pagination);
+    const { totalCount, edges, pageInfo } = await this.postService.getPosts(
+      filter,
+      pagination,
+    );
+
+    return { totalCount, edges, pageInfo };
   }
 
   @Query()
   async postsByCategories(
     @Args('categories', { type: () => [String] }) categories: string[],
-    @Args('skip', { type: () => Int, defaultValue: 0 }) skip: number,
-    @Args('take', { type: () => Int, defaultValue: 10 }) take: number,
+    @Args('filter', { nullable: true }) filter?: PostsFilterInput,
+    @Args('pagination', { nullable: true }) pagination?: PostPaginationInput,
   ) {
-    return this.postService.getPostsByCategories(categories, skip, take);
+    return this.postService.getPostsByCategories(
+      categories,
+      filter,
+      pagination,
+    );
   }
 
   @Query()
