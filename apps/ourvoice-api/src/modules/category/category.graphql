@@ -1,0 +1,61 @@
+type Query {
+  category(id: Int!): Category
+  categories(
+    filter: CategoriesFilterInput
+    pagination: PaginationInput
+  ): [Category!]!
+  categoriesByNames(names: [String!]!): [Category!]!
+}
+
+type Mutation {
+  createCategory(data: CategoryCreateInput!): Category!
+  updateCategory(id: Int!, data: CategoryUpdateInput!): Category!
+  deleteCategory(id: Int!): Category!
+}
+
+type Category {
+  id: Int!
+  name: String!
+  description: String
+  weight: Int!
+  active: Boolean!
+  createdAt: DateTime
+  disabledAt: DateTime
+  parent: Category
+  children: [Category!]!
+  posts: [Post!]!
+}
+
+type PageInfo {
+  endCursor: Int
+  hasNextPage: Boolean
+}
+
+input CategoryCreateInput {
+  name: String!
+  description: String
+  parentId: Int
+}
+
+input CategoryUpdateInput {
+  name: String
+  description: String
+  parentId: Int
+}
+
+input CategoriesFilterInput {
+  name: String
+  description: String
+  weight: Int
+  active: Boolean
+  parentId: Int
+  createdAfter: DateTime
+  createdBefore: DateTime
+  disabledAfter: DateTime
+  disabledBefore: DateTime
+}
+
+input PaginationInput {
+  cursor: Int
+  limit: Int!
+}

@@ -1,0 +1,17 @@
+type Mutation {
+  createVote(data: VoteCreateInput!): Vote!
+  deleteVote(id: Int!): Vote!
+}
+
+type Vote {
+  id: Int!
+  voteType: String!
+  user: User!
+  post: Post!
+}
+
+input VoteCreateInput {
+  voteType: String!
+  userId: Int!
+  postId: Int!
+}

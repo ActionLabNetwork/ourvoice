@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_MAIN_TEST_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  orgId    Int
+  hash     String   @unique
+  title    String?
+  nickname String?
+  type     UserType @relation(fields: [typeId], references: [id])
+  typeId   Int
+
+  // Meta
+  active     Boolean?  @default(true)
+  createdAt  DateTime? @default(now())
+  disabledAt DateTime?
+  updatedAt  DateTime? @default(now())
+  verifiedAt DateTime?
+
+  // Relations
+  comments Comment[]
+  posts    Post[]
+  votes    Vote[]
+}
+
+model UserType {
+  id    Int    @id @default(autoincrement())
+  type  String
+  users User[]
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String?
+  content   String  @db.VarChar(255)
+  files     Json?
+  moderated Boolean @default(false)
+  published Boolean @default(false)
+  votesDown Int     @default(0)
+  votesUp   Int     @default(0)
+
+  // Meta
+  createdAt   DateTime  @default(now())
+  disabledAt  DateTime?
+  moderatedAt DateTime?
+  publishedAt DateTime?
+
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId   Int
+  categories Category[]
+  comments   Comment[]
+  votes      Vote[]
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  weight      Int     @default(0)
+  active      Boolean @default(true)
+
+  // Meta
+  createdAt  DateTime  @default(now())
+  disabledAt DateTime?
+
+  // Relations
+  parent   Category?  @relation("Subcategories", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentId Int?
+  children Category[] @relation("Subcategories")
+  posts    Post[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  moderated Boolean? @default(false)
+  published Boolean? @default(false)
+
+  // Meta
+  createdAt   DateTime  @default(now())
+  moderatedAt DateTime?
+  publishedAt DateTime?
+  disabledAt  DateTime?
+
+  // Relations
+  author   User?     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId Int?
+  post     Post?     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId   Int?
+  parent   Comment?  @relation("ChildComments", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentId Int?
+  children Comment[] @relation("ChildComments")
+}
+
+model Vote {
+  id       Int    @id @default(autoincrement())
+  voteType String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   Int
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId   Int
+}

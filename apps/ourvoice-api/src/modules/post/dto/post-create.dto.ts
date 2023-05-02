@@ -1,0 +1,49 @@
+import {
+  IsString,
+  IsBoolean,
+  IsInt,
+  ArrayMinSize,
+  ArrayNotEmpty,
+  ArrayMaxSize,
+  IsOptional,
+  Length,
+} from 'class-validator';
+
+export class PostCreateDto {
+  @IsString()
+  @Length(1, 100)
+  title: string;
+
+  @IsString()
+  @Length(1, 255)
+  content: string;
+
+  @IsBoolean()
+  @IsOptional()
+  moderated?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  published?: boolean;
+
+  @IsInt()
+  @IsOptional()
+  votesDown?: number;
+
+  @IsInt()
+  @IsOptional()
+  votesUp?: number;
+
+  @IsInt()
+  authorId: number;
+
+  @ArrayNotEmpty()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(2)
+  @IsInt({ each: true })
+  categoryIds: number[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  files?: string[];
+}

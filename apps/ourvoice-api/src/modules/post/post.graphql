@@ -1,0 +1,103 @@
+type Query {
+  post(id: Int!): Post
+  posts(filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
+  postsByCategories(categories: [String!]!, filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
+  getPresignedUrls(
+    bucket: String!
+    keys: [String!]!
+    expiresIn: Int!
+  ): [PresignedUrl!]!
+}
+
+type Mutation {
+  createPost(data: PostCreateInput!): Post!
+  updatePost(id: Int!, data: PostUpdateInput!): Post!
+  deletePost(id: Int!): Post!
+}
+
+type Post {
+  id: Int!
+  title: String!
+  content: String!
+  files: [String!]
+  moderated: Boolean!
+  published: Boolean!
+  votesDown: Int!
+  votesUp: Int!
+  createdAt: DateTime
+  disabledAt: DateTime
+  moderatedAt: DateTime
+  publishedAt: DateTime
+  author: User!
+  categories: [Category!]!
+  comments: [Comment!]!
+  votes: [Vote!]!
+}
+
+input PostCreateInput {
+  title: String!
+  content: String!
+  files: [String!]
+  moderated: Boolean
+  published: Boolean
+  votesDown: Int
+  votesUp: Int
+  authorId: Int!
+  categoryIds: [Int!]!
+}
+
+input PostUpdateInput {
+  title: String
+  content: String
+  files: [String!]
+  moderated: Boolean
+  published: Boolean
+  votesDown: Int
+  votesUp: Int
+  authorId: Int
+  categoryIds: [Int!]
+}
+
+input PostsFilterInput {
+  title: String
+  content: String
+  moderated: Boolean
+  published: Boolean
+  votesDown: Int
+  votesUp: Int
+  authorId: Int
+  categoryIds: [Int!]
+  createdAfter: DateTime
+  createdBefore: DateTime
+  moderatedAfter: DateTime
+  moderatedBefore: DateTime
+  publishedAfter: DateTime
+  publishedBefore: DateTime
+}
+
+type PresignedUrl {
+  url: String!
+  key: String!
+}
+
+input PostPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PostConnection {
+  totalCount: Int
+  pageInfo: PostPageInfo!
+  edges: [PostEdge]
+}
+
+type PostPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}

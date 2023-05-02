@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator premoderationClient {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@internal/prisma/client"
+}
+
+datasource premoderation {
+  provider = "postgresql"
+  url      = env("DATABASE_PREMODERATION_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  orgId    Int
+  hash     String   @unique
+  title    String?
+  nickname String?
+  type     UserType @relation(fields: [typeId], references: [id])
+  typeId   Int
+
+  // Meta
+  active     Boolean
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now())
+  verifiedAt DateTime?
+  disabledAt DateTime?
+
+  // Relations
+  posts             Post[]              @relation("PostAuthor")
+  moderatedPosts    PostModeration[]
+  comments          Comment[]           @relation("CommentAuthor")
+  moderatedComments CommentModeration[]
+}
+
+model UserType {
+  id    Int    @id @default(autoincrement())
+  type  String
+  users User[]
+}
+
+model Post {
+  id         Int     @id @default(autoincrement())
+  title      String?
+  content    String
+  file       String?
+  identifier String
+  sequence   Int     @default(0)
+
+  // Moderation
+  status     PostStatus       @default(PENDING)
+  version    Int              @default(0)
+  timestamp  DateTime         @default(now())
+  latest     Boolean          @default(true)
+  moderators PostModeration[]
+
+  // Relations
+  comments Comment[]
+  author   User?     @relation("PostAuthor", fields: [authorId], references: [id])
+  authorId Int?
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  content String
+
+  // Moderation
+  status     PostStatus          @default(PENDING)
+  version    Int                 @default(0)
+  timestamp  DateTime            @default(now())
+  latest     Boolean             @default(true)
+  moderators CommentModeration[]
+
+  // Relations
+  author   User?     @relation("CommentAuthor", fields: [authorId], references: [id])
+  authorId Int?
+  post     Post?     @relation(fields: [postId], references: [id])
+  postId   Int?
+  parentId Int?
+  parent   Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children Comment[] @relation("CommentToComment")
+}
+
+model PostModeration {
+  postId      Int
+  post        Post     @relation(fields: [postId], references: [id])
+  moderatorId Int
+  moderator   User     @relation(fields: [moderatorId], references: [id])
+  decision    Decision
+  reason      String?
+  timestamp   DateTime @default(now())
+
+  @@id([postId, moderatorId])
+}
+
+model CommentModeration {
+  commentId   Int
+  comment     Comment  @relation(fields: [commentId], references: [id])
+  moderatorId Int
+  moderator   User     @relation(fields: [moderatorId], references: [id])
+  decision    Decision
+  reason      String?
+  timestamp   DateTime @default(now())
+
+  @@id([commentId, moderatorId])
+}
+
+enum Decision {
+  ACCEPTED
+  REJECTED
+}
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

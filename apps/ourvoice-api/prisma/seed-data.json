@@ -1,0 +1,134 @@
+{
+  "userTypes": [
+    { "type": "Admin" },
+    { "type": "Moderator" },
+    { "type": "User" }
+  ],
+  "users": [
+    {
+      "orgId": 1,
+      "hash": "user1hash",
+      "title": "User 1",
+      "nickname": "user1",
+      "typeId": 1
+    },
+    {
+      "orgId": 2,
+      "hash": "user2hash",
+      "title": "User 2",
+      "nickname": "user2",
+      "typeId": 2
+    },
+    {
+      "orgId": 3,
+      "hash": "user3hash",
+      "title": "User 3",
+      "nickname": "user3",
+      "typeId": 3
+    }
+  ],
+  "categories": [
+    {
+      "name": "Work Environment",
+      "description": "Discuss the work environment and facilities",
+      "createdAt": "2023-04-13T10:00:00Z"
+    },
+    {
+      "name": "Management",
+      "description": "Share feedback about management and leadership",
+      "createdAt": "2023-04-13T10:00:00Z"
+    },
+    {
+      "name": "Policies",
+      "description": "Discuss company policies and procedures",
+      "createdAt": "2023-04-13T10:00:00Z"
+    },
+    {
+      "name": "Career Growth",
+      "description": "Talk about career development and growth opportunities",
+      "createdAt": "2023-04-13T10:00:00Z"
+    },
+    {
+      "name": "Teamwork",
+      "description": "Discuss teamwork and collaboration within the company",
+      "createdAt": "2023-04-13T10:00:00Z"
+    }
+  ],
+  "posts": [
+    {
+      "title": "Post 1",
+      "content": "This is the content of post 1",
+      "files": ["https://example.com/file1.jpg"],
+      "moderated": true,
+      "published": true,
+      "votesUp": 5,
+      "votesDown": 1,
+      "authorId": 1,
+      "createdAt": "2023-04-13T10:00:00Z",
+      "categories": [1]
+    },
+    {
+      "title": "Post 2",
+      "content": "This is the content of post 2",
+      "files": ["https://example.com/file2.jpg"],
+      "moderated": true,
+      "published": true,
+      "votesUp": 2,
+      "votesDown": 0,
+      "authorId": 2,
+      "createdAt": "2023-04-13T11:00:00Z",
+      "categories": [2, 3]
+    },
+    {
+      "title": "Post 3",
+      "content": "This is the content of post 3",
+      "files": ["https://example.com/file3.jpg"],
+      "moderated": false,
+      "published": false,
+      "votesUp": 0,
+      "votesDown": 0,
+      "authorId": 3,
+      "createdAt": "2023-04-14T10:00:00Z",
+      "categories": [3, 4, 5]
+    }
+  ],
+  "comments": [
+    {
+      "content": "This is a comment on post 1",
+      "moderated": true,
+      "published": true,
+      "authorId": 1,
+      "postId": 1,
+      "createdAt": "2023-04-13T10:30:00Z"
+    },
+    {
+      "content": "This is a comment on post 2",
+      "moderated": true,
+      "published": true,
+      "authorId": 2,
+      "postId": 2,
+      "createdAt": "2023-04-13T11:30:00Z"
+    },
+    {
+      "content": "This is a reply to comment 1",
+      "moderated": false,
+      "published": false,
+      "authorId": 1,
+      "postId": 1,
+      "parentId": 1,
+      "createdAt": "2023-04-14T10:30:00Z"
+    }
+  ],
+  "votes": [
+    {
+      "voteType": "UPVOTE",
+      "userId": 1,
+      "postId": 1
+    },
+    {
+      "voteType": "DOWNVOTE",
+      "userId": 2,
+      "postId": 1
+    }
+  ]
+}
