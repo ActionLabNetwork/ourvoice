@@ -29,7 +29,7 @@ export class CategoryService {
       throw new BadRequestException(errors);
     }
 
-    const { parentId, ...rest } = data;
+    const { parentId } = data;
     if (parentId) {
       const parentCategory = await this.categoryRepository.getCategoryById(
         parentId,
