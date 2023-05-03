@@ -41,16 +41,6 @@ This also links to the `reverse proxy` deployed via `docker-compose` file. If yo
 - Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
 - Run `pnpm run dev` from the corresponding `app` directory to start the server (`app`, `api`, `auth`, `admin` or `apps` for all);
 
-Local ports reference:
-| Service | Port |
-| ------- | ----- |
-| Portal | 3011 |
-| App | 3010 |
-| Admin | 3020 |
-| Auth | 3030 |
-| API | 3000 |
-| Auth API| 3001 |
-
 #### Suggested IDEA and plugins:
 
 - [VSCode](https://code.visualstudio.com/)
