@@ -153,7 +153,6 @@ describe('CategoryService', () => {
 
     // Act
     const result = await categoryService.getCategories();
-    console.log(result);
 
     // Assert
     expect(result).toEqual({

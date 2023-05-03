@@ -74,9 +74,9 @@ export class CategoriesFilterInput {
     disabledBefore?: Nullable<DateTime>;
 }
 
-export class PaginationInput {
-    cursor?: Nullable<number>;
-    limit: number;
+export class CategoryPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
 }
 
 export class PostCreateInput {
@@ -138,9 +138,7 @@ export abstract class IQuery {
 
     abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
 
-    abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<PaginationInput>): Category[] | Promise<Category[]>;
-
-    abstract categoriesByNames(names: string[]): Category[] | Promise<Category[]>;
+    abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
@@ -236,12 +234,23 @@ export class Category {
     createdAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     parent?: Nullable<Category>;
-    children: Category[];
-    posts: Post[];
+    children?: Nullable<Category[]>;
+    posts?: Nullable<Post[]>;
 }
 
-export class PageInfo {
-    endCursor?: Nullable<number>;
+export class CategoryEdge {
+    node: Category;
+    cursor: string;
+}
+
+export class CategoryConnection {
+    pageInfo: CategoryPageInfo;
+    edges: CategoryEdge[];
+}
+
+export class CategoryPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
 }
 

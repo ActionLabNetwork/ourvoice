@@ -90,7 +90,6 @@ describe('CategoryRepository', () => {
 
     // Act
     const category = await categoryRepository.getCategoryById(1);
-    console.log(category);
 
     // Assert
     expect(category).toEqual(firstCategory);
