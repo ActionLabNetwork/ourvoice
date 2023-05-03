@@ -185,7 +185,6 @@ describe('PostService', () => {
 
     const filterData = { title: 'Test Title', moderated: true };
     const paginationData = { cursor: '1', limit: 10 };
-
     const expectedResult = {
       edges: [
         {
