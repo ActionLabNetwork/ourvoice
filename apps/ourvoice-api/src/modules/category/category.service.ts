@@ -29,6 +29,18 @@ export class CategoryService {
       throw new BadRequestException(errors);
     }
 
+    // Handle duplicate category
+    const existingCategory = await this.categoryRepository.getCategories({
+      name: data.name,
+    });
+
+    if (existingCategory.totalCount > 0) {
+      throw new BadRequestException(
+        `Category with name ${data.name} already exists`,
+      );
+    }
+
+    // Handle creating subcategory
     const { parentId } = data;
     if (parentId) {
       const parentCategory = await this.categoryRepository.getCategoryById(
@@ -36,7 +48,11 @@ export class CategoryService {
       );
 
       if (!parentCategory) {
-        throw new Error('Invalid parentId provided');
+        throw new BadRequestException('Invalid parentId provided');
+      }
+
+      if (!parentCategory.active) {
+        throw new BadRequestException('Parent category is inactive');
       }
     }
 
@@ -48,8 +64,8 @@ export class CategoryService {
   }
 
   async getCategories(
-    filter: CategoriesFilterInput,
-    pagination: CategoryPaginationInput,
+    filter?: CategoriesFilterInput,
+    pagination?: CategoryPaginationInput,
   ): Promise<{
     totalCount: number;
     edges: { node: Category; cursor: string }[];
