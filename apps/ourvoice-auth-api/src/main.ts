@@ -10,23 +10,25 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  const configService = await app.get(ConfigService);
+
+  // configService.get<AuthOptions[]>('auth');
 
   // TODO: add admin and app addresses to list
   const whitelist: string[] = [
     configService.get('SUPERTOKENS_API_DOMAIN'),
-    configService.get('SUPERTOKENS_WEBSITE_DOMAIN'),
-    'http://localhost:3020',
-    'http://localhost:3010',
-    'http://demo.localhost:3010',
-    'http://www.demo.localhost:3010',
+    configService.get('VITE_APP_AUTH_URL'),
+    configService.get('VITE_APP_ADMIN_URL'),
+    configService.get('VITE_APP_APP_URL'),
   ];
   // TODO : use regex for all deployment names
   app.enableCors({
     // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      console.log(origin);
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      const match = origin
+        .toLowerCase()
+        .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
+      if (!origin || whitelist.indexOf(origin) !== -1 || match) {
         callback(null, true);
       } else {
         callback(

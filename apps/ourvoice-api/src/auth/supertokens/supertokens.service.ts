@@ -19,9 +19,7 @@ export class SupertokensService {
       },
       recipeList: [
         Session.init({
-          cookieDomain: `${
-            process.env.SUPERTOKENS_COOKIE_DOMAIN || '.localhost'
-          }`,
+          cookieDomain: `${process.env.SUPERTOKENS_COOKIE_DOMAIN}`,
         }),
         UserMetadata.init(),
         UserRoles.init(),

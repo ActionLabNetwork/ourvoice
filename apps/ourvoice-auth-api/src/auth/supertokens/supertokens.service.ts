@@ -29,7 +29,7 @@ export class SupertokensService {
       },
       recipeList: [
         Session.init({
-          cookieDomain: config.cookieDomain || '.localhost',
+          cookieDomain: config.cookieDomain || 'localhost',
         }),
         UserMetadata.init(),
         UserRoles.init(),

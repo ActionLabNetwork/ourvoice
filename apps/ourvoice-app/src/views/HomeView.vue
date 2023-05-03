@@ -34,9 +34,7 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 
 const apiURL = import.meta.env.VITE_APP_API_URL || `http://localhost:3000`
 
-const authURL =
-  import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword' ||
-  'http://localhost:3030/signinWithoutPassword'
+const authURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 
 export default defineComponent({
   props: ['deployment'],

@@ -17,7 +17,6 @@ async function bootstrap() {
     'http://localhost:3010',
     'http://localhost:3020',
   ];
-
   app.enableCors({
     // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {

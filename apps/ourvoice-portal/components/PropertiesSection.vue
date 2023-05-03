@@ -1,22 +1,24 @@
 <template>
-  <!-- Heading -->
-  <div class="sm:w-3/4 lg:w-5/12 mx-auto px-2">
-    <h1 class="text-3xl text-center text-bookmark-blue">
-      <span class="text-ourvoice-purple">Our</span
-      ><span class="text-ourvoice-red">Voice</span> features
-    </h1>
-    <p class="text-center text-ourvoice-grey mt-4">
-      Our aim is to make it easy and fear free to share opinions, start
-      discussions around importnat but sometimes sensitive topics.
-    </p>
+  <div>
+    <!-- Heading -->
+    <div class="sm:w-3/4 lg:w-5/12 mx-auto px-2">
+      <h1 class="text-3xl text-center text-bookmark-blue">
+        <span class="text-ourvoice-purple">Our</span
+        ><span class="text-ourvoice-red">Voice</span> features
+      </h1>
+      <p class="text-center text-ourvoice-grey mt-4">
+        Our aim is to make it easy and fear free to share opinions, start
+        discussions around importnat but sometimes sensitive topics.
+      </p>
+    </div>
+    <!-- Props -->
+    <system-property
+      v-for="(property, idx) in properties"
+      :id="idx"
+      :key="idx"
+      :property="property"
+    ></system-property>
   </div>
-  <!-- Props -->
-  <system-property
-    v-for="(property, idx) in properties"
-    :id="idx"
-    :key="idx"
-    :property="property"
-  ></system-property>
 </template>
 
 <script lang="ts">

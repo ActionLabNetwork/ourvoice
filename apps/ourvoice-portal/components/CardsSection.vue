@@ -1,29 +1,30 @@
 <template>
-  <!-- Heading -->
-
-  <div class="container sm:w-3/4 lg:w-5/12 mx-auto px-2">
-    <h1 class="text-3xl text-center text-ourvoice-blue">
-      {{ cardTitle }}
-    </h1>
-    <p class="text-center text-ourvoice-grey mt-4">
-      {{ cardSubTitle }}
-    </p>
-  </div>
-  <!-- Cards -->
-  <div
-    class="container grid grid-cols-1 md:grid-cols-2 gap-24 max-w-screen-lg mt-16"
-  >
-    <!-- Card 1 -->
-    <ClientOnly>
-      <card
-        v-for="(feature, idx) in features"
-        :id="idx"
-        :key="idx"
-        :feature="feature"
-        :class="feature.url ? 'cursor-pointer' : 'cursor-auto'"
-        @click="onClick(feature.url)"
-      ></card
-    ></ClientOnly>
+  <div>
+    <!-- Heading -->
+    <div class="container sm:w-3/4 lg:w-5/12 mx-auto px-2">
+      <h1 class="text-3xl text-center text-ourvoice-blue">
+        {{ cardTitle }}
+      </h1>
+      <p class="text-center text-ourvoice-grey mt-4">
+        {{ cardSubTitle }}
+      </p>
+    </div>
+    <!-- Cards -->
+    <div
+      class="container grid grid-cols-1 md:grid-cols-2 gap-24 max-w-screen-lg mt-16"
+    >
+      <!-- Card 1 -->
+      <ClientOnly>
+        <card
+          v-for="(feature, idx) in features"
+          :id="idx"
+          :key="idx"
+          :feature="feature"
+          :class="feature.url ? 'cursor-pointer' : 'cursor-auto'"
+          @click="onClick(feature.url)"
+        ></card
+      ></ClientOnly>
+    </div>
   </div>
 </template>
 
