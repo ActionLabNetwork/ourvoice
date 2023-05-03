@@ -34,10 +34,10 @@
               v-if="commentFor === 'comment'"
               id="comments"
               v-model="selectedComment"
-              group:true
+              :groups="true"
               valueProp="id"
               label="content"
-              :options="commentsData.data"
+              :options="commentsData.getGroupedComments"
               mode="single"
               :searchable="true"
               required
@@ -93,9 +93,10 @@
     </div>
   </div>
 
-  <!-- <pre
-    class="bg-slate-800 text-orange-400"
-  ><h1>length: {{commentsData.data.length}}</h1>{{ commentsData.data }}</pre> -->
+  <!-- <pre class="bg-slate-800 text-orange-400"><h1>length: {{commentsData.data.length}}</h1>
+  {{ commentsData.data }}
+  </pre>
+  <pre class="bg-white text-orange-400">{{ commentsData.getGroupedComments }}</pre> -->
 </template>
 
 <script lang="ts">
@@ -118,8 +119,8 @@ export default {
 
     // Form fields
     const commentFor = ref('comment')
-    const selectedComment = ref(undefined)
-    const selectedPost = ref(undefined)
+    const selectedComment = ref<number[]>([])
+    const selectedPost = ref<number[]>([])
     const content = ref<string>('')
     const characterCount = ref(0)
 
@@ -129,24 +130,26 @@ export default {
       console.log('selectedPost:', selectedPost.value)
       console.log('commentFor:', commentFor.value)
       console.log('content:', content.value)
-      console.log(commentFor.value === 'post')
       //Create comment
       await commentsStore
         .createComment({
           content: content.value,
-          postId: commentFor.value === 'post' ? selectedPost.value : undefined,
-          parentId: commentFor.value === 'comment' ? selectedComment.value : undefined,
+          postId:
+            commentFor.value === 'post' ? selectedPost.value[0] ?? selectedPost.value : undefined,
+          parentId:
+            commentFor.value === 'comment'
+              ? selectedComment.value[0] ?? selectedComment.value
+              : undefined,
           //Todo: Get authorId from auth
           authorId: 1
         })
         .then(() => {
           console.log('Comment created successfully')
           //Rest form after successfully submitting the form
-          selectedComment.value = undefined
-          selectedPost.value = undefined
+          selectedComment.value = []
+          selectedPost.value = []
           content.value = ''
           characterCount.value = 0
-          location.reload()
         })
         .catch((error) => {
           console.log('Error creating comment:', error)

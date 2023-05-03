@@ -21,10 +21,9 @@ describe('Create Comment Tab Test', () => {
     cy.get('#comment-content').type('This is a test comment for comment')
     cy.get('button').contains('Create Comment').click()
 
-    cy.visit('/noauth')
-    cy.get('li').contains('Create Comment').click()
+    // check if comment is created for comment
     cy.get('#comments').click()
-    cy.get('#comments-multiselect-options li:last').contains('This is a test comment for comment')
+    cy.get('#comments-multiselect-group-1 li:last').contains('This is a test comment for comment')
   })
 
   it('create comment for post', () => {
@@ -36,9 +35,9 @@ describe('Create Comment Tab Test', () => {
     cy.get('#comment-content').type('This is a test comment for post')
     cy.get('button').contains('Create Comment').click()
 
-    cy.visit('/noauth')
-    cy.get('li').contains('Create Comment').click()
+    // check if comment is created for post
+    cy.get('#comment').click()
     cy.get('#comments').click()
-    cy.get('#comments-multiselect-options li:last').contains('This is a test comment for post')
+    cy.get('#comments-multiselect-group-0 li:last').contains('This is a test comment for post')
   })
 })

@@ -114,7 +114,6 @@
       "moderated": false,
       "published": false,
       "authorId": 1,
-      "postId": 1,
       "parentId": 1,
       "createdAt": "2023-04-14T10:30:00Z"
     }

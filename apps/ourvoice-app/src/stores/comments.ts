@@ -4,7 +4,13 @@ import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 
 export interface CommentsState {
-  data: { id: number; content: string; author: Object; post: Object; parent: Object }[]
+  data: {
+    id: number
+    content: string
+    author: Object | null
+    post: Object | null
+    parent: Object | null
+  }[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -17,9 +23,45 @@ export const useCommentsStore = defineStore('comments', {
     error: undefined,
     errorMessage: undefined
   }),
+
   getters: {
     getCommentslength(state) {
       return state.data.length
+    },
+
+    getGroupedComments(state) {
+      const commentsForPosts: {
+        id: number
+        content: string
+        author: Object | null
+        post: Object | null
+        parent: Object | null
+      }[] = []
+      const commentsForComments: {
+        id: number
+        content: string
+        author: Object | null
+        post: Object | null
+        parent: Object | null
+      }[] = []
+      state.data.forEach((c) => {
+        if (c.parent) {
+          commentsForComments.push(c)
+        }
+        if (c.post) {
+          commentsForPosts.push(c)
+        }
+      })
+      return [
+        {
+          label: 'Comments for Posts',
+          options: commentsForPosts
+        },
+        {
+          label: 'Comments for Comments',
+          options: commentsForComments
+        }
+      ]
     }
   },
   actions: {
@@ -27,7 +69,15 @@ export const useCommentsStore = defineStore('comments', {
       const { onResult, onError } = useQuery(GET_COMMENTS_QUERY)
 
       onResult(({ data, loading }) => {
-        this.data = data.comments
+        this.data = data.comments.map(
+          (comment: { id: any; content: any; author: any; post: any; parent: any }) => ({
+            id: comment.id,
+            content: comment.content,
+            author: comment.author ?? null,
+            post: comment.post ?? null,
+            parent: comment.parent ?? null
+          })
+        )
         this.loading = loading
       })
 
@@ -50,6 +100,7 @@ export const useCommentsStore = defineStore('comments', {
       parentId: number | undefined
       authorId: number
     }) {
+      // const result = undefined
       const { mutate } = useMutation(CREATE_COMMENT_MUTATION)
       await mutate({
         data: {
@@ -58,8 +109,11 @@ export const useCommentsStore = defineStore('comments', {
           parentId,
           authorId
         }
-      }).then(async (r) => {
-        console.log(r?.data)
+      }).then((response) => {
+        console.log('response: ', response)
+        this.$patch((state) => {
+          state.data.push(response?.data.createComment)
+        })
       })
     }
   }

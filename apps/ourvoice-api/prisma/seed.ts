@@ -101,7 +101,7 @@ async function main() {
       data: {
         ...rest,
         author: { connect: { id: author.id } },
-        post: { connect: { id: post.id } },
+        post: post ? { connect: { id: post.id } } : undefined,
         parent: parentComment
           ? { connect: { id: parentComment.id } }
           : undefined,
