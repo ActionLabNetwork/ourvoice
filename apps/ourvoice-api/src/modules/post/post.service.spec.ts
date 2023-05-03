@@ -11,12 +11,12 @@ describe('PostService', () => {
   let postService: PostService;
   let postRepositoryMock: DeepMocked<PostRepository>;
 
-  const dummyPost: Post = {
+  const dummyPost = {
     id: 1,
     title: 'Test Title',
     content: 'Test Content',
     authorId: 1,
-    createdAt: new Date(),
+    createdAt: new Date('2023-05-03T00:04:54.956Z'),
     disabledAt: null,
     moderatedAt: null,
     publishedAt: null,
@@ -26,6 +26,19 @@ describe('PostService', () => {
     votesDown: 0,
     votesUp: 0,
   };
+
+  const dummyCategories = [
+    {
+      id: 1,
+      name: 'Work Environment',
+      description: 'Discuss the work environment and facilities',
+      active: true,
+      createdAt: new Date('2023-04-13T10:00:00.000Z'),
+      disabledAt: null,
+      parentId: null,
+      weight: 0,
+    },
+  ];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -137,13 +150,16 @@ describe('PostService', () => {
   it('should get a post by ID', async () => {
     // Arrange
     const postId = 1;
-    postRepositoryMock.getPostById.mockResolvedValue(dummyPost);
+    postRepositoryMock.getPostById.mockResolvedValue({
+      ...dummyPost,
+      categories: dummyCategories,
+    });
 
     // Act
     const result = await postService.getPostById(postId);
 
     // Assert
-    expect(result).toEqual(dummyPost);
+    expect(result).toEqual({ ...dummyPost, categories: dummyCategories });
     expect(postRepositoryMock.getPostById).toHaveBeenCalledWith(postId);
   });
 
@@ -163,16 +179,48 @@ describe('PostService', () => {
   // Tests that getPosts method successfully retrieves posts with valid filter and pagination input.
   it('should get posts with filters and pagination', async () => {
     // Arrange
-    postRepositoryMock.getPosts.mockResolvedValue([dummyPost]);
+    postRepositoryMock.getPosts.mockResolvedValue({
+      totalCount: 1,
+      posts: [dummyPost],
+    });
 
     const filterData = { title: 'Test Title', moderated: true };
-    const paginationData = { cursor: 1, limit: 10 };
+    const paginationData = { cursor: '1', limit: 10 };
+
+    const expectedResult = {
+      edges: [
+        {
+          cursor: 'MQ==',
+          node: {
+            authorId: 1,
+            content: 'Test Content',
+            createdAt: new Date('2023-05-03T00:04:54.956Z'),
+            disabledAt: null,
+            files: null,
+            id: 1,
+            moderated: false,
+            moderatedAt: null,
+            published: false,
+            publishedAt: null,
+            title: 'Test Title',
+            votesDown: 0,
+            votesUp: 0,
+          },
+        },
+      ],
+      pageInfo: {
+        endCursor: 'MQ==',
+        hasNextPage: false,
+        startCursor: 'MQ==',
+      },
+      totalCount: 1,
+    };
 
     // Act
     const result = await postService.getPosts(filterData, paginationData);
 
     // Assert
-    expect(result).toEqual([dummyPost]);
+    expect(result).toEqual(expectedResult);
     expect(postRepositoryMock.getPosts).toHaveBeenCalledWith(
       filterData,
       paginationData,
@@ -181,7 +229,7 @@ describe('PostService', () => {
 
   it('should fail to get posts with invalid filters', async () => {
     const invalidFilterData = { title: 123, moderated: 'not boolean' };
-    const paginationData = { cursor: 1, limit: 10 };
+    const paginationData = { cursor: '1', limit: 10 };
 
     await expect(
       postService.getPosts(invalidFilterData as unknown, paginationData),
@@ -191,8 +239,6 @@ describe('PostService', () => {
   it('should get posts by categories', async () => {
     // Arrange
     const categoryNames = ['Category 1', 'Category 2'];
-    const skip = 0;
-    const take = 10;
 
     const posts = [
       { ...dummyPost, id: 1 },
@@ -202,44 +248,33 @@ describe('PostService', () => {
     postRepositoryMock.getPostsByCategories.mockResolvedValue(posts);
 
     // Act
-    const result = await postService.getPostsByCategories(
-      categoryNames,
-      skip,
-      take,
-    );
+    const result = await postService.getPostsByCategories(categoryNames);
 
     // Assert
     expect(result).toEqual(posts);
     expect(postRepositoryMock.getPostsByCategories).toHaveBeenCalledWith(
       categoryNames,
-      skip,
-      take,
+      undefined,
+      undefined,
     );
   });
 
   it('should return no posts when categories is empty', async () => {
     // Arrange
     const categoryNames = [];
-    const skip = 0;
-    const take = 10;
-
     const posts = [];
 
     postRepositoryMock.getPostsByCategories.mockResolvedValue(posts);
 
     // Act
-    const result = await postService.getPostsByCategories(
-      categoryNames,
-      skip,
-      take,
-    );
+    const result = await postService.getPostsByCategories(categoryNames);
 
     // Assert
     expect(result).toEqual(posts);
     expect(postRepositoryMock.getPostsByCategories).toHaveBeenCalledWith(
       categoryNames,
-      skip,
-      take,
+      undefined,
+      undefined,
     );
   });
 
@@ -256,6 +291,7 @@ describe('PostService', () => {
       id: postId,
       title: 'Updated Title',
       content: 'Updated Content',
+      categories: dummyCategories,
     };
 
     postRepositoryMock.updatePost.mockResolvedValue(updatedPost);
@@ -301,7 +337,10 @@ describe('PostService', () => {
     // Arrange
     const postId = 1;
 
-    postRepositoryMock.deletePost.mockResolvedValue(dummyPost);
+    postRepositoryMock.deletePost.mockResolvedValue({
+      ...dummyPost,
+      categories: dummyCategories,
+    });
 
     // Act
     const result = await postService.deletePost(postId);

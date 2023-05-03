@@ -11,7 +11,7 @@ import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { PostsFilterDto } from './dto/posts-filter.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
-import { numberToCursor } from 'src/utils/cursor-pagination';
+import { numberToCursor } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class PostService {
