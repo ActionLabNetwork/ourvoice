@@ -6,9 +6,18 @@ export const CREATE_COMMENT_MUTATION = gql`
       id
       content
       createdAt
-      publishedAt
-      moderatedAt
-      disabledAt
+      author {
+        id
+        nickname
+      }
+      post {
+        id
+        title
+      }
+      parent {
+        id
+        content
+      }
     }
   }
 `

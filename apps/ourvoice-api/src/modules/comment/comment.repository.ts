@@ -8,7 +8,14 @@ export class CommentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createComment(data: Prisma.CommentCreateInput) {
-    return this.prisma.comment.create({ data });
+    return this.prisma.comment.create({
+      data,
+      include: {
+        author: true,
+        post: true,
+        parent: true,
+      },
+    });
   }
 
   async getCommentById(id: number) {

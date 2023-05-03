@@ -4,7 +4,7 @@ import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 
 export interface CommentsState {
-  data: { id: number; content: string }[]
+  data: { id: number; content: string; author: Object; post: Object; parent: Object }[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -17,7 +17,11 @@ export const useCommentsStore = defineStore('comments', {
     error: undefined,
     errorMessage: undefined
   }),
-
+  getters: {
+    getCommentslength(state) {
+      return state.data.length
+    }
+  },
   actions: {
     async fetchComments() {
       const { onResult, onError } = useQuery(GET_COMMENTS_QUERY)
@@ -54,7 +58,7 @@ export const useCommentsStore = defineStore('comments', {
           parentId,
           authorId
         }
-      }).then((r) => {
+      }).then(async (r) => {
         console.log(r?.data)
       })
     }
