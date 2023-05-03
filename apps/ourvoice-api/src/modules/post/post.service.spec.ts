@@ -4,7 +4,6 @@ import { PostService } from './post.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostRepository } from './post.repository';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { Post } from '@prisma/client';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('PostService', () => {
@@ -215,7 +214,6 @@ describe('PostService', () => {
       },
       totalCount: 1,
     };
-
     // Act
     const result = await postService.getPosts(filterData, paginationData);
 
@@ -346,7 +344,10 @@ describe('PostService', () => {
     const result = await postService.deletePost(postId);
 
     // Assert
-    expect(result).toEqual(dummyPost);
+    expect(result).toEqual({
+      ...dummyPost,
+      categories: dummyCategories,
+    });
     expect(postRepositoryMock.deletePost).toHaveBeenCalledWith(postId);
   });
 
