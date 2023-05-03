@@ -1,70 +1,84 @@
 import { Category, Prisma } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { CategoriesFilterInput, PaginationInput } from 'src/graphql';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { CategoriesFilterInput, CategoryPaginationInput } from 'src/graphql';
+import { cursorToNumber } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class CategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createCategory(data: Prisma.CategoryCreateInput): Promise<Category> {
-    return this.prisma.category.create({ data });
+    return this.prisma.category.create({
+      data,
+    });
   }
 
   async getCategoryById(id: number): Promise<Category> {
-    return this.prisma.category.findUnique({ where: { id } });
+    return this.prisma.category.findUnique({
+      where: { id },
+    });
   }
 
   async getCategories(
-    filter: CategoriesFilterInput,
-    pagination: PaginationInput,
-  ): Promise<Category[]> {
+    filter?: CategoriesFilterInput,
+    pagination?: CategoryPaginationInput,
+  ): Promise<{ totalCount: number; categories: Category[] }> {
     const where: Prisma.CategoryWhereInput = {};
 
     if (filter) {
       applyNameFilter(where, filter);
+      applyDescriptionFilter(where, filter);
       applyActiveFilter(where, filter);
       applyParentIdFilter(where, filter);
       applyWeightFilter(where, filter);
       applyDateFilters(where, filter);
     }
 
+    const totalCount = await this.prisma.category.count({ where });
+
     const categories = await this.prisma.category.findMany({
       where,
-      skip: pagination?.cursor ? 1 : 0,
-      cursor: pagination?.cursor ? { id: pagination.cursor } : undefined,
-      take: pagination?.limit,
+      skip: pagination?.cursor ? 1 : undefined,
+      cursor: pagination?.cursor
+        ? { id: cursorToNumber(pagination.cursor) }
+        : undefined,
+      take: pagination?.limit ?? 10,
     });
 
-    return categories;
+    return { totalCount, categories };
   }
 
-  async getCategoriesByNames(
-    name: string[],
-    skip: number,
-    take: number,
-  ): Promise<Category[]> {
-    return this.prisma.category.findMany({
-      where: {
-        name: {
-          in: name,
-          mode: 'insensitive',
-        },
-      },
-      skip,
-      take,
+  async updateCategory(
+    id: number,
+    data: Prisma.CategoryUpdateInput,
+  ): Promise<Category> {
+    const categoryExists = await this.prisma.category.findUnique({
+      where: { id },
     });
-  }
 
-  async update(id: number, data: Partial<Category>): Promise<Category> {
+    if (!categoryExists) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
     return this.prisma.category.update({
       where: { id },
       data,
     });
   }
 
-  async delete(id: number) {
-    return this.prisma.category.delete({ where: { id } });
+  async deleteCategory(id: number): Promise<Category> {
+    const categoryExists = await this.prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!categoryExists) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    return this.prisma.category.delete({
+      where: { id },
+    });
   }
 }
 
@@ -72,6 +86,12 @@ export class CategoryRepository {
 function applyNameFilter(where, filter) {
   if (filter.name) {
     where.name = { contains: filter.name, mode: 'insensitive' };
+  }
+}
+
+function applyDescriptionFilter(where, filter) {
+  if (filter.description) {
+    where.description = { contains: filter.description, mode: 'insensitive' };
   }
 }
 

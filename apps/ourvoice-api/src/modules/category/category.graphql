@@ -2,9 +2,8 @@ type Query {
   category(id: Int!): Category
   categories(
     filter: CategoriesFilterInput
-    pagination: PaginationInput
-  ): [Category!]!
-  categoriesByNames(names: [String!]!): [Category!]!
+    pagination: CategoryPaginationInput
+  ): CategoryConnection
 }
 
 type Mutation {
@@ -22,13 +21,8 @@ type Category {
   createdAt: DateTime
   disabledAt: DateTime
   parent: Category
-  children: [Category!]!
-  posts: [Post!]!
-}
-
-type PageInfo {
-  endCursor: Int
-  hasNextPage: Boolean
+  children: [Category!]
+  posts: [Post!]
 }
 
 input CategoryCreateInput {
@@ -55,7 +49,23 @@ input CategoriesFilterInput {
   disabledBefore: DateTime
 }
 
-input PaginationInput {
-  cursor: Int
-  limit: Int!
+input CategoryPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type CategoryEdge {
+  node: Category!
+  cursor: String!
+}
+
+type CategoryConnection {
+  pageInfo: CategoryPageInfo!
+  edges: [CategoryEdge!]!
+}
+
+type CategoryPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
 }
