@@ -9,7 +9,7 @@
 
           <div class="mb-6">
             <label
-              :for="commentFor === 'comment' ? 'commentsData' : 'post-id'"
+              :for="commentFor === 'comment' ? 'comments' : 'posts'"
               class="block text-gray-700 text-lg mb-1 font-semibold"
               >Comment for</label
             >
@@ -34,6 +34,7 @@
               v-if="commentFor === 'comment'"
               id="comments"
               v-model="selectedComment"
+              group:true
               valueProp="id"
               label="content"
               :options="commentsData.data"
@@ -58,16 +59,6 @@
               placeholder="Select a post"
               class="px-4"
             />
-            <!-- <input
-              v-else
-              v-model="selectedPost"
-              id="post-id"
-              type="number"
-              required
-              min="1"
-              placeholder="Enter Post ID"
-              class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-7 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
-            /> -->
           </div>
           <div class="mb-6">
             <label for="comment-content" class="block text-gray-700 text-lg font-semibold mb-1"
@@ -101,6 +92,10 @@
       </div>
     </div>
   </div>
+
+  <!-- <pre
+    class="bg-slate-800 text-orange-400"
+  ><h1>length: {{commentsData.data.length}}</h1>{{ commentsData.data }}</pre> -->
 </template>
 
 <script lang="ts">
@@ -146,17 +141,16 @@ export default {
         })
         .then(() => {
           console.log('Comment created successfully')
+          //Rest form after successfully submitting the form
+          selectedComment.value = undefined
+          selectedPost.value = undefined
+          content.value = ''
+          characterCount.value = 0
+          location.reload()
         })
         .catch((error) => {
-          console.log('Error creating comment', error)
+          console.log('Error creating comment:', error)
         })
-
-      //Rest form after successfully submitting the form
-      selectedComment.value = undefined
-      selectedPost.value = undefined
-      content.value = ''
-      characterCount.value = 0
-      location.reload()
     }
 
     //Errors

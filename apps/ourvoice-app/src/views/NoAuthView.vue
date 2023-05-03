@@ -8,8 +8,6 @@
         <CreateComment />
       </TabContent>
     </TabsWrapper>
-    <!-- <CreatePost />
-    <CreateComment /> -->
   </div>
 </template>
 
