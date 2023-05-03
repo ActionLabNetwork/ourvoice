@@ -30,6 +30,7 @@
     "build:api": "pnpm --filter ./apps/ourvoice-api build",
     "start:api": "pnpm --filter ./apps/ourvoice-api start",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:api": "pnpm --filter ./apps/ourvoice-api test",
     "test:api:integration": "pnpm --filter ./apps/ourvoice-api test:integration",
     "lint:ts": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "lint": "run-s lint:ts",

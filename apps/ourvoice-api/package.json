@@ -89,6 +89,7 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
+    "testPathIgnorePatterns": [".*integration\\.spec\\.ts"],
     "testEnvironment": "node"
   }
 }
