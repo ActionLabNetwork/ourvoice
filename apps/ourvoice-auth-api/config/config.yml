@@ -1,1 +1,13 @@
-config/config.yml
+deployments: 
+  - 'demo'
+organisation: ourvoice.app
+roles:
+  - user
+  - moderator
+  - admin
+auth:
+  - EmailPassword
+  - Passwordless
+  - Verify
+  - Dashboard
+
