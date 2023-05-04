@@ -54,6 +54,7 @@
 <script lang="ts">
 import Session from 'supertokens-web-js/recipe/session'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
