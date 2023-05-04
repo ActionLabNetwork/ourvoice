@@ -89,7 +89,6 @@ export default defineComponent({
   },
 
   mounted() {
-    console.log(this.deployment)
     // this function checks if a session exists, and if not,
     // it will redirect to the login screen.
     this.checkForSession()

@@ -42,7 +42,6 @@ import deployment from './config/deployment';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        console.log(configService.get<string>('SUPERTOKENS_WEBSITE_DOMAIN'));
         return {
           connectionURI: configService.get<string>('SUPERTOKENS_URI'),
           apiKey: configService.get<string>('SUPERTOKENS_API_KEY'),

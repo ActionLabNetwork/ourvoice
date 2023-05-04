@@ -103,12 +103,16 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
+import YamlContent from '../../../../config/config.yml'
+
 // const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
 // const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const organisation = import.meta.env.VITE_APP_ORG
 const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+
+// TODO: this list might be coming from the database later
+const organisation = YamlContent.organisation
 
 export default defineComponent({
   data() {

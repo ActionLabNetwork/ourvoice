@@ -16,19 +16,25 @@ async function bootstrap() {
 
   // TODO: add admin and app addresses to list
   const whitelist: string[] = [
-    configService.get('SUPERTOKENS_API_DOMAIN'),
+    configService.get('SUPERTOKENS_API_DOMAIN'), // app itself
     configService.get('VITE_APP_AUTH_URL'),
     configService.get('VITE_APP_ADMIN_URL'),
-    configService.get('VITE_APP_APP_URL'),
+    configService.get('VITE_APP_APP_DOMAIN'),
   ];
   // TODO : use regex for all deployment names
   app.enableCors({
-    // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      const match = origin
-        .toLowerCase()
-        .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
-      if (!origin || whitelist.indexOf(origin) !== -1 || match) {
+      // const match = origin
+      //   .toLowerCase()
+      //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
+      const parts = origin.split('.');
+      if (
+        !origin ||
+        whitelist.indexOf(origin) !== -1 ||
+        whitelist.indexOf(
+          `${parts[parts.length - 2]}.${parts[parts.length - 1]}`,
+        ) !== -1
+      ) {
         callback(null, true);
       } else {
         callback(
@@ -47,7 +53,7 @@ async function bootstrap() {
   configService
     .get<string[]>('roles')
     .map(async (role) => await createRole(role));
-  await app.listen(configService.get('PORT') as number);
+  await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
 }
 
 bootstrap();

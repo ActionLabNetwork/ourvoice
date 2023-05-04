@@ -1,5 +1,6 @@
 deployments: 
-  - demo
+  - 'demo'
+organisation: ourvoice.app
 roles:
   - user
   - moderator

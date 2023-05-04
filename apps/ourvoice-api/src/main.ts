@@ -13,14 +13,20 @@ async function bootstrap() {
 
   // TODO: add website domains
   const whitelist: string[] = [
-    configService.get('ORIGIN'), // app itself
-    'http://localhost:3010',
-    'http://localhost:3020',
+    configService.get('VITE_APP_API_URL'), // app itself
+    configService.get('VITE_APP_ADMIN_URL'),
+    configService.get('VITE_APP_APP_DOMAIN'),
   ];
   app.enableCors({
-    // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      const parts = origin.split('.');
+      if (
+        !origin ||
+        whitelist.indexOf(origin) !== -1 ||
+        whitelist.indexOf(
+          `${parts[parts.length - 2]}.${parts[parts.length - 1]}`,
+        ) !== -1
+      ) {
         callback(null, true);
       } else {
         callback(
@@ -36,7 +42,7 @@ async function bootstrap() {
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
 
-  await app.listen(configService.get('PORT') as number);
+  await app.listen(configService.get<number>('API_PORT') || 3000);
 }
 
 bootstrap();

@@ -138,9 +138,13 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
+import YamlContent from '../../../../config/config.yml'
+
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-// const organisation = import.meta.env.VITE_APP_ORG
-const appURL = import.meta.env.VITE_APP_APP_URL
+const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+
+// TODO: this list might be coming from the database later
+const organisation = YamlContent.organisation
 
 export default defineComponent({
   data() {
@@ -357,7 +361,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = appURL
+        window.location.href = `http://demo${domain}`
       }
     }
   }
