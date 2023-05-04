@@ -17,6 +17,7 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3010',
     'http://localhost:3020',
+    'http://localhost:4173', // cypress
   ];
 
   app.enableCors({

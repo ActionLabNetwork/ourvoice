@@ -3,7 +3,13 @@
     {
       "AllowedHeaders": ["*"],
       "AllowedMethods": ["GET", "POST", "PUT"],
-      "AllowedOrigins": ["http://localhost:3000", "http://localhost:3010", "https://app.localstack.cloud", "http://app.localstack.cloud"],
+      "AllowedOrigins": [
+        "http://localhost:3000",
+        "http://localhost:3010",
+        "http://localhost:4173",
+        "https://app.localstack.cloud",
+        "http://app.localstack.cloud"
+      ],
       "ExposeHeaders": ["ETag"]
     }
   ]
