@@ -32,7 +32,7 @@ In order to achieve local development frontend cookie sharing for subdomains you
 
 This also links to the `reverse proxy` deployed via `docker-compose` file. If you add any additional app subdomains you also need to add redirection and modify `nginx` proxy configuration in [/deployment/init/nginx](/deployment/init/nginx).
 
-> NOTE: This is only needed for local development, production will have its own reverse proxy installed.
+> NOTE: This is only needed for local development, production will have its own reverse proxy installed and domains are handled with DNS records.
 
 #### Setup:
 
