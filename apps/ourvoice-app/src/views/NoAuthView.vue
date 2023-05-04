@@ -15,8 +15,8 @@
 import CreatePost from '../components/post/CreatePost.vue'
 import CreateComment from '../components/comment/CreateComment.vue'
 import { defineComponent } from 'vue'
-import TabsWrapper from '../components/TabsWrapper.vue'
-import TabContent from '../components/TabContent.vue'
+import TabsWrapper from '../components/common/TabsWrapper.vue'
+import TabContent from '../components/common/TabContent.vue'
 
 export default defineComponent({
   components: {

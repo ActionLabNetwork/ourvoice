@@ -1,22 +1,30 @@
 import gql from 'graphql-tag'
 
 export const GET_POSTS_QUERY = gql`
-  query {
+  query getPosts {
     posts {
-      id
-      title
-      content
-      createdAt
-      author {
-        id
-        nickname
+      edges {
+        node {
+          id
+          title
+          content
+          createdAt
+          author {
+            id
+            nickname
+          }
+          categories {
+            id
+            name
+          }
+          comments {
+            id
+            content
+          }
+          votesUp
+          votesDown
+        }
       }
-      categories {
-        id
-        name
-      }
-      votesUp
-      votesDown
     }
   }
 `

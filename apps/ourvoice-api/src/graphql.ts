@@ -7,21 +7,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class CommentCreateInput {
-    content: string;
-    moderated?: Nullable<boolean>;
-    published?: Nullable<boolean>;
-    authorId?: Nullable<number>;
-    postId?: Nullable<number>;
-    parentId?: Nullable<number>;
-}
-
-export class CommentUpdateInput {
-    content?: Nullable<string>;
-    moderated?: Nullable<boolean>;
-    published?: Nullable<boolean>;
-}
-
 export class UserCreateInput {
     orgId: number;
     hash: string;
@@ -77,6 +62,40 @@ export class CategoriesFilterInput {
 export class CategoryPaginationInput {
     cursor?: Nullable<string>;
     limit?: Nullable<number>;
+    page?: Nullable<number>;
+    perPage?: Nullable<number>;
+}
+
+export class CommentCreateInput {
+    content: string;
+    moderated?: Nullable<boolean>;
+    published?: Nullable<boolean>;
+    authorId?: Nullable<number>;
+    postId?: Nullable<number>;
+    parentId?: Nullable<number>;
+}
+
+export class CommentUpdateInput {
+    content?: Nullable<string>;
+    moderated?: Nullable<boolean>;
+    published?: Nullable<boolean>;
+}
+
+export class CommentsFilterInput {
+    content?: Nullable<string>;
+    moderated?: Nullable<boolean>;
+    published?: Nullable<boolean>;
+    authorId?: Nullable<number>;
+    postId?: Nullable<number>;
+    parentId?: Nullable<number>;
+    createdAfter?: Nullable<DateTime>;
+    createdBefore?: Nullable<DateTime>;
+    moderatedAfter?: Nullable<DateTime>;
+    moderatedBefore?: Nullable<DateTime>;
+    publishedAfter?: Nullable<DateTime>;
+    publishedBefore?: Nullable<DateTime>;
+    disabledAfter?: Nullable<DateTime>;
+    disabledBefore?: Nullable<DateTime>;
 }
 
 export class PostCreateInput {
@@ -126,10 +145,6 @@ export class PostPaginationInput {
 }
 
 export abstract class IQuery {
-    abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
-
-    abstract comments(): Comment[] | Promise<Comment[]>;
-
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
     abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
@@ -150,12 +165,6 @@ export abstract class IQuery {
 }
 
 export abstract class IMutation {
-    abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
-
-    abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
-
-    abstract deleteComment(id: number): Comment | Promise<Comment>;
-
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
     abstract createUser(data: UserCreateInput): User | Promise<User>;
@@ -174,26 +183,17 @@ export abstract class IMutation {
 
     abstract deleteCategory(id: number): Category | Promise<Category>;
 
+    abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
+
+    abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
+
+    abstract deleteComment(id: number): Comment | Promise<Comment>;
+
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
     abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
-}
-
-export class Comment {
-    id: number;
-    content: string;
-    moderated?: Nullable<boolean>;
-    published?: Nullable<boolean>;
-    createdAt?: Nullable<DateTime>;
-    moderatedAt?: Nullable<DateTime>;
-    publishedAt?: Nullable<DateTime>;
-    disabledAt?: Nullable<DateTime>;
-    author?: Nullable<User>;
-    post?: Nullable<Post>;
-    parent?: Nullable<Comment>;
-    children: Comment[];
 }
 
 export class User {
@@ -252,6 +252,21 @@ export class CategoryPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+}
+
+export class Comment {
+    id: number;
+    content: string;
+    moderated?: Nullable<boolean>;
+    published?: Nullable<boolean>;
+    createdAt?: Nullable<DateTime>;
+    moderatedAt?: Nullable<DateTime>;
+    publishedAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    author?: Nullable<User>;
+    post?: Nullable<Post>;
+    parent?: Nullable<Comment>;
+    children: Comment[];
 }
 
 export class Post {

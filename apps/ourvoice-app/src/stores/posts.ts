@@ -11,7 +11,6 @@ export interface Post {
   title: string
   content: string
   createdAt: string
-  updatedAt: string
   author: {
     id: number
     nickname: string
@@ -50,7 +49,7 @@ export const usePostsStore = defineStore('posts', {
       const { onResult, onError } = useQuery(GET_POSTS_QUERY)
 
       onResult(({ data, loading }) => {
-        this.data = data.posts
+        this.data = data.posts.edges.map((edge: any) => edge.node)
         this.loading = loading
       })
 
