@@ -1,5 +1,5 @@
-import { createPostTitleCharacterLimit, createPostContentCharacterLimit } from "@/constants/post"
-import { defineRule } from "vee-validate"
+import { createPostTitleCharacterLimit, createPostContentCharacterLimit } from '@/constants/post'
+import { defineRule } from 'vee-validate'
 
 export const validateTitle = (value: string) => {
   if (!value) return 'This field is required'
@@ -41,19 +41,18 @@ export const validateAttachments = (files: FileList) => {
     return true // No file selected, so validation passes
   }
 
+  let totalSize = 0
+
   for (const file of files) {
     if (!allowedFileTypes.includes(file.type)) {
       return `Allowed file types are: ${allowedFileTypes.join(', ')}`
     }
-    if (file.size > maxFileSize) {
-      return `File size must be under ${maxFileSize / (1024 * 1024)}MB`
-    }
+    totalSize += file.size
+  }
+
+  if (totalSize > maxFileSize) {
+    return `Total file size must be under ${maxFileSize / (1024 * 1024)}MB`
   }
 
   return true
 }
-
-defineRule('validateTitle', validateTitle)
-defineRule('validateContent', validateContent)
-defineRule('validateCategories', validateCategories)
-defineRule('validateAttachments', validateAttachments)

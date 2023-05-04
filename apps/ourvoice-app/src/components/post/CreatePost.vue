@@ -20,7 +20,7 @@
                 type="text"
                 id="title"
                 name="title"
-                placeholder="Share your thoughts anonymously"
+                :placeholder="inputPlaceholders.title"
                 class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200 font-semibold text-gray-800"
                 :rules="'validateTitle'"
             />
@@ -35,7 +35,7 @@
               v-model="content"
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-12 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               rows="4"
-              placeholder="I have an idea for improving..."
+              :placeholder="inputPlaceholders.content"
               @input="updateCharacterCount"
               :rules="'validateContent'"
             ></Field>
@@ -49,24 +49,25 @@
           </FormInput>
 
           <!-- Categories input field -->
-          <FormInput v-if="!categoriesData.loading" id="categories" name="categories" labelText="Categories" labelSpan="select 1 to 3">
-            <Field id="categories" name="categories" :rules="'validateCategories'" v-slot="{ field }">
-              <Multiselect
-                id="categories"
-                v-model="selectedCategories"
-                :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
-                mode="tags"
-                :searchable="true"
-                :caret="true"
-                placeholder="Select categories"
-                class="px-4 multiselect-blue"
-                v-bind="field"
-              />
-            </Field>
-
-            <!-- Show error message if there's an error fetching categories -->
-            <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
-              {{ categoriesData.errorMessage }}
+          <FormInput v-if="!categoriesData.loading" id="categories" name="categories" labelText="Categories" labelSpan="select 1 to 2">
+            <div class="flex flex-col w-full">
+              <Field id="categories" name="categories" :rules="'validateCategories'" v-slot="{ field }">
+                <Multiselect
+                  id="categories"
+                  v-model="selectedCategories"
+                  :options="categoriesData.data.map(({ id, name }) => ({ label: name, value: id }))"
+                  mode="tags"
+                  :searchable="true"
+                  :caret="true"
+                  :placeholder="inputPlaceholders.categories"
+                  class="px-8 multiselect-blue"
+                  v-bind="field"
+                />
+              </Field>
+              <!-- Show error message if there's an error fetching categories -->
+              <div v-if="categoriesData.errorMessage" class="text-red-500 text-sm">
+                {{ categoriesData.errorMessage }}
+              </div>
             </div>
           </FormInput>
           <div v-else>
@@ -90,6 +91,7 @@
               type="submit"
               :disabled="!isValidForm"
               class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+              data-cy="create-post-submit-button"
             >
               Create Post
             </button>
@@ -110,7 +112,7 @@ import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories';
 import AttachmentInput from '../inputs/AttachmentInput.vue';
 import AttachmentList from '../inputs/AttachmentList.vue';
-import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
+import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
 import { usePostsStore } from '@/stores/posts';
 import { uploadFileUsingPresignedUrl } from '@/services/s3-service';
 import { Field, defineRule, useForm } from 'vee-validate';
@@ -189,6 +191,7 @@ export default {
         } catch (error) {
           console.error('Error uploading files using presigned URLs:', error);
           // TODO: Handle error accordingly (e.g., show an error message to the user)
+          return
         }
       }
 
@@ -223,7 +226,8 @@ export default {
       attachmentsError,
       updateAttachments,
       isValidForm,
-      onSubmit
+      onSubmit,
+      inputPlaceholders
     };
   },
 };

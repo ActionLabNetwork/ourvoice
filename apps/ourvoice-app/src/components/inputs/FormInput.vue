@@ -8,7 +8,7 @@
       <slot></slot>
     </div>
 
-    <ErrorMessage class="text-red-500 text-sm" v-if="name" :name="name" />
+    <ErrorMessage class="text-red-500 text-sm" v-if="name" :name="name" :data-cy="`${name}-error-message`" />
     <slot name="info"></slot>
   </div>
 </template>
