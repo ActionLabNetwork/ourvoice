@@ -7,8 +7,8 @@ import ForgotPasswordView from '../views/ForgotPasswordView.vue'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const appURL = import.meta.env.VITE_APP_APP_URL
 const adminURL = import.meta.env.VITE_APP_ADMIN_URL
+const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,8 +58,13 @@ const router = createRouter({
       name: 'passwordless',
       component: PasswordlessView,
       // TODO: could use a url param here as well
-      beforeEnter: () => {
-        redirect.set(appURL)
+      beforeEnter: (to) => {
+        if (Object.keys(to.query).length) {
+          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+        } else {
+          redirect.set(`http://demo${domain}`)
+        }
+        // return { path: to.path, query: {}, hash: to.hash }
       },
       alias: ['/magicLink', '/passwordless']
     },

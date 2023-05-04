@@ -25,6 +25,7 @@ SuperTokens.init({
     }),
     EmailVerification.init()
   ]
+  // enableDebugLogs: true
 })
 
 // Set up fontawesome

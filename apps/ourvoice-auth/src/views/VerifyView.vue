@@ -54,9 +54,11 @@
 <script lang="ts">
 import Session from 'supertokens-web-js/recipe/session'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
-const appURL = import.meta.env.VITE_APP_APP_URL
+const redirect: ManageRedirectStateService = new ManageRedirectStateService()
+const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 export default defineComponent({
   data() {
@@ -84,7 +86,7 @@ export default defineComponent({
             // user sign in success
           }
           Passwordless.clearLoginAttemptInfo()
-          window.location.href = appURL
+          this.handleRedirect()
         } else {
           // this can happen if the magic link has expired or is invalid
           console.log('Login failed. Please try again')
@@ -111,9 +113,19 @@ export default defineComponent({
     },
     checkForSession: async function () {
       if (await Session.doesSessionExist()) {
-        window.location.href = appURL
+        this.handleRedirect()
       } else {
         this.hasInitialMagicLinkBeenSent()
+      }
+    },
+    handleRedirect: function () {
+      if (redirect.exists()) {
+        const redirectTo = redirect.get()
+        redirect.purge()
+        window.location.href = redirectTo
+      } else {
+        // fallback redirect
+        window.location.href = `http://demo${domain}`
       }
     }
   }

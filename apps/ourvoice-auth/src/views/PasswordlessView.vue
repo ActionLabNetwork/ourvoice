@@ -108,7 +108,7 @@ import { defineComponent } from 'vue'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const organisation = import.meta.env.VITE_APP_ORG
-const appURL = import.meta.env.VITE_APP_APP_URL
+const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 export default defineComponent({
   data() {
@@ -170,7 +170,7 @@ export default defineComponent({
       if (await Passwordless.getLoginAttemptInfo()) {
         this.needsVerifying = true
         this.isVerify = true
-        redirect.set(appURL)
+        // redirect.set(appURL)
       }
     },
     startTimer() {
@@ -297,7 +297,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = appURL
+        window.location.href = `http://demo${domain}`
       }
     }
   }
