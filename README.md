@@ -49,6 +49,8 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 
 Navigate to `http://demo.ourvoice.test/` to access the Ourvoice App
 
+> NOTE: to be able to login without password and use email sending functions from the APIs add correct SMTP configurations to `apps/ourvoice-out-api/.env` and `apps/ourvoice-api/.env`
+
 Irregular use:
 
 - Run `pnpm dev` in corresponding `app` directory to start that app in development mode
