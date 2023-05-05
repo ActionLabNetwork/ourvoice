@@ -2,11 +2,13 @@ import {
   CommentCreateInput,
   CommentsFilterInput,
   CommentUpdateInput,
-  PaginationInput,
+  CommentPaginationInput,
+  CommentPageInfo,
 } from './../../graphql';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Comment } from '@prisma/client';
 import { CommentRepository } from './comment.repository';
+import { numberToCursor } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class CommentService {
@@ -25,9 +27,30 @@ export class CommentService {
 
   async getComments(
     filter: CommentsFilterInput,
-    pagination: PaginationInput,
-  ): Promise<Comment[]> {
-    return this.commentRepository.getComments(filter, pagination);
+    pagination: CommentPaginationInput,
+  ): Promise<{
+    totalCount: number;
+    edges: { node: Comment; cursor: string }[];
+    pageInfo: CommentPageInfo;
+  }> {
+    // Handle pagination
+    const { totalCount, comments } = await this.commentRepository.getComments(
+      filter,
+      pagination,
+    );
+
+    const edges = comments.map((comment) => ({
+      node: comment,
+      cursor: numberToCursor(comment.id),
+    }));
+
+    const pageInfo = {
+      startCursor: edges.length > 0 ? edges[0].cursor : null,
+      endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      hasNextPage: comments.length < totalCount,
+    };
+
+    return { totalCount, edges, pageInfo };
   }
 
   async getCommentById(id: number): Promise<Comment> {
@@ -35,10 +58,18 @@ export class CommentService {
   }
 
   async updateComment(id: number, data: CommentUpdateInput): Promise<Comment> {
+    const existingComment = await this.commentRepository.getCommentById(id);
+    if (!existingComment) {
+      throw new NotFoundException(`Comment with id ${id} not found`);
+    }
     return this.commentRepository.updateComment(id, data);
   }
 
   async deleteComment(id: number): Promise<Comment> {
+    const existingComment = await this.commentRepository.getCommentById(id);
+    if (!existingComment) {
+      throw new NotFoundException(`Comment with id ${id} not found`);
+    }
     return this.commentRepository.deleteComment(id);
   }
 }

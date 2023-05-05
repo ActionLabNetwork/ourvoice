@@ -2,8 +2,8 @@ type Query {
   comment(id: Int!): Comment
   comments(
     filter: CommentsFilterInput
-    pagination: PaginationInput
-  ): [Comment!]!
+    pagination: CommentPaginationInput
+  ): CommentConnection
 }
 
 type Mutation {
@@ -59,12 +59,24 @@ input CommentsFilterInput {
   disabledBefore: DateTime
 }
 
-type PageInfo {
-  endCursor: Int
-  hasNextPage: Boolean
+input CommentPaginationInput {
+  cursor: String
+  limit: Int
 }
 
-input PaginationInput {
-  page: Int
-  perPage: Int
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type CommentConnection {
+  totalCount: Int
+  pageInfo: CommentPageInfo!
+  edges: [CommentEdge]
+}
+
+type CommentPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
 }

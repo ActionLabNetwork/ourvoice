@@ -69,15 +69,13 @@ export const useCommentsStore = defineStore('comments', {
       const { onResult, onError } = useQuery(GET_COMMENTS_QUERY)
 
       onResult(({ data, loading }) => {
-        this.data = data.comments.map(
-          (comment: { id: any; content: any; author: any; post: any; parent: any }) => ({
-            id: comment.id,
-            content: comment.content,
-            author: comment.author ?? null,
-            post: comment.post ?? null,
-            parent: comment.parent ?? null
-          })
-        )
+        this.data = data.comments.edges.map((comment: any) => ({
+          id: comment.node.id,
+          content: comment.node.content,
+          author: comment.node.author ?? null,
+          post: comment.node.post ?? null,
+          parent: comment.node.parent ?? null
+        }))
         this.loading = loading
       })
 

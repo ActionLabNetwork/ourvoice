@@ -1,7 +1,8 @@
 import { PrismaService } from '../../database/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Comment } from '@prisma/client';
-import { CommentsFilterInput, PaginationInput } from 'src/graphql';
+import { CommentsFilterInput, CommentPaginationInput } from 'src/graphql';
+import { cursorToNumber } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class CommentRepository {
@@ -19,13 +20,20 @@ export class CommentRepository {
   }
 
   async getCommentById(id: number) {
-    return this.prisma.comment.findUnique({ where: { id } });
+    return this.prisma.comment.findUnique({
+      where: { id },
+      include: {
+        author: true,
+        post: true,
+        parent: true,
+      },
+    });
   }
 
   async getComments(
-    filter: CommentsFilterInput,
-    pagination: PaginationInput,
-  ): Promise<Comment[]> {
+    filter?: CommentsFilterInput,
+    pagination?: CommentPaginationInput,
+  ): Promise<{ totalCount: number; comments: Comment[] }> {
     const {
       content,
       moderated,
@@ -54,7 +62,7 @@ export class CommentRepository {
       moderatedAt: moderatedAfter || moderatedBefore ? {} : undefined,
       publishedAt: publishedAfter || publishedBefore ? {} : undefined,
       disabledAt: disabledAfter || disabledBefore ? {} : undefined,
-      children: undefined,
+      children: undefined, //Todo: add children filter,
     };
     if (createdAfter) {
       where.createdAt['gte'] = createdAfter;
@@ -80,6 +88,7 @@ export class CommentRepository {
     if (disabledBefore) {
       where.disabledAt['lte'] = disabledBefore;
     }
+    const totalCount = await this.prisma.comment.count({ where });
     const comments = await this.prisma.comment.findMany({
       where,
       include: {
@@ -89,18 +98,51 @@ export class CommentRepository {
         children: true,
       },
       skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor ? { id: pagination.cursor } : undefined,
+      cursor: pagination?.cursor
+        ? { id: cursorToNumber(pagination.cursor.toString()) }
+        : undefined,
       take: pagination?.limit ?? 10,
     });
 
-    return comments;
+    return { totalCount, comments };
   }
 
   async updateComment(id: number, data: Prisma.CommentUpdateInput) {
-    return this.prisma.comment.update({ where: { id }, data });
+    const commentExists = await this.prisma.comment.findUnique({
+      where: { id },
+    });
+
+    if (!commentExists) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+
+    return this.prisma.comment.update({
+      where: { id },
+      data,
+      include: {
+        author: true,
+        post: true,
+        parent: true,
+        children: true,
+      },
+    });
   }
 
   async deleteComment(id: number) {
-    return this.prisma.comment.delete({ where: { id } });
+    const commentExists = await this.prisma.comment.findUnique({
+      where: { id },
+    });
+    if (!commentExists) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+    return this.prisma.comment.delete({
+      where: { id },
+      include: {
+        author: true,
+        post: true,
+        parent: true,
+        children: true,
+      },
+    });
   }
 }

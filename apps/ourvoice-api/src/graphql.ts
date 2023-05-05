@@ -98,6 +98,11 @@ export class CommentsFilterInput {
     disabledBefore?: Nullable<DateTime>;
 }
 
+export class CommentPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
 export class PostCreateInput {
     title: string;
     content: string;
@@ -267,6 +272,23 @@ export class Comment {
     post?: Nullable<Post>;
     parent?: Nullable<Comment>;
     children: Comment[];
+}
+
+export class CommentEdge {
+    node: Comment;
+    cursor: string;
+}
+
+export class CommentConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: CommentPageInfo;
+    edges?: Nullable<Nullable<CommentEdge>[]>;
+}
+
+export class CommentPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
 }
 
 export class Post {

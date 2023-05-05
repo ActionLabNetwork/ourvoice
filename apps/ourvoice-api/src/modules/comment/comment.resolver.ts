@@ -2,7 +2,7 @@ import {
   CommentCreateInput,
   CommentUpdateInput,
   CommentsFilterInput,
-  PaginationInput,
+  CommentPaginationInput,
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommentService } from 'src/modules/comment/comment.service';
@@ -19,9 +19,11 @@ export class CommentResolver {
   @Query()
   async comments(
     @Args('filter', { nullable: true }) filter?: CommentsFilterInput,
-    @Args('pagination', { nullable: true }) pagination?: PaginationInput,
+    @Args('pagination', { nullable: true }) pagination?: CommentPaginationInput,
   ) {
-    return this.commentService.getComments(filter, pagination);
+    const { totalCount, edges, pageInfo } =
+      await this.commentService.getComments(filter, pagination);
+    return { totalCount, edges, pageInfo };
   }
 
   @Mutation()
