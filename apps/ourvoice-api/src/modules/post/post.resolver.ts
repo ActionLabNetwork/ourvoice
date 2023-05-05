@@ -4,7 +4,7 @@ import {
   PostsFilterInput,
   PostUpdateInput,
 } from './../../graphql';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
 import { s3 } from 'src/config/s3-config';
 import { generatePresignedUrl } from 'src/services/s3-service';
