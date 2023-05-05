@@ -1,20 +1,29 @@
+import { CommentPaginationInput, CommentPageInfo } from './../../graphql';
 import {
-  CommentCreateInput,
-  CommentsFilterInput,
-  CommentUpdateInput,
-  CommentPaginationInput,
-  CommentPageInfo,
-} from './../../graphql';
-import { Injectable, NotFoundException } from '@nestjs/common';
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Comment } from '@prisma/client';
 import { CommentRepository } from './comment.repository';
 import { numberToCursor } from '../../utils/cursor-pagination';
+import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
+import { CommentsFilterDto } from './dto/comment-filter.dto';
+import { CommentCreateDto } from './dto/comment-create.dto';
+import { CommentUpdateDto } from './dto/comment-update.dto';
 
 @Injectable()
 export class CommentService {
   constructor(private readonly commentRepository: CommentRepository) {}
 
-  async createComment(data: CommentCreateInput): Promise<Comment> {
+  async createComment(data: CommentCreateDto): Promise<Comment> {
+    // Validate data
+    const commentCreateDto = plainToClass(CommentCreateDto, data);
+    const errors = await validate(commentCreateDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
     const { authorId, postId, parentId, ...restData } = data;
     const commentData = {
       ...restData,
@@ -26,13 +35,22 @@ export class CommentService {
   }
 
   async getComments(
-    filter: CommentsFilterInput,
-    pagination: CommentPaginationInput,
+    filter?: CommentsFilterDto,
+    pagination?: CommentPaginationInput,
   ): Promise<{
     totalCount: number;
     edges: { node: Comment; cursor: string }[];
     pageInfo: CommentPageInfo;
   }> {
+    // Validate filters
+    if (filter) {
+      const commentsFilterDto = plainToClass(CommentsFilterDto, filter);
+      const errors = await validate(commentsFilterDto);
+      if (errors.length > 0) {
+        throw new BadRequestException(errors);
+      }
+    }
+
     // Handle pagination
     const { totalCount, comments } = await this.commentRepository.getComments(
       filter,
@@ -57,7 +75,14 @@ export class CommentService {
     return this.commentRepository.getCommentById(id);
   }
 
-  async updateComment(id: number, data: CommentUpdateInput): Promise<Comment> {
+  async updateComment(id: number, data: CommentUpdateDto): Promise<Comment> {
+    // Validate filters
+    const commentUpdateDto = plainToClass(CommentUpdateDto, data);
+    const errors = await validate(commentUpdateDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+    // Check if comment exists
     const existingComment = await this.commentRepository.getCommentById(id);
     if (!existingComment) {
       throw new NotFoundException(`Comment with id ${id} not found`);
@@ -66,6 +91,7 @@ export class CommentService {
   }
 
   async deleteComment(id: number): Promise<Comment> {
+    // Check if comment exists
     const existingComment = await this.commentRepository.getCommentById(id);
     if (!existingComment) {
       throw new NotFoundException(`Comment with id ${id} not found`);
