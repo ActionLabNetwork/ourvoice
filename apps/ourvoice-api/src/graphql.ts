@@ -70,7 +70,7 @@ export class CommentCreateInput {
     content: string;
     moderated?: Nullable<boolean>;
     published?: Nullable<boolean>;
-    authorId?: Nullable<number>;
+    authorId: number;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
 }
@@ -79,6 +79,7 @@ export class CommentUpdateInput {
     content?: Nullable<string>;
     moderated?: Nullable<boolean>;
     published?: Nullable<boolean>;
+    authorId?: Nullable<number>;
 }
 
 export class CommentsFilterInput {
@@ -262,13 +263,13 @@ export class CategoryPageInfo {
 export class Comment {
     id: number;
     content: string;
-    moderated?: Nullable<boolean>;
-    published?: Nullable<boolean>;
+    moderated: boolean;
+    published: boolean;
     createdAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;
     publishedAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
-    author?: Nullable<User>;
+    author: User;
     post?: Nullable<Post>;
     parent?: Nullable<Comment>;
     children: Comment[];

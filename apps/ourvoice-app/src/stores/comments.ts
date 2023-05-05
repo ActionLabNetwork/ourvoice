@@ -47,8 +47,7 @@ export const useCommentsStore = defineStore('comments', {
       state.data.forEach((c) => {
         if (c.parent) {
           commentsForComments.push(c)
-        }
-        if (c.post) {
+        } else if (c.post) {
           commentsForPosts.push(c)
         }
       })

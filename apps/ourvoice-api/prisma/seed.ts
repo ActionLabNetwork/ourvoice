@@ -140,4 +140,4 @@ export const seedMainDb = async () => {
 };
 
 // Uncomment this to seed using ts-node
-// seedMainDb();
+seedMainDb();

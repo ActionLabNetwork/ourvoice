@@ -15,13 +15,13 @@ type Mutation {
 type Comment {
   id: Int!
   content: String!
-  moderated: Boolean
-  published: Boolean
+  moderated: Boolean!
+  published: Boolean!
   createdAt: DateTime
   moderatedAt: DateTime
   publishedAt: DateTime
   disabledAt: DateTime
-  author: User
+  author: User!
   post: Post
   parent: Comment
   children: [Comment!]!
@@ -31,7 +31,7 @@ input CommentCreateInput {
   content: String!
   moderated: Boolean
   published: Boolean
-  authorId: Int
+  authorId: Int!
   postId: Int
   parentId: Int
 }
@@ -40,6 +40,7 @@ input CommentUpdateInput {
   content: String
   moderated: Boolean
   published: Boolean
+  authorId: Int
 }
 
 input CommentsFilterInput {
