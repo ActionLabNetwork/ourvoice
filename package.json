@@ -38,7 +38,8 @@
     "migrate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:migrate:premoderation",
     "generate:api:all": "pnpm --sequential generate:api:main generate:api:premoderation",
     "generate:api:main": "pnpm --filter ./apps/ourvoice-api prisma:generate:main",
-    "generate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:generate:premoderation"
+    "generate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:generate:premoderation",
+    "postinstall": "pnpm tsx scripts/copy-envs.ts"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
@@ -61,6 +62,7 @@
   "homepage": "https://github.com/Our-Voice-Inc/ourvoice#readme",
   "devDependencies": {
     "@types/node": "^18.11.18",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-define-config": "^1.13.0",
