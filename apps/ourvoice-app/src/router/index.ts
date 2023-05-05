@@ -26,6 +26,11 @@ const router = createRouter({
       props: () => {
         return addDeployment()
       }
+    },
+    {
+      path: '/noauth',
+      name: 'noauth',
+      component: NoAuthView
     }
   ]
 })
