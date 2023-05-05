@@ -45,8 +45,9 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 - Run from the root `pnpm install` to install dependencies (also runs `pnpm postinstall` and copies all `.env` files)
 - Run from the root `pnpm generate:api:all` and `pnpm migrate:api:all` for database setup.
 - Run `pnpm dev:apps` to start all applications in development mode
+  > NOTE: if you get any Prisma errors then run the generate and migrate scrips one by one.
 
-> NOTE: if you get any Prisma errors then run the generate and migrate scrips one by one.
+Navigate to `http://demo.ourvoice.test/` to access the Ourvoice App
 
 Irregular use:
 
@@ -54,15 +55,17 @@ Irregular use:
 - Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
 - Run from the root `pnpm lint` to show all lint errors and `pnpm lint:fix` to auto fix if possible
 
-Local ports reference:
-| Service | Port |
-| ------- | ----- |
-| Portal | 3011 |
-| App | 3010 |
-| Admin | 3020 |
-| Auth | 3030 |
-| API | 3000 |
-| Auth API| 3001 |
+Local ports and URL reference:
+| Service | Port | Dev URL |
+| ------- | ---- | -------------------------------- |
+| Portal | 3011 | http://portal.ourvoice.test/ |
+| App | 3010 | http://demo.ourvoice.test/ |
+| Admin | 3020 | http://admin.ourvoice.test/ |
+| Auth | 3030 | http://auth.ourvoice.test/ |
+| API | 3000 | http://api.ourvoice.test/ |
+| Auth API| 3001 | http://authapi.ourvoice.test/ |
+
+> NOTE: currently only `demo` deployment is added via [config/config.yml](./config/config.yml). If more is added then they also need to be added to the `hosts` file described in [Prerequisites](####Prerequisites)
 
 ## 🕸️ Structure
 
