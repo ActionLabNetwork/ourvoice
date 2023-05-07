@@ -9,15 +9,12 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'AttachmentList',
-  props: {
-    attachments: {
-      type: FileList,
-      default: [],
-      required: true,
-    },
+<script setup lang="ts">
+defineProps({
+  attachments: {
+    type: FileList,
+    default: [],
+    required: true,
   },
-};
+})
 </script>

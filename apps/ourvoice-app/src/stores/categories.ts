@@ -1,7 +1,6 @@
 import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { defineStore } from 'pinia'
 import { useQuery } from '@vue/apollo-composable'
-import gql from 'graphql-tag'
 
 interface Category {
   id: number

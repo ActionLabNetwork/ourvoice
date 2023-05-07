@@ -1,9 +1,14 @@
-import { createPostTitleCharacterLimit, createPostContentCharacterLimit } from '@/constants/post'
-import { defineRule } from 'vee-validate'
+import {
+  createPostTitleCharacterLimit,
+  createPostContentCharacterLimit,
+  maxCategories,
+  allowedFileTypes,
+  maxAttachmentFilesSize
+} from '@/constants/post'
 
 export const validateTitle = (value: string) => {
   if (!value) return 'This field is required'
-  if (value.length > 100)
+  if (value.length > createPostTitleCharacterLimit)
     return `Title must not exceed ${createPostTitleCharacterLimit} characters.`
 
   const regex = /^[a-zA-Z0-9\s]*$/
@@ -14,11 +19,8 @@ export const validateTitle = (value: string) => {
 
 export const validateContent = (value: string) => {
   if (!value) return 'This field is required'
-  if (value.length > 100)
+  if (value.length > createPostContentCharacterLimit)
     return `Content must not exceed ${createPostContentCharacterLimit} characters.`
-
-  const regex = /^[a-zA-Z0-9\s]*$/
-  if (!regex.test(value)) return 'Content must only contain alphanumeric characters.'
 
   return true
 }
@@ -27,16 +29,13 @@ export const validateCategories = (value: any) => {
   if (!value || value.length < 1) {
     return 'Please select at least one category.'
   }
-  if (value.length > 2) {
+  if (value.length > maxCategories) {
     return 'Please select no more than two categories.'
   }
   return true
 }
 
-const allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf']
-const maxFileSize = 2 * 1024 * 1024 // 2MB
-
-export const validateAttachments = (files: FileList) => {
+export const validateAttachments = (files: FileList | null) => {
   if (!files) {
     return true // No file selected, so validation passes
   }
@@ -50,8 +49,8 @@ export const validateAttachments = (files: FileList) => {
     totalSize += file.size
   }
 
-  if (totalSize > maxFileSize) {
-    return `Total file size must be under ${maxFileSize / (1024 * 1024)}MB`
+  if (totalSize > maxAttachmentFilesSize) {
+    return `Total file size must be under ${maxAttachmentFilesSize / (1024 * 1024)}MB`
   }
 
   return true

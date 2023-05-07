@@ -6,7 +6,7 @@ import Session from 'supertokens-web-js/recipe/session'
 import EmailVerification from 'supertokens-web-js/recipe/emailverification'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 
 import App from './App.vue'
@@ -28,7 +28,7 @@ SuperTokens.init({
 })
 
 // Set up fontawesome
-library.add(faHeading, faPaperclip)
+library.add(fas)
 
 const app = createApp({
   setup() {
