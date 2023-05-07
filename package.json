@@ -36,10 +36,10 @@
     "lint": "run-s lint:ts",
     "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . --ignore-path .gitignore && pretty-quick",
     "preinstall": "npx only-allow pnpm",
-    "migrate:api:all": "pnpm --sequential migrate:api:main migrate:api:premoderation",
+    "migrate:api:all": "pnpm migrate:api:main & pnpm migrate:api:premoderation",
     "migrate:api:main": "pnpm --filter ./apps/ourvoice-api prisma:migrate:main",
     "migrate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:migrate:premoderation",
-    "generate:api:all": "pnpm --sequential generate:api:main generate:api:premoderation",
+    "generate:api:all": "pnpm generate:api:main & pnpm generate:api:premoderation",
     "generate:api:main": "pnpm --filter ./apps/ourvoice-api prisma:generate:main",
     "generate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:generate:premoderation"
   },
