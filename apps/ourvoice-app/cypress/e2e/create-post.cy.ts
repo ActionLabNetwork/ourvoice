@@ -58,13 +58,20 @@ describe('Create Post', () => {
       cy.get('#attachments').should('exist')
       cy.get('button[type="submit"]').should('exist')
     })
+
+    it('should not show any error messages when form is untouched', () => {
+      // Assert
+      cy.get('[data-cy="title-error-message"]').should('not.exist')
+      cy.get('[data-cy="content-error-message"]').should('not.exist')
+      cy.get('[data-cy="categories-error-message"]').should('not.exist')
+      cy.get('[data-cy="attachments-error-message"]').should('not.exist')
+    })
   })
 
   describe('Validation', () => {
     it('should show an error message if the title is empty', () => {
       // Act
-      cy.get('#title').click()
-      cy.get('#content').click()
+      cy.get('#title').click().type('a').clear()
 
       // Assert
       cy.get('[data-cy="title-error-message"]').should('be.visible')
@@ -74,7 +81,6 @@ describe('Create Post', () => {
     it('should show an error message if the title is more than allowed characters', () => {
       // Act
       cy.get('#title').type('a'.repeat(createPostContentCharacterLimit + 1))
-      cy.get('#content').click()
 
       // Assert
       cy.get('[data-cy="title-error-message"]').should('be.visible')
@@ -103,8 +109,7 @@ describe('Create Post', () => {
 
     it('should show an error message if the content is empty', () => {
       // Act
-      cy.get('#content').click()
-      cy.get('#categories').click()
+      cy.get('#content').click().type('a').clear()
 
       // Assert
       cy.get('[data-cy="content-error-message"]').should('be.visible')
@@ -268,6 +273,12 @@ describe('Create Post', () => {
         expect(response?.body.data.createPost).to.have.property('id')
         expect(response?.body.data.createPost).to.have.property('title')
         expect(response?.body.data.createPost).to.have.property('content')
+
+        // Assert form reset
+        cy.get('#title').should('have.value', '')
+        cy.get('#content').should('have.value', '')
+        cy.get('#categories').should('have.value', '')
+        cy.get('#uploaded-attachments-list').should('not.exist')
       })
     })
   })
