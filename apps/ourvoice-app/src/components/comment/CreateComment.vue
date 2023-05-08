@@ -119,8 +119,8 @@ export default {
 
     // Form fields
     const commentFor = ref('comment')
-    const selectedComment = ref<number[]>([])
-    const selectedPost = ref<number[]>([])
+    const selectedComment = ref<number[] | number>([])
+    const selectedPost = ref<number[] | number>([])
     const content = ref<string>('')
     const characterCount = ref(0)
 
@@ -135,10 +135,12 @@ export default {
         .createComment({
           content: content.value,
           postId:
-            commentFor.value === 'post' ? selectedPost.value[0] ?? selectedPost.value : undefined,
+            commentFor.value === 'post' && typeof selectedPost.value == 'number'
+              ? selectedPost.value
+              : commentsStore.data.find((comment) => comment.id == selectedComment.value)?.post?.id,
           parentId:
-            commentFor.value === 'comment'
-              ? selectedComment.value[0] ?? selectedComment.value
+            commentFor.value === 'comment' && typeof selectedComment.value == 'number'
+              ? selectedComment.value
               : undefined,
           //Todo: Get authorId from auth
           authorId: 1
