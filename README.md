@@ -19,6 +19,9 @@ A safe space for employees and community members to anonymously discuss issues a
 - Run from the root `pnpm install` to install dependancies
 - Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
 - Run `pnpm run dev` from the corresponding `app` directory to start the server (`app`, `api` or `admin`);
+- Run from the root `pnpm migrate api:all` and `pnpm generate api:all` to migrate and generate backend prisma db (main and premoderation)
+- Run from the root `pnpm test:api` to run unit tests for the api
+- Run from the root `pnpm test:api:integration` to run integration tests for the api
 
 #### Suggested IDEA and plugins:
 
