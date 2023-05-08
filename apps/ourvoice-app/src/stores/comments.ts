@@ -3,14 +3,25 @@ import { useQuery, useMutation } from '@vue/apollo-composable'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 
-export interface CommentsState {
-  data: {
+export interface Comment {
+  id: number
+  content: string
+  createdAt: string
+  author: {
+    id: number
+    nickname: string
+  }
+  post: {
+    id: number
+    title: string
+  }
+  parent: {
     id: number
     content: string
-    author: Object | null
-    post: Object | null
-    parent: Object | null
-  }[]
+  }
+}
+export interface CommentsState {
+  data: Comment[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -30,20 +41,8 @@ export const useCommentsStore = defineStore('comments', {
     },
 
     getGroupedComments(state) {
-      const commentsForPosts: {
-        id: number
-        content: string
-        author: Object | null
-        post: Object | null
-        parent: Object | null
-      }[] = []
-      const commentsForComments: {
-        id: number
-        content: string
-        author: Object | null
-        post: Object | null
-        parent: Object | null
-      }[] = []
+      const commentsForPosts: Comment[] = []
+      const commentsForComments: Comment[] = []
       state.data.forEach((c) => {
         if (c.parent) {
           commentsForComments.push(c)
@@ -71,6 +70,7 @@ export const useCommentsStore = defineStore('comments', {
         this.data = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
           content: comment.node.content,
+          createdAt: comment.node.createdAt,
           author: comment.node.author ?? null,
           post: comment.node.post ?? null,
           parent: comment.node.parent ?? null
