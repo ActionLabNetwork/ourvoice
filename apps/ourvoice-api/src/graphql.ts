@@ -62,8 +62,6 @@ export class CategoriesFilterInput {
 export class CategoryPaginationInput {
     cursor?: Nullable<string>;
     limit?: Nullable<number>;
-    page?: Nullable<number>;
-    perPage?: Nullable<number>;
 }
 
 export class CommentCreateInput {
@@ -160,6 +158,10 @@ export abstract class IQuery {
     abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
 
     abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
+
+    abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
+
+    abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): Nullable<CommentConnection> | Promise<Nullable<CommentConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
