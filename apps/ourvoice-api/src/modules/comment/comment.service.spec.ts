@@ -3,13 +3,13 @@ import { CommentService } from './comment.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommentRepository } from './comment.repository';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { Comment } from '@prisma/client';
+import { Comment, User, Post } from '@prisma/client';
 
 describe('CommentService', () => {
   let commentService: CommentService;
   let commentRepositoryMock: DeepMocked<CommentRepository>;
 
-  const dummyComment: Comment = {
+  const dummyComment: any = {
     id: 1,
     content: 'Test Content',
     authorId: 1,
@@ -37,6 +37,10 @@ describe('CommentService', () => {
 
     commentService = module.get<CommentService>(CommentService);
     commentRepositoryMock = module.get(CommentRepository);
+  });
+
+  afterEach(async () => {
+    jest.resetAllMocks();
   });
 
   it('should create a comment', async () => {

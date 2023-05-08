@@ -22,11 +22,11 @@ export class CommentRepository {
   async getCommentById(id: number) {
     return this.prisma.comment.findUnique({
       where: { id },
-      include: {
-        author: true,
-        post: true,
-        parent: true,
-      },
+      // include: {
+      //   author: true,
+      //   post: true,
+      //   parent: true,
+      // },
     });
   }
 
