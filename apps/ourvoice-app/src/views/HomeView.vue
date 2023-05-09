@@ -32,20 +32,19 @@ import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
-const apiURL = import.meta.env.VITE_APP_API_URL || `http://localhost:3000`
+const apiURL = import.meta.env.VITE_APP_API_URL
 
-const authURL =
-  import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword' ||
-  'http://localhost:3030/signinWithoutPassword'
+const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 
 export default defineComponent({
+  props: ['deployment'],
   data() {
     return {
       // if session is false, we show a blank screen
       // else we render the UI
       session: false,
       userId: '',
-      authURL: authURL
+      authURL: `${authBaseURL}?d=${this.deployment}`
     }
   },
   methods: {
@@ -68,7 +67,7 @@ export default defineComponent({
         for (const err of validationErrors) {
           if (err.validatorId === EmailVerificationClaim.id) {
             // email is not verified
-            window.location.href = authURL
+            window.location.href = this.authURL
           }
         }
       }
@@ -79,7 +78,7 @@ export default defineComponent({
       if (response.status === 401) {
         // this means that the session has expired and the
         // user needs to relogin.
-        window.location.href = `${authURL}/signinWithoutPassword`
+        window.location.href = this.authURL
         return
       }
 

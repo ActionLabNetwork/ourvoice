@@ -10,20 +10,31 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  const configService = await app.get(ConfigService);
 
-  // TODO: add website domain
+  // configService.get<AuthOptions[]>('auth');
+
+  // TODO: add admin and app addresses to list
   const whitelist: string[] = [
-    'http://localhost:3001',
-    'http://localhost:3030',
-    'http://localhost:3020',
-    'http://localhost:3010',
+    configService.get('SUPERTOKENS_API_DOMAIN'), // app itself
+    configService.get('VITE_APP_AUTH_URL'),
+    configService.get('VITE_APP_ADMIN_URL'),
+    configService.get('VITE_APP_APP_DOMAIN'),
   ];
-
+  // TODO : use regex for all deployment names
   app.enableCors({
-    // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      // const match = origin
+      //   .toLowerCase()
+      //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
+      const parts = origin.split('.');
+      if (
+        !origin ||
+        whitelist.indexOf(origin) !== -1 ||
+        whitelist.indexOf(
+          `${parts[parts.length - 2]}.${parts[parts.length - 1]}`,
+        ) !== -1
+      ) {
         callback(null, true);
       } else {
         callback(
@@ -38,12 +49,11 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-
-  //TODO: initiate roles based on config yml/json
-  await createRole('user');
-  await createRole('moderator');
-  await createRole('admin');
-  await app.listen(configService.get('PORT') as number);
+  // create user roles
+  configService
+    .get<string[]>('roles')
+    .map(async (role) => await createRole(role));
+  await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
 }
 
 bootstrap();

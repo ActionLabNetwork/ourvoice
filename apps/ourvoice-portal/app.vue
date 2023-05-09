@@ -1,5 +1,5 @@
 <template>
-  <NuxtPage class="font-Poppins overflow-x-hidden" />
+  <div>
+    <NuxtPage class="font-Poppins overflow-x-hidden" />
+  </div>
 </template>
-
-<script lang="ts"></script>

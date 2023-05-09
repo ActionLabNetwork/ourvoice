@@ -4,7 +4,6 @@ import { PostService } from './post.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostRepository } from './post.repository';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
-import { Post } from '@prisma/client';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('PostService', () => {
