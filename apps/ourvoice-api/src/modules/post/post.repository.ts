@@ -94,10 +94,12 @@ export class PostRepository {
 
     return { totalCount, posts };
   }
-
+  // TODO: remove lint ignores
   async getPostsByCategories(
     categoryNames: string[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     filter?: PostsFilterInput,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     pagination?: PostPaginationInput,
   ): Promise<Post[]> {
     return await this.prisma.post.findMany({

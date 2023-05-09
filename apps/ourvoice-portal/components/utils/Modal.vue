@@ -1,15 +1,17 @@
 <template>
-  <transition name="modal-animation">
-    <div v-show="modalActive" class="modal">
-      <transition name="modal-animatioon-inner">
-        <div v-show="modalActive" class="modal-inner">
-          Test sfsdfsdfsdfsd
-          <slot />
-          <button type="button" class="btn btn-red btn-hover">Close</button>
-        </div>
-      </transition>
-    </div>
-  </transition>
+  <div>
+    <transition name="modal-animation">
+      <div v-show="modalActive" class="modal">
+        <transition name="modal-animatioon-inner">
+          <div v-show="modalActive" class="modal-inner">
+            Test sfsdfsdfsdfsd
+            <slot />
+            <button type="button" class="btn btn-red btn-hover">Close</button>
+          </div>
+        </transition>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts">

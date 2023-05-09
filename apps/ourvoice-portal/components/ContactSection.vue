@@ -95,8 +95,8 @@ export default defineComponent({
       await recaptchaInstance?.recaptchaLoaded()
 
       // Execute reCAPTCHA with action "login".
-      const token = await recaptchaInstance?.executeRecaptcha('submit')
-      console.log(token)
+      // const token = await recaptchaInstance?.executeRecaptcha('submit')
+      // console.log(token)
       // Do stuff with the received token.
     }
 

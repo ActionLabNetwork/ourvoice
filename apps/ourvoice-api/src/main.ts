@@ -5,25 +5,32 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
-import { createRole } from './auth/roles.service';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // TODO: add website domain
+  // TODO: add website domains
   const whitelist: string[] = [
-    'http://localhost:3000',
-    'http://localhost:3010',
-    'http://localhost:3020',
-    'http://localhost:4173', // cypress
+    // 'http://localhost:3000',
+    // 'http://localhost:3010',
+    // 'http://localhost:3020',
+    // 'http://localhost:4173', // cypress
+    configService.get('VITE_APP_API_URL'), // APP itself
+    configService.get('VITE_APP_ADMIN_URL'), // ADMIN
+    configService.get('VITE_APP_APP_DOMAIN'), // DOMAIN
   ];
-
   app.enableCors({
-    // origin: [`${configService.get('ORIGIN')}`], // TODO: URL of the website domain
     origin: function (origin, callback) {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
+      const parts = origin.split('.');
+      if (
+        !origin ||
+        whitelist.indexOf(origin) !== -1 ||
+        whitelist.indexOf(
+          `${parts[parts.length - 2]}.${parts[parts.length - 1]}`,
+        ) !== -1
+      ) {
         callback(null, true);
       } else {
         callback(
@@ -39,11 +46,7 @@ async function bootstrap() {
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
 
-  //TODO: initiate roles based on config yml/json
-  await createRole('user');
-  await createRole('moderator');
-  await createRole('admin');
-  await app.listen(configService.get('PORT') as number);
+  await app.listen(configService.get<number>('API_PORT') || 3000);
 }
 
 bootstrap();
