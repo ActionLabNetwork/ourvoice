@@ -13,9 +13,13 @@ async function bootstrap() {
 
   // TODO: add website domains
   const whitelist: string[] = [
-    configService.get('VITE_APP_API_URL'), // app itself
-    configService.get('VITE_APP_ADMIN_URL'),
-    configService.get('VITE_APP_APP_DOMAIN'),
+    // 'http://localhost:3000',
+    // 'http://localhost:3010',
+    // 'http://localhost:3020',
+    // 'http://localhost:4173', // cypress
+    configService.get('VITE_APP_API_URL'), // APP itself
+    configService.get('VITE_APP_ADMIN_URL'), // ADMIN
+    configService.get('VITE_APP_APP_DOMAIN'), // DOMAIN
   ];
   app.enableCors({
     origin: function (origin, callback) {

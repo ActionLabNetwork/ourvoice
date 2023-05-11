@@ -1,0 +1,10 @@
+{
+  "data": {
+    "createPost": {
+      "id": "id",
+      "title": "title",
+      "content": "content",
+      "__typename": "Post"
+    }
+  }
+}

@@ -185,7 +185,6 @@ describe('PostService', () => {
 
     const filterData = { title: 'Test Title', moderated: true };
     const paginationData = { cursor: '1', limit: 10 };
-
     const expectedResult = {
       edges: [
         {
@@ -214,7 +213,6 @@ describe('PostService', () => {
       },
       totalCount: 1,
     };
-
     // Act
     const result = await postService.getPosts(filterData, paginationData);
 
@@ -345,7 +343,10 @@ describe('PostService', () => {
     const result = await postService.deletePost(postId);
 
     // Assert
-    expect(result).toEqual(dummyPost);
+    expect(result).toEqual({
+      ...dummyPost,
+      categories: dummyCategories,
+    });
     expect(postRepositoryMock.deletePost).toHaveBeenCalledWith(postId);
   });
 

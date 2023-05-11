@@ -74,6 +74,11 @@ export class CategoriesFilterInput {
   disabledBefore?: Nullable<DateTime>;
 }
 
+export class CategoryPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+  
 export class PaginationInput {
   cursor?: Nullable<number>;
   limit: number;
@@ -140,10 +145,7 @@ export abstract class IQuery {
     id: number,
   ): Nullable<Category> | Promise<Nullable<Category>>;
 
-  abstract categories(
-    filter?: Nullable<CategoriesFilterInput>,
-    pagination?: Nullable<PaginationInput>,
-  ): Category[] | Promise<Category[]>;
+  abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
 
   abstract categoriesByNames(names: string[]): Category[] | Promise<Category[]>;
 
@@ -252,16 +254,32 @@ export class Vote {
 }
 
 export class Category {
-  id: number;
-  name: string;
-  description?: Nullable<string>;
-  weight: number;
-  active: boolean;
-  createdAt?: Nullable<DateTime>;
-  disabledAt?: Nullable<DateTime>;
-  parent?: Nullable<Category>;
-  children: Category[];
-  posts: Post[];
+    id: number;
+    name: string;
+    description?: Nullable<string>;
+    weight: number;
+    active: boolean;
+    createdAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    parent?: Nullable<Category>;
+    children?: Nullable<Category[]>;
+    posts?: Nullable<Post[]>;
+}
+
+export class CategoryEdge {
+    node: Category;
+    cursor: string;
+}
+
+export class CategoryConnection {
+    pageInfo: CategoryPageInfo;
+    edges: CategoryEdge[];
+}
+
+export class CategoryPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
 }
 
 export class PageInfo {

@@ -7,23 +7,17 @@
       <slot name="icon"></slot>
       <slot></slot>
     </div>
-
-    <ErrorMessage class="text-red-500 text-sm" v-if="name" :name="name" />
+    <span v-if="name && errorMessage" class="text-red-500 text-sm" :name="name" :data-cy="`${name}-error-message`">{{ errorMessage }}</span>
     <slot name="info"></slot>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { ErrorMessage } from 'vee-validate';
-
-export default defineComponent({
-  components: { ErrorMessage },
-  props: {
-    id: String,
-    labelText: String,
-    labelSpan: String,
-    name: String,
-  },
-});
+<script setup lang="ts">
+defineProps({
+  id: String,
+  labelText: String,
+  labelSpan: String,
+  name: String,
+  errorMessage: { type: String, required: false },
+})
 </script>

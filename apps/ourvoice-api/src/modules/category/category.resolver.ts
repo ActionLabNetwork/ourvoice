@@ -2,7 +2,7 @@ import {
   CategoriesFilterInput,
   CategoryCreateInput,
   CategoryUpdateInput,
-  PaginationInput,
+  CategoryPaginationInput,
 } from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Category } from '@prisma/client';
@@ -13,29 +13,19 @@ export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Query()
-  async category(
-    @Args('id', { type: () => Int }) id: number,
-  ): Promise<Category> {
+  async category(@Args('id') id: number): Promise<Category> {
     return this.categoryService.getCategoryById(id);
   }
 
   @Query()
   async categories(
-    @Args('filter', { type: () => CategoriesFilterInput, nullable: true })
-    filter: CategoriesFilterInput,
-    @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination: PaginationInput,
-  ): Promise<Category[]> {
-    return this.categoryService.getCategories(filter, pagination);
-  }
+    @Args('filter') filter?: CategoriesFilterInput,
+    @Args('pagination') pagination?: CategoryPaginationInput,
+  ) {
+    const { totalCount, edges, pageInfo } =
+      await this.categoryService.getCategories(filter, pagination);
 
-  @Query()
-  async categoriesByNames(
-    @Args('names', { type: () => [String] }) names: string[],
-    @Args('skip', { type: () => Int, defaultValue: 0 }) skip: number,
-    @Args('take', { type: () => Int, defaultValue: 10 }) take: number,
-  ): Promise<Category[]> {
-    return this.categoryService.getCategoriesByNames(names, skip, take);
+    return { totalCount, edges, pageInfo };
   }
 
   @Mutation()

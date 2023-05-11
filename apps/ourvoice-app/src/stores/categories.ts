@@ -1,6 +1,26 @@
+import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { defineStore } from 'pinia'
 import { useQuery } from '@vue/apollo-composable'
-import gql from 'graphql-tag'
+
+interface Category {
+  id: number
+  name: string
+}
+
+interface Edge {
+  node: Category
+}
+
+interface Data {
+  categories: {
+    edges: Edge[]
+  }
+}
+
+interface Result {
+  data: Data
+  loading: boolean
+}
 
 export interface CategoriesState {
   data: { id: number; name: string }[]
@@ -19,19 +39,12 @@ export const useCategoriesStore = defineStore('categories', {
 
   actions: {
     async fetchCategories() {
-      const { onResult, onError } = useQuery(
-        gql`
-          query {
-            categories {
-              id
-              name
-            }
-          }
-        `
-      )
+      const { onResult, onError } = useQuery(GET_CATEGORIES_QUERY)
 
-      onResult(({ data, loading }) => {
-        this.data = data.categories
+      onResult(({ data, loading }: Result) => {
+        const extractCategories = ({ node: { id, name } }: Edge): Category => ({ id, name })
+
+        this.data = data.categories.edges.map(extractCategories)
         this.loading = loading
       })
 

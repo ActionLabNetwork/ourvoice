@@ -1,0 +1,29 @@
+{
+  "data": {
+    "categories": {
+      "edges": [
+        {
+          "node": { "id": 1, "name": "Category 1", "__typename": "Category" },
+          "__typename": "CategoryEdge"
+        },
+        {
+          "node": { "id": 2, "name": "Category 2", "__typename": "Category" },
+          "__typename": "CategoryEdge"
+        },
+        {
+          "node": { "id": 3, "name": "Category 3", "__typename": "Category" },
+          "__typename": "CategoryEdge"
+        },
+        {
+          "node": { "id": 4, "name": "Category 4", "__typename": "Category" },
+          "__typename": "CategoryEdge"
+        },
+        {
+          "node": { "id": 5, "name": "Category 5", "__typename": "Category" },
+          "__typename": "CategoryEdge"
+        }
+      ],
+      "__typename": "CategoryConnection"
+    }
+  }
+}

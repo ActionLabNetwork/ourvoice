@@ -87,7 +87,7 @@ export class PostRepository {
       },
       skip: pagination?.cursor ? 1 : undefined,
       cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor.toString()) }
+        ? { id: cursorToNumber(pagination.cursor) }
         : undefined,
       take: pagination?.limit ?? 10,
     });
