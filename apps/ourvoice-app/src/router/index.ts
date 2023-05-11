@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NoAuthView from '../views/NoAuthView.vue'
+import PostsView from '../views/PostsView.vue'
 
 import YamlContent from '../../../../config/config.yml'
 
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/noauth',
       name: 'noauth',
       component: NoAuthView
+    },
+    {
+      path: '/noauth/post',
+      name: 'post',
+      component: PostsView,
     }
   ]
 })

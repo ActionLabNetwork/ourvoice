@@ -275,6 +275,47 @@ describe('PostService', () => {
     );
   });
 
+  it('should return no posts when categories is empty', async () => {
+    // Arrange
+    const categoryNames = [];
+    const skip = 0;
+    const take = 10;
+
+    const posts = [];
+
+    postRepositoryMock.getPostsByCategories.mockResolvedValue(posts);
+
+    // Act
+    const result = await postService.getPostsByCategories(categoryNames);
+
+    // Assert
+    expect(result).toEqual(posts);
+    expect(postRepositoryMock.getPostsByCategories).toHaveBeenCalledWith(
+      categoryNames,
+      undefined,
+      undefined,
+    );
+  });
+
+  it('should return no posts when categories is empty', async () => {
+    // Arrange
+    const categoryNames = [];
+    const posts = [];
+
+    postRepositoryMock.getPostsByCategories.mockResolvedValue(posts);
+
+    // Act
+    const result = await postService.getPostsByCategories(categoryNames);
+
+    // Assert
+    expect(result).toEqual(posts);
+    expect(postRepositoryMock.getPostsByCategories).toHaveBeenCalledWith(
+      categoryNames,
+      undefined,
+      undefined,
+    );
+  });
+
   it('should update a post', async () => {
     // Arrange
     const postId = 1;

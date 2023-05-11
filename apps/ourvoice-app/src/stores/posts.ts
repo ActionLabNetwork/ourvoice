@@ -11,7 +11,6 @@ export interface Post {
   title: string
   content: string
   createdAt: string
-  updatedAt: string
   author: {
     id: number
     nickname: string
@@ -28,8 +27,16 @@ export interface Post {
   votesDown: number
 }
 
+export interface pageInfo {
+  endCursor: string
+  hasNextPage: boolean
+  startCursor: string
+}
+
 export interface PostsState {
   data: Post[]
+  totalCount: number
+  pageInfo: pageInfo | undefined
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -40,6 +47,8 @@ provideApolloClient(apolloClient)
 export const usePostsStore = defineStore('posts', {
   state: (): PostsState => ({
     data: [],
+    totalCount: 0,
+    pageInfo: undefined,
     loading: false,
     error: undefined,
     errorMessage: undefined
@@ -47,10 +56,14 @@ export const usePostsStore = defineStore('posts', {
 
   actions: {
     async fetchPosts() {
-      const { onResult, onError } = useQuery(GET_POSTS_QUERY)
+      const { onResult, onError } = useQuery(GET_POSTS_QUERY, {
+        limit: 3
+      })
 
       onResult(({ data, loading }) => {
-        this.data = data.posts
+        this.data = data.posts.edges.map((edge: any) => edge.node)
+        this.totalCount = data.posts.totalCount
+        this.pageInfo = data.posts.pageInfo
         this.loading = loading
       })
 

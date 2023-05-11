@@ -1,0 +1,83 @@
+type Query {
+  comment(id: Int!): Comment
+  comments(
+    filter: CommentsFilterInput
+    pagination: CommentPaginationInput
+  ): CommentConnection
+}
+
+type Mutation {
+  createComment(data: CommentCreateInput!): Comment!
+  updateComment(id: Int!, data: CommentUpdateInput!): Comment!
+  deleteComment(id: Int!): Comment!
+}
+
+type Comment {
+  id: Int!
+  content: String!
+  moderated: Boolean!
+  published: Boolean!
+  createdAt: DateTime
+  moderatedAt: DateTime
+  publishedAt: DateTime
+  disabledAt: DateTime
+  author: User!
+  post: Post
+  parent: Comment
+  children: [Comment!]!
+}
+
+input CommentCreateInput {
+  content: String!
+  moderated: Boolean
+  published: Boolean
+  authorId: Int!
+  postId: Int
+  parentId: Int
+}
+
+input CommentUpdateInput {
+  content: String
+  moderated: Boolean
+  published: Boolean
+  authorId: Int
+}
+
+input CommentsFilterInput {
+  content: String
+  moderated: Boolean
+  published: Boolean
+  authorId: Int
+  postId: Int
+  parentId: Int
+  createdAfter: DateTime
+  createdBefore: DateTime
+  moderatedAfter: DateTime
+  moderatedBefore: DateTime
+  publishedAfter: DateTime
+  publishedBefore: DateTime
+  disabledAfter: DateTime
+  disabledBefore: DateTime
+}
+
+input CommentPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type CommentConnection {
+  totalCount: Int
+  pageInfo: CommentPageInfo!
+  edges: [CommentEdge]
+}
+
+type CommentPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}

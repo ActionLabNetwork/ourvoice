@@ -84,6 +84,28 @@ export class PaginationInput {
   limit: number;
 }
 
+export class CommentsFilterInput {
+    content?: Nullable<string>;
+    moderated?: Nullable<boolean>;
+    published?: Nullable<boolean>;
+    authorId?: Nullable<number>;
+    postId?: Nullable<number>;
+    parentId?: Nullable<number>;
+    createdAfter?: Nullable<DateTime>;
+    createdBefore?: Nullable<DateTime>;
+    moderatedAfter?: Nullable<DateTime>;
+    moderatedBefore?: Nullable<DateTime>;
+    publishedAfter?: Nullable<DateTime>;
+    publishedBefore?: Nullable<DateTime>;
+    disabledAfter?: Nullable<DateTime>;
+    disabledBefore?: Nullable<DateTime>;
+}
+
+export class CommentPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
 export class PostCreateInput {
   title: string;
   content: string;
