@@ -280,6 +280,7 @@ export class CategoryPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+}
 
 export class PageInfo {
   endCursor?: Nullable<number>;
