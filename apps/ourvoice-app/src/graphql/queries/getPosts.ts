@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const GET_POSTS_QUERY = gql`
-  query getPosts {
-    posts {
+  query GetPosts($limit: Int = 10) {
+    posts(pagination: { limit: $limit }, filter: null) {
       edges {
         node {
           id
@@ -24,6 +24,12 @@ export const GET_POSTS_QUERY = gql`
           votesUp
           votesDown
         }
+      }
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
       }
     }
   }

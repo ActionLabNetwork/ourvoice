@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const GET_COMMENTS_QUERY = gql`
-  query getComments {
+  query GetComments {
     comments {
       edges {
         node {

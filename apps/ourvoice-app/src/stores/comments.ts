@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
+import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 
 export interface Comment {
@@ -60,6 +62,10 @@ export const useCommentsStore = defineStore('comments', {
           options: commentsForComments
         }
       ]
+    },
+
+    getCommentsByPostId: (state) => (postId: number) => {
+      return state.data.filter((c) => c.post?.id === postId)
     }
   },
   actions: {
@@ -97,7 +103,6 @@ export const useCommentsStore = defineStore('comments', {
       parentId: number | undefined
       authorId: number
     }) {
-      // const result = undefined
       const { mutate } = useMutation(CREATE_COMMENT_MUTATION)
       await mutate({
         data: {
@@ -111,6 +116,39 @@ export const useCommentsStore = defineStore('comments', {
         this.$patch((state) => {
           state.data.push(response?.data.createComment)
         })
+      })
+    },
+
+    async deleteComment(id: number) {
+      const { mutate } = useMutation(DELETE_COMMENT_MUTATION)
+      await mutate({ deleteCommentId: id }).then((response) => {
+        console.log('response: ', response)
+      })
+    },
+
+    async updateComment({
+      id,
+      data
+    }: {
+      id: number
+      data: {
+        content: string
+        authorId: number
+        published: boolean
+        moderated: boolean
+      }
+    }) {
+      const { mutate } = useMutation(UPDATE_COMMENT_MUTATION)
+      await mutate({
+        updateCommentId: id,
+        data: {
+          content: data.content,
+          authorId: data.authorId,
+          published: data.published,
+          moderated: data.moderated
+        }
+      }).then((response) => {
+        console.log('response: ', response)
       })
     }
   }
