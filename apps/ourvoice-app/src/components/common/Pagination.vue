@@ -23,11 +23,11 @@
           {{ ' ' }}
           to
           {{ ' ' }}
-          <span class="font-medium">10</span>
+          <span class="font-medium">3</span>
           {{ ' ' }}
           of
           {{ ' ' }}
-          <span class="font-medium">97</span>
+          <span class="font-medium">{{ total }}</span>
           {{ ' ' }}
           results
         </p>
