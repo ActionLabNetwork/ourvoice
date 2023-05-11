@@ -58,8 +58,7 @@ import { ManageRedirectStateService } from '../utils/manage-redirect-state.servi
 import { defineComponent } from 'vue'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-
-const appURL = import.meta.env.VITE_APP_APP_URL
+const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 export default defineComponent({
   data() {
@@ -87,7 +86,7 @@ export default defineComponent({
             // user sign in success
           }
           Passwordless.clearLoginAttemptInfo()
-          window.location.href = appURL
+          this.handleRedirect()
         } else {
           // this can happen if the magic link has expired or is invalid
           console.log('Login failed. Please try again')
@@ -114,9 +113,19 @@ export default defineComponent({
     },
     checkForSession: async function () {
       if (await Session.doesSessionExist()) {
-        window.location.href = appURL
+        this.handleRedirect()
       } else {
         this.hasInitialMagicLinkBeenSent()
+      }
+    },
+    handleRedirect: function () {
+      if (redirect.exists()) {
+        const redirectTo = redirect.get()
+        redirect.purge()
+        window.location.href = redirectTo
+      } else {
+        // fallback redirect
+        window.location.href = `http://demo${domain}`
       }
     }
   }

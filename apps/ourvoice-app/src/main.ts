@@ -15,16 +15,17 @@ import router from './router'
 SuperTokens.init({
   appInfo: {
     appName: `${import.meta.env.VITE_APP_NAME || 'OurVoice APP'}`,
-    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL || 'http://localhost:3001'}`,
+    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL}`,
     apiBasePath: `${import.meta.env.VITE_APP_AUTH_API_BASE || '/auth'}`
   },
   recipeList: [
     Session.init({
-      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN || '.localhost'}`,
-      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN || '.localhost'}`
+      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN}`,
+      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN}`
     }),
     EmailVerification.init()
   ]
+  // enableDebugLogs: true
 })
 
 // Set up fontawesome

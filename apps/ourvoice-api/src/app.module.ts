@@ -24,12 +24,9 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       appInfo: {
         // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
         appName: `${process.env.SUPERTOKENS_APP_NAME}` || 'Ourvoice API',
-        apiDomain:
-          `${process.env.SUPERTOKENS_API_DOMAIN}` || 'http://localhost:3001',
+        apiDomain: `${process.env.SUPERTOKENS_API_DOMAIN}`,
         apiBasePath: `${process.env.SUPERTOKENS_API_BASE_PATH}` || '/auth',
-        websiteDomain:
-          `${process.env.SUPERTOKENS_WEBSITE_DOMAIN}` ||
-          'http://localhost:3030',
+        websiteDomain: `${process.env.SUPERTOKENS_WEBSITE_DOMAIN}`,
         websiteBasePath: `${process.env.SUPERTOKENS_WEBSITE_BASE_PATH}` || '/',
       },
       smtpSettings: {
