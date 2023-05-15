@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const GET_POSTS_QUERY = gql`
-  query GetPosts($limit: Int = 10) {
-    posts(pagination: { limit: $limit }, filter: null) {
+  query GetPosts($limit: Int = 10, $cursor: String = null) {
+    posts(pagination: { limit: $limit, cursor: $cursor }, filter: null) {
       edges {
         node {
           id

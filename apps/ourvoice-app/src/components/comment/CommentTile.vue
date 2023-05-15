@@ -23,18 +23,25 @@
     </div>
     <div class="space-y-4" v-show="showCommentList">
       <CommentCard
-        v-for="comment in commentsStore.getCommentsByPostId(postId).slice().reverse()"
+        v-for="comment in commentsStoreRef.data.value
+          .filter((comment) => comment.post.id === postId)
+          .reverse()"
         :key="comment.id"
         :comment="comment"
+        @delete="(commentId) => deleteComment(commentId)"
       />
     </div>
   </div>
+  <!-- <pre
+    >{{ commentsStoreRef.data }}
+  </pre> -->
 </template>
 
 <script lang="ts">
 import { ref } from 'vue'
 import CommentCard from './CommentCard.vue'
 import { useCommentsStore } from '@/stores/comments'
+import { storeToRefs } from 'pinia'
 export default {
   name: 'CommentTile',
   components: {
@@ -47,12 +54,18 @@ export default {
     }
   },
   setup() {
-    const showCommentList = ref(true)
     const commentsStore = useCommentsStore()
-    commentsStore.fetchComments()
+    useCommentsStore().fetchComments()
+    const commentsStoreRef = storeToRefs(useCommentsStore())
+    const showCommentList = ref(false)
+    const deleteComment = (commentId: number) => {
+      console.log(commentId)
+    }
     return {
       showCommentList,
-      commentsStore
+      commentsStore,
+      commentsStoreRef,
+      deleteComment
     }
   }
 }

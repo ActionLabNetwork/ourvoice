@@ -56,7 +56,10 @@ export class PostService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: posts.length < totalCount,
+      hasNextPage:
+        posts.length == pagination.limit &&
+        posts.length < totalCount &&
+        posts.length != 0,
     };
 
     return { totalCount, edges, pageInfo };

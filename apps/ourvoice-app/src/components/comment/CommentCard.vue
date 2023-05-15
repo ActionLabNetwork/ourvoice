@@ -102,7 +102,8 @@ export default {
       required: true
     }
   },
-  setup(props) {
+  emits: ['delete'],
+  setup(props, ctx) {
     const commentStore = useCommentsStore()
     const showReply = ref(false)
     const commentEditing = ref(false)
@@ -139,7 +140,7 @@ export default {
     const deleteComment = async () => {
       console.log('delete comment', props.comment.id)
       await commentStore.deleteComment(props.comment.id)
-      location.reload()
+      ctx.emit('delete', props.comment.id)
     }
     const commentContent = ref(props.comment.content)
 
