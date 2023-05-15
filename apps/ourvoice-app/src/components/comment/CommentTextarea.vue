@@ -11,7 +11,7 @@
       <form action="">
         <textarea
           v-model="content"
-          class="w-full max-h-20 rounded-lg p-2 drop-shadow-md bg-gray-200"
+          class="w-full max-h-20 rounded-lg p-2 drop-shadow-md bg-gray-200 dark:bg-gray-500"
           maxlength="255"
           name=""
           id=""

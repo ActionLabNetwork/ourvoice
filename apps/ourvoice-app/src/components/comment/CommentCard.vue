@@ -8,7 +8,7 @@
       />
     </div>
     <div class="flex-1">
-      <div class="bg-white rounded-lg pl-4 pr-2 py-2 leading-relaxed">
+      <div class="bg-white dark:bg-ourvoice-blue rounded-lg pl-4 pr-2 py-2 leading-relaxed">
         <!-- <strong>{{ comment.author.nickname }}</strong> -->
 
         <div class="text-sm md:text-md py-2">
@@ -52,7 +52,7 @@
 
         <div class="flex">
           <div
-            class="text-gray-500 hover:text-indigo-400 my-auto bg-gray-100 px-2 py-1 rounded-full text-xs md:text-sm"
+            class="text-gray-500 dark:text-gray-100 hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
             @click="showReply = !showReply"
           >
             <font-awesome-icon icon="fa-solid fa-comment" />

@@ -7,7 +7,7 @@
     />
   </div>
   <div class="flex-1 rounded-lg p-2 leading-relaxed">
-    <div class="bg-white px-4 py-2 rounded-lg">
+    <div class="bg-white dark:bg-ourvoice-blue px-4 py-2 rounded-lg">
       <!-- <strong>{{ post.author.nickname }}</strong> -->
 
       <h1 class="text-lg md:text-xl font-bold">Title: {{ post.title }}</h1>
@@ -16,22 +16,24 @@
       </p>
 
       <div class="flex">
-        <div class="grid grid-cols-3 divide-x divide-none text-gray-500 text-xs md:text-sm">
+        <div
+          class="grid grid-cols-3 divide-x divide-none text-gray-500 dark:text-gray-100 text-xs md:text-sm"
+        >
           <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
+            class="hover:text-indigo-400 dark:hover:text-indigo-400 hover:cursor-pointer bg-gray-100 dark:bg-gray-500 text-center rounded-full px-2 py-1 m-auto w-fit"
             @click="showCommentTextarea = !showCommentTextarea"
           >
             <font-awesome-icon icon="fa-solid fa-comment" />
             <span class="hidden sm:inline-block px-1"> Comment </span>
           </div>
           <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
+            class="hover:text-indigo-400 dark:hover:text-indigo-400 hover:cursor-pointer bg-gray-100 dark:bg-gray-500 text-center rounded-full px-2 py-1 m-auto w-fit"
           >
             <font-awesome-icon icon="fa-solid fa-thumbs-up" />
             <span class="hidden sm:inline-block px-1"> Vote up </span>
           </div>
           <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
+            class="hover:text-indigo-400 dark:hover:text-indigo-400 hover:cursor-pointer bg-gray-100 dark:bg-gray-500 text-center rounded-full px-2 py-1 m-auto w-fit"
           >
             <font-awesome-icon icon="fa-solid fa-thumbs-down" />
             <span class="hidden sm:inline-block px-1"> Vote down </span>
