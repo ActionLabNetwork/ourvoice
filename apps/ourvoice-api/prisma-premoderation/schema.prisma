@@ -11,40 +11,11 @@ datasource premoderation {
   url      = env("DATABASE_PREMODERATION_URL")
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  orgId    Int
-  hash     String   @unique
-  title    String?
-  nickname String?
-  type     UserType @relation(fields: [typeId], references: [id])
-  typeId   Int
-
-  // Meta
-  active     Boolean
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @default(now())
-  verifiedAt DateTime?
-  disabledAt DateTime?
-
-  // Relations
-  posts             Post[]              @relation("PostAuthor")
-  moderatedPosts    PostModeration[]
-  comments          Comment[]           @relation("CommentAuthor")
-  moderatedComments CommentModeration[]
-}
-
-model UserType {
-  id    Int    @id @default(autoincrement())
-  type  String
-  users User[]
-}
-
 model Post {
   id         Int     @id @default(autoincrement())
-  title      String?
+  title      String
   content    String
-  file       String?
+  files      Json?
   identifier String
   sequence   Int     @default(0)
 
@@ -57,8 +28,7 @@ model Post {
 
   // Relations
   comments Comment[]
-  author   User?     @relation("PostAuthor", fields: [authorId], references: [id])
-  authorId Int?
+  authorHash String
 }
 
 model Comment {
@@ -73,8 +43,7 @@ model Comment {
   moderators CommentModeration[]
 
   // Relations
-  author   User      @relation("CommentAuthor", fields: [authorId], references: [id])
-  authorId Int
+  authorHash String
   post     Post?     @relation(fields: [postId], references: [id])
   postId   Int?
   parentId Int?
@@ -85,25 +54,23 @@ model Comment {
 model PostModeration {
   postId      Int
   post        Post     @relation(fields: [postId], references: [id])
-  moderatorId Int
-  moderator   User     @relation(fields: [moderatorId], references: [id])
+  moderatorHash String
   decision    Decision
   reason      String?
   timestamp   DateTime @default(now())
 
-  @@id([postId, moderatorId])
+  @@id([postId, moderatorHash])
 }
 
 model CommentModeration {
   commentId   Int
   comment     Comment  @relation(fields: [commentId], references: [id])
-  moderatorId Int
-  moderator   User     @relation(fields: [moderatorId], references: [id])
+  moderatorHash String
   decision    Decision
   reason      String?
   timestamp   DateTime @default(now())
 
-  @@id([commentId, moderatorId])
+  @@id([commentId, moderatorHash])
 }
 
 enum Decision {

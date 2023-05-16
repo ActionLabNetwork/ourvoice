@@ -40,8 +40,8 @@ model UserType {
 
 model Post {
   id        Int     @id @default(autoincrement())
-  title     String?
-  content   String  @db.VarChar(255)
+  title     String
+  content   String
   files     Json?
   moderated Boolean @default(false)
   published Boolean @default(false)
