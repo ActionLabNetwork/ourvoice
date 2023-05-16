@@ -1,10 +1,11 @@
+import { PremoderationService } from './../moderation/premoderation.service';
 import { PostPaginationInput } from './../../graphql';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Post } from '@prisma/client';
+import { Post, Prisma } from '@prisma/client';
 import { PostRepository } from './post.repository';
 import { PostCreateDto } from './dto/post-create.dto';
 import { validate } from 'class-validator';
@@ -15,7 +16,10 @@ import { numberToCursor } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly postRepository: PostRepository) {}
+  constructor(
+    private readonly postRepository: PostRepository,
+    private readonly premoderationService: PremoderationService,
+  ) {}
 
   async createPost(data: PostCreateDto): Promise<Post> {
     const postCreateDto = plainToClass(PostCreateDto, data);
@@ -34,7 +38,13 @@ export class PostService {
         connect: categories.map((id) => ({ id })),
       },
     };
-    return this.postRepository.createPost(postData);
+
+    const newPost = await this.postRepository.createPost(postData);
+    const newPostWithAuthor: Prisma.PromiseReturnType<typeof this.getPostById> =
+      await this.postRepository.getPostById(newPost.id, { author: true });
+    await this.premoderationService.copyPostToPremoderation(newPostWithAuthor);
+
+    return newPost;
   }
 
   async getPostById(id: number): Promise<Post> {

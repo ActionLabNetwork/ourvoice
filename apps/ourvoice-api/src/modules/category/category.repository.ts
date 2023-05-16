@@ -1,6 +1,6 @@
 import { Category, Prisma } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { CategoriesFilterInput, CategoryPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 

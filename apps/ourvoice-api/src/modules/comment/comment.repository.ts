@@ -1,4 +1,4 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Comment } from '@prisma/client';
 import { CommentsFilterInput, CommentPaginationInput } from 'src/graphql';

@@ -1,7 +1,7 @@
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { NotFoundException } from '@nestjs/common';
 import { seedMainDb } from './../../../prisma/seed';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { PostRepository } from './post.repository';
 

@@ -1,6 +1,6 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post, Prisma } from '@prisma/client';
+import { Category, Post, Prisma, User, Vote } from '@prisma/client';
 import { PostsFilterInput, PostPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 
@@ -12,10 +12,10 @@ export class PostRepository {
     return this.prisma.post.create({ data });
   }
 
-  async getPostById(id: number) {
+  async getPostById(id: number, include?: Prisma.PostInclude) {
     return this.prisma.post.findUnique({
       where: { id },
-      include: { categories: true },
+      include,
     });
   }
 

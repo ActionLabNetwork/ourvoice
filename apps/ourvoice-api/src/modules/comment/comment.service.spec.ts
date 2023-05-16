@@ -1,4 +1,4 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { CommentService } from './comment.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommentRepository } from './comment.repository';
