@@ -103,6 +103,13 @@ export class CommentPaginationInput {
     limit?: Nullable<number>;
 }
 
+export class ContactFormEntryCreateInput {
+    name: string;
+    email: string;
+    message: string;
+    recaptchaToken: string;
+}
+
 export class PostCreateInput {
     title: string;
     content: string;
@@ -197,6 +204,8 @@ export abstract class IMutation {
     abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
 
     abstract deleteComment(id: number): Comment | Promise<Comment>;
+
+    abstract createContactFormEntry(data: ContactFormEntryCreateInput): string | Promise<string>;
 
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
