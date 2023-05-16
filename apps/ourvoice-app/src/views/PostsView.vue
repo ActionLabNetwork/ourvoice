@@ -3,30 +3,46 @@
     class="mx-auto w-full min-h-screen bg-gray-200 dark:bg-ourvoice-blue overflow-y-scroll"
     ref="postsInfiniteScroll"
   >
-    <div class="p-1 md:p-4 lg:p-6 bg-slate-100 mb-3 dark:bg-slate-700 flex">
-      <h1
-        class="text-ourvoice-blue dark:text-ourvoice-white text-4xl md:text-5xl lg:text-6xl text-center lg:text-left"
-      >
-        <span class="text-ourvoice-red">OurVoice</span>
-        App
-      </h1>
-      <button
-        @click="toggleDark()"
-        class="p-1 ml-auto my-auto w-fit text-yellow-500 dark:text-ourvoice-purple"
-      >
-        <font-awesome-icon icon="fa-solid fa-moon" size="xl" v-if="isDark" />
-        <font-awesome-icon icon="fa-solid fa-sun" size="xl" v-else />
-        <span class="hidden md:inline-block ml-1">{{ isDark ? 'Dark' : 'Light' }}</span>
-      </button>
-    </div>
+    <nav class="sticky top-0 h-auto bg-black text-ourvoice-white z-10 drop-shadow-lg">
+      <div class="p-1 md:p-4 bg-slate-100 mb-3 dark:bg-slate-700 flex">
+        <h1
+          class="text-ourvoice-blue dark:text-ourvoice-white text-4xl md:text-5xl lg:text-6xl text-center lg:text-left"
+        >
+          <span class="text-ourvoice-red">OurVoice</span>
+          App
+        </h1>
+        <button
+          @click="toggleDark()"
+          class="p-1 ml-auto my-auto w-fit text-yellow-500 dark:text-ourvoice-purple"
+        >
+          <font-awesome-icon icon="fa-solid fa-moon" size="xl" v-if="isDark" />
+          <font-awesome-icon icon="fa-solid fa-sun" size="xl" v-else />
+          <span class="hidden md:inline-block ml-1">{{ isDark ? 'Dark' : 'Light' }}</span>
+        </button>
+      </div>
+    </nav>
 
     <div
       class="space-y-4 rounded-lg bg-white dark:bg-slate-800 p-3 max-w-screen-lg mx-auto dark:text-white text-black"
     >
-      <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
-        Posts
-        <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
-      </h1>
+      <div class="flex">
+        <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
+          Posts
+          <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
+        </h1>
+        <div class="ml-auto mt-auto mr-2 text-ourvoice-grey">
+          <font-awesome-icon
+            icon="fa-solid fa-arrow-up-wide-short"
+            size="lg"
+            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer"
+          />
+          <font-awesome-icon
+            icon="fa-solid fa-filter"
+            size="lg"
+            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer"
+          />
+        </div>
+      </div>
 
       <div
         class="flex bg-slate-100 dark:bg-slate-700 p-2 rounded-lg drop-shadow-lg"
@@ -62,7 +78,7 @@ import { usePostsStore } from '@/stores/posts'
 import PostCard from '@/components/post/PostCard.vue'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useInfiniteScroll, useDark, useToggle } from '@vueuse/core'
+import { useInfiniteScroll, useDark, useToggle, useVirtualList } from '@vueuse/core'
 export default {
   components: {
     PostCard

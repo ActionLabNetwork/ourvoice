@@ -3,8 +3,8 @@ import { apolloClient } from './../graphql/client/index'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
-import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
-import { provideApolloClient } from '@vue/apollo-composable'
+import { GET_COMMENTS_QUERY, GET_COMMENTS_BY_POST_ID_QUERY } from '@/graphql/queries/getComments'
+import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 
 export interface Comment {
   id: number
@@ -179,6 +179,18 @@ export const useCommentsStore = defineStore('comments', {
           this.error = error
         }
       }
+    },
+
+    async commentsByPostId(postId: number) {
+      const { result } = useQuery(GET_COMMENTS_BY_POST_ID_QUERY, {
+        pagination: {
+          first: 2
+        },
+        filter: {
+          postId
+        }
+      })
+      return result
     }
   }
 })

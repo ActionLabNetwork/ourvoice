@@ -11,7 +11,7 @@
         />
       </div>
       <!-- TODO: Commment Pagination -->
-      <div class="text-xs md:text-sm text-gray-500 font-semibold">
+      <div class="text-xs md:text-sm text-gray-500 dark:text-gray-300 font-semibold">
         999 Comments -
         <span
           class="text-indigo-400 hover:cursor-pointer"
@@ -40,12 +40,14 @@
 <script lang="ts">
 import { ref } from 'vue'
 import CommentCard from './CommentCard.vue'
+// import Pagination from '../common/Pagination.vue'
 import { useCommentsStore } from '@/stores/comments'
 import { storeToRefs } from 'pinia'
 export default {
   name: 'CommentTile',
   components: {
     CommentCard
+    // Pagination
   },
   props: {
     postId: {
@@ -55,12 +57,13 @@ export default {
   },
   setup() {
     const commentsStore = useCommentsStore()
-    useCommentsStore().fetchComments()
-    const commentsStoreRef = storeToRefs(useCommentsStore())
+    commentsStore.fetchComments()
+    const commentsStoreRef = storeToRefs(commentsStore)
     const showCommentList = ref(false)
     const deleteComment = (commentId: number) => {
       console.log(commentId)
     }
+
     return {
       showCommentList,
       commentsStore,

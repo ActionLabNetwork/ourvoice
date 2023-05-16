@@ -50,15 +50,27 @@
           </div>
         </div>
 
-        <div class="flex">
+        <div class="flex text-gray-500 dark:text-gray-300">
           <div
-            class="text-gray-500 dark:text-gray-100 hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
+            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
             @click="showReply = !showReply"
           >
             <font-awesome-icon icon="fa-solid fa-comment" />
             <span class="hidden sm:inline-block px-1"> Reply</span>
           </div>
-          <div class="text-gray-500 ml-auto text-right">
+          <div
+            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
+          >
+            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+            <span class="hidden sm:inline-block px-1"> Vote up </span>
+          </div>
+          <div
+            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
+          >
+            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+            <span class="hidden sm:inline-block px-1"> Vote down </span>
+          </div>
+          <div class="ml-auto text-right">
             <span class="text-xs md:text-md">{{ timePassed(comment.createdAt) }}</span>
           </div>
         </div>
