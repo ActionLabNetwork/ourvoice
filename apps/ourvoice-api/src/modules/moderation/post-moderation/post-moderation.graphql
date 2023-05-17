@@ -1,0 +1,71 @@
+type Query {
+  moderationPost(id: Int!): ModerationPost
+  moderationPosts(
+    filter: ModerationPostsFilterInput
+    pagination: ModerationPostPaginationInput
+  ): ModerationPostConnection
+}
+
+type ModerationPost {
+  id: Int!
+  title: String!
+  content: String!
+  files: String
+  identifier: String!
+  sequence: Int!
+  status: ModerationPostStatus!
+  version: Int!
+  timestamp: String!
+  latest: Boolean!
+  moderators: [PostModeration]
+  comments: [ModerationComment]
+  authorHash: String!
+}
+
+type PostModeration {
+  post: ModerationPost!
+  moderatorHash: String!
+  decision: ModerationDecision!
+  reason: String
+  timestamp: String!
+}
+
+enum ModerationDecision {
+  ACCEPTED
+  REJECTED
+}
+
+enum ModerationPostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+input ModerationPostsFilterInput {
+  title: String
+  content: String
+  status: ModerationPostStatus
+  authorHash: String
+}
+
+input ModerationPostPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type ModerationPostEdge {
+  node: ModerationPost!
+  cursor: String!
+}
+
+type ModerationPostConnection {
+  totalCount: Int
+  pageInfo: ModerationPostPageInfo!
+  edges: [ModerationPostEdge]
+}
+
+type ModerationPostPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}
