@@ -12,7 +12,10 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+
 import { ContactFormModule } from './modules/contactform/contactform.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
+
 
 import deployment from './config/deployment';
 
@@ -53,6 +56,7 @@ import deployment from './config/deployment';
     PostModule,
     CategoryModule,
     CommentModule,
+<<<<<<< HEAD
     ContactFormModule.register({
       smtpSettings: {
         host: process.env.CONTACT_FORM_SMTP_HOST,
@@ -62,6 +66,9 @@ import deployment from './config/deployment';
       },
       recaptchaSecret: process.env.CONTACT_FORM_RECAPTCHA_SECRET,
     }),
+=======
+    ModerationModule,
+>>>>>>> 13c2542 (fix(cors-whitelist): skip cors check if origin is undefined so dev pages are accessible)
   ],
   controllers: [AppController],
   providers: [AppService],
