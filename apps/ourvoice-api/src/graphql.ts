@@ -8,32 +8,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class UserCreateInput {
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId: number;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
+export enum ModerationDecision {
+    ACCEPTED = "ACCEPTED",
+    REJECTED = "REJECTED"
 }
 
-export class UserUpdateInput {
-    orgId?: Nullable<number>;
-    hash?: Nullable<string>;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId?: Nullable<number>;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-}
-
-export class VoteCreateInput {
-    voteType: string;
-    userId: number;
-    postId: number;
+export enum ModerationPostStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED"
 }
 
 export class CategoryCreateInput {
@@ -110,6 +93,40 @@ export class ContactFormEntryCreateInput {
     recaptchaToken: string;
 }
 
+export class ModerationCommentsFilterInput {
+    content?: Nullable<string>;
+    status?: Nullable<ModerationPostStatus>;
+    authorHash?: Nullable<string>;
+    postId?: Nullable<number>;
+    parentId?: Nullable<number>;
+}
+
+export class ModerationCommentPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
+export class ModerationPostsFilterInput {
+    title?: Nullable<string>;
+    content?: Nullable<string>;
+    status?: Nullable<ModerationPostStatus>;
+    authorHash?: Nullable<string>;
+}
+
+export class ModerationPostPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
+export class ModerationPostCreateInput {
+    title: string;
+    content: string;
+    categoryIds: Nullable<number>[];
+    files?: Nullable<Nullable<string>[]>;
+    identifier: string;
+    authorHash: string;
+}
+
 export class PostCreateInput {
     title: string;
     content: string;
@@ -156,13 +173,35 @@ export class PostPaginationInput {
     limit?: Nullable<number>;
 }
 
+export class UserCreateInput {
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId: number;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+}
+
+export class UserUpdateInput {
+    orgId?: Nullable<number>;
+    hash?: Nullable<string>;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId?: Nullable<number>;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+}
+
+export class VoteCreateInput {
+    voteType: string;
+    userId: number;
+    postId: number;
+}
+
 export abstract class IQuery {
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract users(): User[] | Promise<User[]>;
-
     abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
 
     abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
@@ -171,6 +210,14 @@ export abstract class IQuery {
 
     abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): Nullable<CommentConnection> | Promise<Nullable<CommentConnection>>;
 
+    abstract moderationComment(id: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
+    abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
+
+    abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
+    abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
+
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
     abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
@@ -178,21 +225,15 @@ export abstract class IQuery {
     abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(): User[] | Promise<User[]>;
 }
 
 export abstract class IMutation {
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract createUser(data: UserCreateInput): User | Promise<User>;
-
-    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
-
-    abstract deleteUser(id: number): User | Promise<User>;
-
-    abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
-
-    abstract deleteVote(id: number): Vote | Promise<Vote>;
-
     abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
 
     abstract updateCategory(id: number, data: CategoryUpdateInput): Category | Promise<Category>;
@@ -207,40 +248,25 @@ export abstract class IMutation {
 
     abstract createContactFormEntry(data: ContactFormEntryCreateInput): string | Promise<string>;
 
+    abstract createModerationPost(data: ModerationPostCreateInput): ModerationPost | Promise<ModerationPost>;
+
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
     abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
-}
 
-export class User {
-    id: number;
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    type: UserType;
-    active?: Nullable<boolean>;
-    createdAt?: Nullable<DateTime>;
-    disabledAt?: Nullable<DateTime>;
-    updatedAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-    comments: Comment[];
-    posts: Post[];
-}
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
-export class UserType {
-    id: number;
-    type: string;
-    users: User[];
-}
+    abstract createUser(data: UserCreateInput): User | Promise<User>;
 
-export class Vote {
-    id: number;
-    voteType: string;
-    user: User;
-    post: Post;
+    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
+
+    abstract deleteUser(id: number): User | Promise<User>;
+
+    abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
+
+    abstract deleteVote(id: number): Vote | Promise<Vote>;
 }
 
 export class Category {
@@ -304,6 +330,88 @@ export class CommentPageInfo {
     hasNextPage?: Nullable<boolean>;
 }
 
+export class ModerationComment {
+    id: string;
+    content: string;
+    status: ModerationPostStatus;
+    version: number;
+    timestamp: string;
+    latest: boolean;
+    moderators?: Nullable<Nullable<CommentModeration>[]>;
+    authorHash: string;
+    post?: Nullable<ModerationPost>;
+    parentId?: Nullable<number>;
+    parent?: Nullable<ModerationComment>;
+    children?: Nullable<Nullable<ModerationComment>[]>;
+}
+
+export class CommentModeration {
+    comment: ModerationComment;
+    moderatorHash: string;
+    decision: ModerationDecision;
+    reason?: Nullable<string>;
+    timestamp: string;
+}
+
+export class ModerationCommentEdge {
+    node: ModerationComment;
+    cursor: string;
+}
+
+export class ModerationCommentConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: ModerationCommentPageInfo;
+    edges?: Nullable<Nullable<ModerationCommentEdge>[]>;
+}
+
+export class ModerationCommentPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
+}
+
+export class ModerationPost {
+    id: number;
+    title: string;
+    content: string;
+    categoryIds: Nullable<number>[];
+    files?: Nullable<Nullable<string>[]>;
+    identifier: string;
+    sequence: number;
+    status: ModerationPostStatus;
+    version: number;
+    timestamp: string;
+    latest: boolean;
+    moderators?: Nullable<Nullable<PostModeration>[]>;
+    comments?: Nullable<Nullable<ModerationComment>[]>;
+    authorHash: string;
+}
+
+export class PostModeration {
+    post: ModerationPost;
+    moderatorHash: string;
+    decision: ModerationDecision;
+    reason?: Nullable<string>;
+    timestamp: string;
+}
+
+export class ModerationPostEdge {
+    node: ModerationPost;
+    cursor: string;
+}
+
+export class ModerationPostConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: ModerationPostPageInfo;
+    edges?: Nullable<Nullable<ModerationPostEdge>[]>;
+}
+
+export class ModerationPostPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
+}
+
 export class Post {
     id: number;
     title: string;
@@ -343,6 +451,35 @@ export class PostPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+}
+
+export class User {
+    id: number;
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    type: UserType;
+    active?: Nullable<boolean>;
+    createdAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+    comments: Comment[];
+    posts: Post[];
+}
+
+export class UserType {
+    id: number;
+    type: string;
+    users: User[];
+}
+
+export class Vote {
+    id: number;
+    voteType: string;
+    user: User;
+    post: Post;
 }
 
 export type DateTime = any;

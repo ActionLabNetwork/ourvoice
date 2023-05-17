@@ -2,6 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   ModerationPostsFilterInput,
   ModerationPostPaginationInput,
+  ModerationPostCreateInput,
 } from 'src/graphql';
 import { ModerationPostService } from './post-moderation.service';
 
@@ -20,10 +21,18 @@ export class ModerationPostResolver {
     @Args('pagination', { nullable: true })
     pagination?: ModerationPostPaginationInput,
   ) {
-    console.log('test');
     const { totalCount, edges, pageInfo } =
       await this.moderationPostService.getModerationPosts(filter, pagination);
 
     return { totalCount, edges, pageInfo };
+  }
+
+  @Mutation()
+  async createModerationPost(@Args('data') data: ModerationPostCreateInput) {
+    try {
+      return this.moderationPostService.createPost(data);
+    } catch (error) {
+      console.error({ error });
+    }
   }
 }

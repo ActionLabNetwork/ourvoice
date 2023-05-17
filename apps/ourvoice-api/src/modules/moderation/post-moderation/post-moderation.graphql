@@ -6,11 +6,16 @@ type Query {
   ): ModerationPostConnection
 }
 
+type Mutation {
+  createModerationPost(data: ModerationPostCreateInput!): ModerationPost!
+}
+
 type ModerationPost {
   id: Int!
   title: String!
   content: String!
-  files: String
+  categoryIds: [Int]!
+  files: [String]
   identifier: String!
   sequence: Int!
   status: ModerationPostStatus!
@@ -68,4 +73,13 @@ type ModerationPostPageInfo {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean
+}
+
+input ModerationPostCreateInput {
+  title: String!
+  content: String!
+  categoryIds: [Int]!
+  files: [String]
+  identifier: String!
+  authorHash: String!
 }

@@ -9,6 +9,7 @@ import { Post } from '@internal/prisma/client';
 import { numberToCursor } from 'src/utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { ModerationPostRepository } from './post-moderation.repository';
+import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
 export class ModerationPostService {
@@ -64,5 +65,16 @@ export class ModerationPostService {
     };
 
     return { totalCount, edges, pageInfo };
+  }
+
+  async createPost(data: PostCreateDto) {
+    const postCreateDto = plainToClass(PostCreateDto, data);
+    const errors = await validate(postCreateDto);
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    return await this.moderationPostRepository.createModerationPost(data);
   }
 }

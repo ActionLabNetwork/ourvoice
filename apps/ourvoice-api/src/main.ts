@@ -14,6 +14,7 @@ async function bootstrap() {
   // TODO: add website domains
   const whitelist: string[] = [
     // 'http://localhost:4173', // cypress
+    configService.get('VITE_APP_LOCALHOST_ORIGIN'),
     configService.get('VITE_APP_API_URL'), // APP itself
     configService.get('VITE_APP_ADMIN_URL'), // ADMIN
     configService.get('VITE_APP_APP_DOMAIN'), // DOMAIN

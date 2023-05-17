@@ -12,12 +12,12 @@ datasource premoderation {
 }
 
 model Post {
-  id         Int     @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   title      String
   content    String
   files      Json?
   identifier String
-  sequence   Int     @default(0)
+  sequence   Int    @default(0)
 
   // Moderation
   status     PostStatus       @default(PENDING)
@@ -27,8 +27,9 @@ model Post {
   moderators PostModeration[]
 
   // Relations
-  comments Comment[]
-  authorHash String
+  categoryIds Int[]
+  comments    Comment[]
+  authorHash  String
 }
 
 model Comment {
@@ -44,31 +45,35 @@ model Comment {
 
   // Relations
   authorHash String
-  post     Post?     @relation(fields: [postId], references: [id])
-  postId   Int?
-  parentId Int?
-  parent   Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
-  children Comment[] @relation("CommentToComment")
+  post       Post?     @relation(fields: [postId], references: [id])
+  postId     Int?
+  parentId   Int?
+  parent     Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children   Comment[] @relation("CommentToComment")
 }
 
 model PostModeration {
-  postId      Int
-  post        Post     @relation(fields: [postId], references: [id])
-  moderatorHash String
-  decision    Decision
-  reason      String?
-  timestamp   DateTime @default(now())
+  postId          Int
+  post            Post     @relation(fields: [postId], references: [id])
+  moderatorHash   String
+  decision        Decision
+  reason          String?
+  timestamp       DateTime @default(now())
+  modifiedTitle   String?
+  modifiedContent String?
 
   @@id([postId, moderatorHash])
 }
 
 model CommentModeration {
-  commentId   Int
-  comment     Comment  @relation(fields: [commentId], references: [id])
-  moderatorHash String
-  decision    Decision
-  reason      String?
-  timestamp   DateTime @default(now())
+  commentId       Int
+  comment         Comment  @relation(fields: [commentId], references: [id])
+  moderatorHash   String
+  decision        Decision
+  reason          String?
+  timestamp       DateTime @default(now())
+  modifiedTitle   String?
+  modifiedContent String?
 
   @@id([commentId, moderatorHash])
 }

@@ -62,7 +62,7 @@ async function main() {
       identifier: 'post-3',
       sequence: 0,
       authorHash: user3hash,
-      status: 'PENDING',
+      status: 'REJECTED',
       version: 0,
       timestamp: new Date('2023-04-14T10:00:00Z'),
       latest: true,
@@ -123,6 +123,8 @@ async function main() {
       reason: 'This post violates our community guidelines',
       moderatorHash: user1hash,
       post: { connect: { id: post2.id } },
+      modifiedTitle: 'More appropriate title',
+      modifiedContent: 'Modified content',
     },
   });
 
@@ -142,6 +144,8 @@ async function main() {
       reason: 'This comment is inappropriate',
       moderatorHash: user1hash,
       comment: { connect: { id: comment2.id } },
+      modifiedTitle: 'Less inappropriate title',
+      modifiedContent: 'Less inappropriate content',
     },
   });
 

@@ -49,4 +49,12 @@ export class ModerationPostRepository {
 
     return { totalCount, moderationPosts };
   }
+
+  async createModerationPost(data: Prisma.PostCreateInput) {
+    const newPost = await this.prisma.post.create({ data });
+    // TODO: DELETE THIS
+    console.log({ newPost });
+
+    return newPost;
+  }
 }
