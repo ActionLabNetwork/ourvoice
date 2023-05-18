@@ -44,7 +44,10 @@ const router = createRouter({
     },
     {path: '/post',
       name: 'create-post',
-      component: CreatePostView
+      component: CreatePostView,
+      props: () => {
+        return addDeployment()
+      }
     },
     {
       path: '/noauth',

@@ -1,3 +1,5 @@
+import { useUserStore } from './user'
+import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
 import { CREATE_POST_MUTATION } from './../graphql/mutations/createPost'
@@ -5,6 +7,8 @@ import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient, useQuery, useMutation } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
+
+import authService from '@/services/auth-service'
 
 export interface Post {
   id: number
@@ -108,10 +112,33 @@ export const usePostsStore = defineStore('posts', {
       files: string[]
       authorId: number
     }) {
-      const { mutate } = useMutation(CREATE_POST_MUTATION)
+      // Check for valid deployment and user session
+      const userStore = useUserStore()
 
-      await mutate({
+      const { mutate: createPostMutate } = useMutation(CREATE_POST_MUTATION)
+      const { mutate: createModerationPostMutate } = useMutation(CREATE_MODERATION_POST_MUTATION)
+
+      // Check if we can access the session and generate a user hash for storing in the db
+      if (!userStore.isLoggedIn) {
+        // TODO: Set up a proper error handling module
+        throw new Error('User session is invalid')
+      }
+
+      const authorHash = await authService.hashInput(userStore.userId, userStore.deployment)
+
+      await createPostMutate({
         data: { title, content, categoryIds, files, authorId }
+      })
+
+      await createModerationPostMutate({
+        data: {
+          title,
+          content,
+          categoryIds,
+          files,
+          authorHash,
+          identifier: 'random-identifier'
+        }
       })
     },
 

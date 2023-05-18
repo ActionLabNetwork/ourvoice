@@ -198,6 +198,7 @@ import {
   validateContent,
   validateTitle
 } from '@/validators'
+import { useUserStore } from '@/stores/user'
 
 interface PresignedUrlResponse {
   key: string
@@ -218,6 +219,9 @@ const createPostValidationSchema = {
     return validateAttachments(value)
   }
 }
+
+// Init user store and set deployment
+const userStore = useUserStore()
 
 // Fetch categories and initial state
 const categoriesStore = useCategoriesStore()
@@ -275,8 +279,7 @@ const updateAttachments = async (event: Event) => {
   attachmentsField.value.value = files
 
   // Generate unique keys for each attachment
-  // TODO: Replace with dynamic user identifier when integrating with auth
-  const keys = Array.from(files).map((file, index) => generateUniqueKey('user123', file, index))
+  const keys = Array.from(files).map((file, index) => generateUniqueKey(userStore.sessionHash, file, index));
 
   try {
     const response = await postsStore.getPresignedUrls(
@@ -359,7 +362,7 @@ const categoriesOptions = computed(() => {
 })
 
 // The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
-watch(selectedCategories, () => {
+watch(selectedCategories, async () => {
   categoriesField.value.value = selectedCategories.value
 })
 </script>
