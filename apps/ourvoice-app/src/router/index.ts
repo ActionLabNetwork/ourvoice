@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import PostsView from '../views/PostsView.vue'
+import TestView from '@/views/TestView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
 import CreateCommentView from '../views/CreateCommentView.vue'
@@ -64,13 +65,13 @@ const router = createRouter({
     {
       path: '/post',
       name: 'create-post',
-      component: CreatePostView,
+      component: CreatePostView
       meta: { requiresAuth: true }
     },
     {
       path: '/comment',
       name: 'create-comment',
-      component: CreateCommentView,
+      component: CreateCommentView
       meta: { requiresAuth: true }
     },
     {
@@ -102,6 +103,11 @@ const router = createRouter({
       name: 'post',
       component: PostsView,
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: TestView
     }
   ]
 })
