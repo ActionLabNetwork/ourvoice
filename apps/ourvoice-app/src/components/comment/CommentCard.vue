@@ -8,7 +8,7 @@
       />
     </div>
     <div class="flex-1">
-      <div class="bg-white dark:bg-ourvoice-blue rounded-lg pl-4 pr-2 py-2 leading-relaxed">
+      <div class="bg-slate-200 dark:bg-ourvoice-blue rounded-lg drop-shadow-lg pl-4 pr-2 py-2 leading-relaxed">
         <!-- <strong>{{ comment.author.nickname }}</strong> -->
 
         <div class="text-sm md:text-md py-2">

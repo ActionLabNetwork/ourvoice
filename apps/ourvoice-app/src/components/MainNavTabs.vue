@@ -1,8 +1,8 @@
 <template>
-  <div :class="['grid', `grid-cols-${tabState.length}`]">
+  <div :class="['border-b', 'grid', 'grid-flow-col', `grid-cols-${tabState.length}`]">
     <div
-      class="text-center overflow-hidden hover:bg-gray-200 dark:hover:bg-gray-500 border-black dark:border-white"
-      :class="tab.isActive ? ' border-b-2 ' : ''"
+      class="text-center hover:bg-gray-400 bg-opacity-10 hover:bg-opacity-30 border-black dark:border-white"
+      :class="tab.isActive ? ' border-b-2  font-semibold dark:text-white' : ''"
       v-for="tab in tabState"
       :key="tab.name"
       @click="setActiveTab(tab)"
@@ -20,13 +20,18 @@ interface Tab {
   isActive: boolean
 }
 
+const emit = defineEmits(['setActiveTab'])
+
 const tabState = ref<Tab[]>([
-  { name: 'Q/A', isActive: true },
+  { name: 'Posts', isActive: true },
   { name: 'Polls', isActive: false }
+  // { name: 'Posts', isActive: false }
 ])
 
 const setActiveTab = (tab: Tab) => {
+  if (tab.isActive) return
   tabState.value.forEach((tab) => (tab.isActive = false))
   tab.isActive = true
+  emit('setActiveTab', tab.name)
 }
 </script>

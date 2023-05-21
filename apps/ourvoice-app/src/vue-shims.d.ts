@@ -4,6 +4,7 @@ declare module '*.vue' {
   export default component
 }
 
+declare module 'vue-virtual-scroller'
 declare module '*.md' {
   import type { ComponentOptions } from 'vue'
   const Component: ComponentOptions

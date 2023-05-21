@@ -9,6 +9,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { DefaultApolloClient } from '@vue/apollo-composable'
+import VueVirtualScroller from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 import App from './App.vue'
 import router from './router'
@@ -44,5 +46,5 @@ app.use(createHead())
 app.use(router)
 
 app.component('font-awesome-icon', FontAwesomeIcon)
-
+app.use(VueVirtualScroller)
 app.mount('#app')
