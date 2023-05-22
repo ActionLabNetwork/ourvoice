@@ -24,6 +24,7 @@ interface Edge {
 
 export interface CategoriesState {
   data: { id: number; name: string }[]
+  selectedCategories: number[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -32,6 +33,7 @@ export interface CategoriesState {
 export const useCategoriesStore = defineStore('categories', {
   state: (): CategoriesState => ({
     data: [],
+    selectedCategories: [],
     loading: false,
     error: undefined,
     errorMessage: undefined

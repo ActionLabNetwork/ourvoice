@@ -24,19 +24,16 @@
             activeTab = tabName }" />
         </div>
         
-        <PostVirtualList v-if="activeTab === 'Posts'"/>
+        <PostVirtualList v-if="activeTab === 'Posts'" />
       </main>
 
       <aside class="hidden lg:block lg:w-64 2xl:w-96 bg-ourvoice-gray p-5 overflow-y-auto h-full no-scrollbar">
-        <CategoryFilter @category-change="(category) => {
-          handleFilter(category)
-        }
-          " />
+        <CategoryFilter />
       </aside>
     </div>
     <!-- end main container -->
 
-    <!-- <footer class="bg-white dark:bg-gray-800 border-t border-slate-400">
+    <footer class="bg-white dark:bg-gray-800 border-t border-slate-400">
       <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
         <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
           >© 2023 <a href="#" class="hover:underline">OurVoice</a>. All Rights Reserved.
@@ -58,7 +55,7 @@
           </li>
         </ul>
       </div>
-    </footer> -->
+    </footer>
 
     <!-- Create Post Modal -->
     <div>
@@ -89,11 +86,6 @@ import Modal from '@/components/common/Modal.vue'
 import CreatePost from '@/components/post/CreatePost.vue'
 import { ref } from 'vue'
 
-
-const handleFilter = (category: string) => {
-  console.log(category)
-  // postsStore.fetchPosts({ limit: 10 })
-}
 const activeTab = ref('Posts')
 const modalOpen = ref(false)
 </script>
