@@ -29,8 +29,8 @@ export class PostCreateDto {
   files?: string[];
 
   @IsString()
-  identifier: string;
-
-  @IsString()
   authorHash: string;
+
+  @IsNumber()
+  requiredModerations: number;
 }

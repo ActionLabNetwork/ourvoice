@@ -7,26 +7,38 @@ type Query {
 }
 
 type ModerationComment {
-  id: ID!
-  content: String!
+  id: Int!
   status: ModerationPostStatus!
   version: Int!
   timestamp: String!
   latest: Boolean!
-  moderators: [CommentModeration]
   authorHash: String!
   post: ModerationPost
   parentId: Int
   parent: ModerationComment
-  children: [ModerationComment]
+  children: [ModerationComment!]!
+  versions: [ModerationCommentVersion!]!
+}
+
+type ModerationCommentVersion {
+  id: Int!
+  content: String!
+  version: Int!
+  status: ModerationPostStatus!
+  latest: Boolean!
+  timestamp: String!
+  comment: ModerationComment!
+  moderations: [CommentModeration!]!
 }
 
 type CommentModeration {
-  comment: ModerationComment!
+  id: Int!
+  commentVersion: ModerationCommentVersion!
   moderatorHash: String!
   decision: ModerationDecision!
   reason: String
   timestamp: String!
+  modifiedContent: String
 }
 
 enum ModerationDecision {
@@ -34,7 +46,7 @@ enum ModerationDecision {
   REJECTED
 }
 
-enum ModerationPostStatus {
+enum ModerationCommentStatus {
   PENDING
   APPROVED
   REJECTED
@@ -42,7 +54,7 @@ enum ModerationPostStatus {
 
 input ModerationCommentsFilterInput {
   content: String
-  status: ModerationPostStatus
+  status: ModerationCommentStatus
   authorHash: String
   postId: Int
   parentId: Int

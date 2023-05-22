@@ -1,4 +1,3 @@
-import { PremoderationService } from './../moderation/premoderation.service';
 import { PostPaginationInput } from './../../graphql';
 import {
   BadRequestException,
@@ -16,10 +15,7 @@ import { numberToCursor } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class PostService {
-  constructor(
-    private readonly postRepository: PostRepository,
-    private readonly premoderationService: PremoderationService,
-  ) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async createPost(data: PostCreateDto): Promise<Post> {
     const postCreateDto = plainToClass(PostCreateDto, data);
@@ -40,9 +36,9 @@ export class PostService {
     };
 
     const newPost = await this.postRepository.createPost(postData);
-    const newPostWithAuthor: Prisma.PromiseReturnType<typeof this.getPostById> =
-      await this.postRepository.getPostById(newPost.id, { author: true });
-    await this.premoderationService.copyPostToPremoderation(newPostWithAuthor);
+    // const newPostWithAuthor: Prisma.PromiseReturnType<typeof this.getPostById> =
+    //   await this.postRepository.getPostById(newPost.id, { author: true });
+    // await this.premoderationService.copyPostToPremoderation(newPostWithAuthor);
 
     return newPost;
   }

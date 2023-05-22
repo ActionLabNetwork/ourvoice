@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/database/premoderation/prisma.module';
 import { ModerationModule } from '../moderation.module';
-import { ModerationPostRepository } from './post-moderation.repository';
-import { ModerationPostResolver } from './post-moderation.resolver';
-import { ModerationPostService } from './post-moderation.service';
+import { PostModerationRepository } from './post-moderation.repository';
+import { PostModerationResolver } from './post-moderation.resolver';
+import { PostModerationService } from './post-moderation.service';
 
 @Module({
   imports: [PrismaModule],
   providers: [
-    ModerationPostRepository,
-    ModerationPostService,
-    ModerationPostResolver,
+    PostModerationRepository,
+    PostModerationService,
+    PostModerationResolver,
   ],
-  exports: [ModerationPostService],
+  exports: [PostModerationService],
 })
 export class PostModerationModule {}

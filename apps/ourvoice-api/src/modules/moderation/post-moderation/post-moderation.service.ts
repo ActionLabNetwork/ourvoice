@@ -8,18 +8,14 @@ import {
 import { Post } from '@internal/prisma/client';
 import { numberToCursor } from 'src/utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
-import { ModerationPostRepository } from './post-moderation.repository';
+import { PostModerationRepository } from './post-moderation.repository';
 import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
-export class ModerationPostService {
+export class PostModerationService {
   constructor(
-    private readonly moderationPostRepository: ModerationPostRepository,
+    private readonly moderationPostRepository: PostModerationRepository,
   ) {}
-
-  async getModerationPostById(id: number) {
-    return this.moderationPostRepository.getModerationPostById(id);
-  }
 
   async getModerationPosts(
     filter?: ModerationPostsFilterInput,

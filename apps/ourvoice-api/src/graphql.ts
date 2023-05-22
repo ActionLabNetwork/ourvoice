@@ -13,6 +13,12 @@ export enum ModerationDecision {
     REJECTED = "REJECTED"
 }
 
+export enum ModerationCommentStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED"
+}
+
 export enum ModerationPostStatus {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
@@ -95,7 +101,7 @@ export class ContactFormEntryCreateInput {
 
 export class ModerationCommentsFilterInput {
     content?: Nullable<string>;
-    status?: Nullable<ModerationPostStatus>;
+    status?: Nullable<ModerationCommentStatus>;
     authorHash?: Nullable<string>;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
@@ -106,25 +112,22 @@ export class ModerationCommentPaginationInput {
     limit?: Nullable<number>;
 }
 
+export class ModerationPostCreateInput {
+    title: string;
+    content: string;
+    categoryIds: number[];
+    files?: Nullable<Nullable<string>[]>;
+    authorHash: string;
+    requiredModerations: number;
+}
+
 export class ModerationPostsFilterInput {
-    title?: Nullable<string>;
-    content?: Nullable<string>;
     status?: Nullable<ModerationPostStatus>;
-    authorHash?: Nullable<string>;
 }
 
 export class ModerationPostPaginationInput {
     cursor?: Nullable<string>;
     limit?: Nullable<number>;
-}
-
-export class ModerationPostCreateInput {
-    title: string;
-    content: string;
-    categoryIds: Nullable<number>[];
-    files?: Nullable<Nullable<string>[]>;
-    identifier: string;
-    authorHash: string;
 }
 
 export class PostCreateInput {
@@ -214,8 +217,6 @@ export abstract class IQuery {
 
     abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
 
-    abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
-
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
@@ -248,7 +249,7 @@ export abstract class IMutation {
 
     abstract createContactFormEntry(data: ContactFormEntryCreateInput): string | Promise<string>;
 
-    abstract createModerationPost(data: ModerationPostCreateInput): ModerationPost | Promise<ModerationPost>;
+    abstract createModerationPost(data: ModerationPostCreateInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
@@ -331,26 +332,38 @@ export class CommentPageInfo {
 }
 
 export class ModerationComment {
-    id: string;
-    content: string;
+    id: number;
     status: ModerationPostStatus;
     version: number;
     timestamp: string;
     latest: boolean;
-    moderators?: Nullable<Nullable<CommentModeration>[]>;
     authorHash: string;
     post?: Nullable<ModerationPost>;
     parentId?: Nullable<number>;
     parent?: Nullable<ModerationComment>;
-    children?: Nullable<Nullable<ModerationComment>[]>;
+    children: ModerationComment[];
+    versions: ModerationCommentVersion[];
+}
+
+export class ModerationCommentVersion {
+    id: number;
+    content: string;
+    version: number;
+    status: ModerationPostStatus;
+    latest: boolean;
+    timestamp: string;
+    comment: ModerationComment;
+    moderations: CommentModeration[];
 }
 
 export class CommentModeration {
-    comment: ModerationComment;
+    id: number;
+    commentVersion: ModerationCommentVersion;
     moderatorHash: string;
     decision: ModerationDecision;
     reason?: Nullable<string>;
     timestamp: string;
+    modifiedContent?: Nullable<string>;
 }
 
 export class ModerationCommentEdge {
@@ -372,23 +385,30 @@ export class ModerationCommentPageInfo {
 
 export class ModerationPost {
     id: number;
-    title: string;
-    content: string;
-    categoryIds: Nullable<number>[];
-    files?: Nullable<Nullable<string>[]>;
-    identifier: string;
-    sequence: number;
     status: ModerationPostStatus;
-    version: number;
-    timestamp: string;
-    latest: boolean;
-    moderators?: Nullable<Nullable<PostModeration>[]>;
-    comments?: Nullable<Nullable<ModerationComment>[]>;
+    versions: ModerationPostVersion[];
+    requiredModerations: number;
+    comments: ModerationComment[];
     authorHash: string;
 }
 
+export class ModerationPostVersion {
+    id: number;
+    title: string;
+    content: string;
+    categoryIds: number[];
+    files?: Nullable<string>;
+    version: number;
+    status: ModerationPostStatus;
+    latest: boolean;
+    timestamp: string;
+    post: Post;
+    moderations: PostModeration[];
+}
+
 export class PostModeration {
-    post: ModerationPost;
+    id: number;
+    postVersion: ModerationPostVersion;
     moderatorHash: string;
     decision: ModerationDecision;
     reason?: Nullable<string>;
