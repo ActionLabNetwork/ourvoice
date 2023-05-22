@@ -1,121 +1,170 @@
 <template>
-  <div
-    class="mx-auto w-full min-h-screen bg-gray-200 dark:bg-ourvoice-blue overflow-y-scroll"
-    ref="postsInfiniteScroll"
-  >
-    <nav class="sticky top-0 h-auto bg-black text-ourvoice-white z-10 drop-shadow-lg">
-      <div class="p-1 md:p-4 bg-slate-100 mb-3 dark:bg-slate-700 flex">
-        <h1
-          class="text-ourvoice-blue dark:text-ourvoice-white text-4xl md:text-5xl lg:text-6xl text-center lg:text-left"
-        >
-          <span class="text-ourvoice-red">OurVoice</span>
-          App
-        </h1>
-        <button
-          @click="toggleDark()"
-          class="p-1 ml-auto my-auto w-fit text-yellow-500 dark:text-ourvoice-purple"
-        >
-          <font-awesome-icon icon="fa-solid fa-moon" size="xl" v-if="isDark" />
-          <font-awesome-icon icon="fa-solid fa-sun" size="xl" v-else />
-          <span class="hidden md:inline-block ml-1">{{ isDark ? 'Dark' : 'Light' }}</span>
-        </button>
-      </div>
-    </nav>
+  <div class="leading-relaxed max-w-3xl border-4 h-screen m-auto w-full overflow-y-scroll relative" ref="el">
 
-    <div
-      class="space-y-4 rounded-lg bg-white dark:bg-slate-800 p-3 max-w-screen-lg mx-auto dark:text-white text-black"
-    >
-      <div class="flex">
-        <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
-          Posts
-          <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
-        </h1>
-        <div class="ml-auto mt-auto mr-2 text-ourvoice-grey">
-          <font-awesome-icon
-            icon="fa-solid fa-arrow-up-wide-short"
-            size="lg"
-            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer"
-          />
-          <font-awesome-icon
-            icon="fa-solid fa-filter"
-            size="lg"
-            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer"
-          />
-        </div>
-      </div>
-
-      <div
-        class="flex bg-slate-100 dark:bg-slate-700 p-2 rounded-lg drop-shadow-lg"
-        v-for="post in postsData.data.value"
-        :key="post.id"
-      >
-        <PostCard :post="post" />
-      </div>
-
-      {{ postsData.pageInfo.value }}
+    <div class="sticky top-0 z-30 backdrop-blur-md">
+      <CategoryFilter :vertical="false"/>
+      {{ cursor }}
     </div>
-    <!-- TODO: change create post ui -->
-    <a href="http://localhost:3010/noauth">
-      <button
-        class="bg-indigo-500 hover:bg-indigo-600 text-white drop-shadow-md font-bold p-1 rounded-full h-fit fixed bottom-10 right-10 z-10"
-      >
-        <div class="flex align-middle">
-          <div class="p-2 bg-indigo-400 rounded-full">
-            <font-awesome-icon icon="fa-solid fa-pen-to-square" size="xl" />
-          </div>
-          <div class="py-2 px-1">Create Post</div>
-        </div>
-      </button>
-    </a>
-    <!-- <pre class="bg-yellow-100 rounded-lg p-5 mt-5"
-      >{{ postsData.data }}
-    </pre> -->
+
+    <div v-for="item in itemList" :key="item.id" class="break-all">
+      <PostCard :post="item" />
+    </div>
+  </div>
+
+  <div v-if="loading" class="fixed top-0 flex justify-center items-center h-full w-full backdrop-blur-xl">
+    <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
   </div>
 </template>
 
-<script lang="ts">
-import { usePostsStore } from '@/stores/posts'
-import PostCard from '@/components/post/PostCard.vue'
-import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
-import { useInfiniteScroll, useDark, useToggle, useVirtualList } from '@vueuse/core'
-export default {
-  components: {
-    PostCard
-  },
-  setup() {
-    const postsStore = usePostsStore()
-    postsStore.fetchPosts({ limit: 2 })
-    const postsData = storeToRefs(postsStore)
-    const postsInfiniteScroll = ref<HTMLElement | null>(null)
-    const isDark = useDark()
-    const toggleDark = useToggle(isDark)
 
-    const loadMore = async () => {
-      if (postsStore.totalCount > postsStore.data.length) {
-        await postsStore.fetchPosts({ limit: postsStore.data.length + 1 }) //load one more than current length
-        console.log('load more...')
-      } else {
-        // no more posts to load
-        return
+<script lang="ts" setup>
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+import { ref, watch } from 'vue';
+import CategoryFilter from '@/components/common/CategoryFilter.vue';
+import PostCard from '@/components/post/PostCard.vue';
+import { useInfiniteScroll } from '@vueuse/core'
+import { useCategoriesStore } from '@/stores/categories';
+const categoriesStore = useCategoriesStore()
+const GET_POST_QUERY = gql`
+query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
+  posts(pagination: $pagination, filter: $filter) {
+    edges {
+      cursor
+      node {
+        author {
+          id
+          nickname
+        }
+        categories {
+          name
+          id
+        }
+        createdAt
+        disabledAt
+        moderatedAt
+        moderated
+        publishedAt
+        published
+        title
+        votes {
+          id
+          voteType
+        }
+        votesDown
+        votesUp
+        files
+        id
+        content
       }
     }
-
-    useInfiniteScroll(
-      postsInfiniteScroll,
-      async () => {
-        await loadMore()
-      },
-      { distance: 0 } //min distance 0px to bottom of page before loading more
-    )
-    return {
-      postsData,
-      loadMore,
-      postsInfiniteScroll,
-      isDark,
-      toggleDark
+    pageInfo {
+      endCursor
+      hasNextPage
+      startCursor
     }
+    totalCount
   }
 }
+  `
+const cursor = ref<string | null>(null)
+const itemList = ref<any[]>([])
+const { result, loading, fetchMore, onResult, onError } = useQuery(GET_POST_QUERY, () => ({
+  filter: {
+    categoryIds: categoriesStore.selectedCategories
+  },
+  pagination: {
+    cursor: null,
+    limit: 10
+  }
+}))
+
+onResult(({ data }) => {
+  // console.log(data)
+  data?.posts?.edges?.forEach((x: any) => itemList.value.push(x.node))
+})
+
+onError((err) => {
+  console.log(err)
+})
+
+const el = ref<HTMLElement | null>(null)
+useInfiniteScroll(
+  el,
+  () => {
+    // load more
+    loadMore()
+  },
+  { distance: 0 }
+)
+
+watch(() => categoriesStore.selectedCategories, (newValue, oldValue) => {
+  // console.log("changed from", oldValue, "to", newValue)
+  if (oldValue?.length === 0) {
+    // itemList.value = []
+    return
+  }
+  itemList.value = []
+  // fetchMore({
+  //   variables: {
+  //     filter: {
+  //       categoryIds: categoriesStore.selectedCategories
+  //     },
+  //     pagination: {
+  //       cursor: null,
+  //       limit: 10
+  //     }
+  //   },
+  //   updateQuery: (previousResult, { fetchMoreResult }) => {
+  //     const newEdges = fetchMoreResult?.posts?.edges
+  //     const pageInfo = fetchMoreResult?.posts?.pageInfo
+  //     const totalCount = fetchMoreResult?.posts?.totalCount
+  //     return newEdges.length
+  //       ? {
+  //         posts: {
+  //           __typename: previousResult.posts.__typename,
+  //           edges: [...newEdges],
+  //           pageInfo,
+  //           totalCount
+  //         }
+  //       }
+  //       : previousResult
+  //   }
+  // })
+})
+
+const loadMore = () => {
+  if (!result.value?.posts?.pageInfo?.hasNextPage) {
+    return
+  }
+  fetchMore({
+    variables: {
+      filter: {
+        categoryIds: categoriesStore.selectedCategories
+      },
+      pagination: {
+        cursor: result.value?.posts?.pageInfo?.endCursor,
+        limit: 10
+      }
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      const newEdges = fetchMoreResult?.posts?.edges
+      const pageInfo = fetchMoreResult?.posts?.pageInfo
+      const totalCount = fetchMoreResult?.posts?.totalCount
+      return newEdges.length
+        ? {
+          posts: {
+            __typename: previousResult.posts.__typename,
+            edges: [...newEdges],
+            pageInfo,
+            totalCount
+          }
+        }
+        : previousResult
+    }
+  })
+}
+
 </script>
-<style></style>
+
+
