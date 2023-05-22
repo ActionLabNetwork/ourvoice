@@ -12,69 +12,91 @@ datasource premoderation {
 }
 
 model Post {
-  id         Int    @id @default(autoincrement())
-  title      String
-  content    String
-  files      Json?
-  sequence   Int    @default(0)
+  id Int @id @default(autoincrement())
 
   // Moderation
-  status     PostStatus       @default(PENDING)
-  version    Int              @default(0)
-  timestamp  DateTime         @default(now())
-  latest     Boolean          @default(true)
-  moderators PostModeration[]
+  status              PostStatus    @default(PENDING)
+  versions            PostVersion[]
+  requiredModerations Int           @default(1)
 
   // Relations
+  comments   Comment[]
+  authorHash String
+}
+
+model PostVersion {
+  id          Int              @id @default(autoincrement())
+  title       String
+  content     String
   categoryIds Int[]
-  comments    Comment[]
-  authorHash  String
+  files       Json?
+  version     Int              @default(0)
+  status      PostStatus
+  latest      Boolean          @default(false)
+  timestamp   DateTime         @default(now())
+  postId      Int
+  post        Post             @relation(fields: [postId], references: [id])
+  moderations PostModeration[]
+
+  @@unique([postId, version])
 }
 
 model Comment {
-  id      Int    @id @default(autoincrement())
-  content String
+  id Int @id @default(autoincrement())
 
   // Moderation
-  status     PostStatus          @default(PENDING)
-  version    Int                 @default(0)
-  timestamp  DateTime            @default(now())
-  latest     Boolean             @default(true)
-  moderators CommentModeration[]
+  status    PostStatus @default(PENDING)
+  version   Int        @default(0)
+  timestamp DateTime   @default(now())
+  latest    Boolean    @default(true)
 
   // Relations
   authorHash String
-  post       Post?     @relation(fields: [postId], references: [id])
+  post       Post?            @relation(fields: [postId], references: [id])
   postId     Int?
   parentId   Int?
-  parent     Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
-  children   Comment[] @relation("CommentToComment")
+  parent     Comment?         @relation("CommentToComment", fields: [parentId], references: [id])
+  children   Comment[]        @relation("CommentToComment")
+  versions   CommentVersion[]
+}
+
+model CommentVersion {
+  id          Int                 @id @default(autoincrement())
+  content     String
+  version     Int                 @default(0)
+  status      PostStatus
+  latest      Boolean             @default(false)
+  timestamp   DateTime            @default(now())
+  commentId   Int
+  comment     Comment             @relation(fields: [commentId], references: [id])
+  moderations CommentModeration[]
+
+  @@unique([commentId, version])
 }
 
 model PostModeration {
-  postId          Int
-  post            Post     @relation(fields: [postId], references: [id])
-  moderatorHash   String
-  decision        Decision
-  reason          String?
-  timestamp       DateTime @default(now())
-  modifiedTitle   String?
-  modifiedContent String?
+  id            Int         @id @default(autoincrement())
+  postVersionId Int
+  postVersion   PostVersion @relation(fields: [postVersionId], references: [id])
+  moderatorHash String
+  decision      Decision
+  reason        String?
+  timestamp     DateTime    @default(now())
 
-  @@id([postId, moderatorHash])
+  @@index([postVersionId])
 }
 
 model CommentModeration {
-  commentId       Int
-  comment         Comment  @relation(fields: [commentId], references: [id])
-  moderatorHash   String
-  decision        Decision
-  reason          String?
-  timestamp       DateTime @default(now())
-  modifiedTitle   String?
-  modifiedContent String?
+  id               Int            @id @default(autoincrement())
+  commentVersionId Int
+  commentVersion   CommentVersion @relation(fields: [commentVersionId], references: [id])
+  moderatorHash    String
+  decision         Decision
+  reason           String?
+  timestamp        DateTime       @default(now())
+  modifiedContent  String?
 
-  @@id([commentId, moderatorHash])
+  @@index([commentVersionId])
 }
 
 enum Decision {

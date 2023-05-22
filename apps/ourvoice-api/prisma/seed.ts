@@ -23,8 +23,6 @@ async function clearDatabase() {
 }
 
 async function main() {
-  await clearDatabase();
-
   const seedDataPath = join(__dirname, 'seed-data.json');
   const seedData = JSON.parse(readFileSync(seedDataPath, 'utf-8'));
 
@@ -129,14 +127,15 @@ async function main() {
 }
 
 export const seedMainDb = async () => {
-  await main()
-    .catch((e) => {
-      console.error(e);
-      process.exit(1);
-    })
-    .finally(async () => {
-      await prisma.$disconnect();
-    });
+  await clearDatabase();
+  // await main()
+  //   .catch((e) => {
+  //     console.error(e);
+  //     process.exit(1);
+  //   })
+  //   .finally(async () => {
+  //     await prisma.$disconnect();
+  //   });
 };
 
 // Uncomment this to seed using ts-node
