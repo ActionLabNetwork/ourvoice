@@ -1,51 +1,49 @@
 <template>
-    <DynamicScroller v-if="!loading" class="leading-10 h-full lg:pt-10 no-scrollbar" :keyField="'cursor'" @scroll-end="handleScrollEnd"
-        :items="result.posts.edges" :min-item-size="70" ref="scroller">
-        <template #before>
-            <div class="flex border-b-2 py-2">
-                <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
-                    Posts
-                    <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
-                </h1>
-                <div class="ml-auto mt-auto mr-2 text-ourvoice-grey">
-                    <font-awesome-icon icon="fa-solid fa-arrow-up-wide-short" size="lg"
-                        class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
-                    <font-awesome-icon icon="fa-solid fa-filter" size="lg"
-                        class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
+    <div class="h-full w-full overflow-y-auto break-all overflow-x-hidden pt-12 relative">
+        <DynamicScroller :items="postsList" :min-item-size="54" class="h-full">
+            <template #before>
+                <div class="flex border-b-2 py-2 lg:hidden">
+                    <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
+                        Posts
+                        <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
+                    </h1>
+                    <div class="ml-auto mt-auto mr-2 text-ourvoice-grey">
+                        <font-awesome-icon icon="fa-solid fa-arrow-up-wide-short" size="lg"
+                            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
+                        <font-awesome-icon icon="fa-solid fa-filter" size="lg"
+                            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
+                    </div>
                 </div>
-            </div>
-        </template>
-
-        <!-- ScrollWrapper Start-->
-        <template v-slot="{ item, index, active }">
-            <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[item.node.content]" :data-index="index"
-                :data-active="active">
-                <div class="border-b flex py-4 px-1">
-                    <PostCard :post="item.node" />
-                </div>
-            </DynamicScrollerItem>
-        </template>
-        <!-- ScrollWrapper End-->
-
-        <template #after>
-            <div class="mb-2 text-center" ref="spinner" >
-                <font-awesome-icon v-if="loading" icon="fa-solid fa-spinner" size="2xl" spin />
-                <button v-if="result.posts.pageInfo.hasNextPage" @click="loadMore" class="text-indigo-400">
-                    Load More
+            </template>
+            <template v-slot="{ item, index, active }">
+                <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[
+                    item.content,
+                ]" :data-index="index">
+                    <div class="flex border-b">
+                        <PostCard :post="item" />
+                    </div>
+                </DynamicScrollerItem>
+            </template>
+            <template #after>
+                <button class="block mx-auto text-ourvoice-gray text-lg my-5" @click="fetchMorePosts">
+                    {{ hasNextPage ? 'Load More' : 'You have reached the end' }}
+                    <font-awesome-icon v-if="loading" icon="fa-solid fa-spinner" spin />
                 </button>
-            </div>
-        </template>
-    </DynamicScroller>
+            </template>
+        </DynamicScroller>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import PostCard from './PostCard.vue'
-import { useCategoriesStore } from '@/stores/categories'
-import { useQuery } from '@vue/apollo-composable'
+import PostCard from './PostCard.vue';
 import gql from 'graphql-tag'
-import { ref } from 'vue'
-
+import { useQuery } from '@vue/apollo-composable'
+import { computed, watch } from 'vue';
+import { useCategoriesStore } from '@/stores/categories';
 const categoriesStore = useCategoriesStore()
+const selectedCategories = computed(() => categoriesStore?.selectedCategories ?? [])
+const cursor = computed(() => result.value?.posts?.pageInfo?.endCursor ?? null)
+const hasNextPage = computed(() => result.value?.posts?.pageInfo?.hasNextPage ?? false)
 
 const GET_POST_QUERY = gql`
 query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
@@ -89,59 +87,68 @@ query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
 }
   `
 
-const { result, loading, fetchMore, onError } = useQuery(GET_POST_QUERY, () => ({
-    filter: {
-        categoryIds: categoriesStore.selectedCategories
-    },
+const { result, onError, refetch, loading, fetchMore } = useQuery(GET_POST_QUERY, {
+    filter: null as any,
     pagination: {
-        cursor: null,
+        cursor: null as string | null,
         limit: 10
     }
-}))
-onError((error) => {
+})
+
+onError(error => {
     console.log(error)
 })
-const scroller = ref<HTMLElement|null>(null)
-const loadMore = () => {
-    if (!result.value.posts.pageInfo.hasNextPage) {
-        return
-    }
-    console.log('load more')
-    fetchMore({
+
+const refetchPosts = async () => {
+    const res = await refetch({
+        filter: {
+            categoryIds: selectedCategories.value
+        },
+        pagination: {
+            cursor: null,
+            limit: 10
+        }
+    })
+    console.log("refetched Posts", res)
+
+}
+
+const fetchMorePosts = async () => {
+    if (!hasNextPage.value) return
+    const res = await fetchMore({
         variables: {
-            filter: {
-                categoryIds: categoriesStore.selectedCategories
-            },
             pagination: {
-                cursor: result.value.posts.pageInfo.endCursor,
+                cursor: cursor.value,
                 limit: 10
             }
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-            return {
-                ...previousResult,
-                posts: {
-                    ...previousResult.posts,
-                    edges: [
-                        ...previousResult.posts.edges,
-                        ...fetchMoreResult.posts.edges,
-                    ],
-                    pageInfo: {
-                        ...previousResult.posts.pageInfo,
-                        endCursor: fetchMoreResult.posts.pageInfo.endCursor,
-                        hasNextPage: fetchMoreResult.posts.pageInfo.hasNextPage,
-                    },
-                    totalCount: fetchMoreResult.posts.totalCount,
-                },
-
-            }
+            const newEdges = fetchMoreResult?.posts?.edges ?? []
+            const pageInfo = fetchMoreResult?.posts?.pageInfo ?? {}
+            return newEdges?.length
+                ? {
+                    posts: {
+                        __typename: previousResult.posts.__typename,
+                        edges: [...previousResult.posts.edges, ...newEdges],
+                        pageInfo,
+                        totalCount: fetchMoreResult?.posts?.totalCount ?? 0
+                    }
+                }
+                : previousResult
         }
     })
+    console.log("fetched more Posts", res)
 }
-const handleScrollEnd = () => {
-    // console.log('scroll end')
-    // if (result.value.posts.pageInfo.hasNextPage) {
-    //     loadMore()
+const postsList = computed(() => result.value?.posts?.edges.map((post: any) => post.node) ?? [])
+
+watch(selectedCategories, (newValue, oldValue) => {
+    console.log("selectedCategories changed")
+    console.log("old categoryIds", oldValue)
+    console.log("new categoryIds", newValue)
+    // if(newValue?.length && oldValue?.length) {
+    console.log("refetch")
+    refetchPosts()
     // }
-}
+})
+
 </script>
