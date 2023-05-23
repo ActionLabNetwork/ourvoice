@@ -2,15 +2,14 @@
   <div class="leading-relaxed max-w-3xl border-4 h-screen m-auto w-full overflow-y-scroll relative" ref="el">
 
     <div class="sticky top-0 z-30 backdrop-blur-md">
-      <CategoryFilter :vertical="false"/>
-      {{ cursor }}
+      <CategoryFilter :vertical="false" />
     </div>
 
     <div v-for="item in itemList" :key="item.id" class="break-all">
       <PostCard :post="item" />
     </div>
+    <button class="block m-auto" v-if="result?.posts?.pageInfo?.hasNextPage" @click="loadMore">load more</button>
   </div>
-
   <div v-if="loading" class="fixed top-0 flex justify-center items-center h-full w-full backdrop-blur-xl">
     <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
   </div>
@@ -67,26 +66,39 @@ query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
   }
 }
   `
-const cursor = ref<string | null>(null)
 const itemList = ref<any[]>([])
-const { result, loading, fetchMore, onResult, onError } = useQuery(GET_POST_QUERY, () => ({
-  filter: {
-    categoryIds: categoriesStore.selectedCategories
-  },
+const { result, loading, fetchMore, onResult, onError, refetch } = useQuery(GET_POST_QUERY, () => ({
+  filter: null as any,
   pagination: {
     cursor: null,
     limit: 10
   }
-}))
+}), {
+  fetchPolicy: 'cache-first'
+})
 
 onResult(({ data }) => {
-  // console.log(data)
-  data?.posts?.edges?.forEach((x: any) => itemList.value.push(x.node))
+  data?.posts?.edges?.forEach((x: any) => itemList.value?.push(x.node))
 })
 
 onError((err) => {
   console.log(err)
 })
+
+itemList.value = result.value?.posts?.edges?.map((x: any) => x.node)
+const refetchPosts = async () => {
+  await refetch({
+    filter: {
+      categoryIds: categoriesStore.selectedCategories
+    },
+    pagination: {
+      cursor: null,
+      limit: 10
+    }
+  })
+  itemList.value = result.value?.posts?.edges?.map((x: any) => x.node)
+}
+
 
 const el = ref<HTMLElement | null>(null)
 useInfiniteScroll(
@@ -98,45 +110,20 @@ useInfiniteScroll(
   { distance: 0 }
 )
 
+// reset itemList when categories changed and refetch posts
 watch(() => categoriesStore.selectedCategories, (newValue, oldValue) => {
-  // console.log("changed from", oldValue, "to", newValue)
-  if (oldValue?.length === 0) {
-    // itemList.value = []
-    return
-  }
+  console.log("selected categoryIds changed from", oldValue, "to", newValue)
+
+  console.log('reset itemList')
   itemList.value = []
-  // fetchMore({
-  //   variables: {
-  //     filter: {
-  //       categoryIds: categoriesStore.selectedCategories
-  //     },
-  //     pagination: {
-  //       cursor: null,
-  //       limit: 10
-  //     }
-  //   },
-  //   updateQuery: (previousResult, { fetchMoreResult }) => {
-  //     const newEdges = fetchMoreResult?.posts?.edges
-  //     const pageInfo = fetchMoreResult?.posts?.pageInfo
-  //     const totalCount = fetchMoreResult?.posts?.totalCount
-  //     return newEdges.length
-  //       ? {
-  //         posts: {
-  //           __typename: previousResult.posts.__typename,
-  //           edges: [...newEdges],
-  //           pageInfo,
-  //           totalCount
-  //         }
-  //       }
-  //       : previousResult
-  //   }
-  // })
+  refetchPosts()
 })
 
 const loadMore = () => {
   if (!result.value?.posts?.pageInfo?.hasNextPage) {
     return
   }
+  console.log('load more')
   fetchMore({
     variables: {
       filter: {
