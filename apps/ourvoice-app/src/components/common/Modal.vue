@@ -25,10 +25,12 @@
             leave-to="opacity-0 scale-95"
           >
             <DialogPanel
-              class="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+              class="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-700 p-6 text-left align-middle shadow-xl transition-all"
             >
-              <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                Modal Title
+              <DialogTitle as="h3" class="text-lg font-medium leading-6 dark:text-white">
+                <slot name="title">
+                  Model default #title slot
+                </slot>
               </DialogTitle>
               <div class="mt-2 h-1/2">
                 <slot name="content"></slot>

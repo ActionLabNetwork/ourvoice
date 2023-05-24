@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-shrink-0 mr-0">
+  <div class="flex-shrink-0 mr-0 ">
     <img class="mt-2 rounded-full w-8 h-8 sm:w-10 sm:h-10 hover:cursor-pointer"
       :src="`https://api.multiavatar.com/${post.author.nickname}.png`" :title="post.author.nickname" />
   </div>
@@ -11,10 +11,10 @@
         <div class="text-lg md:text-xl font-bold">
           Title: {{ post.title }}
         </div>
-        
-        <div class="ml-auto w-fit" >
+
+        <div class="ml-auto w-fit">
           <span v-for="cat in post.categories" :key="cat.id">
-            #{{ cat.name }} 
+            #{{ cat.name }}
           </span>
         </div>
       </h1>
@@ -26,7 +26,7 @@
       <div class="flex text-gray-500 dark:text-gray-300">
         <div
           class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-          @click="showCommentTextarea = !showCommentTextarea">
+          @click="showComment = !showComment">
           <font-awesome-icon icon="fa-solid fa-comment" />
           <span class="hidden sm:inline-block px-1"> Comment </span>
         </div>
@@ -45,52 +45,30 @@
         </div>
       </div>
     </div>
-
-    <CommentTextarea v-if="showCommentTextarea" @submit="(payload) => createComment(payload)" />
-
-    <CommentTile :postId="post.id" class=" z-auto" />
+    <Modal :isOpen="showComment" @close="showComment = !showComment">
+      <template #title>
+        <span class="text-2xl">Comments</span>
+      </template>
+      <template #content>
+        <CommentTile :postId="post.id" />
+      </template>
+    </Modal>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { timePassed } from '@/utils'
 import { ref } from 'vue'
 import CommentTile from '../comment/CommentTile.vue'
-import CommentTextarea from '../comment/CommentTextarea.vue'
-import { useCommentsStore } from '@/stores/comments'
+import Modal from '../common/Modal.vue'
 
-export default {
-  name: 'PostCard',
-  props: {
-    post: {
-      type: Object,
-      required: true
-    }
-  },
-  components: {
-    CommentTile,
-    CommentTextarea
-  },
-  setup(props) {
-    const commentsStore = useCommentsStore()
-
-    const showCommentTextarea = ref(false)
-    const createComment = (payload: string) => {
-      console.log('createPost')
-      commentsStore.createComment({
-        //TODO: get authorId from auth
-        authorId: 3,
-        content: payload,
-        postId: props.post.id,
-        parentId: undefined
-      })
-      showCommentTextarea.value = false
-    }
-    return {
-      showCommentTextarea,
-      createComment,
-      timePassed
-    }
+defineProps({
+  post: {
+    type: Object,
+    required: true
   }
-}
+})
+const showComment = ref(false)
+
+
 </script>

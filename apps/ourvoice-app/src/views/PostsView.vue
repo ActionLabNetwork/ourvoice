@@ -85,7 +85,6 @@ onError((err) => {
   console.log(err)
 })
 
-itemList.value = result.value?.posts?.edges?.map((x: any) => x.node)
 const refetchPosts = async () => {
   await refetch({
     filter: {

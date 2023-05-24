@@ -19,7 +19,7 @@
                 <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[
                     item.content,
                 ]" :data-index="index">
-                    <div class="flex border-b">
+                    <div class="flex border-b py-10">
                         <PostCard :post="item" />
                     </div>
                 </DynamicScrollerItem>
@@ -35,11 +35,12 @@
 </template>
 
 <script lang="ts" setup>
-import PostCard from './PostCard.vue';
+import PostCard from '@/components/post/PostCard.vue'
 import gql from 'graphql-tag'
 import { useQuery } from '@vue/apollo-composable'
 import { computed, watch } from 'vue';
 import { useCategoriesStore } from '@/stores/categories';
+
 const categoriesStore = useCategoriesStore()
 const selectedCategories = computed(() => categoriesStore?.selectedCategories ?? [])
 const cursor = computed(() => result.value?.posts?.pageInfo?.endCursor ?? null)
