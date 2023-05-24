@@ -2,6 +2,39 @@ import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
 
 const prisma = new PrismaClient();
 
+function getRandomSelection(arr: number[]): number[] {
+  const count = Math.floor(Math.random() * 2) + 1;
+  const shuffled = [...arr];
+
+  for (let i = arr.length; i; i--) {
+    const j = Math.floor(Math.random() * i);
+    [shuffled[i - 1], shuffled[j]] = [shuffled[j], shuffled[i - 1]];
+  }
+  return shuffled.slice(0, count);
+}
+
+function generateVersions(
+  i: number,
+  postStatuses: ('REJECTED' | 'APPROVED' | 'PENDING')[],
+) {
+  const numVersions = Math.floor(Math.random() * 4) + 2; // Random integer between 2 and 5 inclusive
+  const versions = Array(numVersions)
+    .fill({})
+    .map((_, versionIndex) => ({
+      title: `Post ${i + 1}`,
+      content:
+        `This is the content of post ${i + 1}` +
+        (versionIndex > 0 ? `. This is version ${versionIndex + 1}` : ''),
+      categoryIds: getRandomSelection([1, 2, 3, 4, 5]),
+      status: postStatuses[i % postStatuses.length],
+      version: versionIndex + 1,
+      latest: versionIndex === numVersions - 1, // Mark the last version as the latest
+      timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
+    }));
+
+  return versions;
+}
+
 async function clearDatabase() {
   console.log('Clearing database...');
   await prisma.commentModeration.deleteMany();
@@ -39,14 +72,7 @@ async function main() {
         authorHash: userHashes[i % userHashes.length],
         status: postStatuses[i % postStatuses.length],
         versions: {
-          create: {
-            title: `Post ${i + 1}`,
-            content: `This is the content of post ${i + 1}`,
-            status: postStatuses[i % postStatuses.length],
-            version: i,
-            latest: true,
-            timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
-          },
+          create: generateVersions(i, postStatuses),
         },
       },
     });

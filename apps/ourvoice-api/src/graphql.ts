@@ -217,6 +217,8 @@ export abstract class IQuery {
 
     abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
 
+    abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
