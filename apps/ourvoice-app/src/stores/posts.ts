@@ -104,18 +104,16 @@ export const usePostsStore = defineStore('posts', {
       content,
       categoryIds,
       files,
-      authorId
     }: {
       title: string
       content: string
       categoryIds: number[]
       files: string[]
-      authorId: number
     }) {
       // Check for valid deployment and user session
       const userStore = useUserStore()
 
-      const { mutate: createPostMutate } = useMutation(CREATE_POST_MUTATION)
+      // const { mutate: createPostMutate } = useMutation(CREATE_POST_MUTATION)
       const { mutate: createModerationPostMutate } = useMutation(CREATE_MODERATION_POST_MUTATION)
 
       // Check if we can access the session and generate a user hash for storing in the db
@@ -125,21 +123,27 @@ export const usePostsStore = defineStore('posts', {
       }
 
       const authorHash = await authService.hashInput(userStore.userId, userStore.deployment)
+      const requiredModerations = 1
 
-      await createPostMutate({
-        data: { title, content, categoryIds, files, authorId }
-      })
+      // await createPostMutate({
+      //   data: { title, content, categoryIds, files, authorId }
+      // })
 
-      await createModerationPostMutate({
-        data: {
-          title,
-          content,
-          categoryIds,
-          files,
-          authorHash,
-          identifier: 'random-identifier'
-        }
-      })
+      try {
+        console.log({ title, content, categoryIds, files, authorHash, requiredModerations })
+        await createModerationPostMutate({
+          data: {
+            title,
+            content,
+            categoryIds,
+            files,
+            authorHash,
+            requiredModerations
+          }
+        })
+      } catch (error) {
+        console.log({ error })
+      }
     },
 
     async votePost({

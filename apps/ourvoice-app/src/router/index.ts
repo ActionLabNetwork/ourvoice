@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import PostsView from '../views/PostsView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
+import ModerationListView from '../views/ModerationListView.vue'
+import ModerationView from '../views/ModerationView.vue'
 
 import YamlContent from '../../../../config/config.yml'
 import Session from 'supertokens-web-js/recipe/session'
@@ -50,9 +52,17 @@ const router = createRouter({
       }
     },
     {
-      path: '/noauth',
-      name: 'noauth',
-      component: CreatePostView
+      path: '/moderation/posts',
+      name: 'moderate-post-list',
+      component: ModerationListView,
+      props: () => {
+        return addDeployment()
+      }
+    },
+    {
+      path: '/moderation/post/:id',
+      name: 'moderate-post',
+      component: ModerationView,
     },
     {
       path: '/noauth/post',
