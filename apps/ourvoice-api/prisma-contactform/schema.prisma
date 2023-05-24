@@ -1,0 +1,17 @@
+generator contactformClient {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@internal/prisma/contactform"
+}
+
+datasource contactformdb {
+  provider = "mongodb"
+  url      = env("DATABASE_CONTACT_FORM_URL")
+}
+
+model ContactFormEntry {
+  id        String   @id @default(auto()) @map("_id") @contactformdb.ObjectId
+  createdAt DateTime @default(now())
+  name      String
+  email     String
+  message   String
+}

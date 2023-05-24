@@ -73,11 +73,28 @@ services:
       - backend
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', "'${AUTH_POSTGRES_DB}'"]
+      test: [ 'CMD-SHELL', 'pg_isready', '-d', "'${AUTH_POSTGRES_DB}'" ]
       interval: 30s
       timeout: 60s
       retries: 5
       start_period: 80s
+
+  # contact form database
+  ourvoice-contact-form-db:
+    container_name: ourvoice-contact-form-db
+    image: mongo:4
+    networks:
+      - backend
+    restart: unless-stopped
+    ports:
+      - "${CONTACT_FORM_DB_PORT}:27017"
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME:${CONTACT_FORM_DB_ROOT_USERNAME}"
+      - "MONGO_INITDB_ROOT_PASSWORD:${CONTACT_FORM_DB_ROOT_PASSWORD}"
+    volumes:
+      - ./contactformdb/db:/data/db
+    command: mongod --replSet rs0  # replica set is needed for prisma
+
   # auth manager
   supertokens:
     image: registry.supertokens.io/supertokens/supertokens-postgresql:4.3
