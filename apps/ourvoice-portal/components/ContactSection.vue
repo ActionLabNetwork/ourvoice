@@ -20,10 +20,19 @@
             >
             <input
               id="name"
+              v-model="form.name"
               type="text"
               name="name"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-ourvoice-grey py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              @input="v$.name.$reset()"
+              @blur="v$.name.$touch()"
+              :disabled="state.formState != 'open'"
             />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.name.$error" class="text-xs text-red-500">
+                {{ v$.name.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-screen md:w-1/2">
@@ -33,10 +42,19 @@
             >
             <input
               id="email"
+              v-model="form.email"
               type="email"
               name="email"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-ourvoice-grey py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              @input="v$.email.$reset()"
+              @blur="v$.email.$touch()"
+              :disabled="state.formState != 'open'"
             />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.email.$error" class="text-xs text-red-500">
+                {{ v$.email.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-full">
@@ -46,18 +64,34 @@
             >
             <textarea
               id="message"
+              v-model="form.message"
               name="message"
               class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-ourvoice-purple focus:bg-ourvoice-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-ourvoice-grey py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-            ></textarea>
+              @input="v$.message.$reset()"
+              @blur="v$.message.$touch()"
+              :disabled="state.formState != 'open'"
+            />
+            <div class="h-4 mt-0.5">
+              <p v-if="v$.message.$error" class="text-xs text-red-500">
+                {{ v$.message.$errors[0].$message }}
+              </p>
+            </div>
           </div>
         </div>
         <div class="p-2 w-full">
           <button
             type="button"
             class="flex mx-auto btn btn-purple btn-hover"
-            @click="recaptcha"
+            :disabled="state.formState != 'open'"
+            @click="submitForm"
           >
-            Submit
+            {{
+              state.formState == 'open'
+                ? 'Submit'
+                : state.formState == 'loading'
+                ? 'Submitting...'
+                : 'Submitted'
+            }}
           </button>
         </div>
         <div
@@ -75,6 +109,17 @@
 </template>
 
 <script lang="ts">
+import { provideApolloClient, useMutation } from '@vue/apollo-composable'
+import useVuelidate from '@vuelidate/core'
+import {
+  email,
+  helpers,
+  maxLength,
+  minLength,
+  required,
+} from '@vuelidate/validators'
+import { createApolloClient } from '~/graphql/client'
+import gql from 'graphql-tag'
 import { defineComponent } from 'vue'
 import { useReCaptcha, VueReCaptcha } from 'vue-recaptcha-v3'
 
@@ -82,26 +127,81 @@ export default defineComponent({
   name: 'ContactSection',
 
   setup() {
+    const config = useRuntimeConfig()
     const { vueApp } = useNuxtApp()
     vueApp.use(VueReCaptcha, {
-      // TODO: Add site key for recaptcha
-      siteKey: '',
+      siteKey: config.public.recaptchaSiteKey,
+      loaderOptions: {},
     })
+    provideApolloClient(createApolloClient(config.public.apiUrl))
+    const CREATE_CONTACT_FORM_ENTRY = gql`
+      mutation CreateContactFormEntry($data: ContactFormEntryCreateInput!) {
+        createContactFormEntry(data: $data)
+      }
+    `
+    const { mutate: createContactFormEntry } = useMutation(
+      CREATE_CONTACT_FORM_ENTRY
+    )
 
     const recaptchaInstance = useReCaptcha()
+    const form = reactive({
+      name: '',
+      email: '',
+      message: '',
+    })
+    const customEmailValidator = helpers.withMessage('Not a valid email', email)
+    const customRequiredValidator = helpers.withMessage(
+      'This field is required',
+      required
+    )
+    const rules = {
+      name: { customRequiredValidator, maxLength: maxLength(200) },
+      email: { customRequiredValidator, customEmailValidator },
+      message: {
+        customRequiredValidator,
+        minLength: minLength(10),
+        maxLength: maxLength(1000),
+      },
+    }
+    const v$ = useVuelidate(rules, form)
 
-    const recaptcha = async () => {
-      // (optional) Wait until recaptcha has been loaded.
-      await recaptchaInstance?.recaptchaLoaded()
+    type State = {
+      formState: 'open' | 'loading' | 'submitted'
+    }
+    const state: State = reactive({
+      formState: 'open',
+    })
 
-      // Execute reCAPTCHA with action "login".
-      // const token = await recaptchaInstance?.executeRecaptcha('submit')
-      // console.log(token)
-      // Do stuff with the received token.
+    const submitForm = async () => {
+      v$.value.$touch()
+      if (v$.value.$error) return
+      state.formState = 'loading'
+      try {
+        if (!recaptchaInstance) {
+          throw new Error('reCaptcha is not available')
+        }
+        await recaptchaInstance.recaptchaLoaded()
+        const token = await recaptchaInstance.executeRecaptcha('submit')
+        const data = { ...form, recaptchaToken: token }
+        await createContactFormEntry({
+          data,
+        })
+        v$.value.$reset()
+        state.formState = 'submitted'
+      } catch (error) {
+        if (error instanceof Error) {
+          const message = error.message
+          window.alert(message)
+        }
+        state.formState = 'open'
+      }
     }
 
     return {
-      recaptcha,
+      submitForm,
+      form,
+      v$,
+      state,
     }
   },
 })

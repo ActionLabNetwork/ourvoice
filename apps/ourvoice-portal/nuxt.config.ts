@@ -16,4 +16,10 @@ export default defineNuxtConfig({
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
   },
+  runtimeConfig: {
+    public: {
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY,
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3000',
+    },
+  },
 })

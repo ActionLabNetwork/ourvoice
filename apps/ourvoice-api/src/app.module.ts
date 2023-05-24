@@ -12,6 +12,7 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ContactFormModule } from './modules/contactform/contactform.module';
 
 @Module({
   imports: [
@@ -49,6 +50,15 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
     PostModule,
     CategoryModule,
     CommentModule,
+    ContactFormModule.register({
+      smtpSettings: {
+        host: process.env.CONTACT_FORM_SMTP_HOST,
+        port: Number(process.env.CONTACT_FORM_SMTP_PORT),
+        user: process.env.CONTACT_FORM_SMTP_USER,
+        pass: process.env.CONTACT_FORM_SMTP_PASS,
+      },
+      recaptchaSecret: process.env.CONTACT_FORM_RECAPTCHA_SECRET,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
