@@ -1,4 +1,5 @@
 type Query {
+  moderationPost(id: Int!): ModerationPost
   moderationPosts(
     filter: ModerationPostsFilterInput
     pagination: ModerationPostPaginationInput

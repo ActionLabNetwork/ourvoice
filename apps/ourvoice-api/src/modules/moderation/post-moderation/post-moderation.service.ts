@@ -17,6 +17,10 @@ export class PostModerationService {
     private readonly moderationPostRepository: PostModerationRepository,
   ) {}
 
+  async getModerationPostById(id: number): Promise<Post> {
+    return await this.moderationPostRepository.getModerationPostById(id);
+  }
+
   async getModerationPosts(
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,

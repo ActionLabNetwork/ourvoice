@@ -11,6 +11,11 @@ export class PostModerationResolver {
   constructor(private postModerationService: PostModerationService) {}
 
   @Query()
+  async moderationPost(@Args('id') id: number) {
+    return await this.postModerationService.getModerationPostById(id);
+  }
+
+  @Query()
   async moderationPosts(
     @Args('filter', { nullable: true }) filter?: ModerationPostsFilterInput,
     @Args('pagination', { nullable: true })

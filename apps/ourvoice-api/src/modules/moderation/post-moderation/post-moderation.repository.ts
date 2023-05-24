@@ -12,6 +12,13 @@ import { PostCreateDto } from './dto/post-create.dto';
 export class PostModerationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getModerationPostById(id: number): Promise<Post> {
+    return await this.prisma.post.findUnique({
+      where: { id },
+      include: { versions: { orderBy: { version: 'desc' } } },
+    });
+  }
+
   async getModerationPosts(
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
@@ -30,7 +37,7 @@ export class PostModerationRepository {
 
     const moderationPosts = await this.prisma.post.findMany({
       where,
-      include: { versions: true },
+      include: { versions: { orderBy: { version: 'desc' } } },
       skip: pagination?.cursor ? 1 : undefined,
       cursor: pagination?.cursor
         ? { id: cursorToNumber(pagination.cursor) }
