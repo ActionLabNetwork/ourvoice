@@ -8,7 +8,6 @@
         <CreateComment />
       </TabContent>
     </TabsWrapper>
-    <Suspense><PostModerationList /></Suspense>
   </div>
 </template>
 

@@ -1,3 +1,4 @@
+import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
@@ -22,12 +23,25 @@ export interface PostVersion {
   status: PostStatus
 }
 
-export interface ModerationPost {
+export interface PostVersionWithCategories extends Omit<PostVersion, 'categories'> {
+  categories: Category[]
+}
+
+export interface ModerationPostModel {
   id: number
   authorHash: string
   requiredModerations: number
   status: PostStatus
   versions: PostVersion[]
+}
+
+export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
+  versions: PostVersionWithCategories[]
+}
+
+export interface Category {
+  id: number
+  name: string
 }
 
 export interface pageInfo {
@@ -38,6 +52,7 @@ export interface pageInfo {
 
 export interface ModerationPostsState {
   posts: ModerationPost[]
+  categories: Map<number, Category>
   totalCount: number
   pageInfo: pageInfo | undefined
   loading: boolean
@@ -45,9 +60,9 @@ export interface ModerationPostsState {
   errorMessage: string | undefined
 }
 
-interface Edge {
+interface Edge<T> {
   cursor: string
-  node: ModerationPost
+  node: T
 }
 
 provideApolloClient(apolloClient)
@@ -55,6 +70,7 @@ provideApolloClient(apolloClient)
 export const useModerationPostsStore = defineStore('moderation-posts', {
   state: (): ModerationPostsState => ({
     posts: [],
+    categories: new Map(),
     totalCount: 0,
     pageInfo: undefined,
     loading: false,
@@ -65,14 +81,66 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
   actions: {
     async fetchPosts() {
       try {
+        // Fetch posts from Moderation DB
         this.loading = true
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POSTS_QUERY
         })
-        this.posts = data.moderationPosts.edges.map((edge: Edge) => edge.node)
+        this.posts = data.moderationPosts.edges.map((edge: Edge<ModerationPostModel>) => edge.node)
         this.totalCount = data.moderationPosts.totalCount
         this.pageInfo = data.moderationPosts.pageInfo
+
+        console.log('Posts')
         console.log(this.posts)
+
+        // Fetch category names from Main DB
+        const categoryIds = Array.from(
+          this.posts.reduce((acc, post: ModerationPost) => {
+            post.versions
+              .flatMap((version) => version.categoryIds)
+              .forEach((id) => {
+                acc.add(id)
+              })
+            return acc
+          }, new Set())
+        )
+        console.log({ categoryIds })
+
+        const { data: categoriesData } = await apolloClient.query({
+          query: GET_CATEGORIES_QUERY,
+          variables: { filter: { ids: categoryIds } }
+        })
+
+        const categories = categoriesData.categories.edges.map(
+          (edge: Edge<Category>) => edge.node
+        ) as Category[]
+
+        const categoriesMap = categories.reduce((acc, category) => {
+          acc.set(category.id, category)
+          return acc
+        }, new Map<number, Category>())
+
+        this.categories = categoriesMap
+
+        console.log('This.categories')
+        console.log(this.categories)
+
+        // Replace category Ids in each post with categories
+        this.posts = this.posts.map((post) => {
+          const versionsWithCategoriesIncluded = post.versions.map((version) => {
+            const categoryObjs: Category[] = []
+
+            version.categoryIds.forEach((categoryId: number) => {
+              const category = categoriesMap.get(categoryId)
+              if (category) {
+                categoryObjs.push(category)
+              }
+            })
+
+            return { ...version, categories: categoryObjs }
+          })
+          return { ...post, versions: versionsWithCategoriesIncluded }
+        })
       } catch (error) {
         this.error = error as ApolloError
         this.errorMessage = 'Failed to load posts. Please try again.'
