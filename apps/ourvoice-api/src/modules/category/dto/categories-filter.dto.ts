@@ -4,10 +4,17 @@ import {
   IsBoolean,
   IsDateString,
   IsInt,
+  IsNumber,
+  IsArray,
 } from 'class-validator';
 import { DateTime } from 'src/graphql';
 
 export class CategoriesFilterDto {
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  ids: number[];
+
   @IsString()
   @IsOptional()
   name: string;

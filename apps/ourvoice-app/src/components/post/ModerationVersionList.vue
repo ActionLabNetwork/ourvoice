@@ -3,12 +3,8 @@
     <li v-for="version in props.versions" :key="version.id" class="relative flex justify-between gap-x-6 px-4 py-3 hover:bg-slate-100 hover:cursor-pointer sm:px-6" :class="isSelected(version) && 'bg-slate-200'" @click="() => handleVersionClick(version)">
       <div class="flex gap-x-4">
         <div class="min-w-0 flex-auto">
-          <p class="text-sm font-semibold leading-6 text-gray-900">
-              <span class="absolute inset-x-0 -top-px bottom-0" />
-              {{ version.title }}
-          </p>
-          <p class="mt-1 flex text-xs leading-5 text-gray-500">
-            Version {{ version.version }}
+          <p class="text-xs font-semibold mt-1.5 text-gray-900">
+              Version {{ version.version }}
           </p>
         </div>
       </div>

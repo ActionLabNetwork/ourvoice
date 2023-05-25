@@ -77,4 +77,32 @@ export class PostModerationService {
 
     return await this.moderationPostRepository.createModerationPost(data);
   }
+
+  async getPostVersionById(id: number) {
+    return await this.moderationPostRepository.getPostVersionById(id);
+  }
+
+  async approvePostVersion(id: number, moderatorHash: string, reason: string) {
+    // TODO: Validate post version id exists
+    // TODO: Validate moderator hash to see if they have permission/role
+    // TODO: Validate post version is the latest one for its post
+    // TODO: Additional validations...
+    return await this.moderationPostRepository.approvePostVersion(
+      id,
+      moderatorHash,
+      reason,
+    );
+  }
+
+  async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
+    // TODO: Validate post version id exists
+    // TODO: Validate moderator hash to see if they have permission/role
+    // TODO: Validate post version is the latest one for its post
+    // TODO: Additional validations...
+    return await this.moderationPostRepository.rejectPostVersion(
+      id,
+      moderatorHash,
+      reason,
+    );
+  }
 }

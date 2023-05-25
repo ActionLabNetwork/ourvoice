@@ -16,6 +16,7 @@ function getRandomSelection(arr: number[]): number[] {
 function generateVersions(
   i: number,
   postStatuses: ('REJECTED' | 'APPROVED' | 'PENDING')[],
+  authorHash: string,
 ) {
   const numVersions = Math.floor(Math.random() * 4) + 2; // Random integer between 2 and 5 inclusive
   const versions = Array(numVersions)
@@ -28,6 +29,8 @@ function generateVersions(
       categoryIds: getRandomSelection([1, 2, 3, 4, 5]),
       status: postStatuses[i % postStatuses.length],
       version: versionIndex + 1,
+      authorHash,
+      reason: versionIndex > 0 ? 'Modified by moderator' : '',
       latest: versionIndex === numVersions - 1, // Mark the last version as the latest
       timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
     }));
@@ -72,7 +75,11 @@ async function main() {
         authorHash: userHashes[i % userHashes.length],
         status: postStatuses[i % postStatuses.length],
         versions: {
-          create: generateVersions(i, postStatuses),
+          create: generateVersions(
+            i,
+            postStatuses,
+            userHashes[i % userHashes.length],
+          ),
         },
       },
     });
@@ -87,6 +94,7 @@ async function main() {
             content: `This is a comment on post ${i + 1}`,
             status: postStatuses[(i + 1) % postStatuses.length],
             version: i,
+            authorHash: userHashes[(i + 1) % userHashes.length],
             latest: true,
             timestamp: new Date(`2023-04-${13 + i}T10:30:00Z`),
           },

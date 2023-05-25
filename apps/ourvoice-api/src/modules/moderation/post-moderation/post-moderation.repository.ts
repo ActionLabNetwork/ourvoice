@@ -15,7 +15,11 @@ export class PostModerationRepository {
   async getModerationPostById(id: number): Promise<Post> {
     return await this.prisma.post.findUnique({
       where: { id },
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+        },
+      },
     });
   }
 
@@ -62,6 +66,7 @@ export class PostModerationRepository {
         content,
         categoryIds,
         files,
+        authorHash: authorHash,
         status: 'PENDING',
         post: { connect: { id: newPost.id } },
         latest: true,
@@ -70,4 +75,63 @@ export class PostModerationRepository {
 
     return newPost;
   }
+
+  async getPostVersionById(id: number) {
+    return await this.prisma.postVersion.findUnique({
+      where: { id },
+      include: { moderations: true },
+    });
+  }
+
+  async approvePostVersion(id: number, moderatorHash: string, reason: string) {
+    const newPostModeration = await this.prisma.postModeration.create({
+      data: {
+        moderatorHash,
+        decision: 'ACCEPTED',
+        reason,
+        postVersionId: id,
+      },
+    });
+
+    const postVersion = await this.prisma.postVersion.findFirst({
+      where: { id: newPostModeration.postVersionId },
+    });
+
+    return postVersion;
+  }
+
+  async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
+    const newPostModeration = await this.prisma.postModeration.create({
+      data: {
+        moderatorHash,
+        decision: 'REJECTED',
+        reason,
+        postVersionId: id,
+      },
+    });
+
+    const postVersion = await this.prisma.postVersion.findFirst({
+      where: { id: newPostModeration.postVersionId },
+    });
+
+    return postVersion;
+  }
+
+  // async modifyPostVersion(postId: number, title: string, content: string, categoryIds: number[], files: string[], moderatorHash: string, reason: string) {
+  //   // Create a new PostVersion
+  //   const newPostVersion = await this.prisma.postVersion.create({
+  //     data: {
+  //       postId,
+  //       decision: 'ACCEPTED',
+  //       reason,
+  //       postVersionId: id,
+  //     },
+  //   });
+
+  //   const postVersion = await this.prisma.postVersion.findFirst({
+  //     where: { id: newPostModeration.postVersionId },
+  //   });
+
+  //   return postVersion;
+  // }
 }

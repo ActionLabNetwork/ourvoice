@@ -3,7 +3,7 @@
     <Header title="Post Moderation" />
     <main>
       <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <Suspense><PostModeration  /></Suspense>
+        <Suspense><PostModeration :deployment="props.deployment"  /></Suspense>
       </div>
     </main>
   </div>
@@ -13,7 +13,10 @@
 import Header from '@/components/common/Header.vue'
 import PostModeration from '@/components/post/PostModeration.vue'
 
-defineProps({
-  deployment: String
+const props = defineProps({
+  deployment: {
+    type: String,
+    required: true
+  }
 })
 </script>

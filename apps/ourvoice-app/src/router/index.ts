@@ -4,14 +4,16 @@ import AboutView from '../views/AboutView.vue'
 import PostsView from '../views/PostsView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
 import ModerationListView from '../views/ModerationListView.vue'
-import ModerationView from '../views/ModerationView.vue'
+// import ModerationView from '../views/ModerationView.vue'
 
 import YamlContent from '../../../../config/config.yml'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
-// const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
-// const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
+const ModerationView = () => import('../views/ModerationView.vue')
+
+const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
+const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 
 const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 const authURL = `${authBaseURL}?d=${addDeployment().deployment}`
@@ -63,6 +65,9 @@ const router = createRouter({
       path: '/moderation/post/:id',
       name: 'moderate-post',
       component: ModerationView,
+      props: () => {
+        return addDeployment()
+      }
     },
     {
       path: '/noauth/post',

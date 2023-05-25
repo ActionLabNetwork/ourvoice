@@ -14,6 +14,8 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
         files
         timestamp
         version
+        authorHash
+        reason
       }
     }
   }

@@ -1,3 +1,5 @@
+import { REJECT_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/rejectModerationPostVersion'
+import { APPROVE_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/approveModerationPostVersion'
 import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
@@ -21,6 +23,8 @@ interface PostVersionWithCategoryIds {
   version: number
   timestamp: string
   status: PostStatus
+  authorHash: string
+  reason: string
 }
 
 export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
@@ -237,6 +241,47 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       } catch (error) {
         console.error(error)
       }
+    },
+
+    async approvePostVersion(
+      id: number,
+      moderatorHash: string,
+      reason: string
+    ): Promise<PostVersionWithCategoryIds | null> {
+      try {
+        const { data } = await apolloClient.mutate({
+          mutation: APPROVE_MODERATION_POST_VERSION_MUTATION,
+          variables: { id, moderatorHash, reason }
+        })
+
+        console.log('Post version has been approved', data)
+
+        return data
+      } catch (error) {
+        console.error(error)
+      }
+      return null
+    },
+
+    async rejectPostVersion(
+      id: number,
+      moderatorHash: string,
+      reason: string
+    ): Promise<PostVersionWithCategoryIds | null> {
+      try {
+        console.log({ id, moderatorHash, reason })
+        const { data } = await apolloClient.mutate({
+          mutation: REJECT_MODERATION_POST_VERSION_MUTATION,
+          variables: { id, moderatorHash, reason }
+        })
+
+        console.log('Post version has been rejected', data)
+        return data
+      } catch (error) {
+        console.error(error)
+        console.log(error)
+      }
+      return null
     }
   }
 })

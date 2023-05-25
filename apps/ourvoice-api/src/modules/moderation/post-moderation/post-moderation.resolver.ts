@@ -27,8 +27,39 @@ export class PostModerationResolver {
     return { totalCount, edges, pageInfo };
   }
 
+  @Query()
+  async postVersion(@Args('id') id: number) {
+    return await this.postModerationService.getPostVersionById(id);
+  }
+
   @Mutation()
   async createModerationPost(@Args('data') data: ModerationPostCreateInput) {
     return await this.postModerationService.createPost(data);
+  }
+
+  @Mutation()
+  async approveModerationPostVersion(
+    @Args('id') id: number,
+    @Args('moderatorHash') moderatorHash: string,
+    @Args('reason') reason: string,
+  ) {
+    return await this.postModerationService.approvePostVersion(
+      id,
+      moderatorHash,
+      reason,
+    );
+  }
+
+  @Mutation()
+  async rejectModerationPostVersion(
+    @Args('id') id: number,
+    @Args('moderatorHash') moderatorHash: string,
+    @Args('reason') reason: string,
+  ) {
+    return await this.postModerationService.rejectPostVersion(
+      id,
+      moderatorHash,
+      reason,
+    );
   }
 }

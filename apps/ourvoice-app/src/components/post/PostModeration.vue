@@ -10,7 +10,7 @@
       <div v-if="post && version" class="col-span-3">
         <ModerationPostCard :post="post" :version="version ?? undefined" :preview="true" />
 
-        <div v-if="version !== originalPostVersion">
+        <div v-if="version === latestPostVersion">
           <div class="mt-4 flex flex-row justify-end">
             <div>
               <!-- Buttons for accepting or rejecting the post -->
@@ -50,14 +50,16 @@
 
 <script setup lang="ts">
 import { useModerationPostsStore, type ModerationPost, type PostVersion } from '@/stores/moderation-posts';
+import { useUserStore } from '@/stores/user';
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ModerationPostCard from './ModerationPostCard.vue';
 import ModerationVersionList from './ModerationVersionList.vue'
 import ModifyPost from './ModifyPost.vue';
 
-const latestPostVersion = computed(() => post.value?.versions[post.value?.versions.length - 1])
-const originalPostVersion = computed(() => post.value?.versions[post.value?.versions.length - 1])
+const props = defineProps({ deployment: { type: String, required: true } })
+
+const latestPostVersion = computed(() => post.value?.versions[0])
 
 const route = useRoute();
 const router = useRouter();
@@ -65,6 +67,9 @@ const post = ref<ModerationPost | null>(null);
 const version = ref<PostVersion | null>(latestPostVersion.value ?? null)
 
 const moderationPostsStore = useModerationPostsStore()
+const userStore = useUserStore()
+
+await userStore.setDeployment(props.deployment)
 
 const handleVersionChange = (newVersion: PostVersion) => {
   version.value = newVersion
@@ -80,21 +85,35 @@ watch(post, newPost => {
   post.value = newPost
 })
 
-const acceptPost = () => {
-  // call the API to accept the post
-  // await moderatePost(post.value.id, 'ACCEPTED');
-  // then redirect to the previous page
-  router.back();
+const acceptPost = async () => {
+  if (!userStore.userId) {
+    console.error('User not logged in')
+    return
+  }
+
+  if (!version.value) {
+    console.error('No version selected')
+    return
+  }
+
+  await moderationPostsStore.approvePostVersion(version.value.id, userStore.userId, "")
 };
 
 const modifyPost = () => {
   router.back()
 }
 
-const rejectPost = () => {
-  // call the API to reject the post
-  // await moderatePost(post.value.id, 'REJECTED');
-  // then redirect to the previous page
-  router.back();
+const rejectPost = async () => {
+  if (!userStore.userId) {
+    console.error('User not logged in')
+    return
+  }
+
+  if (!version.value) {
+    console.error('No version selected')
+    return
+  }
+
+  await moderationPostsStore.rejectPostVersion(version.value.id, userStore.userId, "Inappropriate")
 };
 </script>

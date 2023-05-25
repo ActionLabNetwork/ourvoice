@@ -31,6 +31,8 @@ model PostVersion {
   categoryIds Int[]
   files       Json?
   version     Int              @default(0)
+  authorHash  String
+  reason      String?
   status      PostStatus
   latest      Boolean          @default(false)
   timestamp   DateTime         @default(now())
@@ -64,6 +66,8 @@ model CommentVersion {
   id          Int                 @id @default(autoincrement())
   content     String
   version     Int                 @default(0)
+  authorHash  String
+  reason      String?
   status      PostStatus
   latest      Boolean             @default(false)
   timestamp   DateTime            @default(now())

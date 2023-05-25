@@ -38,6 +38,7 @@ export class CategoryUpdateInput {
 }
 
 export class CategoriesFilterInput {
+    ids?: Nullable<Nullable<number>[]>;
     name?: Nullable<string>;
     description?: Nullable<string>;
     weight?: Nullable<number>;
@@ -221,6 +222,8 @@ export abstract class IQuery {
 
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
 
+    abstract postVersion(id: number): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
     abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
@@ -252,6 +255,10 @@ export abstract class IMutation {
     abstract createContactFormEntry(data: ContactFormEntryCreateInput): string | Promise<string>;
 
     abstract createModerationPost(data: ModerationPostCreateInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
+    abstract approveModerationPostVersion(id: number, moderatorHash: string, reason?: Nullable<string>): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+
+    abstract rejectModerationPostVersion(id: number, moderatorHash: string, reason: string): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
 
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
@@ -399,8 +406,10 @@ export class ModerationPostVersion {
     title: string;
     content: string;
     categoryIds: number[];
-    files?: Nullable<string>;
+    files?: Nullable<string[]>;
     version: number;
+    authorHash: string;
+    reason?: Nullable<string>;
     status: ModerationPostStatus;
     latest: boolean;
     timestamp: string;

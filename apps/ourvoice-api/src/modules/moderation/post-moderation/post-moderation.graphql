@@ -4,12 +4,15 @@ type Query {
     filter: ModerationPostsFilterInput
     pagination: ModerationPostPaginationInput
   ): ModerationPostConnection
+  postVersion(id: Int!): ModerationPostVersion
 }
 
 type Mutation {
   createModerationPost(
     data: ModerationPostCreateInput!
   ): ModerationPost
+  approveModerationPostVersion(id: Int!, moderatorHash: String!, reason: String): ModerationPostVersion
+  rejectModerationPostVersion(id: Int!, moderatorHash: String!, reason: String!): ModerationPostVersion
 }
 
 type ModerationPost {
@@ -26,8 +29,10 @@ type ModerationPostVersion {
   title: String!
   content: String!
   categoryIds: [Int!]!
-  files: String
+  files: [String!]
   version: Int!
+  authorHash: String!
+  reason: String
   status: ModerationPostStatus!
   latest: Boolean!
   timestamp: String!
