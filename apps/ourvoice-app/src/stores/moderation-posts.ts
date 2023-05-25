@@ -12,7 +12,7 @@ import { GET_MODERATION_POST_BY_ID_QUERY } from '@/graphql/queries/getModeration
 
 type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
-export interface PostVersion {
+interface PostVersionWithCategoryIds {
   id: number
   title: string
   content: string
@@ -23,7 +23,7 @@ export interface PostVersion {
   status: PostStatus
 }
 
-export interface PostVersionWithCategories extends Omit<PostVersion, 'categories'> {
+export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
   categories: Category[]
 }
 
@@ -32,11 +32,11 @@ export interface ModerationPostModel {
   authorHash: string
   requiredModerations: number
   status: PostStatus
-  versions: PostVersion[]
+  versions: PostVersionWithCategoryIds[]
 }
 
 export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
-  versions: PostVersionWithCategories[]
+  versions: PostVersion[]
 }
 
 export interface Category {
@@ -90,9 +90,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         this.totalCount = data.moderationPosts.totalCount
         this.pageInfo = data.moderationPosts.pageInfo
 
-        console.log('Posts')
-        console.log(this.posts)
-
         // Fetch category names from Main DB
         const categoryIds = Array.from(
           this.posts.reduce((acc, post: ModerationPost) => {
@@ -104,7 +101,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
             return acc
           }, new Set())
         )
-        console.log({ categoryIds })
 
         const { data: categoriesData } = await apolloClient.query({
           query: GET_CATEGORIES_QUERY,
@@ -121,9 +117,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         }, new Map<number, Category>())
 
         this.categories = categoriesMap
-
-        console.log('This.categories')
-        console.log(this.categories)
 
         // Replace category Ids in each post with categories
         this.posts = this.posts.map((post) => {
@@ -155,7 +148,49 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           variables: { moderationPostId: id }
         })
 
-        return data.moderationPost
+        const moderationPost = data.moderationPost as ModerationPostModel
+
+        // Fetch category names from Main DB
+        const categoryIds = new Set<number>()
+        moderationPost.versions
+          .flatMap((version: PostVersionWithCategoryIds) => version.categoryIds)
+          .forEach((id: number) => {
+            categoryIds.add(id)
+          })
+
+        const { data: categoriesData } = await apolloClient.query({
+          query: GET_CATEGORIES_QUERY,
+          variables: { filter: { ids: Array.from(categoryIds) } }
+        })
+
+        const categories = categoriesData.categories.edges.map(
+          (edge: Edge<Category>) => edge.node
+        ) as Category[]
+
+        const categoriesMap = categories.reduce((acc, category) => {
+          acc.set(category.id, category)
+          return acc
+        }, new Map<number, Category>())
+
+        // Replace category Ids in each post with categories
+        const versionsWithCategoriesIncluded = moderationPost.versions.map((version) => {
+          const categoryObjs: Category[] = []
+
+          version.categoryIds.forEach((categoryId: number) => {
+            const category = categoriesMap.get(categoryId)
+            if (category) {
+              categoryObjs.push(category)
+            }
+
+            return { ...version, categories: categoryObjs }
+          })
+
+          return { ...version, categories: categoryObjs }
+        })
+
+        const retVal = { ...moderationPost, versions: versionsWithCategoriesIncluded }
+
+        return retVal
       } catch (error) {
         console.error(`Failed to load post with ID ${id}. Please try again.`, error)
         return null

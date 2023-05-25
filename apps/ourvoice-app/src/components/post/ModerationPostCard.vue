@@ -1,5 +1,5 @@
 <template>
-  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-lg p-6 mb-6 hover:shadow-xl transition-all duration-200">
+  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-lg p-6 hover:shadow-xl transition-all duration-200">
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
       {{ version.title }}
     </h3>
@@ -9,6 +9,9 @@
         {{ name }}
       </div>
     </div>
+    <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
+      {{ `${version.files.length}` }} attachments
+    </p>
     <p class="mt-6 text-gray-500">Posted by <span class="font-semibold">@{{ post.authorHash }}</span></p>
     <p class="mt-2 text-gray-400 text-xs mb-2">
       {{ `${formattedDate(version)}` }}
@@ -26,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import type { ModerationPost, PostVersionWithCategories } from '@/stores/moderation-posts';
+import { watch } from 'vue';
+import type { ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 
@@ -37,7 +40,7 @@ const props = defineProps({
     required: true
   },
   version: {
-    type: Object as PropType<PostVersionWithCategories>,
+    type: Object as PropType<PostVersion>,
     defaultValue: null
   },
   preview: {
@@ -46,7 +49,7 @@ const props = defineProps({
   }
 });
 
-const formattedDate = (version: PostVersionWithCategories) =>
+const formattedDate = (version: PostVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
 
 watch(props, newVal => {
