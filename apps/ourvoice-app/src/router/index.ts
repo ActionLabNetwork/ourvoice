@@ -4,13 +4,12 @@ import AboutView from '../views/AboutView.vue'
 import PostsView from '../views/PostsView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
 import ModerationListView from '../views/ModerationListView.vue'
-// import ModerationView from '../views/ModerationView.vue'
+import ModerationView from '../views/ModerationView.vue'
 
 import YamlContent from '../../../../config/config.yml'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
-
-const ModerationView = () => import('../views/ModerationView.vue')
+import { useDeploymentStore } from '@/stores/deployment'
 
 const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
 const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
@@ -136,6 +135,10 @@ router.beforeEach(async (to, from, next) => {
   const isDev = import.meta.env.DEV
   const host = window.location.host
   const deployment = getDeployment(host, deploymentDomain, deployments)
+
+  // Save deployment in Pinia store
+  const deploymentStore = useDeploymentStore()
+  deploymentStore.deployment = deployment || ''
 
   if (!isDev && !deployment) {
     redirectTo(portalURL)

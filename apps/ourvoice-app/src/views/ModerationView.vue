@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import Header from '@/components/common/Header.vue'
-import PostModeration from '@/components/post/PostModeration.vue'
+import PostModeration from '@/components/post/moderation/PostModeration.vue'
 
 const props = defineProps({
   deployment: {

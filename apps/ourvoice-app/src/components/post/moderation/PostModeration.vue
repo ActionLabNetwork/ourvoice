@@ -17,12 +17,12 @@
           </div>
 
           <!-- Moderation Controls -->
-          <div v-if="!showModerationControls"
+          <div v-if="isLatestVersion && hasNotBeenModerated"
             :class="{ 'col-span-2': showModifyForm, 'col-span-4': !showModifyForm }"
           >
             <ModerationControls @moderation-submit="handleModerationControlsSubmit" @moderation-action-change="handleModerationControlsActionChange" />
           </div>
-          <div v-else class="col-span-4">
+          <div v-if="isLatestVersion && !hasNotBeenModerated" class="col-span-4">
             <!-- Renew button -->
             <div class="mt-4 flex justify-end">
               <div>
@@ -51,35 +51,57 @@ import { useModerationPostsStore, type ModerationPost, type PostVersion, type Mo
 import { useUserStore } from '@/stores/user';
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import ModerationPostCard from './ModerationPostCard.vue';
-import ModerationVersionList from './ModerationVersionList.vue'
-import ModifyPost, { type FormFields } from './ModifyPost.vue';
-import ModerationControls from './ModerationControls.vue'
+import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
+import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
+import ModifyPost, { type FormFields } from '@/components/post/moderation/ModifyPost.vue';
+import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
+import { storeToRefs } from 'pinia';
 
+// Define Props
 const props = defineProps({ deployment: { type: String, required: true } })
 
-const latestPostVersion = computed(() => post.value?.versions[0])
-
-const route = useRoute();
-const router = useRouter();
-const post = ref<ModerationPost | null>(null);
-const version = ref<PostVersion | null>(latestPostVersion.value ?? null)
-const modifyValues = ref<FormFields | null>(null)
-
-const moderationPostsStore = useModerationPostsStore()
+// Set deployment and fetch user session
 const userStore = useUserStore()
+await userStore.verifyUserSession()
 
-await userStore.setDeployment(props.deployment)
+// Init post moderation store
+const moderationPostsStore = useModerationPostsStore()
 
+// Post and Version refs
+const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
+
+// Route handling
+const route = useRoute();
+
+onMounted(async () => {
+  // Fetch and set Post and Version, defaulting to latest version
+  moderationPostsStore.$reset()
+  await moderationPostsStore.fetchPostById(+route.params.id)
+
+  // Check if user has moderated this version
+  await moderationPostsStore.checkIfUserHasModerated(userStore.userId, props.deployment)
+});
+
+const modifyValues = ref<FormFields | null>(null)
+const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
+const hasNotBeenModerated = computed(() => !moderationPostsStore.userHasModeratedPost)
+
+// Methods
 const handleVersionChange = async (newVersion: PostVersion) => {
-  version.value = newVersion
-  showModerationControls.value = newVersion === latestPostVersion.value && !(await hasModerated(userStore.userId))
+  moderationPostsStore.versionInModeration = newVersion
+
+  // Check if user has moderated this version
+  await moderationPostsStore.checkIfUserHasModerated(userStore.userId, props.deployment)
+
+  console.log(isLatestVersion.value, hasNotBeenModerated.value)
 }
 
 const hasModerated = async (userId: string): Promise<boolean> => {
-  if (!version.value) return false
+  const version = moderationPostsStore.versionInModeration
 
-  const versionModerators = Array.from(version.value.moderations.reduce((acc, moderation) => {
+  if (!version) return false
+
+  const versionModerators = Array.from(version.moderations.reduce((acc, moderation) => {
     if (moderation) acc.add(moderation.moderatorHash)
     return acc
   }, new Set<string>()))
@@ -92,80 +114,78 @@ const hasModerated = async (userId: string): Promise<boolean> => {
 }
 
 const findSelfModeration = async () => {
-  if (!version.value) return null
+  const version = moderationPostsStore.versionInModeration
 
-  const promises = version.value.moderations.map((moderation) => {
+  if (!version) return null
+
+  const promises = version.moderations.map((moderation) => {
     return authService.verifyHash(userStore.userId, props.deployment, moderation.moderatorHash)
   })
 
   const moderators = await Promise.all(promises)
-  return version.value.moderations[moderators.indexOf(true)]
+  return version.moderations[moderators.indexOf(true)]
 }
 
 const decisionIcon = { icon: 'fa-check', color: '#ffffff' }
 
+// Component show flags
 const showModerationControls = ref<boolean>(true)
 const showModifyForm = ref<boolean>(false)
 
-showModerationControls.value = (latestPostVersion.value ?? false) && !(await hasModerated(userStore.userId))
-
-onMounted(async () => {
-  post.value = await moderationPostsStore.fetchPostById(+route.params.id)
-  version.value = post.value?.versions[0] ?? null
-  version.value = post.value?.versions[0] ?? null
-
-  console.log(await findSelfModeration())
-});
-
-watch(post, newPost => {
-  post.value = newPost
-})
+showModerationControls.value = (moderationPostsStore.latestPostVersion ?? false) && !(await hasModerated(userStore.userId))
 
 const acceptPost = async (reason: string) => {
+  const version = moderationPostsStore.versionInModeration
+
   if (!userStore.userId) {
     console.error('User not logged in')
     return
   }
 
-  if (!version.value) {
+  if (!version) {
     console.error('No version selected')
     return
   }
 
-  await moderationPostsStore.approvePostVersion(version.value.id, userStore.sessionHash, reason)
+  await moderationPostsStore.approvePostVersion(version.id, userStore.sessionHash, reason)
 };
 
 const modifyPost = async (values: FormFields, reason: string) => {
+  const post = moderationPostsStore.postInModeration
+  const version = moderationPostsStore.versionInModeration
+
   if (!userStore.userId) {
     console.error('User not logged in')
     return
   }
 
-  if (!post.value) {
+  if (!post) {
     console.error('No post selected')
     return
   }
 
-  if (!version.value) {
+  if (!version) {
     console.error('No version selected')
     return
   }
 
-  await moderationPostsStore.modifyModerationPost(post.value.id, userStore.sessionHash, reason, values)
+  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, reason, values)
 }
 
 const rejectPost = async (reason: string) => {
+  const version = moderationPostsStore.versionInModeration
+
   if (!userStore.userId) {
     console.error('User not logged in')
     return
   }
 
-  if (!version.value) {
+  if (!version) {
     console.error('No version selected')
     return
   }
 
-  await moderationPostsStore.rejectPostVersion(version.value.id, userStore.sessionHash, reason)
+  await moderationPostsStore.rejectPostVersion(version.id, userStore.sessionHash, reason)
 };
 
 const handleModerationControlsSubmit = ({ action, reason }: { action: 'Approve' | 'Modify' | 'Reject', reason: string }) => {

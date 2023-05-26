@@ -1,3 +1,4 @@
+import { useDeploymentStore } from './deployment'
 import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
@@ -103,7 +104,7 @@ export const usePostsStore = defineStore('posts', {
       title,
       content,
       categoryIds,
-      files,
+      files
     }: {
       title: string
       content: string
@@ -111,6 +112,7 @@ export const usePostsStore = defineStore('posts', {
       files: string[]
     }) {
       // Check for valid deployment and user session
+      const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
       // const { mutate: createPostMutate } = useMutation(CREATE_POST_MUTATION)
@@ -122,7 +124,7 @@ export const usePostsStore = defineStore('posts', {
         throw new Error('User session is invalid')
       }
 
-      const authorHash = await authService.hashInput(userStore.userId, userStore.deployment)
+      const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
       const requiredModerations = 1
 
       // await createPostMutate({

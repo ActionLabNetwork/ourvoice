@@ -44,7 +44,6 @@ import type { PostVersion } from '@/stores/moderation-posts'
 import { computed, onMounted, ref, watch, type PropType } from 'vue'
 
 import { formatTimestampToReadableDate } from '@/utils'
-import type { Post } from '@/stores/posts'
 
 
 const props = defineProps({

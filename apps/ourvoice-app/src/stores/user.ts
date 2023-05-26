@@ -1,15 +1,14 @@
 import authService from '@/services/auth-service'
 import { defineStore } from 'pinia'
+import { useDeploymentStore } from '@/stores/deployment'
 
 export interface UserState {
-  deployment: string
   userId: string
   sessionHash: string
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    deployment: '',
     userId: '',
     sessionHash: ''
   }),
@@ -20,8 +19,9 @@ export const useUserStore = defineStore('user', {
     }
   },
   actions: {
-    async setDeployment(deployment: string) {
-      this.deployment = deployment
+    async verifyUserSession() {
+      const deploymentStore = useDeploymentStore()
+      const deployment = deploymentStore.deployment
 
       const userId = (await authService.getSessionInfo()).data.userId
       this.userId = userId

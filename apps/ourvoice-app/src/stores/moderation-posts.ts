@@ -1,3 +1,4 @@
+import { useDeploymentStore } from './deployment'
 import { REJECT_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/rejectModerationPostVersion'
 import { APPROVE_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/approveModerationPostVersion'
 import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
@@ -67,12 +68,15 @@ export interface pageInfo {
 
 export interface ModerationPostsState {
   posts: ModerationPost[]
+  postInModeration: ModerationPost | undefined
+  versionInModeration: PostVersion | undefined
   categories: Map<number, Category>
   totalCount: number
   pageInfo: pageInfo | undefined
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
+  userHasModeratedPost: boolean
 }
 
 interface Edge<T> {
@@ -85,14 +89,19 @@ provideApolloClient(apolloClient)
 export const useModerationPostsStore = defineStore('moderation-posts', {
   state: (): ModerationPostsState => ({
     posts: [],
+    postInModeration: undefined,
+    versionInModeration: undefined,
     categories: new Map(),
     totalCount: 0,
     pageInfo: undefined,
     loading: false,
     error: undefined,
-    errorMessage: undefined
+    errorMessage: undefined,
+    userHasModeratedPost: false
   }),
-
+  getters: {
+    latestPostVersion: (state) => state.versionInModeration === state.postInModeration?.versions[0]
+  },
   actions: {
     async fetchPosts() {
       try {
@@ -156,7 +165,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         this.loading = false
       }
     },
-    async fetchPostById(id: number): Promise<ModerationPost | null> {
+    async fetchPostById(id: number) {
       try {
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POST_BY_ID_QUERY,
@@ -203,12 +212,13 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           return { ...version, categories: categoryObjs }
         })
 
-        const retVal = { ...moderationPost, versions: versionsWithCategoriesIncluded }
+        const post = { ...moderationPost, versions: versionsWithCategoriesIncluded }
 
-        return retVal
+        // Set states to be used for moderation
+        this.postInModeration = post
+        this.versionInModeration = post.versions[0]
       } catch (error) {
         console.error(`Failed to load post with ID ${id}. Please try again.`, error)
-        return null
       }
     },
 
@@ -224,15 +234,16 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       files: string[]
     }) {
       // Check for valid deployment and user session
+      const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
       // Check if we can access the session and generate a user hash for storing in the db
-      if (!userStore.isLoggedIn) {
+      if (!(await userStore.isLoggedIn)) {
         // TODO: Set up a proper error handling module
         throw new Error('User session is invalid')
       }
 
-      const authorHash = await authService.hashInput(userStore.userId, userStore.deployment)
+      const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
       const requiredModerations = 1
 
       try {
@@ -254,6 +265,26 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       }
     },
 
+    // Moderation actions
+    async checkIfUserHasModerated(userId: string, deployment: string) {
+      const version = this.versionInModeration
+
+      if (!version) return false
+
+      const versionModerators = Array.from(
+        version.moderations.reduce((acc, moderation) => {
+          if (moderation) acc.add(moderation.moderatorHash)
+          return acc
+        }, new Set<string>())
+      )
+
+      const promises = versionModerators.map((moderator) =>
+        authService.verifyHash(userId, deployment, moderator)
+      )
+
+      const hasModeratedList = await Promise.all(promises)
+      this.userHasModeratedPost = hasModeratedList.includes(true)
+    },
     async approvePostVersion(
       id: number,
       moderatorHash: string,
@@ -266,7 +297,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         })
 
         console.log('Post version has been approved', data)
-
+        this.userHasModeratedPost = true
         return data
       } catch (error) {
         console.error(error)
@@ -287,6 +318,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         })
 
         console.log('Post version has been rejected', data)
+        this.userHasModeratedPost = true
         return data
       } catch (error) {
         console.error(error)
@@ -298,7 +330,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       postId: number,
       moderatorHash: string,
       reason: string,
-      modifiedData: { title: string; content: string; categoryIds: number[]; files: string[] }
+      modifiedData: { title?: string; content?: string; categoryIds?: number[]; files?: string[] }
     ) {
       try {
         const { data } = await apolloClient.mutate({

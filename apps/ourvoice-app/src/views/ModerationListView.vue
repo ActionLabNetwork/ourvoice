@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import Header from '@/components/common/Header.vue'
-import PostModerationList from '@/components/post/PostModerationList.vue'
+import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 
 import { computed, onMounted } from 'vue';
