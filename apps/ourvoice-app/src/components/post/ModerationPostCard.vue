@@ -1,5 +1,11 @@
 <template>
-  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-lg p-6 hover:shadow-xl transition-all duration-200">
+  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative">
+    <div class="absolute right-10" v-if="props.decisionIcon">
+      Your decision:
+      <span class="pl-2">
+        <font-awesome-icon size="2xl" :style="`color: ${props.decisionIcon?.color}`" :icon="`['fas', ${props.decisionIcon?.icon}]`" />
+      </span>
+    </div>
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
       {{ version.title }}
     </h3>
@@ -34,6 +40,11 @@ import type { ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 
+interface DecisionIcon {
+  icon: string;
+  color: string;
+}
+
 const props = defineProps({
   post: {
     type: Object as PropType<ModerationPost>,
@@ -46,6 +57,10 @@ const props = defineProps({
   preview: {
     type: Boolean,
     defaultValue: false
+  },
+  decisionIcon: {
+    type: Object as PropType<DecisionIcon>,
+    required: false
   }
 });
 

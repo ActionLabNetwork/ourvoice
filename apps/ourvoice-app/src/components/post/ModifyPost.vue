@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen">
-    <div class="container mx-auto p-4">
+  <div>
+    <div id="modify-form">
       <div
-        class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto"
+        class="bg-white p-8 shadow-lg"
       >
         <!-- Form for creating new post -->
-        <form class="space-y-6">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-800">Modify Post</h2>
+        <form @submit="onSubmit" class="space-y-6">
+          <h2 class="text-xl font-semibold mb-6 text-gray-800">Modify Post</h2>
 
           <!-- Title input field -->
           <FormInput id="title" labelText="Title" name="title" labelSpan="required" :error-message="titleField.errorMessage.value" :meta="titleField.meta">
@@ -59,7 +59,7 @@
               class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
               data-cy="create-post-submit-button"
             >
-              Modify Post
+              Check Modified Post
             </button>
           </div>
           <div v-else>
@@ -84,11 +84,20 @@ import { useForm, useField } from 'vee-validate';
 import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
 import { useUserStore } from '@/stores/user';
 
+export interface FormFields {
+  title?: string;
+  content?: string;
+  categories?: string[];
+  attachments?: FileList | null;
+}
+
 const props = defineProps({
   // deployment: { type: String, required: true, default: '' },
   title: String,
   content: String
 })
+
+const emit = defineEmits(['modify-form-submit'])
 
 interface PresignedUrlResponse {
   key: string;
@@ -107,12 +116,12 @@ const createPostValidationSchema = {
   content(value: string) {
     return validateContent(value)
   },
-  categories(value: string[]) {
-    return validateCategories(value)
-  },
-  attachments(value: FileList | null) {
-    return validateAttachments(value)
-  }
+  // categories(value: string[]) {
+  //   return validateCategories(value)
+  // },
+  // attachments(value: FileList | null) {
+  //   return validateAttachments(value)
+  // }
 }
 
 // Init user store and set deployment
@@ -182,7 +191,9 @@ const generateUniqueKey = (userIdentifier: string, file: File, index: number) =>
 //   }
 // }
 
-const requiredFields = [titleField, contentField, categoriesField]
+// const requiredFields = [titleField, contentField, categoriesField]
+const requiredFields = [titleField, contentField]
+
 
 const allRequiredFieldsValidated = computed(() => {
   return requiredFields.every(field => field.meta.validated);
@@ -197,7 +208,14 @@ const isValidForm = computed(() => {
   return allRequiredFieldsValidated.value && formHasNoErrors.value
 })
 
+
+
 // Handle Form submission
+const onSubmit = handleSubmit(async (values) => {
+  console.log("emitting modifu form submit")
+  // Emit values to parent component
+  emit('modify-form-submit', values)
+})
 // const onSubmit = handleSubmit(async (values) => {
 //   // Upload files to S3 using the presigned URLs
 //   if (values.attachments && presignedUrls.value.length > 0) {

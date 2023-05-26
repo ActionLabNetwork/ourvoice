@@ -105,4 +105,22 @@ export class PostModerationService {
       reason,
     );
   }
+
+  async modifyModerationPost(
+    postId: number,
+    moderatorHash: string,
+    reason: string,
+    data: any,
+  ) {
+    // TODO: Validate data using class-validator
+    // TODO: Validate post id
+    // TODO: Validate moderator hash to see if they have permission/role
+    console.log('DATAAAA', data);
+    return await this.moderationPostRepository.modifyModerationPost(
+      postId,
+      moderatorHash,
+      reason,
+      data,
+    );
+  }
 }

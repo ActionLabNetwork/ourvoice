@@ -11,6 +11,7 @@ import { provideApolloClient } from '@vue/apollo-composable'
 import authService from '@/services/auth-service'
 import type { ApolloError } from '@apollo/client/errors'
 import { GET_MODERATION_POST_BY_ID_QUERY } from '@/graphql/queries/getModerationPost'
+import { MODIFY_MODERATION_POST_MUTATION } from '@/graphql/mutations/modifyModerationPost'
 
 type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -25,6 +26,8 @@ interface PostVersionWithCategoryIds {
   status: PostStatus
   authorHash: string
   reason: string
+  latest: boolean
+  moderations: Moderation[]
 }
 
 export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
@@ -37,6 +40,14 @@ export interface ModerationPostModel {
   requiredModerations: number
   status: PostStatus
   versions: PostVersionWithCategoryIds[]
+}
+
+export interface Moderation {
+  id: number
+  decision: 'APPROVE' | 'REJECT'
+  moderatorHash: string
+  reason: string
+  timestamp: string
 }
 
 export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
@@ -279,7 +290,25 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         return data
       } catch (error) {
         console.error(error)
-        console.log(error)
+      }
+      return null
+    },
+
+    async modifyModerationPost(
+      postId: number,
+      moderatorHash: string,
+      reason: string,
+      modifiedData: { title: string; content: string; categoryIds: number[]; files: string[] }
+    ) {
+      try {
+        const { data } = await apolloClient.mutate({
+          mutation: MODIFY_MODERATION_POST_MUTATION,
+          variables: { postId, moderatorHash, reason, data: modifiedData }
+        })
+        console.log('Moderation post has been modified', data)
+        return data
+      } catch (error) {
+        console.error(error)
       }
       return null
     }

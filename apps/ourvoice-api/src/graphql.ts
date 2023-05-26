@@ -131,6 +131,13 @@ export class ModerationPostPaginationInput {
     limit?: Nullable<number>;
 }
 
+export class ModerationPostModifyInput {
+    title?: Nullable<string>;
+    content?: Nullable<string>;
+    categoryIds?: Nullable<number[]>;
+    files?: Nullable<Nullable<string>[]>;
+}
+
 export class PostCreateInput {
     title: string;
     content: string;
@@ -259,6 +266,8 @@ export abstract class IMutation {
     abstract approveModerationPostVersion(id: number, moderatorHash: string, reason?: Nullable<string>): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
 
     abstract rejectModerationPostVersion(id: number, moderatorHash: string, reason: string): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+
+    abstract modifyModerationPost(postId: number, moderatorHash: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
@@ -414,7 +423,7 @@ export class ModerationPostVersion {
     latest: boolean;
     timestamp: string;
     post: Post;
-    moderations: PostModeration[];
+    moderations?: Nullable<PostModeration[]>;
 }
 
 export class PostModeration {

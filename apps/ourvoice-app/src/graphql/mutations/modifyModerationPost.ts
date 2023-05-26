@@ -1,8 +1,18 @@
 import gql from 'graphql-tag'
 
-export const GET_MODERATION_POST_BY_ID_QUERY = gql`
-  query GetModerationPostsById($moderationPostId: Int!) {
-    moderationPost(id: $moderationPostId) {
+export const MODIFY_MODERATION_POST_MUTATION = gql`
+  mutation ModifyModerationPostVersionMutation(
+    $postId: Int!
+    $moderatorHash: String!
+    $reason: String!
+    $data: ModerationPostModifyInput!
+  ) {
+    modifyModerationPost(
+      postId: $postId
+      moderatorHash: $moderatorHash
+      reason: $reason
+      data: $data
+    ) {
       id
       authorHash
       requiredModerations

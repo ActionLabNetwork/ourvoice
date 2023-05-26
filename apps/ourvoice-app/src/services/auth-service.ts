@@ -16,9 +16,9 @@ export default {
 
     return hash
   },
-  async verifyHash(input: string, hash: string) {
+  async verifyHash(input: string, deployment: string, hash: string) {
     try {
-      return await bcrypt.compare(input + GLOBAL_PEPPER, hash)
+      return await bcrypt.compare(input + deployment + GLOBAL_PEPPER, hash)
     } catch (err) {
       console.error(err)
       throw new Error('Error occurred during hash verification.')

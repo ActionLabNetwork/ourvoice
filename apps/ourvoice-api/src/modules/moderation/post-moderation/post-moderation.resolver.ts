@@ -3,6 +3,7 @@ import {
   ModerationPostsFilterInput,
   ModerationPostPaginationInput,
   ModerationPostCreateInput,
+  ModerationPostModifyInput,
 } from 'src/graphql';
 import { PostModerationService } from './post-moderation.service';
 
@@ -60,6 +61,21 @@ export class PostModerationResolver {
       id,
       moderatorHash,
       reason,
+    );
+  }
+
+  @Mutation()
+  async modifyModerationPost(
+    @Args('postId') id: number,
+    @Args('moderatorHash') moderatorHash: string,
+    @Args('reason') reason: string,
+    @Args('data') data: ModerationPostModifyInput,
+  ) {
+    return await this.postModerationService.modifyModerationPost(
+      id,
+      moderatorHash,
+      reason,
+      data,
     );
   }
 }

@@ -18,6 +18,7 @@ export class PostModerationRepository {
       include: {
         versions: {
           orderBy: { version: 'desc' },
+          include: { moderations: true },
         },
       },
     });
@@ -117,21 +118,52 @@ export class PostModerationRepository {
     return postVersion;
   }
 
-  // async modifyPostVersion(postId: number, title: string, content: string, categoryIds: number[], files: string[], moderatorHash: string, reason: string) {
-  //   // Create a new PostVersion
-  //   const newPostVersion = await this.prisma.postVersion.create({
-  //     data: {
-  //       postId,
-  //       decision: 'ACCEPTED',
-  //       reason,
-  //       postVersionId: id,
-  //     },
-  //   });
+  async modifyModerationPost(
+    postId: number,
+    moderatorHash: string,
+    reason: string,
+    data: any,
+  ) {
+    // TODO: Turn this all into a transaction
+    // Fetch the current post
+    const moderationPost = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: { versions: { orderBy: { version: 'desc' } } },
+    });
 
-  //   const postVersion = await this.prisma.postVersion.findFirst({
-  //     where: { id: newPostModeration.postVersionId },
-  //   });
+    // Create a new PostVersion
+    const postVersion: Prisma.PostVersionCreateInput = {
+      title: data.title ?? moderationPost.versions[0].title,
+      content: data.content ?? moderationPost.versions[0].content,
+      categoryIds: data.categoryIds ?? moderationPost.versions[0].categoryIds,
+      authorHash: moderatorHash,
+      status: 'PENDING',
+      post: { connect: { id: postId } },
+      reason,
+      version: moderationPost.versions[0].version + 1,
+      latest: true,
+    };
 
-  //   return postVersion;
-  // }
+    // Update latest field of latest post version to false
+    await this.prisma.postVersion.update({
+      where: { id: moderationPost.versions[0].id },
+      data: { latest: false },
+    });
+
+    await this.prisma.postVersion.create({
+      data: postVersion,
+    });
+
+    const modifiedModerationPost = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: { moderations: true },
+        },
+      },
+    });
+
+    return modifiedModerationPost;
+  }
 }

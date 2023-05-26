@@ -19,6 +19,7 @@ export const GET_MODERATION_POSTS_QUERY = gql`
             timestamp
             version
             status
+            latest
           }
         }
       }

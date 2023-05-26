@@ -13,6 +13,7 @@ type Mutation {
   ): ModerationPost
   approveModerationPostVersion(id: Int!, moderatorHash: String!, reason: String): ModerationPostVersion
   rejectModerationPostVersion(id: Int!, moderatorHash: String!, reason: String!): ModerationPostVersion
+  modifyModerationPost(postId: Int!, moderatorHash: String!, reason: String!, data: ModerationPostModifyInput!): ModerationPost
 }
 
 type ModerationPost {
@@ -37,7 +38,7 @@ type ModerationPostVersion {
   latest: Boolean!
   timestamp: String!
   post: Post!
-  moderations: [PostModeration!]!
+  moderations: [PostModeration!]
 }
 
 type PostModeration {
@@ -93,4 +94,11 @@ type ModerationPostPageInfo {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean
+}
+
+input ModerationPostModifyInput {
+  title: String
+  content: String
+  categoryIds: [Int!]
+  files: [String]
 }
