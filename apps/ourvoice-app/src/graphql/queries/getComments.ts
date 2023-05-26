@@ -39,8 +39,20 @@ export const GET_COMMENTS_BY_POST_ID_QUERY = gql`
           content
           createdAt
           id
+          author {
+            id
+            nickname
+          }
+          post {
+            id
+            title
+          }
           parent {
             id
+            author {
+              id
+              nickname
+            }
           }
         }
       }

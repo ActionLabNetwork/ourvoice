@@ -94,7 +94,11 @@ export class CommentRepository {
       where,
       include: {
         post: true,
-        parent: true,
+        parent: {
+          include: {
+            author: true,
+          },
+        },
         children: true,
       },
       skip: pagination?.cursor ? 1 : undefined,
@@ -102,6 +106,7 @@ export class CommentRepository {
         ? { id: cursorToNumber(pagination.cursor.toString()) }
         : undefined,
       take: pagination?.limit ?? 10,
+      orderBy: { createdAt: 'desc' },
     });
 
     return { totalCount, comments };

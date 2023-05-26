@@ -5,8 +5,8 @@
         :src="`https://api.multiavatar.com/${comment.author.nickname}.png`" :title="comment.author.nickname" />
     </div>
     <div class="flex-1">
-      <div class="bg-slate-200 dark:bg-ourvoice-blue rounded-lg drop-shadow-lg pl-4 pr-2 py-2 leading-relaxed">
-        <!-- <strong>{{ comment.author.nickname }}</strong> -->
+      <strong>{{ comment.author.nickname }} reply to @{{ comment?.parent?.author?.nickname??'Original Post'}}</strong>
+      <div class="bg-white dark:bg-ourvoice-blue rounded-lg drop-shadow-md pl-4 pr-2 py-2 leading-relaxed">
         <div class="text-sm md:text-md py-2">
           <div v-if="commentEditing">
             <form @submit.prevent="handleUpdate" @reset="abortUpdate">
@@ -33,7 +33,7 @@
             </form>
           </div>
           <div v-else>
-            {{ commentContent }}
+            {{ commentContent }} 
           </div>
         </div>
 
@@ -95,6 +95,8 @@ const commentStore = useCommentsStore()
 const showReply = ref(false)
 const commentEditing = ref(false)
 const commentContent = ref(props.comment.content)
+
+
 const createComment = (payload: string) => {
   commentStore.createComment({
     authorId: 3,
@@ -124,8 +126,6 @@ const abortUpdate = () => {
 }
 
 const deleteComment = async () => {
-  console.log('delete comment', props.comment.id)
-  await commentStore.deleteComment(props.comment.id)
   emits('delete', props.comment.id)
 }
 </script>

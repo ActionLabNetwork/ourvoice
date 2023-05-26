@@ -99,7 +99,7 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresModerator: true }
     },
     {
-      path: '/noauth/post',
+      path: '/post',
       name: 'post',
       component: PostsView,
       meta: { requiresAuth: false }

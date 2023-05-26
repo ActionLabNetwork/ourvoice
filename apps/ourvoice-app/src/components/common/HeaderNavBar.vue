@@ -29,7 +29,7 @@
             >
               <!-- User avatar -->
               <img
-                src="https://api.multiavatar.com/Binx Bond.png"
+                src="https://api.multiavatar.com/user3.png"
                 class="rounded-full"
                 style="height: 25px; width: 25px"
                 alt=""

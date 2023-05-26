@@ -1,37 +1,32 @@
 <template>
-    <div class="h-full w-full overflow-y-auto break-all overflow-x-hidden pt-12 relative">
-        <DynamicScroller :items="postsList" :min-item-size="54" class="h-full">
-            <template #before>
-                <div class="flex border-b-2 py-2 lg:hidden">
-                    <h1 class="my-4 text-3xl font-semibold text-ourvoice-blue dark:text-ourvoice-white">
-                        Posts
-                        <font-awesome-icon icon="fa-solid fa-bullhorn" class="text-ourvoice-purple" />
-                    </h1>
-                    <div class="ml-auto mt-auto mr-2 text-ourvoice-grey">
-                        <font-awesome-icon icon="fa-solid fa-arrow-up-wide-short" size="lg"
-                            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
-                        <font-awesome-icon icon="fa-solid fa-filter" size="lg"
-                            class="p-1 hover:text-ourvoice-purple hover:cursor-pointer" />
-                    </div>
-                </div>
-            </template>
-            <template v-slot="{ item, index, active }">
-                <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[
-                    item.content,
-                ]" :data-index="index">
-                    <div class="flex border-b py-10">
-                        <PostCard :post="item" />
-                    </div>
-                </DynamicScrollerItem>
-            </template>
-            <template #after>
-                <button class="block mx-auto text-ourvoice-gray text-lg my-5" @click="fetchMorePosts">
-                    {{ hasNextPage ? 'Load More' : 'You have reached the end' }}
-                    <font-awesome-icon v-if="loading" icon="fa-solid fa-spinner" spin />
+    <!-- <div class="h-full w-full overflow-y-hidden break-all overflow-x-hidden relative"> -->
+    <DynamicScroller :items="postsList" :min-item-size="54" class="h-full no-scrollbar">
+        <template #before>
+            <div class="pt-5 flex border-b dark:text-white">
+                <h1 class="px-2 text-4xl flex-1">Post</h1>
+                <button class="px-2">
+                    <font-awesome-icon icon="fa-solid fa-arrow-up-wide-short" size="xl" />
                 </button>
-            </template>
-        </DynamicScroller>
-    </div>
+                <button class="px-2">
+                    <font-awesome-icon icon="fa-solid fa-filter" size="xl" />
+                </button>
+            </div>
+        </template>
+        <template v-slot="{ item, index, active }">
+            <DynamicScrollerItem :item="item" :active="active" :size-dependencies="[
+                item.content,
+            ]" :data-index="index">
+                <PostCard :post="item" />
+            </DynamicScrollerItem>
+        </template>
+        <template #after>
+            <button class="block mx-auto text-ourvoice-gray text-lg my-5" @click="fetchMorePosts">
+                {{ hasNextPage ? 'Load More' : 'You have reached the end' }}
+                <font-awesome-icon v-if="loading" icon="fa-solid fa-spinner" spin />
+            </button>
+        </template>
+    </DynamicScroller>
+    <!-- </div> -->
 </template>
 
 <script lang="ts" setup>
@@ -76,6 +71,9 @@ query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
         files
         id
         content
+        comments {
+          id
+        }
       }
     }
     pageInfo {
@@ -146,10 +144,8 @@ watch(selectedCategories, (newValue, oldValue) => {
     console.log("selectedCategories changed")
     console.log("old categoryIds", oldValue)
     console.log("new categoryIds", newValue)
-    // if(newValue?.length && oldValue?.length) {
     console.log("refetch")
     refetchPosts()
-    // }
 })
 
 </script>
