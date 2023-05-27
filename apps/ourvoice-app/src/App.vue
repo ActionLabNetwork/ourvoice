@@ -25,8 +25,8 @@ import Navbar from './components/common/Navbar.vue'
   }
 
   #app {
-    display: flex;
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-template-columns: 1fr 5fr;
   }
 }
 </style>
