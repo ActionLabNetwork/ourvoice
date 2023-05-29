@@ -7,6 +7,11 @@ type Query {
     keys: [String!]!
     expiresIn: Int!
   ): [PresignedUrl!]!
+  getPresignedDownloadUrls(
+    bucket: String!
+    keys: [String!]!
+    expiresIn: Int!
+  ): [PresignedUrl!]!
 }
 
 type Mutation {

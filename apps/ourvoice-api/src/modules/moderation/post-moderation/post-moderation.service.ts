@@ -61,7 +61,7 @@ export class PostModerationService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: moderationPosts.length < totalCount,
+      hasNextPage: moderationPosts.length === (pagination?.limit ?? 10),
     };
 
     return { totalCount, edges, pageInfo };

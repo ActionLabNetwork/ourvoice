@@ -7,7 +7,10 @@ import {
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from 'src/modules/post/post.service';
 import { s3 } from 'src/config/s3-config';
-import { generatePresignedUrl } from 'src/services/s3-service';
+import {
+  generatePresignedDownloadUrl,
+  generatePresignedUploadUrl,
+} from 'src/services/s3-service';
 
 @Resolver('Post')
 export class PostResolver {
@@ -52,7 +55,32 @@ export class PostResolver {
   ) {
     const urls = await Promise.all(
       keys.map(async (key) => {
-        const url = await generatePresignedUrl(s3, bucket, key, expiresIn);
+        const url = await generatePresignedUploadUrl(
+          s3,
+          bucket,
+          key,
+          expiresIn,
+        );
+        return { url, key };
+      }),
+    );
+    return urls;
+  }
+
+  @Query()
+  async getPresignedDownloadUrls(
+    @Args('bucket') bucket: string,
+    @Args('keys', { type: () => [String] }) keys: string[],
+    @Args('expiresIn') expiresIn: number,
+  ) {
+    const urls = await Promise.all(
+      keys.map(async (key) => {
+        const url = await generatePresignedDownloadUrl(
+          s3,
+          bucket,
+          key,
+          expiresIn,
+        );
         return { url, key };
       }),
     );

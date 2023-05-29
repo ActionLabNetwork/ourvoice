@@ -71,6 +71,7 @@ export class PostModerationRepository {
         status: 'PENDING',
         post: { connect: { id: newPost.id } },
         latest: true,
+        version: 1,
       },
     });
 
@@ -155,6 +156,7 @@ export class PostModerationRepository {
       title: data.title ?? moderationPost.versions[0].title,
       content: data.content ?? moderationPost.versions[0].content,
       categoryIds: data.categoryIds ?? moderationPost.versions[0].categoryIds,
+      files: data.files ?? moderationPost.versions[0].files,
       authorHash: moderatorHash,
       status: 'PENDING',
       post: { connect: { id: postId } },

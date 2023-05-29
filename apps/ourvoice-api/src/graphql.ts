@@ -239,6 +239,8 @@ export abstract class IQuery {
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
+    abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
     abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
