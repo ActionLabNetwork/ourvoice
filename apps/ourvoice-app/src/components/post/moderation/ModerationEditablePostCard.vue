@@ -6,15 +6,34 @@
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
     </div>
+    <!-- Title -->
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
-      {{ version.title }}
+       <textarea v-model="localVersion.title" class="border rounded p-2 w-full"></textarea>
     </h3>
-    <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
-    <div class="flex flex-wrap mb-3">
-      <div v-for="{ id, name } in version.categories" :key="id" class="bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded mr-2 mb-2">
-        {{ name }}
+    <!-- Content -->
+    <p class="text-gray-700 text-lg leading-relaxed mb-3">
+      <textarea v-model="localVersion.content" class="border rounded p-2 w-full"></textarea>
+    </p>
+    <!-- Categories -->
+    <FormInput v-if="!categoriesStore.loading" id="categoriesWrapper" name="categories" labelText="Categories" labelSpan="select 1 to 2" :error-message="categoriesField.errorMessage.value" :meta="categoriesField.meta">
+      <div class="flex flex-col w-full">
+        <Multiselect
+          id="categories"
+          name="categories"
+          v-model="selectedCategories"
+          :options="categoriesOptions"
+          mode="tags"
+          :searchable="true"
+          :caret="true"
+          class="px-8 multiselect-blue"
+          />
+        <!-- Show error message if there's an error fetching categories -->
+        <div v-if="categoriesStore.errorMessage" class="text-red-500 text-sm">
+          {{ categoriesStore.errorMessage }}
+        </div>
       </div>
-    </div>
+    </FormInput>
+    <!-- Attachments -->
     <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
       {{ `${version.files.length}` }} attachments
     </p>
@@ -41,11 +60,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import { storeToRefs } from 'pinia';
+import { useCategoriesStore } from '@/stores/categories';
+import { useField } from 'vee-validate';
+import Multiselect from '@vueform/multiselect';
+import FormInput from '@/components/inputs/FormInput.vue'
 
 interface DecisionIcon {
   text: string;
@@ -65,6 +88,41 @@ const props = defineProps({
 
 const moderationPostsStore = useModerationPostsStore();
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
+
+const categoriesStore = useCategoriesStore()
+await categoriesStore.fetchCategories()
+
+// VeeValidate Form Fields
+const useVeeValidateField = <T,>(fieldName: string) => {
+  const { errorMessage, value, meta } = useField<T>(fieldName)
+  return { errorMessage, value, meta }
+}
+
+const titleField = useVeeValidateField<string>('title')
+const contentField = useVeeValidateField<string>('content')
+const categoriesField = useVeeValidateField<number[]>('categories')
+const attachmentsField = useVeeValidateField<FileList | null>('attachments')
+
+// Form fields
+const selectedCategories = ref<number[]>([])
+const attachmentsInputRef = ref<HTMLInputElement | null>(null)
+const characterCount = ref(0)
+// const presignedUrls = ref<PresignedUrlResponse[]>([])
+
+const categoriesOptions = computed(() => {
+  return categoriesStore.data.map(({ id, name }) => ({ label: name, value: id }))
+})
+
+if (version.value) {
+  selectedCategories.value = version.value.categories.map(({ id }) => id)
+}
+
+// The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
+watch(selectedCategories, async () => {
+  categoriesField.value.value = selectedCategories.value
+  console.log(selectedCategories.value)
+})
+
 
 const moderationResultGroups = computed(() => {
   const groups = version.value?.moderations.reduce((acc, moderation) => {
@@ -89,4 +147,8 @@ const moderationResultGroups = computed(() => {
 
 const formattedDate = (version: PostVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
+
+// Reactive copies of post and version
+const localPost = reactive({ ...post.value });
+const localVersion = reactive({ ...version.value });
 </script>

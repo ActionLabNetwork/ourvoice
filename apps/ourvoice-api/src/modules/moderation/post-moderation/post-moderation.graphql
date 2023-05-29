@@ -11,9 +11,10 @@ type Mutation {
   createModerationPost(
     data: ModerationPostCreateInput!
   ): ModerationPost
-  approveModerationPostVersion(id: Int!, moderatorHash: String!, reason: String): ModerationPostVersion
-  rejectModerationPostVersion(id: Int!, moderatorHash: String!, reason: String!): ModerationPostVersion
+  approveModerationPostVersion(id: Int!, moderatorHash: String!, reason: String): ModerationPost
+  rejectModerationPostVersion(id: Int!, moderatorHash: String!, reason: String!): ModerationPost
   modifyModerationPost(postId: Int!, moderatorHash: String!, reason: String!, data: ModerationPostModifyInput!): ModerationPost
+  renewPostModeration(postModerationId: Int!): ModerationPost
 }
 
 type ModerationPost {

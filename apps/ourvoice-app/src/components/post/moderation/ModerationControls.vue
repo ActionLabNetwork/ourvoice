@@ -53,7 +53,7 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headless
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
 const actions = [
-  { name: 'Approve', icon: 'fa-check' },
+  { name: 'Accept', icon: 'fa-check' },
   { name: 'Modify', icon: 'fa-edit' },
   { name: 'Reject', icon: 'fa-xmark' },
 ]

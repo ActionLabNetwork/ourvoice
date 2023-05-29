@@ -13,6 +13,7 @@ import authService from '@/services/auth-service'
 import type { ApolloError } from '@apollo/client/errors'
 import { GET_MODERATION_POST_BY_ID_QUERY } from '@/graphql/queries/getModerationPost'
 import { MODIFY_MODERATION_POST_MUTATION } from '@/graphql/mutations/modifyModerationPost'
+import { RENEW_POST_MODERATION_MUTATION } from '@/graphql/mutations/renewPostModeration'
 
 type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -45,7 +46,7 @@ export interface ModerationPostModel {
 
 export interface Moderation {
   id: number
-  decision: 'APPROVE' | 'REJECT'
+  decision: 'ACCEPTED' | 'REJECTED'
   moderatorHash: string
   reason: string
   timestamp: string
@@ -84,6 +85,18 @@ interface Edge<T> {
   node: T
 }
 
+const findSelfModeration = async (
+  version: PostVersionWithCategoryIds,
+  userId: string,
+  deployment: string
+) => {
+  const promises = version.moderations.map((moderation) => {
+    return authService.verifyHash(userId, deployment, moderation.moderatorHash)
+  })
+  const moderators = await Promise.all(promises)
+  return version.moderations[moderators.indexOf(true)]
+}
+
 provideApolloClient(apolloClient)
 
 export const useModerationPostsStore = defineStore('moderation-posts', {
@@ -100,7 +113,16 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     userHasModeratedPost: false
   }),
   getters: {
-    latestPostVersion: (state) => state.versionInModeration === state.postInModeration?.versions[0]
+    latestPostVersion: (state) => state.versionInModeration === state.postInModeration?.versions[0],
+    selfModerationForVersion: async (state) => {
+      if (!state.versionInModeration) return undefined
+
+      return await findSelfModeration(
+        state.versionInModeration,
+        useUserStore().userId,
+        useDeploymentStore().deployment
+      )
+    }
   },
   actions: {
     async fetchPosts() {
@@ -266,10 +288,10 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     },
 
     // Moderation actions
-    async checkIfUserHasModerated(userId: string, deployment: string) {
+    async checkIfUserHasModerated(userId: string) {
       const version = this.versionInModeration
 
-      if (!version) return false
+      if (!version) return
 
       const versionModerators = Array.from(
         version.moderations.reduce((acc, moderation) => {
@@ -279,7 +301,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       )
 
       const promises = versionModerators.map((moderator) =>
-        authService.verifyHash(userId, deployment, moderator)
+        authService.verifyHash(userId, useDeploymentStore().deployment, moderator)
       )
 
       const hasModeratedList = await Promise.all(promises)
@@ -290,6 +312,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       moderatorHash: string,
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
+      if (!this.postInModeration) return null
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: APPROVE_MODERATION_POST_VERSION_MUTATION,
@@ -297,7 +321,10 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         })
 
         console.log('Post version has been approved', data)
+
+        await this.fetchPostById(this.postInModeration.id)
         this.userHasModeratedPost = true
+
         return data
       } catch (error) {
         console.error(error)
@@ -310,15 +337,19 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       moderatorHash: string,
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
+      if (!this.postInModeration) return null
+
       try {
-        console.log({ id, moderatorHash, reason })
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_POST_VERSION_MUTATION,
           variables: { id, moderatorHash, reason }
         })
 
         console.log('Post version has been rejected', data)
+
+        await this.fetchPostById(this.postInModeration.id)
         this.userHasModeratedPost = true
+
         return data
       } catch (error) {
         console.error(error)
@@ -343,6 +374,37 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         console.error(error)
       }
       return null
+    },
+
+    async renewPostModeration() {
+      if (!this.postInModeration) {
+        console.error('No post in moderation')
+        return
+      }
+
+      const selfModeration = await this.selfModerationForVersion
+      if (!selfModeration) {
+        console.error('No self moderation found for post version')
+        return
+      }
+
+      try {
+        const { data } = await apolloClient.mutate({
+          mutation: RENEW_POST_MODERATION_MUTATION,
+          variables: { postModerationId: selfModeration.id }
+        })
+        console.log(
+          'Self moderation has been renewed. You can now moderate this version again.',
+          data
+        )
+
+        await this.fetchPostById(this.postInModeration.id)
+        this.userHasModeratedPost = false
+
+        return data
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 })

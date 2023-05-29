@@ -115,12 +115,15 @@ export class PostModerationService {
     // TODO: Validate data using class-validator
     // TODO: Validate post id
     // TODO: Validate moderator hash to see if they have permission/role
-    console.log('DATAAAA', data);
     return await this.moderationPostRepository.modifyModerationPost(
       postId,
       moderatorHash,
       reason,
       data,
     );
+  }
+
+  async renewPostModeration(id: number) {
+    return await this.moderationPostRepository.renewPostModeration(id);
   }
 }

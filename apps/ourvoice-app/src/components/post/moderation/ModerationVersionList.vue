@@ -12,8 +12,8 @@
         <div class="hidden sm:flex sm:flex-col sm:items-end space-y-2">
           <p v-if="version.timestamp" class="mt-1 text-xs leading-5 text-gray-500">
             Last moderated <br />
-            <time :datetime="version.timestamp">
-              {{ `${formatTimestampToReadableDate(+version.timestamp)}` }}
+            <time :datetime="version.moderations[0].timestamp">
+              {{ `${formatTimestampToReadableDate(+version.moderations[0].timestamp)}` }}
             </time>
           </p>
           <div v-else class="mt-1 flex items-center gap-x-1.5">
@@ -63,15 +63,10 @@ const originalPostVersion = ref(props.versions[props.versions.length - 1])
 
 onMounted(() => {
   selected.value = props.versions[0]
-  console.log(selected.value)
 })
 
 const handleVersionClick = (version: PostVersion) => {
   selected.value = version
   emit('versionClicked', version)
 }
-
-watch(isSelected, (newVal) => {
-  console.log(newVal)
-})
 </script>

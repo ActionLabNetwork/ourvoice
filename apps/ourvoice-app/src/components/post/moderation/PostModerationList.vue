@@ -6,7 +6,7 @@
       </div>
 
       <div v-else>
-          <ModerationPostCard :post="post" :version="post.versions[0]" />
+          <ModerationPostCard />
       </div>
     </div>
   </div>

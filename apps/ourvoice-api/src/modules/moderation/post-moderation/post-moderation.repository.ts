@@ -18,7 +18,7 @@ export class PostModerationRepository {
       include: {
         versions: {
           orderBy: { version: 'desc' },
-          include: { moderations: true },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
         },
       },
     });
@@ -80,7 +80,7 @@ export class PostModerationRepository {
   async getPostVersionById(id: number) {
     return await this.prisma.postVersion.findUnique({
       where: { id },
-      include: { moderations: true },
+      include: { moderations: { orderBy: { timestamp: 'desc' } } },
     });
   }
 
@@ -92,13 +92,20 @@ export class PostModerationRepository {
         reason,
         postVersionId: id,
       },
+      select: { postVersion: true },
     });
 
-    const postVersion = await this.prisma.postVersion.findFirst({
-      where: { id: newPostModeration.postVersionId },
-    });
+    const postId = newPostModeration.postVersion.postId;
 
-    return postVersion;
+    return await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+        },
+      },
+    });
   }
 
   async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
@@ -109,13 +116,20 @@ export class PostModerationRepository {
         reason,
         postVersionId: id,
       },
+      select: { postVersion: true },
     });
 
-    const postVersion = await this.prisma.postVersion.findFirst({
-      where: { id: newPostModeration.postVersionId },
-    });
+    const postId = newPostModeration.postVersion.postId;
 
-    return postVersion;
+    return await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+        },
+      },
+    });
   }
 
   async modifyModerationPost(
@@ -128,7 +142,12 @@ export class PostModerationRepository {
     // Fetch the current post
     const moderationPost = await this.prisma.post.findUnique({
       where: { id: postId },
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+        },
+      },
     });
 
     // Create a new PostVersion
@@ -159,11 +178,36 @@ export class PostModerationRepository {
       include: {
         versions: {
           orderBy: { version: 'desc' },
-          include: { moderations: true },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
         },
       },
     });
 
     return modifiedModerationPost;
+  }
+
+  async renewPostModeration(id: number) {
+    console.log({ id });
+    const postModeration = await this.prisma.postModeration.findUnique({
+      where: { id },
+      select: { postVersion: true },
+    });
+
+    if (!postModeration) {
+      throw new Error('PostModeration not found');
+    }
+
+    const postId = postModeration.postVersion.postId;
+
+    await this.prisma.postModeration.delete({ where: { id } });
+    return await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+        },
+      },
+    });
   }
 }

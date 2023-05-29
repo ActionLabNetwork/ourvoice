@@ -263,11 +263,13 @@ export abstract class IMutation {
 
     abstract createModerationPost(data: ModerationPostCreateInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract approveModerationPostVersion(id: number, moderatorHash: string, reason?: Nullable<string>): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+    abstract approveModerationPostVersion(id: number, moderatorHash: string, reason?: Nullable<string>): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract rejectModerationPostVersion(id: number, moderatorHash: string, reason: string): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+    abstract rejectModerationPostVersion(id: number, moderatorHash: string, reason: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract modifyModerationPost(postId: number, moderatorHash: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
+    abstract renewPostModeration(postModerationId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 

@@ -132,7 +132,6 @@ export const usePostsStore = defineStore('posts', {
       // })
 
       try {
-        console.log({ title, content, categoryIds, files, authorHash, requiredModerations })
         await createModerationPostMutate({
           data: {
             title,

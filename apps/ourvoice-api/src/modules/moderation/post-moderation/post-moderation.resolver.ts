@@ -78,4 +78,9 @@ export class PostModerationResolver {
       data,
     );
   }
+
+  @Mutation()
+  async renewPostModeration(@Args('postModerationId') id: number) {
+    return await this.postModerationService.renewPostModeration(id);
+  }
 }

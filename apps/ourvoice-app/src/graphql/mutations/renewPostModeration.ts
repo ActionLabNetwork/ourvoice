@@ -1,12 +1,8 @@
 import gql from 'graphql-tag'
 
-export const REJECT_MODERATION_POST_VERSION_MUTATION = gql`
-  mutation RejectModerationPostVersionMutation(
-    $id: Int!
-    $moderatorHash: String!
-    $reason: String!
-  ) {
-    rejectModerationPostVersion(id: $id, moderatorHash: $moderatorHash, reason: $reason) {
+export const RENEW_POST_MODERATION_MUTATION = gql`
+  mutation RenewPostModerationMutation($postModerationId: Int!) {
+    renewPostModeration(postModerationId: $postModerationId) {
       id
       authorHash
       requiredModerations

@@ -64,9 +64,6 @@ const router = createRouter({
       path: '/moderation/post/:id',
       name: 'moderate-post',
       component: ModerationView,
-      props: () => {
-        return addDeployment()
-      }
     },
     {
       path: '/noauth/post',
