@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div class="flex justify-end">
+    <div v-if="version?.reason || (version?.moderations && version.moderations.length)" class="flex justify-end">
       <div @click="toggleSidePane" class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md">
         <p>
           Moderation History
@@ -25,11 +25,6 @@
         <ModerationPostCard v-else :post="post" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
 
         <div class="grid grid-cols-4">
-          <!-- <div v-if="showModifyForm && version" class="col-span-2"> -->
-            <!-- Post Modify Form -->
-            <!-- <ModifyPost :title="version.title" :content="version.content" @modify-form-submit="handleModifyFormSubmit"/>
-          </div> -->
-
           <!-- Moderation Controls -->
           <div v-if="isLatestVersion && hasNotBeenModerated"
             class="col-span-4"
@@ -63,16 +58,16 @@
 <script setup lang="ts">
 import { useModerationPostsStore, type Moderation, type PostVersion, } from '@/stores/moderation-posts';
 import { useUserStore } from '@/stores/user';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue';
 import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue';
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
-import type { FormFields } from '@/components/post/moderation/ModifyPost.vue';
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import { storeToRefs } from 'pinia';
+import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -80,7 +75,7 @@ interface PostFields {
   title?: string;
   content?: string;
   categoryIds?: number[];
-  attachments?: FileList | null;
+  files?: string[] | null;
 }
 
 // Verify user session
@@ -115,10 +110,9 @@ onMounted(async () => {
   moderationPostsStore.$reset()
   await moderationPostsStore.fetchPostById(+route.params.id)
 
-  // Check if user has moderated this version
-  await moderationPostsStore.checkIfUserHasModerated(userStore.userId)
-
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+  if (version.value) {
+    refreshVersion(version.value)
+  }
 });
 
 const modifyValues = ref<PostFields | null>(null)
@@ -128,11 +122,22 @@ const hasNotBeenModerated = computed(() => !moderationPostsStore.userHasModerate
 // Methods
 const handleVersionChange = async (newVersion: PostVersion) => {
   moderationPostsStore.versionInModeration = newVersion
+  refreshVersion(newVersion)
+}
 
+const refreshVersion = async (newVersion: PostVersion) => {
   // Check if user has moderated this version
   await moderationPostsStore.checkIfUserHasModerated(userStore.userId)
 
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+
+  // If there are files, request their download urls
+  if (newVersion.files && newVersion.files.length > 0)
+    await moderationPostsStore.getPresignedDownloadUrls(
+      postFilesBucket,
+      newVersion.files,
+      postFilesPresignedUrlTTL
+    )
 }
 
 const decisionIcon = { ACCEPTED: { text: 'Accepted', indicatorClass: 'text-green-500 bg-green-400/10' }, REJECTED: { text: 'Rejected', indicatorClass: 'text-rose-500 bg-rose-400/10' } }
@@ -235,11 +240,8 @@ const handleModifyFormUpdate = (editedVersion: PostVersion) => {
     title: editedVersion.title,
     content: editedVersion.content,
     categoryIds: editedVersion.categoryIds,
+    files: editedVersion.files
   }
-}
-
-const handleModifyFormSubmit = (values: PostFields) => {
-  modifyValues.value = values
 }
 
 const handleRenewModeration = async () => {

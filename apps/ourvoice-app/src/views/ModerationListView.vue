@@ -1,19 +1,21 @@
 <template>
   <div class="w-full h-full bg-gray-100">
     <Header title="Moderation Posts List" />
-    <div class="px-10 py-10">
-      <BaseTab>
-        <template #pending>
-          <PostModerationList :posts="moderationPosts.PENDING" />
-        </template>
-        <template #approved>
-          <PostModerationList :posts="moderationPosts.APPROVED" />
-        </template>
-        <template #rejected>
-          <PostModerationList :posts="moderationPosts.REJECTED" />
-        </template>
-      </BaseTab>
-    </div>
+    <main>
+      <div class="px-10 py-10 bg-gray-100">
+        <BaseTab>
+          <template #pending>
+            <PostModerationList :posts="moderationPosts.PENDING" />
+          </template>
+          <template #approved>
+            <PostModerationList :posts="moderationPosts.APPROVED" />
+          </template>
+          <template #rejected>
+            <PostModerationList :posts="moderationPosts.REJECTED" />
+          </template>
+        </BaseTab>
+      </div>
+    </main>
   </div>
 </template>
 

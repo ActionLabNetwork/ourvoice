@@ -1,16 +1,21 @@
 import authService from '@/services/auth-service'
 import { defineStore } from 'pinia'
 import { useDeploymentStore } from '@/stores/deployment'
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 
 export interface UserState {
   userId: string
   sessionHash: string
+  nickname: string
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     userId: '',
-    sessionHash: ''
+    sessionHash: '',
+    nickname: uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals]
+    })
   }),
   getters: {
     isLoggedIn: async () => {

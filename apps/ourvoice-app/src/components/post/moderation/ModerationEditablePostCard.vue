@@ -10,10 +10,12 @@
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
        <textarea v-model="localVersion.title" class="border rounded p-2 w-full"></textarea>
     </h3>
+
     <!-- Content -->
     <p class="text-gray-700 text-lg leading-relaxed mb-3">
       <textarea v-model="localVersion.content" class="border rounded p-2 w-full"></textarea>
     </p>
+
     <!-- Categories -->
     <FormInput v-if="!categoriesStore.loading" id="categoriesWrapper" name="categories" labelText="Categories" labelSpan="select 1 to 2" :error-message="categoriesField.errorMessage.value" :meta="categoriesField.meta">
       <div class="flex flex-col w-full">
@@ -33,28 +35,30 @@
         </div>
       </div>
     </FormInput>
+
     <!-- Attachments -->
-    <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
-      {{ `${version.files.length}` }} attachments
+    <p v-if="version.files && version.attachmentsDownloadUrls" class="mt-2 text-gray-400 text-md mb-2">
+      {{ `${version.attachmentsDownloadUrls.length}` }} attachments
     </p>
-    <p class="mt-6 text-gray-500">Posted by <span class="font-semibold">@{{ post.authorHash }}</span></p>
+    <AttachmentBadge v-if="version.attachmentsDownloadUrls"  :files="version.attachmentsDownloadUrls" :modifyMode ="true" @remove-file="handleRemoveFile" />
+
+    <!-- Author -->
+    <p class="mt-6 text-gray-500">Authored by
+      <span class="font-semibold">
+        {{ useUserStore().nickname }}
+      </span>
+    </p>
     <p class="mt-2 text-gray-400 text-xs mb-2">
       {{ `${formattedDate(version)}` }}
     </p>
+
+    <!-- Moderator decisions count -->
     <div class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">
           {{ decision }}: {{ count }}
         </p>
       </div>
-    </div>
-    <div class="mt-4" v-if="!preview && version.status === 'PENDING'">
-      <router-link v-if="post && post.id"
-        :to="{ name: 'moderate-post', params: { id: post.id } }"
-        class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-      >
-        Moderate
-      </router-link>
     </div>
   </div>
 </template>
@@ -69,6 +73,8 @@ import { useCategoriesStore } from '@/stores/categories';
 import { useField } from 'vee-validate';
 import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
+import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
+import { useUserStore } from '@/stores/user';
 
 interface DecisionIcon {
   text: string;
@@ -153,6 +159,19 @@ const formattedDate = (version: PostVersion) =>
 
 // Reactive copies of post and version
 const localVersion = reactive({ ...version.value });
+
+const handleRemoveFile = (file: { key: string; url: string; }) => {
+  if (!moderationPostsStore.versionInModeration) return
+
+  const modifiedAttachments = moderationPostsStore.versionInModeration.attachmentsDownloadUrls?.filter((f) => f.key !== file.key)
+
+  moderationPostsStore.versionInModeration = {
+    ...moderationPostsStore.versionInModeration,
+    attachmentsDownloadUrls: modifiedAttachments
+  }
+
+  localVersion.files = modifiedAttachments?.map(({ key }) => key)
+}
 
 watch(
   localVersion,

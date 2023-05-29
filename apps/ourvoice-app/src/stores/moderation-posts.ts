@@ -1,3 +1,4 @@
+import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from './../graphql/queries/getPresignedDownloadUrls'
 import { useDeploymentStore } from './deployment'
 import { REJECT_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/rejectModerationPostVersion'
 import { APPROVE_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/approveModerationPostVersion'
@@ -14,6 +15,8 @@ import type { ApolloError } from '@apollo/client/errors'
 import { GET_MODERATION_POST_BY_ID_QUERY } from '@/graphql/queries/getModerationPost'
 import { MODIFY_MODERATION_POST_MUTATION } from '@/graphql/mutations/modifyModerationPost'
 import { RENEW_POST_MODERATION_MUTATION } from '@/graphql/mutations/renewPostModeration'
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { version } from 'graphql'
 
 type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -30,6 +33,7 @@ interface PostVersionWithCategoryIds {
   reason: string
   latest: boolean
   moderations: Moderation[]
+  attachmentsDownloadUrls?: { key: string; url: string }[]
 }
 
 export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
@@ -86,6 +90,13 @@ interface Edge<T> {
   node: T
 }
 
+interface PostFields {
+  title?: string
+  content?: string
+  categoryIds?: number[]
+  files?: string[] | null
+}
+
 const findSelfModeration = async (
   version: PostVersionWithCategoryIds,
   userId: string,
@@ -99,6 +110,8 @@ const findSelfModeration = async (
 }
 
 provideApolloClient(apolloClient)
+
+const POSTS_LIMIT = 50
 
 export const useModerationPostsStore = defineStore('moderation-posts', {
   state: (): ModerationPostsState => ({
@@ -115,7 +128,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     userHasModeratedPost: false
   }),
   getters: {
-    latestPostVersion: (state) => state.versionInModeration === state.postInModeration?.versions[0],
+    latestPostVersion: (state) =>
+      state.versionInModeration?.id === state.postInModeration?.versions[0].id,
     selfModerationForVersion: async (state) => {
       if (!state.versionInModeration) return undefined
 
@@ -127,14 +141,22 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     }
   },
   actions: {
-    async fetchPosts() {
+    async fetchPosts(loadMore = false) {
       try {
         // Fetch posts from Moderation DB
         this.loading = true
+
         const { data } = await apolloClient.query({
-          query: GET_MODERATION_POSTS_QUERY
+          query: GET_MODERATION_POSTS_QUERY,
+          variables: this.pageInfo && loadMore ? { cursor: this.pageInfo.endCursor } : {}
         })
-        this.posts = data.moderationPosts.edges.map((edge: Edge<ModerationPostModel>) => edge.node)
+
+        // If we're loading more posts, append them. Otherwise, replace the posts.
+        const newPosts = data.moderationPosts.edges.map(
+          (edge: Edge<ModerationPostModel>) => edge.node
+        )
+        this.posts = loadMore ? [...this.posts, ...newPosts] : newPosts
+
         this.totalCount = data.moderationPosts.totalCount
         this.pageInfo = data.moderationPosts.pageInfo
 
@@ -182,12 +204,19 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           })
           return { ...post, versions: versionsWithCategoriesIncluded }
         })
+
+        if (this.pageInfo?.hasNextPage && this.posts.length <= POSTS_LIMIT) {
+          await this.loadMorePosts()
+        }
       } catch (error) {
         this.error = error as ApolloError
         this.errorMessage = 'Failed to load posts. Please try again.'
       } finally {
         this.loading = false
       }
+    },
+    async loadMorePosts() {
+      await this.fetchPosts(true)
     },
     async fetchPostById(id: number) {
       try {
@@ -243,6 +272,27 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         this.versionInModeration = post.versions[0]
       } catch (error) {
         console.error(`Failed to load post with ID ${id}. Please try again.`, error)
+      }
+    },
+    async getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number) {
+      try {
+        const downloadUrls = await apolloClient.query({
+          query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
+          variables: {
+            bucket,
+            keys,
+            expiresIn
+          }
+        })
+
+        if (this.versionInModeration) {
+          this.versionInModeration.attachmentsDownloadUrls =
+            downloadUrls.data.getPresignedDownloadUrls
+        }
+
+        console.log({ downloadUrls })
+      } catch (error) {
+        console.error(error)
       }
     },
 
@@ -363,7 +413,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       postId: number,
       moderatorHash: string,
       reason: string,
-      modifiedData: { title?: string; content?: string; categoryIds?: number[]; files?: string[] }
+      modifiedData: PostFields
     ) {
       if (!this.postInModeration) return null
 

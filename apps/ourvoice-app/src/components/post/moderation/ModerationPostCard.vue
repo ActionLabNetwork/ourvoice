@@ -1,27 +1,45 @@
 <template>
   <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative">
+    <!-- Self moderation indicator -->
     <div class="absolute right-10" v-if="props.decisionIcon">
       <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
     </div>
+
+    <!-- Title -->
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
       {{ version.title }}
     </h3>
+
+    <!-- Content -->
     <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
+
+    <!-- Categories -->
     <div class="flex flex-wrap mb-3">
       <div v-for="{ id, name } in version.categories" :key="id" class="bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded mr-2 mb-2">
         {{ name }}
       </div>
     </div>
+
+    <!-- Attachments -->
     <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
       {{ `${version.files.length}` }} attachments
     </p>
-    <p class="mt-6 text-gray-500">Posted by <span class="font-semibold">@{{ post.authorHash }}</span></p>
+    <AttachmentBadge v-if="version.attachmentsDownloadUrls"  :files="version.attachmentsDownloadUrls" />
+
+    <!-- Author -->
+    <p class="mt-6 text-gray-500">Authored by
+      <span class="font-semibold">
+        {{ useUserStore().nickname }}
+      </span>
+    </p>
     <p class="mt-2 text-gray-400 text-xs mb-2">
       {{ `${formattedDate(version)}` }}
     </p>
+
+    <!-- Moderation decisions count -->
     <div v-if="props.version == undefined" class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">
@@ -29,6 +47,8 @@
         </p>
       </div>
     </div>
+
+    <!-- Moderate button -->
     <div class="mt-4" v-if="!preview && version.status === 'PENDING'">
       <router-link v-if="post && post.id"
         :to="{ name: 'moderate-post', params: { id: post.id } }"
@@ -45,6 +65,8 @@ import { computed } from 'vue';
 import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
+import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
+import { useUserStore } from '@/stores/user';
 
 interface DecisionIcon {
   text: string;

@@ -20,3 +20,13 @@ export async function uploadFileUsingPresignedUrl(
     throw error
   }
 }
+
+export const generateUniqueKey = (userIdentifier: string, file: File, index: number) => {
+  const timestamp = Date.now()
+  return `${userIdentifier}/${timestamp}_${index}_${file.name}`
+}
+
+export const getFileNameFromKey = (key: string) => {
+  const parts = key.split('_')
+  return parts[parts.length - 1]
+}

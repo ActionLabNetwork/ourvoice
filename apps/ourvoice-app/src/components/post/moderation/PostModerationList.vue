@@ -1,5 +1,5 @@
 <template>
-  <div class="moderation-page w-full grid grid-cols-2 p-5">
+  <div class="moderation-page p-5">
     <div v-for="(post) in props.posts" :key="post.id" class="p-5">
       <div v-if="props.posts.length === 0">
         <p class="text-lg text-gray-600">No posts to display...</p>
