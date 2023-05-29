@@ -32,7 +32,6 @@
     "@vueuse/core": "^10.1.2",
     "crypto-js": "^4.1.1",
     "cypress-file-upload": "^5.0.8",
-    "daisyui": "^2.51.6",
     "date-fns": "^2.30.0",
     "graphql": "^16.7.1",
     "graphql-tag": "^2.12.6",

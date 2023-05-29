@@ -1,247 +1,314 @@
 <template>
-  <!--First Grid Fraction Nav bar -->
-  <AppNavBar />
+  <!--First Grid Fraction-->
+  <AppNavBar class="h-[5vh] lg:h-full" />
 
-  <!-- Second Grid Fraction Main Content-->
-  <div class="border-4 border-red-400 bg-slate-200 min-h-screen">
-    <!-- Mobile filter dialog -->
-    <TransitionRoot as="template" :show="mobileFiltersOpen">
-      <Dialog as="div" class="relative z-40 lg:hidden" @close="mobileFiltersOpen = false">
-        <TransitionChild
-          as="template"
-          enter="transition-opacity ease-linear duration-300"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
-          leave="transition-opacity ease-linear duration-300"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
-        >
-          <div class="fixed inset-0 bg-black bg-opacity-25" />
-        </TransitionChild>
+  <!-- Second Grid Fraction-->
+  <div class="border-red-400 h-[95vh] lg:h-screen flex flex-col">
+    <main class="px-0 lg:px-0 border-green-400 flex flex-col overflow-hidden grow">
+      <section
+        class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-4 border-yellow-400 flex-1 overflow-auto"
+      >
+        <!-- Post grid/take 3 columns -->
+        <div class="lg:col-span-3 border-r overflow-y-auto h-full relative">
+          <div class="border-2 border-red-400" v-for="(value, key) in filters" :key="key">
+            {{ key }}:{{ value }}
+          </div>
+          <div class="border-2 border-indigo-400">
+            <p>sort by: {{ sortOptions }}</p>
+            <p>sort order: {{ sortDescending ? 'descending' : 'ascending' }}</p>
+          </div>
 
-        <div class="fixed inset-0 z-40 flex">
-          <TransitionChild
-            as="template"
-            enter="transition ease-in-out duration-300 transform"
-            enter-from="translate-x-full"
-            enter-to="translate-x-0"
-            leave="transition ease-in-out duration-300 transform"
-            leave-from="translate-x-0"
-            leave-to="translate-x-full"
-          >
-            <DialogPanel
-              class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl"
-            >
-              <div class="flex items-center justify-between px-4">
-                <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+          <div class="border-2 border-green-400">
+            gqlPostsFilter(computed): {{ gqlPostsFilter }}
+          </div>
+
+          <div class="border-2 border-black">currentVariables: {{ variables }}</div>
+          <!-- stiky page header -->
+          <div class="sticky top-0 z-10 backdrop-blur-lg">
+            <div class="flex items-baseline justify-between border-b lg:py-6">
+              <h1 class="text-lg lg:text-4xl font-bold tracking-tight text-gray-900 mx-4">Posts</h1>
+
+              <div class="flex items-center mx-4">
+                <button
+                  @click="modalOpen = true"
+                  class="mr-6 px-2 py-1 text-gray-500 hover:text-gray-600"
+                >
+                  <font-awesome-icon icon="fa-solid fa-plus" />
+                </button>
+                <!-- create post Modal -->
+                <Modal :isOpen="modalOpen" @close="modalOpen = false">
+                  <template #content>
+                    <CreatePost />
+                  </template>
+                </Modal>
+                <!-- Sort Dropdown -->
+                <Menu as="div" class="relative inline-block text-left">
+                  <div>
+                    <MenuButton
+                      class="group inline-flex justify-center text-sm font-medium text-gray-800 hover:text-gray-900"
+                    >
+                      Sort by
+                      <ChevronDownIcon
+                        class="mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-500 group-hover:text-gray-600"
+                        aria-hidden="true"
+                      />
+                    </MenuButton>
+                  </div>
+
+                  <transition
+                    enter-active-class="transition ease-out duration-100"
+                    enter-from-class="transform opacity-0 scale-95"
+                    enter-to-class="transform opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-75"
+                    leave-from-class="transform opacity-100 scale-100"
+                    leave-to-class="transform opacity-0 scale-95"
+                  >
+                    <MenuItems
+                      class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    >
+                      <div class="py-1">
+                        <MenuItem
+                          v-for="option in sortOptions"
+                          :key="option.name"
+                          v-slot="{ active }"
+                          @click="handleSortChange(option.name)"
+                        >
+                          <button
+                            type="button"
+                            :class="[
+                              option.current ? 'font-medium text-gray-900' : 'text-gray-500',
+                              active ? 'bg-gray-100 w-full' : '',
+                              'block px-4 py-2 text-sm'
+                            ]"
+                          >
+                            {{ option.name }}
+                          </button>
+                        </MenuItem>
+                      </div>
+                    </MenuItems>
+                  </transition>
+                </Menu>
+                <!-- Sort Order Toggle-->
+                <button
+                  @click="toggleSortOrder()"
+                  type="button"
+                  class="ml-4 p-2 text-gray-500 hover:text-gray-600"
+                >
+                  <font-awesome-icon
+                    v-if="sortDescending"
+                    icon="fa-solid fa-arrow-down-wide-short"
+                  />
+                  <font-awesome-icon v-else icon="fa-solid fa-arrow-down-short-wide" />
+                </button>
+                <!-- Filter button on Small screen -->
                 <button
                   type="button"
-                  class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                  @click="mobileFiltersOpen = false"
+                  class="ml-4 p-2 text-gray-500 hover:text-gray-600 lg:hidden"
+                  @click="mobileFiltersOpen = true"
                 >
-                  <span class="sr-only">Close menu</span>
-                  <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                  <FunnelIcon class="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
-
-              <!-- Filters -->
-              <form class="mt-4 border-t border-gray-200">
-                <h3 class="sr-only">Categories</h3>
-                <!-- <ul role="list" class="px-2 py-3 font-medium text-gray-900">
-                  <li v-for="category in subCategories" :key="category.name">
-                    <a :href="category.href" class="block px-2 py-3">{{ category.name }}</a>
-                  </li>
-                </ul> -->
-
-                <Disclosure
-                  as="div"
-                  v-for="section in filters"
-                  :key="section.id"
-                  class="border-t border-gray-200 px-4 py-6"
-                  v-slot="{ open }"
-                  :defaultOpen="true"
-                >
-                  <h3 class="-mx-2 -my-3 flow-root">
-                    <DisclosureButton
-                      class="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500"
-                    >
-                      <span class="font-medium text-gray-900">{{ section.name }}</span>
-                      <span class="ml-6 flex items-center">
-                        <PlusIcon v-if="!open" class="h-5 w-5" aria-hidden="true" />
-                        <MinusIcon v-else class="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    </DisclosureButton>
-                  </h3>
-                  <DisclosurePanel class="pt-6">
-                    <div class="space-y-6">
-                      <div
-                        v-for="(option, optionIdx) in section.options"
-                        :key="option.value"
-                        class="flex items-center"
-                      >
-                        <input
-                          :id="`filter-mobile-${section.id}-${optionIdx}`"
-                          :name="`${section.id}[]`"
-                          :value="option.value"
-                          type="checkbox"
-                          :checked="option.checked"
-                          class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <label
-                          :for="`filter-mobile-${section.id}-${optionIdx}`"
-                          class="ml-3 min-w-0 flex-1 text-gray-500"
-                          >{{ option.label }}</label
-                        >
-                      </div>
-                    </div>
-                  </DisclosurePanel>
-                </Disclosure>
-              </form>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </TransitionRoot>
-
-    <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 border-4 border-green-400">
-      <div class="flex items-baseline justify-between border-b border-gray-400 pb-6 pt-24">
-        <h1 class="text-4xl font-bold tracking-tight text-gray-900">Posts</h1>
-        <div class="flex items-center">
-          <Menu as="div" class="relative inline-block text-left">
-            <div>
-              <MenuButton
-                class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                Sort
-                <ChevronDownIcon
-                  class="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                  aria-hidden="true"
-                />
-              </MenuButton>
             </div>
-
-            <transition
-              enter-active-class="transition ease-out duration-100"
-              enter-from-class="transform opacity-0 scale-95"
-              enter-to-class="transform opacity-100 scale-100"
-              leave-active-class="transition ease-in duration-75"
-              leave-from-class="transform opacity-100 scale-100"
-              leave-to-class="transform opacity-0 scale-95"
-            >
-              <MenuItems
-                class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
-              >
-                <div class="py-1">
-                  <MenuItem
-                    v-for="option in sortOptions"
-                    :key="option.name"
-                    v-slot="{ active }"
-                    @click="handleSortChange(option.name)"
-                  >
-                    <a
-                      :href="option.href"
-                      :class="[
-                        option.current ? 'font-medium text-gray-900' : 'text-gray-500',
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm'
-                      ]"
-                      >{{ option.name }}</a
-                    >
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </transition>
-          </Menu>
-
-          <button type="button" class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-            <span class="sr-only">View grid</span>
-            <Squares2X2Icon class="h-5 w-5" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            class="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
-            @click="mobileFiltersOpen = true"
-          >
-            <span class="sr-only">Filters</span>
-            <FunnelIcon class="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-      <section aria-labelledby="products-heading" class="pb-24 pt-6">
-        <h2 id="posts-heading" class="sr-only">Posts</h2>
-
-        <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 border-4 border-yellow-400">
-          <!-- Post grid -->
-          <div class="lg:col-span-3 bg-gray-100 border-4 border-blue-400">
-            <!-- Your content -->
-            {{ categories }}
-            {{ categories }}
-            {{ categories }}
-            {{ categories }}
-            {{ categories }}
-            {{ categories }}
           </div>
-          <!-- Filters -->
-          <form class="hidden lg:block border-4 border-orange-400">
-            <h3 class="sr-only">Filter</h3>
-            <!-- <ul role="list" class="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
-              <li v-for="category in subCategories" :key="category.name">
-                <a :href="category.href">{{ category.name }}</a>
-              </li>
-            </ul> -->
 
-            <Disclosure
-              as="div"
-              v-for="section in filters"
-              :key="section.id"
-              class="border-b border-gray-200 py-6"
-              v-slot="{ open }"
-              :defaultOpen="true"
-            >
-              <h3 class="-my-3 flow-root">
-                <DisclosureButton
-                  class="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
-                >
-                  <span class="font-medium text-gray-900">{{ section.name }}</span>
-                  <span class="ml-6 flex items-center">
-                    <PlusIcon v-if="!open" class="h-5 w-5" aria-hidden="true" />
-                    <MinusIcon v-else class="h-5 w-5" aria-hidden="true" />
-                  </span>
-                </DisclosureButton>
-              </h3>
-              <DisclosurePanel class="pt-6">
-                <div class="space-y-4">
-                  <div
-                    v-for="(option, optionIdx) in section.options"
-                    :key="option.value"
-                    class="flex items-center"
-                  >
-                    <input
-                      :id="`filter-${section.id}-${optionIdx}`"
-                      :name="`${section.id}[]`"
-                      :value="option.value"
-                      type="checkbox"
-                      :checked="option.checked"
-                      class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label
-                      :for="`filter-${section.id}-${optionIdx}`"
-                      class="ml-3 text-sm text-gray-600"
-                      >{{ option.label }}</label
-                    >
-                  </div>
-                </div>
-              </DisclosurePanel>
-            </Disclosure>
-          </form>
+          <!-- Post Card List-->
+          <PostWrapper
+            v-for="(post, index) in posts"
+            :key="index"
+            :id="post.node?.id"
+            :title="post.node?.title"
+            :content="post.node?.content"
+            :author="post.node?.author"
+            :votesUp="post.node?.votesUp"
+            :votesDown="post.node?.votesDown"
+            :comments="post.node?.comments"
+            :createdAt="post.node?.createdAt"
+            :publishedAt="post.node?.publishedAt"
+            :moderatedAt="post.node?.moderatedAt"
+            :updatedAt="post.node?.updatedAt"
+            :files="post.node?.files"
+            :categories="post.node?.categories"
+            class="drop-shadow-md hover:drop-shadow-xl"
+          />
+          <!-- PlaceHolder If no posts found -->
+          <div v-if="!posts.length" class="flex pt-6 justify-center">Not Found</div>
         </div>
+        <!-- Filters/take 1 column-->
+        <form @submit.prevent="handleSubmitFilters" class="hidden lg:block border-orange-400">
+          <Disclosure
+            as="div"
+            v-for="(value, key) in filters"
+            :key="key"
+            class="border-b border-gray-200 py-6"
+            v-slot="{ open }"
+            :defaultOpen="true"
+          >
+            <h3 class="-my-3 flow-root">
+              <DisclosureButton
+                class="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500"
+              >
+                <span class="font-medium text-gray-900">{{ key }}</span>
+                <span class="ml-6 flex items-center">
+                  <PlusIcon v-if="!open" class="h-5 w-5" aria-hidden="true" />
+                  <MinusIcon v-else class="h-5 w-5" aria-hidden="true" />
+                </span>
+              </DisclosureButton>
+            </h3>
+            <DisclosurePanel class="pt-6">
+              <div class="space-y-4">
+                <div
+                  v-for="(option, optionIdx) in value"
+                  :key="option.value"
+                  class="flex items-center"
+                >
+                  <input
+                    :id="`filter-${key}-${optionIdx}`"
+                    :name="`${key}[]`"
+                    :value="option.value"
+                    type="checkbox"
+                    v-model="option.checked"
+                    class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label :for="`filter-${key}-${optionIdx}`" class="ml-3 text-sm text-gray-600">{{
+                    option.label
+                  }}</label>
+                </div>
+              </div>
+            </DisclosurePanel>
+          </Disclosure>
+          <div class="p-6 flex flex-col justify-around space-y-4">
+            <button
+              type="submit"
+              class="p-2 text-white rounded-lg bg-gray-800 hover:bg-opacity-70 transform duration-200"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              @click="resetFilters"
+              class="p-2 text-white rounded-lg bg-ourvoice-red hover:bg-opacity-70 transform duration-200"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <!-- Mobile filter overlay dialog -->
+        <TransitionRoot as="template" :show="mobileFiltersOpen">
+          <Dialog as="div" class="relative z-40 lg:hidden" @close="mobileFiltersOpen = false">
+            <TransitionChild
+              as="template"
+              enter="transition-opacity ease-linear duration-300"
+              enter-from="opacity-0"
+              enter-to="opacity-100"
+              leave="transition-opacity ease-linear duration-300"
+              leave-from="opacity-100"
+              leave-to="opacity-0"
+            >
+              <div class="fixed inset-0 bg-black bg-opacity-25" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 z-40 flex">
+              <TransitionChild
+                as="template"
+                enter="transition ease-in-out duration-300 transform"
+                enter-from="translate-x-full"
+                enter-to="translate-x-0"
+                leave="transition ease-in-out duration-300 transform"
+                leave-from="translate-x-0"
+                leave-to="translate-x-full"
+              >
+                <DialogPanel
+                  class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl"
+                >
+                  <div class="flex items-center justify-between px-4">
+                    <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+                    <button
+                      type="button"
+                      class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                      @click="mobileFiltersOpen = false"
+                    >
+                      <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  <!-- Filters -->
+                  <form @submit.prevent="handleSubmitFilters" class="mt-4 border-t border-gray-200">
+                    <Disclosure
+                      as="div"
+                      v-for="(value, key) in filters"
+                      :key="key"
+                      class="border-t border-gray-200 px-4 py-6"
+                      v-slot="{ open }"
+                      :defaultOpen="true"
+                    >
+                      <h3 class="-mx-2 -my-3 flow-root">
+                        <DisclosureButton
+                          class="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500"
+                        >
+                          <span class="font-medium text-gray-900">{{ key }}</span>
+                          <span class="ml-6 flex items-center">
+                            <PlusIcon v-if="!open" class="h-5 w-5" aria-hidden="true" />
+                            <MinusIcon v-else class="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        </DisclosureButton>
+                      </h3>
+                      <DisclosurePanel class="pt-6">
+                        <div class="space-y-6">
+                          <div
+                            v-for="(option, optionIdx) in value"
+                            :key="option.value"
+                            class="flex items-center"
+                          >
+                            <input
+                              :id="`filter-mobile-${key}-${optionIdx}`"
+                              :name="`${key}[]`"
+                              :value="option.value"
+                              type="checkbox"
+                              v-model="option.checked"
+                              class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            />
+                            <label
+                              :for="`filter-mobile-${key}-${optionIdx}`"
+                              class="ml-3 min-w-0 flex-1 text-gray-500"
+                              >{{ option.label }}</label
+                            >
+                          </div>
+                        </div>
+                      </DisclosurePanel>
+                    </Disclosure>
+                    <div class="p-6 flex flex-col justify-around space-y-4">
+                      <button
+                        type="submit"
+                        class="p-2 text-white rounded-lg bg-gray-800 hover:bg-opacity-70 transform duration-200"
+                      >
+                        Apply
+                      </button>
+                      <button
+                        type="button"
+                        @click="resetFilters"
+                        class="p-2 text-white rounded-lg bg-ourvoice-red hover:bg-opacity-70 transform duration-200"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </form>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </Dialog>
+        </TransitionRoot>
       </section>
     </main>
-    <!-- <AppFooter class="border-4 border-fuchsia-400 w-full"/> -->
+    <AppFooter />
   </div>
 </template>
 
 <script lang="ts" setup>
+import Modal from '@/components/common/Modal.vue'
+import PostWrapper from '@/components/post/PostWrapper.vue'
+import CreatePost from '@/components/post/CreatePost.vue'
 import {
   Dialog,
   DialogPanel,
@@ -256,68 +323,155 @@ import {
   TransitionRoot
 } from '@headlessui/vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import {
-  ChevronDownIcon,
-  FunnelIcon,
-  MinusIcon,
-  PlusIcon,
-  Squares2X2Icon
-} from '@heroicons/vue/20/solid'
-import { computed, reactive, ref, watchEffect } from 'vue'
+import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/vue/20/solid'
+import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+import { useToggle } from '@vueuse/core'
+
+const GET_POST_QUERY = gql`
+  query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
+    posts(pagination: $pagination, filter: $filter) {
+      edges {
+        cursor
+        node {
+          author {
+            id
+            nickname
+          }
+          categories {
+            name
+            id
+          }
+          createdAt
+          disabledAt
+          moderatedAt
+          moderated
+          publishedAt
+          published
+          title
+          votes {
+            id
+            voteType
+          }
+          votesDown
+          votesUp
+          files
+          id
+          content
+          comments {
+            id
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
+      }
+      totalCount
+    }
+  }
+`
+const mobileFiltersOpen = ref(false)
+const modalOpen = ref(false)
+const { onResult, onError, variables } = useQuery(GET_POST_QUERY, {
+  pagination: {
+    limit: 100,
+    cursor: null
+  } as any,
+  filter: null as any
+} as any)
+
+const posts = ref([] as any)
+onResult(({ data, loading }) => {
+  if (loading) return
+  console.log(data)
+  posts.value = data.posts.edges
+})
+
+onError((err) => console.log(err))
 const categoriesStore = useCategoriesStore()
 categoriesStore.fetchCategories()
 const categories = computed(() => categoriesStore)
 
 const sortOptions = ref([
-  { name: 'Latest', href: '#', current: true },
-  { name: 'Upvotes', href: '#', current: false },
-  { name: 'Downvotes', href: '#', current: false },
-  { name: 'Most Commented', href: '#', current: false }
+  { name: 'Published Time', href: '#', current: true },
+  { name: 'Upvotes Count', href: '#', current: false },
+  { name: 'Downvotes Count', href: '#', current: false },
+  { name: 'Comments Count', href: '#', current: false }
 ])
+
+const sortDescending = ref(true)
+const toggleSortOrder = useToggle(sortDescending)
+
+const filters = ref({
+  Category: [{ id: 0, value: 'All', label: 'All', checked: true }],
+  TimeRange: [
+    { value: 'latest', label: 'Latest (3 days)', checked: false },
+    { value: 'all time', label: 'All Time', checked: true }
+  ]
+})
+
+const gqlPostsFilter = computed(() => {
+  const createdAfter = filters.value.TimeRange[0].checked
+    ? new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+    : null
+  return {
+    categoryIds: filters.value.Category.filter((category) => category.checked).map(
+      (category) => category.id
+    ),
+    createdAfter
+  }
+})
 
 const handleSortChange = (sortOption: string) => {
   sortOptions.value.forEach((option) => {
     option.current = option.name === sortOption
   })
 }
-// const subCategories = [
-//   { name: 'Totes', href: '#' },
-//   { name: 'Backpacks', href: '#' },
-// ]
-
-const filters = reactive([
-  {
-    id: 'category',
-    name: 'Category',
-    options: [
-      { id: 0, value: 'all', label: 'All', checked: true },
-      { id: -1, value: 'other', label: 'Other', checked: false }
-    ]
-  },
-  {
-    id: 'time range',
-    name: 'Time Range',
-    options: [
-      { value: 'latest', label: 'Latest', checked: false },
-      { value: 'all time', label: 'All Time', checked: false }
-    ]
+const handleSubmitFilters = () => {
+  console.log('submit filters', gqlPostsFilter.value)
+  variables.value = {
+    pagination: {
+      limit: 100
+    },
+    filter: gqlPostsFilter.value
   }
-])
+}
+
+const resetFilters = () => {
+  filters.value.Category.forEach((category) => {
+    category.checked = true
+  })
+  filters.value.TimeRange.forEach((timeRange) => {
+    timeRange.checked = false
+  })
+  filters.value.TimeRange[1].checked = true
+}
 
 watchEffect(() => {
   const cats = categories.value.data.map((category) => {
-    return {
+    return reactive({
       id: category.id,
       value: category.name,
       label: category.name,
-      checked: false
-    }
+      checked: true
+    })
   })
-  filters[0].options = [...filters[0].options, ...cats]
+  filters.value.Category = cats
 })
 
-watchEffect(() => console.log(filters[0]))
-
-const mobileFiltersOpen = ref(false)
+// Todo: replace with a better solution using date picker
+watch(filters.value.TimeRange[0], (newValue) => {
+  if (newValue.checked) {
+    filters.value.TimeRange[1].checked = false
+  }
+})
+watch(filters.value.TimeRange[1], (newValue) => {
+  if (newValue.checked) {
+    filters.value.TimeRange[0].checked = false
+  }
+})
 </script>

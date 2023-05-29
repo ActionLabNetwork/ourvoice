@@ -16,6 +16,8 @@ import Navbar from './components/common/Navbar.vue'
   height: 100vh;
   margin: 0 auto;
   font-weight: normal;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 1024px) {

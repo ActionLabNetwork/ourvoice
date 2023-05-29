@@ -10,7 +10,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 bg-black bg-opacity-25" />
+        <div class="fixed inset-0 backdrop-blur-md" />
       </TransitionChild>
 
       <div class="fixed inset-0 overflow-y-auto">
@@ -28,9 +28,7 @@
               class="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-700 p-6 text-left align-middle shadow-xl transition-all"
             >
               <DialogTitle as="h3" class="text-lg font-medium leading-6 dark:text-white">
-                <slot name="title">
-                  Model default #title slot
-                </slot>
+                <slot name="title"></slot>
               </DialogTitle>
               <div class="mt-2 h-1/2">
                 <slot name="content"></slot>

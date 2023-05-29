@@ -1,8 +1,10 @@
 <template>
-  <div class="border-4 border-black flex flex-col space-y-6">
+  <div class="border-r border-gray-400 flex flex-col bg-gray-800 text-white">
     <!-- Logo -->
-    <div class="border-b-4 py-6 px-4 flex lg:block justify-between">
-      <a class="block font-bold text-2xl" href="#">OverVoice</a>
+    <div class="lg:py-6 px-4 flex lg:block justify-between">
+      <a class="flex font-bold text-lg lg:text-4xl items-center" href="../">
+        <span class="">Over</span><span class="text-ourvoice-red">Voice</span>
+      </a>
 
       <!-- Mobile Buttons -->
       <div class="flex lg:hidden">
@@ -25,27 +27,38 @@
         </button>
       </div>
     </div>
+
     <!--  Nav Bar -->
     <div
-      class="lg:flex flex-col flex-grow border-4 space-y-5 justify-between"
-      :class="hideDropPanel ? 'flex' : 'hidden'"
+      class="lg:flex flex-col flex-grow border-t border-gray-400 justify-between bg-gray-800"
+      :class="hideDropPanel ? 'flex z-40 ' : 'hidden'"
     >
-      <nav class="border-4 border-indigo-400 lg:grid space-y-8">
+      <nav class="border-indigo-400 lg:grid space-y-6">
         <div class="p-4 hidden lg:block">
           <DarkModeToggle />
         </div>
-        <div class="p-4 hover:bg-gray-500 mx-1 transition duration-200">Posts</div>
-        <div class="p-4 rounded-sm hover:bg-gray-500 mx-1 transition duration-200">Polls</div>
+        <a href="../" class="block p-4 hover:bg-gray-700 mx-1 transition">
+          <font-awesome-icon icon="fa-solid fa-house" />
+          <span class="px-6">Home</span>
+        </a>
+        <a href="./post" class="block p-4 hover:bg-gray-700 mx-1 transition border-b">
+          <font-awesome-icon icon="fa-solid fa-bullhorn" />
+          <span class="px-6">Posts</span>
+        </a>
+        <a href="#" class="block p-4 rounded-sm hover:bg-gray-700 mx-1 transition">
+          <font-awesome-icon icon="fa-solid fa-square-poll-vertical" />
+          <span class="px-6">Polls</span>
+        </a>
       </nav>
 
       <!--  signin/signout -->
-      <div class="flex justify-between border-4">
+      <div class="flex justify-between bg-gray-700">
         <img
           class="rounded-full p-2"
           src="https://ui-avatars.com/api/?size=48?&name=Mingye+Li"
           alt=""
         />
-        <a class="border-4 p-2 flex items-center border-ourvoice-red hover:bg-gray-700" href="#"
+        <a class="p-2 flex items-center border-ourvoice-red hover:bg-gray-700 transform" href="#"
           >Sign out</a
         >
       </div>
