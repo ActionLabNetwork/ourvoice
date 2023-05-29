@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch } from 'vue';
+import { ref, computed, reactive, watch, watchEffect } from 'vue';
 import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
@@ -85,6 +85,8 @@ const props = defineProps({
     required: false
   }
 });
+
+const emit = defineEmits(['update']);
 
 const moderationPostsStore = useModerationPostsStore();
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
@@ -120,6 +122,7 @@ if (version.value) {
 // The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
 watch(selectedCategories, async () => {
   categoriesField.value.value = selectedCategories.value
+  localVersion.categoryIds = selectedCategories.value
   console.log(selectedCategories.value)
 })
 
@@ -149,6 +152,13 @@ const formattedDate = (version: PostVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
 
 // Reactive copies of post and version
-const localPost = reactive({ ...post.value });
 const localVersion = reactive({ ...version.value });
+
+watch(
+  localVersion,
+  () => {
+    emit('update', localVersion);
+  },
+  { deep: true }
+);
 </script>

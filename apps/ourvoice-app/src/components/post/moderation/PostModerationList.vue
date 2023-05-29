@@ -6,7 +6,7 @@
       </div>
 
       <div v-else>
-          <ModerationPostCard />
+        <ModerationPostCard :post="post" :version="post.versions[0]" />
       </div>
     </div>
   </div>
@@ -20,6 +20,7 @@ import type { ModerationPost } from '@/stores/moderation-posts';
 const props = defineProps({
   posts: { type: Array as PropType<ModerationPost[]>, required: true }
 })
+console.log(props.posts)
 </script>
 
 <style scoped>

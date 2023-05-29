@@ -21,8 +21,8 @@
 
       <!-- Post Preview -->
       <div v-if="post && version" class="col-span-3">
-        <ModerationEditablePostCard v-if="showModifyForm" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
-        <ModerationPostCard v-else :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
+        <ModerationEditablePostCard v-if="showModifyForm" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" @update="handleModifyFormUpdate" />
+        <ModerationPostCard v-else :post="post" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
 
         <div class="grid grid-cols-4">
           <!-- <div v-if="showModifyForm && version" class="col-span-2"> -->
@@ -64,7 +64,7 @@
 import { useModerationPostsStore, type Moderation, type PostVersion, } from '@/stores/moderation-posts';
 import { useUserStore } from '@/stores/user';
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue';
 import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue';
@@ -73,13 +73,19 @@ import type { FormFields } from '@/components/post/moderation/ModifyPost.vue';
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import { storeToRefs } from 'pinia';
-import { useDeploymentStore } from '@/stores/deployment';
 
-// Set deployment and fetch user session
-const deploymentStore = useDeploymentStore()
+type ModerationActions = 'Accept' | 'Modify' | 'Reject'
+
+interface PostFields {
+  title?: string;
+  content?: string;
+  categoryIds?: number[];
+  attachments?: FileList | null;
+}
+
+// Verify user session
 const userStore = useUserStore()
 await userStore.verifyUserSession()
-
 
 // Init post moderation store
 const moderationPostsStore = useModerationPostsStore()
@@ -102,6 +108,7 @@ const handleSidePaneToggle = (open: boolean) => {
 
 // Route handling
 const route = useRoute();
+const router = useRouter()
 
 onMounted(async () => {
   // Fetch and set Post and Version, defaulting to latest version
@@ -114,7 +121,7 @@ onMounted(async () => {
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 });
 
-const modifyValues = ref<FormFields | null>(null)
+const modifyValues = ref<PostFields | null>(null)
 const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
 const hasNotBeenModerated = computed(() => !moderationPostsStore.userHasModeratedPost)
 
@@ -150,7 +157,7 @@ const acceptPost = async (reason: string) => {
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 };
 
-const modifyPost = async (values: FormFields, reason: string) => {
+const modifyPost = async (values: PostFields, reason: string) => {
   const post = moderationPostsStore.postInModeration
   const version = moderationPostsStore.versionInModeration
 
@@ -171,6 +178,9 @@ const modifyPost = async (values: FormFields, reason: string) => {
 
   await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, reason, values)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+
+  // Reload the page
+  router.go(0)
 }
 
 const rejectPost = async (reason: string) => {
@@ -190,9 +200,9 @@ const rejectPost = async (reason: string) => {
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 };
 
-const handleModerationControlsSubmit = ({ action, reason }: { action: 'Approve' | 'Modify' | 'Reject', reason: string }) => {
+const handleModerationControlsSubmit = ({ action, reason }: { action: ModerationActions, reason: string }) => {
   switch (action) {
-    case 'Approve':
+    case 'Accept':
       acceptPost(reason);
       break;
     case 'Modify':
@@ -210,7 +220,7 @@ const handleModerationControlsSubmit = ({ action, reason }: { action: 'Approve' 
   }
 }
 
-const handleModerationControlsActionChange = (action: 'Approve' | 'Modify' | 'Reject') => {
+const handleModerationControlsActionChange = (action: ModerationActions) => {
   if (action === 'Modify') {
     showModifyForm.value = true
   } else {
@@ -218,7 +228,17 @@ const handleModerationControlsActionChange = (action: 'Approve' | 'Modify' | 'Re
   }
 }
 
-const handleModifyFormSubmit = (values: FormFields) => {
+const handleModifyFormUpdate = (editedVersion: PostVersion) => {
+  console.log({ editedVersion })
+  moderationPostsStore.modifiedPostVersion = editedVersion
+  modifyValues.value = {
+    title: editedVersion.title,
+    content: editedVersion.content,
+    categoryIds: editedVersion.categoryIds,
+  }
+}
+
+const handleModifyFormSubmit = (values: PostFields) => {
   modifyValues.value = values
 }
 

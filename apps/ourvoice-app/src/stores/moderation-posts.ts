@@ -71,6 +71,7 @@ export interface ModerationPostsState {
   posts: ModerationPost[]
   postInModeration: ModerationPost | undefined
   versionInModeration: PostVersion | undefined
+  modifiedPostVersion: PostVersion | undefined
   categories: Map<number, Category>
   totalCount: number
   pageInfo: pageInfo | undefined
@@ -104,6 +105,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     posts: [],
     postInModeration: undefined,
     versionInModeration: undefined,
+    modifiedPostVersion: undefined,
     categories: new Map(),
     totalCount: 0,
     pageInfo: undefined,
@@ -363,12 +365,16 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       reason: string,
       modifiedData: { title?: string; content?: string; categoryIds?: number[]; files?: string[] }
     ) {
+      if (!this.postInModeration) return null
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_POST_MUTATION,
           variables: { postId, moderatorHash, reason, data: modifiedData }
         })
         console.log('Moderation post has been modified', data)
+
+        await this.fetchPostById(this.postInModeration.id)
         return data
       } catch (error) {
         console.error(error)

@@ -22,7 +22,7 @@
     <p class="mt-2 text-gray-400 text-xs mb-2">
       {{ `${formattedDate(version)}` }}
     </p>
-    <div class="flex gap-3 justify-around">
+    <div v-if="props.version == undefined" class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">
           {{ decision }}: {{ count }}
@@ -42,10 +42,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
+import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
-import { storeToRefs } from 'pinia';
 
 interface DecisionIcon {
   text: string;
@@ -53,6 +52,14 @@ interface DecisionIcon {
 }
 
 const props = defineProps({
+  post: {
+    type: Object as PropType<ModerationPost>,
+    required: true
+  },
+  version: {
+    type: Object as PropType<PostVersion>,
+    required: false
+  },
   preview: {
     type: Boolean,
     defaultValue: false
@@ -63,8 +70,7 @@ const props = defineProps({
   }
 });
 
-const moderationPostsStore = useModerationPostsStore();
-const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
+const version = computed(() => props.version)
 
 const moderationResultGroups = computed(() => {
   const groups = version.value?.moderations.reduce((acc, moderation) => {
