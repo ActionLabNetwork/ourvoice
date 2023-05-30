@@ -16,7 +16,7 @@
           </div>
           <div class="mt-3 flex flex-col divide-y gap-x-2.5 text-xs leading-5 text-gray-500">
             <p>
-              <span v-if="moderation.reason.length" class="font-semibold">Reason: </span>
+              <span v-if="moderation.reason && moderation.reason.length" class="font-semibold">Reason: </span>
               <span v-else class="font-semibold">No reason specified </span>
               {{ moderation.reason }}
             </p>
@@ -50,6 +50,7 @@ interface History {
 const moderationPostsStore = useModerationPostsStore();
 
 const { versionInModeration: version } = storeToRefs(moderationPostsStore);
+
 const moderations = computed(() => {
   if (!version.value) return []
 
@@ -61,9 +62,11 @@ const moderations = computed(() => {
     moderatorHash
   })) ?? []
 
-  const modifyModerations: History[] = [{ id: version.value.id, decision: 'MODIFIED', reason: version.value?.reason, timestamp: version.value?.timestamp, moderatorHash: version.value?.authorHash }]
+  const modifyModerations: History[] = version.value.version > 1 ? [{ id: version.value.id, decision: 'MODIFIED', reason: version.value?.reason, timestamp: version.value?.timestamp, moderatorHash: version.value?.authorHash }] : []
 
-  return modifyModerations.concat(acceptOrRejectModerations)
+  const moderations = acceptOrRejectModerations.concat(modifyModerations)
+
+  return moderations
 });
 
 const actions = {

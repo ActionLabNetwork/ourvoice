@@ -18,7 +18,7 @@
           Not moderated yet
         </p>
         <div>
-          <span v-if="version === originalPostVersion" class="inline-flex flex-shrink-0 rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+          <span v-if="version.id === originalPostVersion.id" class="inline-flex flex-shrink-0 rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             Original
           </span>
 

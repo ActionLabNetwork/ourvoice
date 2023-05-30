@@ -21,6 +21,10 @@ export const useUserStore = defineStore('user', {
     isLoggedIn: async () => {
       const response = await authService.getSessionInfo()
       return response.status === 200 && response.data.userId
+    },
+    nicknameInParts: (state) => {
+      const [first, middle, last] = state.nickname.split('_')
+      return { first, middle, last }
     }
   },
   actions: {
@@ -30,7 +34,10 @@ export const useUserStore = defineStore('user', {
 
       const userId = (await authService.getSessionInfo()).data.userId
       this.userId = userId
-      this.sessionHash = await authService.hashInput(userId, deployment)
+
+      if (!this.sessionHash) {
+        this.sessionHash = await authService.hashInput(userId, deployment)
+      }
     }
   }
 })

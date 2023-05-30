@@ -1,10 +1,24 @@
 <template>
-  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative">
+  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
     <!-- Self moderation indicator -->
     <div class="absolute right-10" v-if="props.decisionIcon">
       <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
+      </div>
+    </div>
+
+    <!-- Author -->
+    <div class="group block flex-shrink-0 mb-3">
+      <div class="flex items-center">
+        <div>
+          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nicknameInParts.first}+${nicknameInParts.last}`" alt="PseudoNickname" />
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-700">
+            {{ userStore.nickname }}</p>
+          <p class="text-xs font-medium text-gray-500">{{ `${formattedDate(version)}` }}</p>
+        </div>
       </div>
     </div>
 
@@ -17,27 +31,19 @@
     <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
 
     <!-- Categories -->
-    <div class="flex flex-wrap mb-3">
+    <div class="flex flex-wrap">
       <div v-for="{ id, name } in version.categories" :key="id" class="bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded mr-2 mb-2">
         {{ name }}
       </div>
     </div>
 
     <!-- Attachments -->
-    <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
-      {{ `${version.files.length}` }} attachments
-    </p>
-    <AttachmentBadge v-if="version.attachmentsDownloadUrls"  :files="version.attachmentsDownloadUrls" />
-
-    <!-- Author -->
-    <p class="mt-6 text-gray-500">Authored by
-      <span class="font-semibold">
-        {{ useUserStore().nickname }}
-      </span>
-    </p>
-    <p class="mt-2 text-gray-400 text-xs mb-2">
-      {{ `${formattedDate(version)}` }}
-    </p>
+    <div>
+      <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
+        {{ `${version.files.length}` }} attachments
+      </p>
+      <AttachmentBadge v-if="version.attachmentsDownloadUrls"  :files="version.attachmentsDownloadUrls" />
+    </div>
 
     <!-- Moderation decisions count -->
     <div v-if="props.version == undefined" class="flex gap-3 justify-around">
@@ -67,6 +73,7 @@ import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
 import { useUserStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
 interface DecisionIcon {
   text: string;
@@ -91,6 +98,9 @@ const props = defineProps({
     required: false
   }
 });
+
+const userStore = useUserStore()
+const { nicknameInParts } = storeToRefs(userStore)
 
 const version = computed(() => props.version)
 
