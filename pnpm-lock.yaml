@@ -269,8 +269,8 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.16.16)(typescript@4.9.5)
       tsconfig-paths:
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: 4.2.0
+        version: 4.2.0
 
   apps/ourvoice-app:
     dependencies:
@@ -566,8 +566,8 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.16.16)(typescript@4.9.5)
       tsconfig-paths:
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: 4.2.0
+        version: 4.2.0
 
   apps/ourvoice-portal:
     dependencies:
@@ -8973,6 +8973,7 @@ packages:
   /json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
+    hasBin: true
 
   /jsonc-parser@3.2.0:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
@@ -12217,15 +12218,6 @@ packages:
       json5: 1.0.2
       minimist: 1.2.8
       strip-bom: 3.0.0
-
-  /tsconfig-paths@4.1.0:
-    resolution: {integrity: sha512-AHx4Euop/dXFC+Vx589alFba8QItjF+8hf8LtmuiCwHyI4rHXQtOOENaM8kvYf5fR0dRChy3wzWIZ9WbB7FWow==}
-    engines: {node: '>=6'}
-    dependencies:
-      json5: 2.2.3
-      minimist: 1.2.8
-      strip-bom: 3.0.0
-    dev: true
 
   /tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
