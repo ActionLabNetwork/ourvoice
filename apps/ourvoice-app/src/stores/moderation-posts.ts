@@ -289,8 +289,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           this.versionInModeration.attachmentsDownloadUrls =
             downloadUrls.data.getPresignedDownloadUrls
         }
-
-        console.log({ downloadUrls })
       } catch (error) {
         console.error(error)
       }
