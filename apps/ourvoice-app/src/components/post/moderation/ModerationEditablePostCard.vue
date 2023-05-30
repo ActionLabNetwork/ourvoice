@@ -137,7 +137,6 @@ if (version.value) {
 watch(selectedCategories, async () => {
   categoriesField.value.value = selectedCategories.value
   localVersion.categoryIds = selectedCategories.value
-  console.log(selectedCategories.value)
 })
 
 

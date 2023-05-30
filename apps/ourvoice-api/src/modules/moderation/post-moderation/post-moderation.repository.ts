@@ -54,6 +54,13 @@ export class PostModerationRepository {
     return { totalCount, moderationPosts };
   }
 
+  async getPostModerationById(id: number) {
+    return await this.prisma.postModeration.findUnique({
+      where: { id },
+      include: { postVersion: true },
+    });
+  }
+
   async createModerationPost(data: PostCreateDto) {
     const { title, content, categoryIds, files, authorHash } = data;
     const newPost = await this.prisma.post.create({
@@ -190,7 +197,7 @@ export class PostModerationRepository {
             title: data.title ?? latestVersion.title,
             content: data.content ?? latestVersion.content,
             categoryIds: data.categoryIds ?? latestVersion.categoryIds,
-            files: data.files ?? latestVersion.files,
+            files: data.files ? data.files : latestVersion.files ?? undefined,
             authorHash: moderatorHash,
             status: 'PENDING',
             post: { connect: { id: postId } },
@@ -227,16 +234,20 @@ export class PostModerationRepository {
     return modifiedModerationPost;
   }
 
-  async renewPostModeration(id: number) {
+  async renewPostModeration(id: number, moderatorHash: string) {
     const renewedPostId = await this.prisma.$transaction(async (tx) => {
       // Fetch the postModeration and related post
       const postModeration = await tx.postModeration.findUnique({
         where: { id },
-        select: { postVersion: true },
+        include: { postVersion: true },
       });
 
       if (!postModeration) {
         throw new Error('PostModeration not found');
+      }
+
+      if (postModeration.moderatorHash !== moderatorHash) {
+        throw new Error('Moderator hash does not match');
       }
 
       const postId = postModeration.postVersion.postId;

@@ -80,7 +80,13 @@ export class PostModerationResolver {
   }
 
   @Mutation()
-  async renewPostModeration(@Args('postModerationId') id: number) {
-    return await this.postModerationService.renewPostModeration(id);
+  async renewPostModeration(
+    @Args('postModerationId') id: number,
+    @Args('moderatorHash') moderatorHash: string,
+  ) {
+    return await this.postModerationService.renewPostModeration(
+      id,
+      moderatorHash,
+    );
   }
 }

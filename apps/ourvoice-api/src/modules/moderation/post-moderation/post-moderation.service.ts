@@ -179,8 +179,17 @@ export class PostModerationService {
     );
   }
 
-  async renewPostModeration(id: number) {
-    // TODO: Validate that the moderator hash matches the one in the moderation
-    return await this.moderationPostRepository.renewPostModeration(id);
+  async renewPostModeration(id: number, moderatorHash: string) {
+    const moderationToBeRenewed =
+      await this.moderationPostRepository.getPostModerationById(id);
+
+    if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
+      throw new BadRequestException('Invalid moderator hash');
+    }
+
+    return await this.moderationPostRepository.renewPostModeration(
+      id,
+      moderatorHash,
+    );
   }
 }

@@ -415,8 +415,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     ) {
       if (!this.postInModeration) return null
 
-      console.log({ modifiedData })
-
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_POST_MUTATION,
@@ -447,7 +445,10 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: RENEW_POST_MODERATION_MUTATION,
-          variables: { postModerationId: selfModeration.id }
+          variables: {
+            postModerationId: selfModeration.id,
+            moderatorHash: useUserStore().sessionHash
+          }
         })
         console.log(
           'Self moderation has been renewed. You can now moderate this version again.',

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const RENEW_POST_MODERATION_MUTATION = gql`
-  mutation RenewPostModerationMutation($postModerationId: Int!) {
-    renewPostModeration(postModerationId: $postModerationId) {
+  mutation RenewPostModerationMutation($postModerationId: Int!, $moderatorHash: String!) {
+    renewPostModeration(postModerationId: $postModerationId, moderatorHash: $moderatorHash) {
       id
       authorHash
       requiredModerations

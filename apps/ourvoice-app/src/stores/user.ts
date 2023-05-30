@@ -36,7 +36,8 @@ export const useUserStore = defineStore('user', {
       this.userId = userId
 
       if (!this.sessionHash) {
-        this.sessionHash = await authService.hashInput(userId, deployment)
+        const sessionHash = await authService.hashInput(userId, deployment)
+        this.sessionHash = sessionHash
       }
     }
   }
