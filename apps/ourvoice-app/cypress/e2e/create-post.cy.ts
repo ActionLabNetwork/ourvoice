@@ -111,7 +111,8 @@ describe('Create Post', () => {
 
     it('should show an error message if the content is empty', () => {
       // Act
-      cy.get('#content').click().type('a').clear()
+      cy.get('#content').click()
+      cy.get('#content').type('a').clear()
 
       // Assert
       cy.get('[data-cy="content-error-message"]').should('be.visible')
