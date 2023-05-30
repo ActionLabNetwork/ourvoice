@@ -137,7 +137,7 @@ router.beforeEach(async (to, from, next) => {
   const deploymentStore = useDeploymentStore()
   deploymentStore.deployment = deployment || ''
 
-  if (!isDev && !deployment) {
+  if (!deployment) {
     redirectTo(portalURL)
   }
 
