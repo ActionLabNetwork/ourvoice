@@ -31,7 +31,7 @@
     "@vue/apollo-composable": "4.0.0-beta.5",
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",
-    "@vueuse/nuxt": "^9.13.0",
+    "@vueuse/nuxt": "^10.1.2",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "vue-recaptcha-v3": "^2.0.1"
