@@ -49,7 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.8.1",
-    "supertokens-node": "^13.6.0",
+    "supertokens-node": "^14.1.1",
     "ts-morph": "^18.0.0",
     "webpack": "^5.84.1"
   },
