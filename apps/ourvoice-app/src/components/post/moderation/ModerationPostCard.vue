@@ -46,7 +46,7 @@
     </div>
 
     <!-- Moderation decisions count -->
-    <div v-if="props.version == undefined" class="flex gap-3 justify-around">
+    <div v-if="props.version?.moderations?.length && props.version.moderations.length > 0" class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">
           {{ decision }}: {{ count }}

@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import {
@@ -10,6 +14,7 @@ import { numberToCursor } from 'src/utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
 import { PostCreateDto } from './dto/post-create.dto';
+import { PostModifyDto } from './dto/post-modify.dto';
 
 @Injectable()
 export class PostModerationService {
@@ -18,7 +23,14 @@ export class PostModerationService {
   ) {}
 
   async getModerationPostById(id: number): Promise<Post> {
-    return await this.moderationPostRepository.getModerationPostById(id);
+    const moderationPost =
+      await this.moderationPostRepository.getModerationPostById(id);
+
+    if (!moderationPost) {
+      throw new NotFoundException(`Post with id ${id} not found`);
+    }
+
+    return moderationPost;
   }
 
   async getModerationPosts(
@@ -79,14 +91,32 @@ export class PostModerationService {
   }
 
   async getPostVersionById(id: number) {
-    return await this.moderationPostRepository.getPostVersionById(id);
+    const postVersion = await this.moderationPostRepository.getPostVersionById(
+      id,
+    );
+
+    if (!postVersion) {
+      throw new NotFoundException(`Post version with id ${id} not found`);
+    }
+
+    return postVersion;
   }
 
   async approvePostVersion(id: number, moderatorHash: string, reason: string) {
-    // TODO: Validate post version id exists
     // TODO: Validate moderator hash to see if they have permission/role
-    // TODO: Validate post version is the latest one for its post
-    // TODO: Additional validations...
+
+    // Validate id exists
+    const postToBeApproved =
+      await this.moderationPostRepository.getPostVersionById(id);
+
+    if (!postToBeApproved) {
+      throw new NotFoundException('Post version does not exist');
+    }
+
+    if (!postToBeApproved.latest) {
+      throw new BadRequestException('Post version is not the latest one');
+    }
+
     return await this.moderationPostRepository.approvePostVersion(
       id,
       moderatorHash,
@@ -95,10 +125,21 @@ export class PostModerationService {
   }
 
   async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
-    // TODO: Validate post version id exists
     // TODO: Validate moderator hash to see if they have permission/role
-    // TODO: Validate post version is the latest one for its post
-    // TODO: Additional validations...
+
+    // Validate id exists
+    const postToBeRejected =
+      await this.moderationPostRepository.getPostVersionById(id);
+
+    if (!postToBeRejected) {
+      throw new NotFoundException('Post version does not exist');
+    }
+
+    // Validate that version is latest
+    if (!postToBeRejected.latest) {
+      throw new BadRequestException('Post version is not the latest one');
+    }
+
     return await this.moderationPostRepository.rejectPostVersion(
       id,
       moderatorHash,
@@ -110,10 +151,25 @@ export class PostModerationService {
     postId: number,
     moderatorHash: string,
     reason: string,
-    data: any,
+    data: PostModifyDto,
   ) {
-    // TODO: Validate data using class-validator
-    // TODO: Validate post id
+    // TODO: Validate moderator hash to see if they have permission/role
+
+    // Validate data
+    const postModifyDto = plainToClass(PostModifyDto, data);
+    const errors = await validate(postModifyDto);
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    // Validate post id
+    const postToBeModified =
+      await this.moderationPostRepository.getPostVersionById(postId);
+
+    if (!postToBeModified) {
+      throw new NotFoundException('Post version does not exist');
+    }
     // TODO: Validate moderator hash to see if they have permission/role
     return await this.moderationPostRepository.modifyModerationPost(
       postId,
@@ -124,6 +180,7 @@ export class PostModerationService {
   }
 
   async renewPostModeration(id: number) {
+    // TODO: Validate that the moderator hash matches the one in the moderation
     return await this.moderationPostRepository.renewPostModeration(id);
   }
 }

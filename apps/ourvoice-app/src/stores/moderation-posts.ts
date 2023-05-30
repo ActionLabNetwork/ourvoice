@@ -417,6 +417,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     ) {
       if (!this.postInModeration) return null
 
+      console.log({ modifiedData })
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_POST_MUTATION,
