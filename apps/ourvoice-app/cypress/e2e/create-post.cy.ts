@@ -71,7 +71,9 @@ describe('Create Post', () => {
   describe('Validation', () => {
     it('should show an error message if the title is empty', () => {
       // Act
-      cy.get('#title').click().type('a').clear()
+      cy.get('#title').click()
+      cy.get('#title').type('a')
+      cy.get('#title').clear()
 
       // Assert
       cy.get('[data-cy="title-error-message"]').should('be.visible')
