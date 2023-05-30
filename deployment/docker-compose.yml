@@ -82,7 +82,7 @@ services:
   # contact form database
   ourvoice-contact-form-db:
     container_name: ourvoice-contact-form-db
-    image: mongo:4
+    image: mongo:6
     networks:
       - backend
     restart: unless-stopped
