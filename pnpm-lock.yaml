@@ -200,6 +200,9 @@ importers:
       ts-morph:
         specifier: ^18.0.0
         version: 18.0.0
+      unique-names-generator:
+        specifier: ^4.7.1
+        version: 4.7.1
       webpack:
         specifier: ^5.86.0
         version: 5.86.0

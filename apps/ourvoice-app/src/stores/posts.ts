@@ -124,7 +124,9 @@ export const usePostsStore = defineStore('posts', {
         throw new Error('User session is invalid')
       }
 
-      const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
+      // const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
+      const authorHash = useUserStore().sessionHash
+      const authorNickname = useUserStore().nickname
       const requiredModerations = 1
 
       // await createPostMutate({
@@ -139,6 +141,7 @@ export const usePostsStore = defineStore('posts', {
             categoryIds,
             files,
             authorHash,
+            authorNickname,
             requiredModerations
           }
         })

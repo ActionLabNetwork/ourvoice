@@ -158,7 +158,7 @@ const acceptPost = async (reason: string) => {
     return
   }
 
-  await moderationPostsStore.approvePostVersion(version.id, userStore.sessionHash, reason)
+  await moderationPostsStore.approvePostVersion(version.id, userStore.sessionHash, userStore.nickname, reason)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 };
 
@@ -181,7 +181,7 @@ const modifyPost = async (values: PostFields, reason: string) => {
     return
   }
 
-  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, reason, values)
+  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, userStore.nickname, reason, values)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 
   // Reload the page
@@ -201,7 +201,7 @@ const rejectPost = async (reason: string) => {
     return
   }
 
-  await moderationPostsStore.rejectPostVersion(version.id, userStore.sessionHash, reason)
+  await moderationPostsStore.rejectPostVersion(version.id, userStore.sessionHash, userStore.nickname, reason)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 };
 

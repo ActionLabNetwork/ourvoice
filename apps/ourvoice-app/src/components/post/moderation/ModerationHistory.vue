@@ -9,7 +9,7 @@
             </div>
             <h2 class="min-w-0 text-sm font-semibold leading-6">
               <div class="flex gap-x-2">
-                <span class="truncate">{{ moderation.moderatorHash }}</span>
+                <span class="truncate">{{ moderation.moderatorNickname }}</span>
                 <span class="absolute inset-0" />
               </div>
             </h2>
@@ -45,6 +45,7 @@ interface History {
   reason: string;
   timestamp: string;
   moderatorHash: string;
+  moderatorNickname: string;
 }
 
 const moderationPostsStore = useModerationPostsStore();
@@ -54,15 +55,16 @@ const { versionInModeration: version } = storeToRefs(moderationPostsStore);
 const moderations = computed(() => {
   if (!version.value) return []
 
-  const acceptOrRejectModerations: History[] = version.value?.moderations.map(({ id, decision, reason, timestamp, moderatorHash }) => ({
+  const acceptOrRejectModerations: History[] = version.value?.moderations.map(({ id, decision, reason, timestamp, moderatorHash, moderatorNickname }) => ({
     id,
     decision,
     reason,
     timestamp,
-    moderatorHash
+    moderatorHash,
+    moderatorNickname
   })) ?? []
 
-  const modifyModerations: History[] = version.value.version > 1 ? [{ id: version.value.id, decision: 'MODIFIED', reason: version.value?.reason, timestamp: version.value?.timestamp, moderatorHash: version.value?.authorHash }] : []
+  const modifyModerations: History[] = version.value.version > 1 ? [{ id: version.value.id, decision: 'MODIFIED', reason: version.value?.reason, timestamp: version.value?.timestamp, moderatorHash: version.value?.authorHash, moderatorNickname: version.value?.authorNickname }] : []
 
   const moderations = acceptOrRejectModerations.concat(modifyModerations)
 

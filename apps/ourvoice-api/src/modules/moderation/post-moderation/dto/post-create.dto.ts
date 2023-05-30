@@ -31,6 +31,9 @@ export class PostCreateDto {
   @IsString()
   authorHash: string;
 
+  @IsString()
+  authorNickname: string;
+
   @IsNumber()
   requiredModerations: number;
 }

@@ -5,6 +5,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
     moderationPost(id: $moderationPostId) {
       id
       authorHash
+      authorNickname
       requiredModerations
       versions {
         id
@@ -15,6 +16,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
         timestamp
         version
         authorHash
+        authorNickname
         reason
         latest
         status
@@ -22,6 +24,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
           id
           decision
           moderatorHash
+          moderatorNickname
           reason
           timestamp
         }

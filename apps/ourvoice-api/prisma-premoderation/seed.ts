@@ -1,4 +1,10 @@
 import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from 'unique-names-generator';
 
 const prisma = new PrismaClient();
 
@@ -30,6 +36,7 @@ function generateVersions(
       status: postStatuses[i % postStatuses.length],
       version: versionIndex + 1,
       authorHash,
+      authorNickname: authorHash,
       reason: versionIndex > 0 ? 'Modified by moderator' : '',
       latest: versionIndex === numVersions - 1, // Mark the last version as the latest
       timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
@@ -69,32 +76,43 @@ async function main() {
   ];
 
   for (let i = 0; i < 10; i++) {
+    const authorHash = uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals],
+      style: 'lowerCase',
+      separator: '-',
+    });
+
     // Create posts
     const post = await prisma.post.create({
       data: {
-        authorHash: userHashes[i % userHashes.length],
+        authorHash,
+        authorNickname: authorHash,
         status: postStatuses[i % postStatuses.length],
         versions: {
-          create: generateVersions(
-            i,
-            postStatuses,
-            userHashes[i % userHashes.length],
-          ),
+          create: generateVersions(i, postStatuses, authorHash),
         },
       },
     });
 
     // Create comments
+    const commentAuthorHash = uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals],
+      style: 'lowerCase',
+      separator: '-',
+    });
+
     const comment = await prisma.comment.create({
       data: {
-        authorHash: userHashes[(i + 1) % userHashes.length],
+        authorHash: commentAuthorHash,
+        authorNickname: commentAuthorHash,
         post: { connect: { id: post.id } },
         versions: {
           create: {
             content: `This is a comment on post ${i + 1}`,
             status: postStatuses[(i + 1) % postStatuses.length],
             version: i,
-            authorHash: userHashes[(i + 1) % userHashes.length],
+            authorHash: commentAuthorHash,
+            authorNickname: commentAuthorHash,
             latest: true,
             timestamp: new Date(`2023-04-${13 + i}T10:30:00Z`),
           },
@@ -103,10 +121,17 @@ async function main() {
     });
 
     // Create post moderations
+    const moderatorHash = uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals],
+      style: 'lowerCase',
+      separator: '-',
+    });
+
     await prisma.postModeration.create({
       data: {
         postVersionId: post.id,
-        moderatorHash: userHashes[(i + 2) % userHashes.length],
+        moderatorHash,
+        moderatorNickname: moderatorHash,
         decision: decisions[i % decisions.length],
         reason: `Moderation reason for post ${i + 1}`,
       },
@@ -116,7 +141,8 @@ async function main() {
     await prisma.commentModeration.create({
       data: {
         commentVersionId: comment.id,
-        moderatorHash: userHashes[(i + 2) % userHashes.length],
+        moderatorHash,
+        moderatorNickname: moderatorHash,
         decision: decisions[i % decisions.length],
         reason: `Moderation reason for comment on post ${i + 1}`,
       },

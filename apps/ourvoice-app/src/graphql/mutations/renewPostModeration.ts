@@ -5,6 +5,7 @@ export const RENEW_POST_MODERATION_MUTATION = gql`
     renewPostModeration(postModerationId: $postModerationId, moderatorHash: $moderatorHash) {
       id
       authorHash
+      authorNickname
       requiredModerations
       versions {
         id
@@ -15,12 +16,14 @@ export const RENEW_POST_MODERATION_MUTATION = gql`
         timestamp
         version
         authorHash
+        authorNickname
         reason
         latest
         moderations {
           id
           decision
           moderatorHash
+          moderatorNickname
           reason
           timestamp
         }

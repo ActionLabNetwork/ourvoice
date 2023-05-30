@@ -16,7 +16,7 @@
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium text-gray-700">
-            {{ userStore.nickname }}</p>
+            {{ version.authorNickname }}</p>
           <p class="text-xs font-medium text-gray-500">{{ `${formattedDate(version)}` }}</p>
         </div>
       </div>
@@ -103,6 +103,7 @@ const userStore = useUserStore()
 const { nicknameInParts } = storeToRefs(userStore)
 
 const version = computed(() => props.version)
+console.log('version', version.value)
 
 const moderationResultGroups = computed(() => {
   const groups = version.value?.moderations.reduce((acc, moderation) => {

@@ -42,11 +42,13 @@ export class PostModerationResolver {
   async approveModerationPostVersion(
     @Args('id') id: number,
     @Args('moderatorHash') moderatorHash: string,
+    @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
   ) {
     return await this.postModerationService.approvePostVersion(
       id,
       moderatorHash,
+      moderatorNickname,
       reason,
     );
   }
@@ -55,11 +57,13 @@ export class PostModerationResolver {
   async rejectModerationPostVersion(
     @Args('id') id: number,
     @Args('moderatorHash') moderatorHash: string,
+    @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
   ) {
     return await this.postModerationService.rejectPostVersion(
       id,
       moderatorHash,
+      moderatorNickname,
       reason,
     );
   }
@@ -68,12 +72,14 @@ export class PostModerationResolver {
   async modifyModerationPost(
     @Args('postId') id: number,
     @Args('moderatorHash') moderatorHash: string,
+    @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationPostModifyInput,
   ) {
     return await this.postModerationService.modifyModerationPost(
       id,
       moderatorHash,
+      moderatorNickname,
       reason,
       data,
     );

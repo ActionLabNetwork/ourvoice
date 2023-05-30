@@ -30,6 +30,7 @@ interface PostVersionWithCategoryIds {
   timestamp: string
   status: PostStatus
   authorHash: string
+  authorNickname: string
   reason: string
   latest: boolean
   moderations: Moderation[]
@@ -43,6 +44,7 @@ export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categorie
 export interface ModerationPostModel {
   id: number
   authorHash: string
+  authorNickname: string
   requiredModerations: number
   status: PostStatus
   versions: PostVersionWithCategoryIds[]
@@ -52,6 +54,7 @@ export interface Moderation {
   id: number
   decision: 'ACCEPTED' | 'REJECTED'
   moderatorHash: string
+  moderatorNickname: string
   reason: string
   timestamp: string
 }
@@ -155,6 +158,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         const newPosts = data.moderationPosts.edges.map(
           (edge: Edge<ModerationPostModel>) => edge.node
         )
+        console.log({ newPosts })
         this.posts = loadMore ? [...this.posts, ...newPosts] : newPosts
 
         this.totalCount = data.moderationPosts.totalCount
@@ -360,6 +364,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     async approvePostVersion(
       id: number,
       moderatorHash: string,
+      moderatorNickname: string,
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
       if (!this.postInModeration) return null
@@ -367,7 +372,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: APPROVE_MODERATION_POST_VERSION_MUTATION,
-          variables: { id, moderatorHash, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason }
         })
 
         console.log('Post version has been approved', data)
@@ -385,6 +390,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     async rejectPostVersion(
       id: number,
       moderatorHash: string,
+      moderatorNickname: string,
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
       if (!this.postInModeration) return null
@@ -392,7 +398,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_POST_VERSION_MUTATION,
-          variables: { id, moderatorHash, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason }
         })
 
         console.log('Post version has been rejected', data)
@@ -410,6 +416,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     async modifyModerationPost(
       postId: number,
       moderatorHash: string,
+      moderatorNickname: string,
       reason: string,
       modifiedData: PostFields
     ) {
@@ -418,7 +425,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_POST_MUTATION,
-          variables: { postId, moderatorHash, reason, data: modifiedData }
+          variables: { postId, moderatorHash, moderatorNickname, reason, data: modifiedData }
         })
         console.log('Moderation post has been modified', data)
 

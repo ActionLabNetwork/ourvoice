@@ -102,7 +102,12 @@ export class PostModerationService {
     return postVersion;
   }
 
-  async approvePostVersion(id: number, moderatorHash: string, reason: string) {
+  async approvePostVersion(
+    id: number,
+    moderatorHash: string,
+    moderatorNickname,
+    reason: string,
+  ) {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -120,11 +125,17 @@ export class PostModerationService {
     return await this.moderationPostRepository.approvePostVersion(
       id,
       moderatorHash,
+      moderatorNickname,
       reason,
     );
   }
 
-  async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
+  async rejectPostVersion(
+    id: number,
+    moderatorHash: string,
+    moderatorNickname: string,
+    reason: string,
+  ) {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -143,6 +154,7 @@ export class PostModerationService {
     return await this.moderationPostRepository.rejectPostVersion(
       id,
       moderatorHash,
+      moderatorNickname,
       reason,
     );
   }
@@ -150,6 +162,7 @@ export class PostModerationService {
   async modifyModerationPost(
     postId: number,
     moderatorHash: string,
+    moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
   ) {
@@ -174,6 +187,7 @@ export class PostModerationService {
     return await this.moderationPostRepository.modifyModerationPost(
       postId,
       moderatorHash,
+      moderatorNickname,
       reason,
       data,
     );

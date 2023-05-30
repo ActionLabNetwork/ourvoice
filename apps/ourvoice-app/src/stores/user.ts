@@ -13,9 +13,7 @@ export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     userId: '',
     sessionHash: '',
-    nickname: uniqueNamesGenerator({
-      dictionaries: [adjectives, colors, animals]
-    })
+    nickname: ''
   }),
   getters: {
     isLoggedIn: async () => {
@@ -37,7 +35,15 @@ export const useUserStore = defineStore('user', {
 
       if (!this.sessionHash) {
         const sessionHash = await authService.hashInput(userId, deployment)
+        console.log({ sessionHash })
         this.sessionHash = sessionHash
+
+        const nickname = uniqueNamesGenerator({
+          dictionaries: [adjectives, colors, animals],
+          seed: sessionHash
+        })
+        console.log({ nickname })
+        this.nickname = nickname
       }
     }
   }

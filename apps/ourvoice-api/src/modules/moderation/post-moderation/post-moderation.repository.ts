@@ -62,10 +62,12 @@ export class PostModerationRepository {
   }
 
   async createModerationPost(data: PostCreateDto) {
-    const { title, content, categoryIds, files, authorHash } = data;
+    const { title, content, categoryIds, files, authorHash, authorNickname } =
+      data;
     const newPost = await this.prisma.post.create({
       data: {
         authorHash,
+        authorNickname,
       },
     });
 
@@ -75,7 +77,8 @@ export class PostModerationRepository {
         content,
         categoryIds,
         files,
-        authorHash: authorHash,
+        authorHash,
+        authorNickname,
         status: 'PENDING',
         post: { connect: { id: newPost.id } },
         latest: true,
@@ -93,12 +96,18 @@ export class PostModerationRepository {
     });
   }
 
-  async approvePostVersion(id: number, moderatorHash: string, reason: string) {
+  async approvePostVersion(
+    id: number,
+    moderatorHash: string,
+    moderatorNickname: string,
+    reason: string,
+  ) {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
       // Create a new post moderation entry
       const newPostModeration = await tx.postModeration.create({
         data: {
           moderatorHash,
+          moderatorNickname,
           decision: 'ACCEPTED',
           reason,
           postVersionId: id,
@@ -131,12 +140,18 @@ export class PostModerationRepository {
     });
   }
 
-  async rejectPostVersion(id: number, moderatorHash: string, reason: string) {
+  async rejectPostVersion(
+    id: number,
+    moderatorHash: string,
+    moderatorNickname: string,
+    reason: string,
+  ) {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
       // Create a new post moderation entry
       const newPostModeration = await tx.postModeration.create({
         data: {
           moderatorHash,
+          moderatorNickname,
           decision: 'REJECTED',
           reason,
           postVersionId: id,
@@ -172,6 +187,7 @@ export class PostModerationRepository {
   async modifyModerationPost(
     postId: number,
     moderatorHash: string,
+    moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
   ) {
@@ -199,6 +215,7 @@ export class PostModerationRepository {
             categoryIds: data.categoryIds ?? latestVersion.categoryIds,
             files: data.files ? data.files : latestVersion.files ?? undefined,
             authorHash: moderatorHash,
+            authorNickname: moderatorNickname,
             status: 'PENDING',
             post: { connect: { id: postId } },
             reason,

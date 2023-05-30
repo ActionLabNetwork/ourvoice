@@ -13,14 +13,18 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue';
+import { onMounted, type PropType } from 'vue';
 import ModerationPostCard from './ModerationPostCard.vue';
 import type { ModerationPost } from '@/stores/moderation-posts';
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps({
   posts: { type: Array as PropType<ModerationPost[]>, required: true }
 })
-console.log(props.posts)
+
+onMounted(() => {
+  useUserStore().verifyUserSession()
+})
 </script>
 
 <style scoped>

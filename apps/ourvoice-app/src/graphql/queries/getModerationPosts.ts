@@ -8,6 +8,7 @@ export const GET_MODERATION_POSTS_QUERY = gql`
         node {
           id
           authorHash
+          authorNickname
           requiredModerations
           status
           versions {
@@ -16,6 +17,8 @@ export const GET_MODERATION_POSTS_QUERY = gql`
             content
             categoryIds
             files
+            authorHash
+            authorNickname
             timestamp
             version
             status
