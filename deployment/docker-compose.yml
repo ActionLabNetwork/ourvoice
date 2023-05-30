@@ -97,7 +97,7 @@ services:
 
   # auth manager
   supertokens:
-    image: registry.supertokens.io/supertokens/supertokens-postgresql:4.3
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:4.6
     container_name: supertokens
     depends_on:
       authdb:
