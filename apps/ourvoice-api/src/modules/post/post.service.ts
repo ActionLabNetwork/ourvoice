@@ -1,4 +1,4 @@
-import { PostPaginationInput } from './../../graphql';
+import { PostPaginationInput, PostSortingInput } from './../../graphql';
 import {
   BadRequestException,
   Injectable,
@@ -23,6 +23,7 @@ export class PostService {
   async getPosts(
     filter?: PostsFilterDto,
     pagination?: PostPaginationInput,
+    sort?: PostSortingInput,
   ): Promise<{
     totalCount: number;
     edges: { node: Post; cursor: string }[];
@@ -46,6 +47,7 @@ export class PostService {
     const { totalCount, posts } = await this.postRepository.getPosts(
       filter,
       pagination,
+      sort,
     );
 
     const edges = posts.map((post) => ({

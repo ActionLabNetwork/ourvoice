@@ -1,7 +1,11 @@
 import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
-import { PostsFilterInput, PostPaginationInput } from 'src/graphql';
+import {
+  PostsFilterInput,
+  PostPaginationInput,
+  PostSortingInput,
+} from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 
 @Injectable()
@@ -18,6 +22,7 @@ export class PostRepository {
   async getPosts(
     filter?: PostsFilterInput,
     pagination?: PostPaginationInput,
+    sort?: PostSortingInput,
   ): Promise<{ totalCount: number; posts: Post[] }> {
     const {
       title,
@@ -37,6 +42,15 @@ export class PostRepository {
       publishedBefore,
     } = filter ?? {};
 
+    const {
+      sortByCreatedAt,
+      sortByModeratedAt,
+      sortBypublishedAt,
+      sortByVotesUp,
+      sortByVotesDown,
+      sortByCommentsCount,
+    } = sort ?? {};
+
     const where: Prisma.PostWhereInput = {
       title: title ? { contains: title, mode: 'insensitive' } : undefined,
       content: content ? { contains: content, mode: 'insensitive' } : undefined,
@@ -53,6 +67,28 @@ export class PostRepository {
       moderatedAt: moderatedAfter || moderatedBefore ? {} : undefined,
       publishedAt: publishedAfter || publishedBefore ? {} : undefined,
     };
+
+    const orderBy: Prisma.PostOrderByWithRelationInput[] = [];
+    if (sortByCreatedAt) {
+      orderBy.push({ createdAt: sortByCreatedAt });
+    }
+    if (sortByModeratedAt) {
+      orderBy.push({ moderatedAt: sortByModeratedAt });
+    }
+    if (sortBypublishedAt) {
+      orderBy.push({ publishedAt: sortBypublishedAt });
+    }
+    if (sortByVotesUp) {
+      orderBy.push({ votesUp: sortByVotesUp });
+    }
+    if (sortByVotesDown) {
+      orderBy.push({ votesDown: sortByVotesDown });
+    }
+    if (sortByCommentsCount) {
+      orderBy.push({ comments: { _count: sortByCommentsCount } });
+    }
+
+    console.log('post sort', sort);
 
     if (createdAfter) {
       where.createdAt['gte'] = createdAfter;
@@ -87,7 +123,7 @@ export class PostRepository {
         ? { id: cursorToNumber(pagination.cursor) }
         : undefined,
       take: pagination?.limit ?? 10,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
     });
 
     return { totalCount, posts };

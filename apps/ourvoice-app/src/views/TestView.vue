@@ -9,8 +9,8 @@
         class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-4 border-yellow-400 flex-1 overflow-auto"
       >
         <!-- Post grid/take 3 columns -->
-        <div class="lg:col-span-3 border-r overflow-y-auto h-full relative">
-          <div class="border-2 border-red-400" v-for="(value, key) in filters" :key="key">
+        <div class="lg:col-span-3 border-r overflow-y-auto h-full relative" ref="scrollContainer">
+          <!-- <div class="border-2 border-red-400" v-for="(value, key) in filters" :key="key">
             {{ key }}:{{ value }}
           </div>
           <div class="border-2 border-indigo-400">
@@ -19,12 +19,18 @@
           </div>
 
           <div class="border-2 border-green-400">
-            gqlPostsFilter(computed): {{ gqlPostsFilter }}
+            gqlPostsSort(computed): {{ gqlPostsSort }} <br />
+            gqlPostsFilter(computed):
+            {{ gqlPostsFilter }}
           </div>
+          <div class="border-2 border-black">currentVariables: {{ variables }}</div> -->
 
-          <div class="border-2 border-black">currentVariables: {{ variables }}</div>
           <!-- stiky page header -->
           <div class="sticky top-0 z-10 backdrop-blur-lg">
+            <!-- <div class="border-2 border-blue-400">
+              scroll y: {{ y }} <br />
+              arrivedState {{ arrivedState }}
+            </div> -->
             <div class="flex items-baseline justify-between border-b lg:py-6">
               <h1 class="text-lg lg:text-4xl font-bold tracking-tight text-gray-900 mx-4">Posts</h1>
 
@@ -328,11 +334,18 @@ import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
-import { useToggle } from '@vueuse/core'
+import { useToggle, useScroll } from '@vueuse/core'
+
+const scrollContainer = ref<HTMLElement | null>(null)
+const { y } = useScroll(scrollContainer)
 
 const GET_POST_QUERY = gql`
-  query Posts($pagination: PostPaginationInput, $filter: PostsFilterInput) {
-    posts(pagination: $pagination, filter: $filter) {
+  query Posts(
+    $sort: PostSortingInput
+    $pagination: PostPaginationInput
+    $filter: PostsFilterInput
+  ) {
+    posts(sort: $sort, pagination: $pagination, filter: $filter) {
       edges {
         cursor
         node {
@@ -376,35 +389,12 @@ const GET_POST_QUERY = gql`
 `
 const mobileFiltersOpen = ref(false)
 const modalOpen = ref(false)
-const { onResult, onError, variables } = useQuery(GET_POST_QUERY, {
-  pagination: {
-    limit: 100,
-    cursor: null
-  } as any,
-  filter: null as any
-} as any)
-
-const posts = ref([] as any)
-onResult(({ data, loading }) => {
-  if (loading) return
-  console.log(data)
-  posts.value = data.posts.edges
-})
-
-onError((err) => console.log(err))
-const categoriesStore = useCategoriesStore()
-categoriesStore.fetchCategories()
-const categories = computed(() => categoriesStore)
-
 const sortOptions = ref([
-  { name: 'Published Time', href: '#', current: true },
-  { name: 'Upvotes Count', href: '#', current: false },
-  { name: 'Downvotes Count', href: '#', current: false },
-  { name: 'Comments Count', href: '#', current: false }
+  { name: 'Created Time', value: 'sortByCreatedAt', current: true },
+  { name: 'Upvotes Count', value: 'sortByVotesUp', current: false },
+  { name: 'Downvotes Count', value: 'sortByVotesDown', current: false },
+  { name: 'Comments Count', value: 'sortByCommentsCount', current: false }
 ])
-
-const sortDescending = ref(true)
-const toggleSortOrder = useToggle(sortDescending)
 
 const filters = ref({
   Category: [{ id: 0, value: 'All', label: 'All', checked: true }],
@@ -413,6 +403,10 @@ const filters = ref({
     { value: 'all time', label: 'All Time', checked: true }
   ]
 })
+const posts = ref([] as any)
+const sortDescending = ref(true)
+const toggleSortOrder = useToggle(sortDescending)
+const filterChanged = ref(false)
 
 const gqlPostsFilter = computed(() => {
   const createdAfter = filters.value.TimeRange[0].checked
@@ -425,20 +419,44 @@ const gqlPostsFilter = computed(() => {
     createdAfter
   }
 })
+const gqlPostsSort = computed(() => {
+  const sortOption = sortOptions.value.find((option) => option.current)
+  if (!sortOption) return null
+  return {
+    [sortOption.value]: sortDescending.value ? 'desc' : 'asc'
+  }
+})
 
+const { onResult, onError, variables } = useQuery(GET_POST_QUERY, {
+  pagination: {
+    limit: 100,
+    cursor: null
+  } as any,
+  filter: null as any,
+  sort: gqlPostsSort
+} as any)
+
+onResult(({ data, loading }) => {
+  if (loading) return
+  console.log('load posts', data)
+  posts.value = data.posts.edges
+  y.value = 0
+})
+
+onError((err) => console.log(err))
+const categoriesStore = useCategoriesStore()
+categoriesStore.fetchCategories()
+const categories = computed(() => categoriesStore)
 const handleSortChange = (sortOption: string) => {
   sortOptions.value.forEach((option) => {
     option.current = option.name === sortOption
   })
 }
+
 const handleSubmitFilters = () => {
-  console.log('submit filters', gqlPostsFilter.value)
-  variables.value = {
-    pagination: {
-      limit: 100
-    },
-    filter: gqlPostsFilter.value
-  }
+  console.log('Applied filters', gqlPostsFilter.value)
+  variables.value.filter = gqlPostsFilter.value
+  filterChanged.value = false
 }
 
 const resetFilters = () => {
@@ -449,7 +467,13 @@ const resetFilters = () => {
     timeRange.checked = false
   })
   filters.value.TimeRange[1].checked = true
+  handleSubmitFilters()
+  filterChanged.value = false
 }
+
+watch(gqlPostsFilter, () => {
+  filterChanged.value = true
+})
 
 watchEffect(() => {
   const cats = categories.value.data.map((category) => {

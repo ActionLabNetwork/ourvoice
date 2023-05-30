@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -7,6 +6,11 @@
 
 /* tslint:disable */
 /* eslint-disable */
+
+export enum sortOrder {
+    asc = "asc",
+    desc = "desc"
+}
 
 export enum ModerationDecision {
     ACCEPTED = "ACCEPTED",
@@ -212,6 +216,15 @@ export class PostsFilterInput {
     publishedBefore?: Nullable<DateTime>;
 }
 
+export class PostSortingInput {
+    sortByCreatedAt?: Nullable<sortOrder>;
+    sortBypublishedAt?: Nullable<sortOrder>;
+    sortByModeratedAt?: Nullable<sortOrder>;
+    sortByVotesUp?: Nullable<sortOrder>;
+    sortByVotesDown?: Nullable<sortOrder>;
+    sortByCommentsCount?: Nullable<sortOrder>;
+}
+
 export class PostPaginationInput {
     cursor?: Nullable<string>;
     limit?: Nullable<number>;
@@ -246,7 +259,7 @@ export abstract class IQuery {
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
-    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 
     abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 

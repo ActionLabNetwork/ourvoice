@@ -41,7 +41,7 @@
           <font-awesome-icon icon="fa-solid fa-house" />
           <span class="px-6">Home</span>
         </a>
-        <a href="./post" class="block p-4 hover:bg-gray-700 mx-1 transition border-b">
+        <a href="./test" class="block p-4 hover:bg-gray-700 mx-1 transition bg-gray-700">
           <font-awesome-icon icon="fa-solid fa-bullhorn" />
           <span class="px-6">Posts</span>
         </a>
