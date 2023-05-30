@@ -11,7 +11,7 @@
       <Pagination :total="postsData.totalCount" :current-page="1" :per-page="3" />
 
       <!-- TODO: change create post ui -->
-      <a href="http://localhost:3010/noauth">
+      <a href="/noauth">
         <button
           class="bg-indigo-500 hover:bg-indigo-600 text-white drop-shadow-md font-bold p-1 rounded-full h-fit fixed top-10 right-10 z-10"
         >

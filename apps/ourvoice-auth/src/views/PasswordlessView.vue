@@ -170,6 +170,10 @@ export default defineComponent({
   },
 
   methods: {
+    // TODO: this list might be coming from the database later
+    getConfig(option) {
+      return YamlContent[option]
+    },
     hasInitialMagicLinkBeenSent: async function () {
       if (await Passwordless.getLoginAttemptInfo()) {
         this.needsVerifying = true
