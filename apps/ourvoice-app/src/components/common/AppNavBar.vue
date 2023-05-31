@@ -35,7 +35,7 @@
     >
       <nav class="border-indigo-400 lg:grid space-y-6">
         <div class="p-4 hidden lg:block">
-          <DarkModeToggle />
+          <DarkButton />
         </div>
         <a href="../" class="block p-4 hover:bg-gray-700 mx-1 transition">
           <font-awesome-icon icon="fa-solid fa-house" />
@@ -52,7 +52,7 @@
       </nav>
 
       <!--  signin/signout -->
-      <div class="flex justify-between bg-gray-700">
+      <div class="flex justify-between bg-gray-700 px-5">
         <img
           class="rounded-full p-2"
           src="https://ui-avatars.com/api/?size=48?&name=Mingye+Li"
@@ -68,7 +68,6 @@
 
 <script lang="ts" setup>
 import DarkButton from './DarkButton.vue'
-import DarkModeToggle from './DarkModeToggle.vue'
 import { ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 const hideDropPanel = ref(false)

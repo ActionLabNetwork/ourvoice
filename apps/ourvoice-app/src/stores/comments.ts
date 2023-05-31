@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import { apolloClient } from './../graphql/client/index'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
-import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
-import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY, GET_COMMENTS_BY_POST_ID_QUERY } from '@/graphql/queries/getComments'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 
@@ -71,6 +69,7 @@ export const useCommentsStore = defineStore('comments', {
       return state.data.filter((c) => c.post?.id === postId)
     }
   },
+
   actions: {
     async fetchComments() {
       try {

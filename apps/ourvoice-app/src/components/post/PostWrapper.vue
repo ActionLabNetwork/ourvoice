@@ -3,7 +3,7 @@
     class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl"
   >
     <!-- <h1>id: {{ props.id }}</h1> -->
-    <h1 class="text-2xl font-semibold flex justify-between items-center">
+    <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ props.title }}
       <div>
         <span
@@ -14,11 +14,15 @@
         </span>
       </div>
     </h1>
-    <h2 class="text-sm text-gray-500">
+    <h2 class="text-xs lg:text-sm text-gray-500">
       <span>{{ timePassed(props.createdAt) }} </span> by
       <span class="font-semibold">{{ props.author?.nickname }}</span>
     </h2>
-    <p class="text-sm my-2">{{ props.content }}</p>
+    <p class="text-sm my-2">
+      <font-awesome-icon icon="fa-solid fa-quote-left" />
+      {{ props.content }}
+      <font-awesome-icon icon="fa-solid fa-quote-right" />
+    </p>
     <div id="fileUrlsWrapper" class="text-right">
       <a
         class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline"
@@ -49,7 +53,7 @@
         </button>
       </div>
       <div>
-        <button class="hover:underline">comments({{ props.comments.length }})</button>
+        <slot> </slot>
       </div>
     </div>
   </div>
@@ -79,8 +83,13 @@ export interface Post {
 const props = defineProps<Post>()
 
 const presignedUrls = ref<string[]>([])
-watchEffect(async () => {
-  const res = (await postsStore.getPresignedUrls('test-bucket', props.files ?? [], 60000)) as any
+
+const updatePresignedUrls = async () => {
+  const res = (await postsStore.getPresignedUrls('test-bucket', props.files, 60000)) as any
   presignedUrls.value = res?.map((r: any) => r.url)
+}
+
+watchEffect(() => {
+  if (presignedUrls.value.length != props.files.length) updatePresignedUrls()
 })
 </script>

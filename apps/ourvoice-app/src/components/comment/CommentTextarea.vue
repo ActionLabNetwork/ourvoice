@@ -3,7 +3,7 @@
     <div class="flex-shrink-0 mr-3">
       <img
         class="rounded-full w-6 h-6 sm:w-8 sm:h-8"
-        src="https://api.multiavatar.com/user3.png"
+        src="https://ui-avatars.com/api/?size=48?&name=Mingye+Li"
         title="usr999"
       />
     </div>
@@ -11,7 +11,7 @@
       <form action="">
         <textarea
           v-model="content"
-          class="w-full max-h-20 rounded-lg p-2 drop-shadow-md bg-white-200 dark:bg-gray-500 border"
+          class="w-full max-h-20 rounded-lg p-2 border border-black"
           maxlength="255"
           name=""
           id=""
@@ -23,9 +23,6 @@
         ></textarea>
       </form>
       <p class="text-gray-500">press enter to post</p>
-      <!-- <div class="text-right">
-        <button class="bg-indigo-400 text-white px-4 rounded-lg hover:bg-indigo-500">Submit</button>
-      </div> -->
     </div>
   </div>
 </template>

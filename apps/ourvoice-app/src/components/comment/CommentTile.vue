@@ -1,27 +1,26 @@
 <template>
-  <div class="text-gray-500 dark:text-gray-300 my-1">
-    <CommentTextarea @submit="(comment) => {
-      commentsStore.createComment({
-        content: comment,
-        postId: postId,
-        authorId: 3,
-        parentId: undefined
-      })
-    }" />
+  <div class="text-gray-500 my-1">
+    <CommentTextarea
+      @submit="
+        (comment) => {
+          commentsStore.createComment({
+            content: comment,
+            postId: postId,
+            authorId: 3,
+            parentId: undefined
+          })
+        }
+      "
+    />
 
     <div class="my-3 flex items-center tracking-wide">
-      <div class="flex -space-x-2 mr-2">
-        <!-- <img v-for="comment in commentsStore.getCommentsByPostId(postId).slice(-2).reverse()" :key="comment.id"
-          class="rounded-full w-6 h-6 border border-white"
-          :src="`https://api.multiavatar.com/${comment.author.nickname}.png`" alt="" /> -->
-      </div>
-      <div class="text-xs md:text-sm text-gray-500 dark:text-gray-300 font-semibold">
+      <div v-if="comments?.length" class="text-xs lg:text-sm text-gray-500 font-semibold">
         {{ noOfComments }} Comments
       </div>
     </div>
 
     <div class="space-y-10">
-      <CommentCard v-for="comment in comments" :key="comment.node.id" :comment="comment.node" @delete="(commentId)=>deleteComment(commentId)"/>
+      <CommentCard v-for="comment in comments" :key="comment.node.id" :comment="comment.node" />
     </div>
   </div>
 </template>
@@ -41,24 +40,20 @@ const props = defineProps({
   },
   noOfComments: {
     type: Number,
-    required: true
+    required: false
   }
 })
 const { result } = useQuery(GET_COMMENTS_BY_POST_ID_QUERY, {
-  "pagination": {
-    "limit": 5,
-    "cursor": null
+  pagination: {
+    limit: 100,
+    cursor: null
   },
-  "filter": {
-    "postId": props.postId
+  filter: {
+    postId: props.postId
   }
 })
 
 const comments = computed(() => {
-  return result?.value?.comments?.edges??[]
+  return result?.value?.comments?.edges ?? []
 })
-
-const deleteComment = (commentId: number) => {
-  commentsStore.deleteComment(commentId)
-}
 </script>
