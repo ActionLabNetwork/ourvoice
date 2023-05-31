@@ -353,13 +353,13 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1
       '@types/jsdom':
-        specifier: ^21.1.0
+        specifier: ^21.1.1
         version: 21.1.1
       '@types/node':
-        specifier: ^18.16.1
+        specifier: ^18.16.17
         version: 18.16.17
       '@vitejs/plugin-vue':
-        specifier: ^4.0.0
+        specifier: ^4.2.3
         version: 4.2.3(vite@4.3.9)(vue@3.3.4)
       '@vue/eslint-config-prettier':
         specifier: ^7.1.0
