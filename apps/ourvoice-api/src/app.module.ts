@@ -14,9 +14,12 @@ import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ContactFormModule } from './modules/contactform/contactform.module';
 
+import deployment from './config/deployment';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
+      load: [deployment],
       isGlobal: true,
     }),
     AuthModule.forRoot({

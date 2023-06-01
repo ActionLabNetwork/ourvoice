@@ -400,6 +400,9 @@ importers:
       supertokens-web-js:
         specifier: ^0.5.0
         version: 0.5.0
+      vite-plugin-vue-markdown:
+        specifier: ^0.23.5
+        version: 0.23.5(vite@4.3.9)
       vue:
         specifier: ^3.3.4
         version: 3.3.4

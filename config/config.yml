@@ -9,7 +9,7 @@ auth:
   - Passwordless
   - Verify
   - Dashboard
-logo: https://demo.ourvoice.app/images/logos/logo_our_voice.svg
+logo: /ourvoice_logo.svg
 slogan: 'This is the deployment slogan text from config.yml file'
 moderatorCount: 3
 postFrequency: hourly

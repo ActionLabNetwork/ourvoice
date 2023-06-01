@@ -21,7 +21,11 @@
       </div>
       <!-- Deployment info -->
       <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
+      <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"
+        ><button type="button" class="btn btn-purple btn-hover">Learn More</button></a
+      >
     </div>
+
     <!-- Deployment image -->
     <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
       <img

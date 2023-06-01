@@ -45,7 +45,6 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-
   await app.listen(configService.get<number>('API_PORT') || 3000);
 }
 
