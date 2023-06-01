@@ -35,11 +35,13 @@
     <div class="block sm:hidden justify-self-end ml-auto">
       <Menu>
         <MenuButton>
-          <font-awesome-icon
-            class="text-ourvoice-portal-navbar-gray"
-            icon="bars"
-            size="2x"
-          />
+          <ClientOnly>
+            <font-awesome-icon
+              class="text-ourvoice-portal-navbar-gray"
+              icon="bars"
+              size="2x"
+            />
+          </ClientOnly>
         </MenuButton>
         <MenuItems
           class="absolute text-ourvoice-portal-navbar-gray bg-black px-4 py-4 w-40 right-0 text-base flex flex-col gap-2"

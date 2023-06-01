@@ -92,8 +92,10 @@
             <div class="m-auto">
               <span v-if="state.formState == 'open'"
                 ><span class="mr-1.5">Submit</span>
-                <font-awesome-icon icon="arrow-right"
-              /></span>
+                <ClientOnly>
+                  <font-awesome-icon icon="arrow-right"
+                /></ClientOnly>
+              </span>
               <span v-else-if="state.formState == 'loading'">Loading...</span>
               <span v-else>Submitted</span>
             </div>

@@ -15,10 +15,26 @@
       <div
         class="flex flex-row justify-center gap-x-6 gap-y-2 self-center flex-wrap"
       >
-        <button type="button" class="btn btn-yellow w-[212px]">
+        <button
+          type="button"
+          class="btn btn-yellow w-[212px]"
+          @click="
+            () => {
+              useRouter().push({ path: '/', hash: '#why' })
+            }
+          "
+        >
           Read More
         </button>
-        <button type="button" class="btn btn-outline w-[212px]">
+        <button
+          type="button"
+          class="btn btn-outline w-[212px]"
+          @click="
+            () => {
+              useRouter().push({ path: '/', hash: '#contact' })
+            }
+          "
+        >
           Contact Us
         </button>
       </div>

@@ -18,7 +18,7 @@
             @click.prevent="toggleModal"
           >
             <span class="mr-1.5">Try it</span
-            ><font-awesome-icon icon="arrow-right" />
+            ><ClientOnly><font-awesome-icon icon="arrow-right" /></ClientOnly>
           </button>
         </div>
       </div>
