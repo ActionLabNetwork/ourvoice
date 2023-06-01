@@ -9,7 +9,7 @@
       <HeroSection />
     </section>
     <!-- Features -->
-    <section id="why" class="bg-ourvoice-portal-yellow py-20 border-t-black-4">
+    <section id="why">
       <CardsSection
         :title="cardsTitle"
         :sub-title="cardsSubTitle"

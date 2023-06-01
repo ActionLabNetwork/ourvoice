@@ -33,6 +33,7 @@
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",
     "@vueuse/nuxt": "^10.1.2",
+    "@vueuse/core": "^10.1.2",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "vue-recaptcha-v3": "^2.0.1"
