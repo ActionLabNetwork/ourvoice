@@ -1,46 +1,46 @@
 <template>
   <div>
     <div
-      class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28"
+      class="container flex flex-col items-center z-10 mt-14 pt-24 pb-8 lg:py-40 lg:pb-20"
     >
-      <!-- Content -->
-      <div class="flex flex-1 flex-col items-center lg:items-start">
-        <h2
-          class="text-ourvoice-blue text-3xl md:text-4 lg:text-5xl text-center lg:text-left mb-6"
-        >
-          <span class="text-ourvoice-red">Safe</span> digital space for
-          <span class="text-ourvoice-red">workplace</span>-related discussion
-        </h2>
-        <p class="text-ourvoice-grey text-lg text-center lg:text-left mb-6">
-          A safe space for employees and community members to anonymously
-          discuss issues and concerns about their work environments.
-        </p>
-        <div class="flex justify-center flex-wrap gap-6">
-          <button type="button" class="btn btn-purple btn-hover">
-            Read More
-          </button>
-          <button type="button" class="btn btn-red btn-hover">
-            Contact Us
-          </button>
-        </div>
-      </div>
-      <!-- Image -->
-      <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
-        <img
-          class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full shadow-md"
-          :src="img"
-          alt="OurVoice interface"
-        />
+      <h2
+        class="text-5xl font-Roboto font-semibold self-center text-center max-w-[680px]"
+      >
+        Safe digital space for workplace-related discussion
+      </h2>
+      <p class="text-xl font-Roboto font-normal text-center mb-6 max-w-[680px]">
+        A safe space for employees and community members to anonymously discuss
+        issues and concerns about their work environments.
+      </p>
+      <div
+        class="flex flex-row justify-center gap-x-6 gap-y-2 self-center flex-wrap"
+      >
+        <button type="button" class="btn btn-yellow w-[212px]">
+          Read More
+        </button>
+        <button type="button" class="btn btn-outline w-[212px]">
+          Contact Us
+        </button>
       </div>
     </div>
-    <!-- Rounded Rectangle -->
-    <div
-      class="hidden md:block overflow-hidden bg-ourvoice-purple rounded-l-full absolute h-80 w-2/4 top-32 right-0 lg:-bottom-28 lg:-right-36"
-    ></div>
+    <div class="flex flex-row justify-between items-end">
+      <img
+        :src="leftImg"
+        class="hidden h-auto md:block md:w-[300px] xl:w-[450px]"
+      />
+      <img
+        :src="imgs.right"
+        class="hidden h-auto md:block relative md:bottom-[-35px] md:w-[300px] xl:bottom-[-70px] xl:w-[450px] -z-10"
+      />
+      <img :src="imgs.small" class="md:hidden mx-auto h-auto w-[300px]" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import leftImgUrl from '@/assets/img/family-left.png'
+import rightImgUrl from '@/assets/img/family-right.png'
+import smallImgUrl from '@/assets/img/family-small.png'
 import imgUrl from '@/assets/img/hero_image.png'
 import { defineComponent, ref } from 'vue'
 
@@ -49,9 +49,17 @@ export default defineComponent({
 
   setup() {
     const img = ref(imgUrl)
+    const leftImg = ref(leftImgUrl)
+    const imgs = ref({
+      left: leftImgUrl,
+      right: rightImgUrl,
+      small: smallImgUrl,
+    })
 
     return {
       img: img.value,
+      imgs: imgs.value,
+      leftImg: leftImg.value,
     }
   },
 })

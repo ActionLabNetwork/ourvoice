@@ -1,14 +1,11 @@
 <template>
-  <div>
+  <div class="px-[70px]">
     <!-- Heading -->
-    <div class="sm:w-3/4 lg:w-5/12 mx-auto px-2">
-      <h1 class="text-3xl text-center text-bookmark-blue">
-        <span class="text-ourvoice-purple">Our</span
-        ><span class="text-ourvoice-red">Voice</span> features
-      </h1>
-      <p class="text-center text-ourvoice-grey mt-4">
+    <div class="sm:w-3/4 md:w-8/12 lg:w-7/12 mx-auto px-2">
+      <h1 class="mb-2">Making everyone feel heard</h1>
+      <p class="text-center text-xl font-normal">
         Our aim is to make it easy and fear free to share opinions, start
-        discussions around importnat but sometimes sensitive topics.
+        discussions around important but sometimes sensitive topics.
       </p>
     </div>
     <!-- Props -->

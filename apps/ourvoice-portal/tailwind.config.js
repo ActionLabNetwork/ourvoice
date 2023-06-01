@@ -16,10 +16,14 @@ module.exports = {
         'ourvoice-blue': '#242A45',
         'ourvoice-grey': '#9194A2',
         'ourvoice-white': '#f7f7f7',
+        'ourvoice-portal-yellow': '#ffcd29',
+        'ourvoice-portal-navbar-gray': '#f5f5f7',
       },
     },
     fontFamily: {
       Poppins: ['Poppins, sans-serif'],
+      Inter: ['Inter', 'Sans-serif'],
+      Roboto: ['Roboto', 'Sans-serif'],
     },
     container: {
       center: true,

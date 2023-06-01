@@ -4,26 +4,25 @@
       <!-- Image -->
       <div class="flex flex-1 justify-center z-10 mb-10 lg:mb-0">
         <img
-          class="transform transition-all hover:scale-110 w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full shadow-xl"
+          class="transform transition-all hover:scale-110 w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
           :src="systemProperty.image"
           alt=""
         />
       </div>
       <!-- Content -->
-      <div class="flex flex-1 flex-col items-center lg:items-start">
-        <h1 class="text-3xl text-ourvoice-blue">{{ systemProperty.title }}</h1>
-        <p
-          class="text-ourvoice-grey my-4 text-center lg:text-left sm:w-3/4 lg:w-full"
-        >
+      <div class="flex flex-1 flex-col items-center">
+        <h1 class="text-3xl font-bold font-Inter lg:text-start lg:w-8/12">
+          {{ systemProperty.title }}
+        </h1>
+        <p class="my-4 font-Inter lg:text-start sm:w-3/4 lg:w-8/12">
           {{ systemProperty.description }}
         </p>
-        <button type="button" class="btn btn-purple btn-hover">
-          More Info
-        </button>
+        <!-- Read more button -->
+        <!--        <button type="button" class="btn btn-hover btn-yellow py-4 px-16">-->
+        <!--          Read More-->
+        <!--        </button>-->
       </div>
     </div>
-    <!-- Rounded Rectangle -->
-    <div :class="divClass[1]"></div>
   </div>
 </template>
 

@@ -1,27 +1,18 @@
 <template>
   <div
-    class="group flex flex-col rounded-md shadow-md bg-white lg:mb-16 card-hover"
+    class="rounded-2xl border-black border-2 p-3 bg-white w-[282px] lg:w-[560px] shrink-0"
   >
-    <div class="p-6 flex flex-col items-center">
-      <!-- <img :src="feature.image" alt="function" /> -->
-      <span class="text-ourvoice-purple group-hover:text-ourvoice-red">
-        <font-awesome-icon :icon="cardFeature.image" size="7x" />
-      </span>
-      <h3 class="mt-5 mb-2 text-ourvoice-blue text-lg group-hover:text-white">
-        {{ cardFeature.title }}
-      </h3>
-      <p
-        class="mb-2 text-ourvoice-grey font-light group-hover:text-white text-justify"
-      >
-        {{ cardFeature.description }}
-      </p>
-    </div>
-    <!-- <hr class="border-b border-ourvoice-white" />
-    <div class="flex p-6">
-      <button type="button" class="flex-1 btn btn-purple hover:bg-ourvoice-white hover:text-black">
-        Learn More
-      </button>
-    </div> -->
+    <img :src="cardFeature.image" />
+    <h3
+      class="mt-5 mb-2 text-2xl font-semibold text-ourvoice-blue group-hover:text-white"
+    >
+      {{ cardFeature.title }}
+    </h3>
+    <p
+      class="mb-2 text-black font-normal text-[17px] group-hover:text-white text-justify"
+    >
+      {{ cardFeature.description }}
+    </p>
   </div>
 </template>
 
