@@ -19,6 +19,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@tsconfig/node18": "^2.0.1",
     "@unhead/vue": "^1.1.27",
     "@vue/apollo-composable": "4.0.0-beta.5",
     "@vueform/multiselect": "^2.6.2",

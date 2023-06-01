@@ -16,13 +16,6 @@ A safe space for employees and community members to anonymously discuss issues a
 
 ### Development
 
-- Run from the root `pnpm install` to install dependancies
-- Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
-- Run `pnpm run dev` from the corresponding `app` directory to start the server (`app`, `api` or `admin`);
-- Run from the root `pnpm migrate api:all` and `pnpm generate api:all` to migrate and generate backend prisma db (main and premoderation)
-- Run from the root `pnpm test:api` to run unit tests for the api
-- Run from the root `pnpm test:api:integration` to run integration tests for the api
-
 #### Suggested IDEA and plugins:
 
 - [VSCode](https://code.visualstudio.com/)
@@ -48,21 +41,27 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 
 #### Setup:
 
-- Run from deployment `docker compose up -d` to start services (`reverse-proxy`, `supertokens`, `databases`)
+- Run from deployment `docker compose up -d` to start services (`reverse-proxy`, `supertokens`, `databases`, `localstack`)
 - Run from the root `pnpm install` to install dependencies (also runs `pnpm postinstall` and copies all `.env` files)
 - Run from the root `pnpm generate:api:all` and `pnpm migrate:api:all` for database setup.
 - Run `pnpm dev:apps` to start all applications in development mode
   > NOTE: if you get any Prisma errors then run the generate and migrate scrips one by one.
 
-Navigate to `http://demo.ourvoice.test/` to access the Ourvoice App
+#### Regular use:
+
+- Run from the root `pnpm dev:apps` to start all the apps
+
+Navigate to `http://demo.ourvoice.test/` to access the OurVoice App or `http://admin.ourvoice.test` for OurVoice Admin app
 
 > NOTE: to be able to login without password and use email sending functions from the APIs add correct SMTP configurations to `apps/ourvoice-out-api/.env` and `apps/ourvoice-api/.env`
 
-Irregular use:
+#### Irregular use:
 
-- Run `pnpm dev` in corresponding `app` directory to start that app in development mode
+- Run `pnpm dev` in corresponding `app` directory (`app`, `api` or `admin`) to start that app in development mode
 - Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
 - Run from the root `pnpm lint` to show all lint errors and `pnpm lint:fix` to auto fix if possible
+- Run from the root `pnpm test:api` to run unit tests for the api
+- Run from the root `pnpm test:api:integration` to run integration tests for the api
 
 Local ports and URL reference:
 | Service | Port | Dev URL |
@@ -75,6 +74,31 @@ Local ports and URL reference:
 | Auth API| 3001 | http://authapi.ourvoice.test/ |
 
 > NOTE: currently only `demo` deployment is added via [config/config.yml](./config/config.yml). If more is added then they also need to be added to the `hosts` file described in [Prerequisites](####Prerequisites)
+
+## Configuration
+
+### Runtime
+
+All runtime configurations come from corresponding `.env` files:
+
+- `deployment/.env` - all environment variables for docker containers
+- `apps/**/.env` - individual app environment variables (used in development)
+
+All these files are copied from `.env.template` on initial run of `pnpm postinstall` script (automatically run after running `pnpm install`)
+
+> NOTE: Files are only copied when they do not exist. If additional environment variables are added to the `.env.template` files, they need to be manually added to each respective `.env` file.
+
+## Deployment
+
+Deployment configuration is stored in:
+
+- `config/config.yml`
+- `apps/ourvoice-api/config/config/config.yml`
+- `apps/ourvoice-auth-api/config/config/config.yml`
+
+> NOTE: Config files in both of the API applications are copies of the overall configuration files (not to be changed) and are automatically created via `pnpm postinstall` script (automatically run after running `pnpm install`)
+
+Content such as deployment specific texts are loaded from `config/content` folder as markdown files and rended as html on application views.
 
 ## 🕸️ Structure
 

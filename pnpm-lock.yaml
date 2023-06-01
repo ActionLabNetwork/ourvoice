@@ -59,6 +59,9 @@ importers:
 
   apps/ourvoice-admin:
     dependencies:
+      '@tsconfig/node18':
+        specifier: ^2.0.1
+        version: 2.0.1
       pinia:
         specifier: ^2.1.3
         version: 2.1.3(typescript@5.0.4)(vue@3.3.4)
@@ -286,6 +289,9 @@ importers:
       '@fortawesome/vue-fontawesome':
         specifier: ^3.0.3
         version: 3.0.3(@fortawesome/fontawesome-svg-core@6.4.0)(vue@3.3.4)
+      '@tsconfig/node18':
+        specifier: ^2.0.1
+        version: 2.0.1
       '@unhead/vue':
         specifier: ^1.1.27
         version: 1.1.27(vue@3.3.4)
@@ -398,6 +404,9 @@ importers:
 
   apps/ourvoice-auth:
     dependencies:
+      '@tsconfig/node18':
+        specifier: ^2.0.1
+        version: 2.0.1
       pinia:
         specifier: ^2.1.3
         version: 2.1.3(typescript@5.0.4)(vue@3.3.4)
@@ -4008,6 +4017,10 @@ packages:
   /@tsconfig/node16@1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
     dev: true
+
+  /@tsconfig/node18@2.0.1:
+    resolution: {integrity: sha512-UqdfvuJK0SArA2CxhKWwwAWfnVSXiYe63bVpMutc27vpngCntGUZQETO24pEJ46zU6XM+7SpqYoMgcO3bM11Ew==}
+    dev: false
 
   /@types/babel__core@7.20.0:
     resolution: {integrity: sha512-+n8dL/9GWblDO0iU6eZAwEIJVr5DWigtle+Q6HLOrh/pdbXOhOtqzq8VPPE2zvNJzSKY4vH/z3iT3tn0A3ypiQ==}
