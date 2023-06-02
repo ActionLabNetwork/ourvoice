@@ -127,16 +127,20 @@ async function main() {
 }
 
 export const seedMainDb = async () => {
+  console.log('Clearing main database...');
   await clearDatabase();
-  // await main()
-  //   .catch((e) => {
-  //     console.error(e);
-  //     process.exit(1);
-  //   })
-  //   .finally(async () => {
-  //     await prisma.$disconnect();
-  //   });
+  console.log('Seeding main database...');
+  await main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
 };
 
-// Uncomment this to seed using ts-node
-// seedMainDb();
+seedMainDb()
+  .then
+  // Do nothing
+  ();

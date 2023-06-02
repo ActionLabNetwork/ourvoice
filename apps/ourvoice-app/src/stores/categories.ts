@@ -1,6 +1,7 @@
 import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { defineStore } from 'pinia'
 import { useQuery } from '@vue/apollo-composable'
+import { apolloClient } from './../graphql/client/index'
 
 interface Category {
   id: number
@@ -39,21 +40,18 @@ export const useCategoriesStore = defineStore('categories', {
 
   actions: {
     async fetchCategories() {
-      const { onResult, onError } = useQuery(GET_CATEGORIES_QUERY)
+      try {
+        const { data } = await apolloClient.query({ query: GET_CATEGORIES_QUERY })
 
-      onResult(({ data, loading }: Result) => {
         const extractCategories = ({ node: { id, name } }: Edge): Category => ({ id, name })
 
         this.data = data.categories.edges.map(extractCategories)
-        this.loading = loading
-      })
-
-      onError((error) => {
+      } catch (error) {
         this.error = error
         if (error) {
           this.errorMessage = 'Failed to load categories. Please try again.'
         }
-      })
+      }
     }
   }
 })

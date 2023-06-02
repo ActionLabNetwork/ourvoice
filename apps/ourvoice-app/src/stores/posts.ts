@@ -61,43 +61,33 @@ export const usePostsStore = defineStore('posts', {
 
   actions: {
     async fetchPosts() {
-      const { onResult, onError } = useQuery(GET_POSTS_QUERY, {
-        limit: 3
-      })
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_POSTS_QUERY,
+          variables: { limit: 3 }
+        })
 
-      onResult(({ data, loading }) => {
         this.data = data.posts.edges.map((edge: any) => edge.node)
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
-        this.loading = loading
-      })
-
-      onError((error) => {
+      } catch (error) {
         this.error = error
         if (error) {
           this.errorMessage = 'Failed to load posts. Please try again.'
         }
-      })
+      }
     },
 
     async getPresignedUrls(bucket: string, keys: string[], expiresIn: number) {
-      const { onResult, onError } = useQuery(GET_PRESIGNED_URLS_QUERY, {
-        bucket,
-        keys,
-        expiresIn
-      })
-
-      return new Promise((resolve, reject) => {
-        onResult(({ data, loading }) => {
-          if (!loading) {
-            resolve(data.getPresignedUrls)
-          }
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_PRESIGNED_URLS_QUERY,
+          variables: { bucket, keys, expiresIn }
         })
-
-        onError((error) => {
-          reject(error)
-        })
-      })
+        return data.getPresignedUrls
+      } catch (error) {
+        this.error = error
+      }
     },
 
     async createPost({
@@ -115,37 +105,33 @@ export const usePostsStore = defineStore('posts', {
       const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
-      // const { mutate: createPostMutate } = useMutation(CREATE_POST_MUTATION)
-      const { mutate: createModerationPostMutate } = useMutation(CREATE_MODERATION_POST_MUTATION)
-
       // Check if we can access the session and generate a user hash for storing in the db
       if (!userStore.isLoggedIn) {
         // TODO: Set up a proper error handling module
         throw new Error('User session is invalid')
       }
 
-      // const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
       const authorHash = useUserStore().sessionHash
       const authorNickname = useUserStore().nickname
       const requiredModerations = 1
 
-      // await createPostMutate({
-      //   data: { title, content, categoryIds, files, authorId }
-      // })
-
       try {
-        await createModerationPostMutate({
-          data: {
-            title,
-            content,
-            categoryIds,
-            files,
-            authorHash,
-            authorNickname,
-            requiredModerations
+        await apolloClient.mutate({
+          mutation: CREATE_MODERATION_POST_MUTATION,
+          variables: {
+            data: {
+              title,
+              content,
+              categoryIds,
+              files,
+              authorHash,
+              authorNickname,
+              requiredModerations
+            }
           }
         })
       } catch (error) {
+        this.error = error
         console.log({ error })
       }
     },
@@ -159,10 +145,9 @@ export const usePostsStore = defineStore('posts', {
       userId: number
       voteType: string
     }) {
-      const { mutate } = useMutation(VOTE_POST_MUTATION)
-
-      await mutate({
-        data: { postId, userId, voteType }
+      await apolloClient.mutate({
+        mutation: VOTE_POST_MUTATION,
+        variables: { data: { postId, userId, voteType } }
       })
     }
   }

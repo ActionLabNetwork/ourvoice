@@ -1,13 +1,15 @@
 <template>
   <div class="mx-auto p-5 w-full min-h-screen bg-gray-200 overflow-y-scroll">
-    <TabsWrapper>
-      <TabContent title="Create Post">
-        <CreatePost :deployment="props.deployment" />
-      </TabContent>
-      <TabContent title="Create Comment">
-        <CreateComment />
-      </TabContent>
-    </TabsWrapper>
+    <Suspense>
+      <TabsWrapper>
+        <TabContent title="Create Post">
+          <CreatePost />
+        </TabContent>
+        <TabContent title="Create Comment">
+          <CreateComment />
+        </TabContent>
+      </TabsWrapper>
+    </Suspense>
   </div>
 </template>
 

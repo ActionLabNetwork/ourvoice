@@ -178,27 +178,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import Multiselect from '@vueform/multiselect'
+import { ref, computed, watch, onMounted } from 'vue';
+import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
-import { useCategoriesStore } from '@/stores/categories'
-import AttachmentList from '../inputs/AttachmentList.vue'
-import {
-  createPostContentCharacterLimit,
-  postFilesBucket,
-  postFilesPresignedUrlTTL,
-  inputPlaceholders
-} from '@/constants/post'
-import { usePostsStore } from '@/stores/posts'
-import { uploadFileUsingPresignedUrl } from '@/services/s3-service'
-import { useForm, useField } from 'vee-validate'
-import {
-  validateAttachments,
-  validateCategories,
-  validateContent,
-  validateTitle
-} from '@/validators'
-import { useUserStore } from '@/stores/user'
+import { useCategoriesStore } from '@/stores/categories';
+import AttachmentList from '../inputs/AttachmentList.vue';
+import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
+import { usePostsStore } from '@/stores/posts';
+import { generateUniqueKey, uploadFileUsingPresignedUrl } from '@/services/s3-service';
+import { useForm, useField } from 'vee-validate';
+import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
+import { useUserStore } from '@/stores/user';
 
 interface PresignedUrlResponse {
   key: string
@@ -220,18 +210,18 @@ const createPostValidationSchema = {
   }
 }
 
-// Init user store and set deployment
 const userStore = useUserStore()
 
 // Fetch categories and initial state
 const categoriesStore = useCategoriesStore()
-categoriesStore.fetchCategories()
-
 const postsStore = usePostsStore()
 
-const { handleSubmit, resetForm, errors } = useForm({
-  validationSchema: createPostValidationSchema
+onMounted(async () => {
+  await userStore.verifyUserSession()
+  await categoriesStore.fetchCategories()
 })
+
+const { handleSubmit, resetForm, errors } = useForm({ validationSchema: createPostValidationSchema })
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -260,11 +250,6 @@ const updateCharacterCount = () => {
     contentField.value.value.length > createPostContentCharacterLimit
       ? `Content must not exceed ${createPostContentCharacterLimit} characters.`
       : ''
-}
-
-const generateUniqueKey = (userIdentifier: string, file: File, index: number) => {
-  const timestamp = Date.now()
-  return `${userIdentifier}/${timestamp}_${index}_${file.name}`
 }
 
 const updateAttachments = async (event: Event) => {
@@ -363,7 +348,8 @@ watch(selectedCategories, async () => {
 })
 </script>
 
-<style src="@vueform/multiselect/themes/default.css"></style>
+<style src="@vueform/multiselect/themes/default.css">
+</style>
 <style>
 :root {
   --form-brand-blue: #2196f3;
