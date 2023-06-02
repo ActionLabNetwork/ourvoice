@@ -10,7 +10,8 @@
         "http://demo.ourvoice.test",
         "http://app.ourvoice.test",
         "https://app.localstack.cloud",
-        "http://app.localstack.cloud"
+        "http://app.localstack.cloud",
+        "http://demo.ourvoice.test"
       ],
       "ExposeHeaders": ["ETag"]
     }
