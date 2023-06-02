@@ -158,7 +158,6 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         const newPosts = data.moderationPosts.edges.map(
           (edge: Edge<ModerationPostModel>) => edge.node
         )
-        console.log({ newPosts })
         this.posts = loadMore ? [...this.posts, ...newPosts] : newPosts
 
         this.totalCount = data.moderationPosts.totalCount

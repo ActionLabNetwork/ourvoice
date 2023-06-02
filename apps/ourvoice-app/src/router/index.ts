@@ -18,7 +18,7 @@ const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 const authURL = `${authBaseURL}?d=${addDeployment().deployment}`
 
 // TODO: this list might be coming from the database later
-const deployment = YamlContent.deployment
+const deployments = YamlContent.deployment
 
 function addDeployment() {
   const host = window.location.host
