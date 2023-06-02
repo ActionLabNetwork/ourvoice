@@ -8,19 +8,29 @@
       <h1 class="text-ourvoice-blue text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
         <span class="text-ourvoice-red">OurVoice</span> App
       </h1>
+      <!-- Deployment description -->
+      <Description class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
+      <!-- Deployment slogan -->
       <p class="text-ourvoice-grey text-lg text-center lg:text-left mb-6">
-        A safe space for employees and community members to anonymously discuss issues and concerns
-        about their work environments.
+        {{ getConfig('slogan') }}
       </p>
       <div v-if="!session" class="flex justify-center flex-wrap gap-6">
-        <a :href="authURL"><button type="button" class="btn btn-purple btn-hover">Login</button></a>
+        <a :href="authURL"
+          ><button type="button" class="btn btn-purple btn-hover">Get Started</button></a
+        >
       </div>
+      <!-- Deployment info -->
+      <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
+      <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"
+        ><button type="button" class="btn btn-purple btn-hover">Learn More</button></a
+      >
     </div>
-    <!-- Image -->
+
+    <!-- Deployment image -->
     <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
       <img
         class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
-        src="@/assets/ourvoice_logo.svg"
+        :src="getConfig('logo')"
         alt="OurVoice interface"
       />
     </div>
@@ -32,11 +42,19 @@ import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
+import YamlContent from '../../../../config/config.yml'
+import Description from '../../../../config/content/description.md'
+import Information from '../../../../config/content/information.md'
+
 const apiURL = import.meta.env.VITE_APP_API_URL
 
 const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 
 export default defineComponent({
+  components: {
+    Description,
+    Information
+  },
   props: ['deployment'],
   data() {
     return {
@@ -48,6 +66,10 @@ export default defineComponent({
     }
   },
   methods: {
+    // TODO: this list might be coming from the database later
+    getConfig(option) {
+      return YamlContent[option]
+    },
     signOut: async function () {
       await Session.signOut()
       window.location.assign('/')

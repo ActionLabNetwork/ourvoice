@@ -43,7 +43,7 @@
     "generate:api:main": "pnpm --filter ./apps/ourvoice-api prisma:generate:main",
     "generate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:generate:premoderation",
     "generate:api:contactform": "pnpm --filter ./apps/ourvoice-api prisma:generate:contactform",
-    "postinstall": "pnpm tsx scripts/copy-envs.ts"
+    "postinstall": "pnpm tsx scripts/copy-config.ts"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",

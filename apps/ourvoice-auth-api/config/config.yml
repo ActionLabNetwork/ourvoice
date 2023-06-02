@@ -1,5 +1,4 @@
-deployments: 
-  - 'demo'
+deployment: demo
 organisation: ourvoice.app
 roles:
   - user
@@ -10,4 +9,8 @@ auth:
   - Passwordless
   - Verify
   - Dashboard
-
+logo: /ourvoice_logo.svg
+slogan: 'This is the deployment slogan text from config.yml file'
+moderatorCount: 3
+postFrequency: hourly
+persistNickNames: true

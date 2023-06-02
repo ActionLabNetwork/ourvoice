@@ -46,6 +46,15 @@
         <div class="divider-container">
           <div class="divider" />
         </div>
+        <!-- Deployment image -->
+        <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
+          <img
+            class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+            :src="getConfig('logo')"
+            alt="OurVoice interface"
+          />
+        </div>
+        <Login />
 
         <div v-if="error" class="error-container">
           <div class="error-message">{{ errorMessage }}</div>
@@ -104,6 +113,7 @@ import { ManageRedirectStateService } from '../utils/manage-redirect-state.servi
 import { defineComponent } from 'vue'
 
 import YamlContent from '../../../../config/config.yml'
+import Login from '../../../../config/content/login.md'
 
 // const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
 // const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
@@ -115,6 +125,9 @@ const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 const organisation = YamlContent.organisation
 
 export default defineComponent({
+  components: {
+    Login
+  },
   data() {
     return {
       // used for setting magic link already sent status
@@ -170,6 +183,10 @@ export default defineComponent({
   },
 
   methods: {
+    // TODO: this list might be coming from the database later
+    getConfig(option) {
+      return YamlContent[option]
+    },
     hasInitialMagicLinkBeenSent: async function () {
       if (await Passwordless.getLoginAttemptInfo()) {
         this.needsVerifying = true

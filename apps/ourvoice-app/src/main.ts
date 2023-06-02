@@ -1,5 +1,6 @@
 import { apolloClient } from './graphql/client/index'
 import { createApp, provide, h } from 'vue'
+import { createHead } from '@unhead/vue'
 import { createPinia } from 'pinia'
 import SuperTokens from 'supertokens-web-js'
 import Session from 'supertokens-web-js/recipe/session'
@@ -39,7 +40,9 @@ const app = createApp({
 })
 
 app.use(createPinia())
+app.use(createHead())
 app.use(router)
+
 app.component('font-awesome-icon', FontAwesomeIcon)
 
 app.mount('#app')

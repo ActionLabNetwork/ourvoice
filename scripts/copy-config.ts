@@ -24,3 +24,10 @@ readdirSync(appDir, { withFileTypes: true }).forEach((dirent) => {
 
 // deployment env file
 copyEnvFile('./deployment')
+
+// copy configuration files
+copyFileSync('./config/config.yml', './apps/ourvoice-api/config/config.yml')
+copyFileSync(
+  './config/config.yml',
+  './apps/ourvoice-auth-api/config/config.yml'
+)

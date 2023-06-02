@@ -23,7 +23,7 @@ async function bootstrap() {
   ];
   app.enableCors({
     origin: function (origin, callback) {
-      const parts = origin.split('.');
+      const parts = origin ? origin.split('.') : origin;
       if (
         !origin ||
         whitelist.indexOf(origin) !== -1 ||
@@ -45,7 +45,6 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-
   await app.listen(configService.get<number>('API_PORT') || 3000);
 }
 

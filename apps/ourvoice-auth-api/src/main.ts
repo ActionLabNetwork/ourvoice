@@ -27,7 +27,7 @@ async function bootstrap() {
       // const match = origin
       //   .toLowerCase()
       //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
-      const parts = origin.split('.');
+      const parts = origin ? origin.split('.') : origin;
       if (
         !origin ||
         whitelist.indexOf(origin) !== -1 ||
