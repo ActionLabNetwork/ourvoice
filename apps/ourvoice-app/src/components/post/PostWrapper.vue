@@ -59,7 +59,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { defineProps, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { timePassed } from '@/utils/index'
 import { usePostsStore } from '@/stores/posts'
 const postsStore = usePostsStore()

@@ -1,8 +1,8 @@
 <template>
   <div class="border-r border-gray-400 flex flex-col bg-gray-800 text-white">
     <!-- Logo -->
-    <div class="lg:py-6 px-4 flex lg:block justify-between">
-      <a class="flex font-bold text-lg lg:text-4xl items-center" href="../">
+    <div class="lg:py-6 flex lg:block justify-between">
+      <a class="flex font-bold text-lg lg:text-4xl items-center px-2 lg:px-4" href="../">
         <span class="">Over</span><span class="text-ourvoice-red">Voice</span>
       </a>
 
@@ -37,11 +37,11 @@
         <div class="p-4 hidden lg:block">
           <DarkButton />
         </div>
-        <a href="../" class="block p-4 hover:bg-gray-700 mx-1 transition">
+        <a href="#" class="block p-4 hover:bg-gray-700 mx-1 transition">
           <font-awesome-icon icon="fa-solid fa-house" />
           <span class="px-6">Home</span>
         </a>
-        <a href="./test" class="block p-4 hover:bg-gray-700 mx-1 transition bg-gray-700">
+        <a href="#" class="block p-4 hover:bg-gray-700 mx-1 transition">
           <font-awesome-icon icon="fa-solid fa-bullhorn" />
           <span class="px-6">Posts</span>
         </a>
@@ -55,7 +55,7 @@
       <div class="flex justify-between bg-gray-700 px-5">
         <img
           class="rounded-full p-2"
-          src="https://ui-avatars.com/api/?size=48?&name=Mingye+Li"
+          src="https://ui-avatars.com/api/?size=48?&name=user3"
           alt=""
         />
         <a class="p-2 flex items-center border-ourvoice-red hover:bg-gray-700 transform" href="#"
