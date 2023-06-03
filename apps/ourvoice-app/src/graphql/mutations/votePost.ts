@@ -11,6 +11,9 @@ export const VOTE_POST_MUTATION = gql`
       post {
         id
       }
+      comment {
+        id
+      }
     }
   }
 `

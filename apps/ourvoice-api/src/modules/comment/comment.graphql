@@ -26,6 +26,7 @@ type Comment {
   post: Post
   parent: Comment
   children: [Comment!]!
+  votes: [Vote!]!
 }
 
 input CommentCreateInput {

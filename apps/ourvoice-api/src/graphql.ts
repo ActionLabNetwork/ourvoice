@@ -51,12 +51,6 @@ export class UserUpdateInput {
     verifiedAt?: Nullable<DateTime>;
 }
 
-export class VoteCreateInput {
-    voteType: string;
-    userId: number;
-    postId: number;
-}
-
 export class CategoryCreateInput {
     name: string;
     description?: Nullable<string>;
@@ -230,6 +224,20 @@ export class PostPaginationInput {
     limit?: Nullable<number>;
 }
 
+export class VoteCreateInput {
+    voteType: string;
+    userId: number;
+    postId: number;
+    commentId?: Nullable<number>;
+}
+
+export class VotesFilterInput {
+    voteType?: Nullable<string>;
+    userId?: Nullable<number>;
+    postId?: Nullable<number>;
+    commentId?: Nullable<number>;
+}
+
 export abstract class IQuery {
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
@@ -265,6 +273,10 @@ export abstract class IQuery {
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
+    abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
+
+    abstract votes(filter?: Nullable<VotesFilterInput>): Vote[] | Promise<Vote[]>;
+
     abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 }
 
@@ -276,10 +288,6 @@ export abstract class IMutation {
     abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
 
     abstract deleteUser(id: number): User | Promise<User>;
-
-    abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
-
-    abstract deleteVote(id: number): Vote | Promise<Vote>;
 
     abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
 
@@ -320,6 +328,10 @@ export abstract class IMutation {
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
+
+    abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
+
+    abstract deleteVote(id: number): Vote | Promise<Vote>;
 }
 
 export class User {
@@ -342,13 +354,6 @@ export class UserType {
     id: number;
     type: string;
     users: User[];
-}
-
-export class Vote {
-    id: number;
-    voteType: string;
-    user: User;
-    post: Post;
 }
 
 export class Category {
@@ -394,6 +399,7 @@ export class Comment {
     post?: Nullable<Post>;
     parent?: Nullable<Comment>;
     children: Comment[];
+    votes: Vote[];
 }
 
 export class CommentEdge {
@@ -562,6 +568,14 @@ export class PostPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+}
+
+export class Vote {
+    id: number;
+    voteType: string;
+    user: User;
+    post: Post;
+    comment?: Nullable<Comment>;
 }
 
 export type DateTime = any;

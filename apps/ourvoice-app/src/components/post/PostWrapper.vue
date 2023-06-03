@@ -37,18 +37,20 @@
     <div class="flex justify-between items-center">
       <div class="flex">
         <button
+          @click="voteForPost('UPVOTE')"
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          {{ props.votesUp }}
+          {{ votes?.filter((vote) => vote.voteType === 'UPVOTE').length }}
           <font-awesome-icon icon="fa-solid fa-thumbs-up" />
         </button>
 
         <button
+          @click="voteForPost('DOWNVOTE')"
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          {{ props.votesDown }}
+          {{ votes?.filter((vote) => vote.voteType === 'DOWNVOTE').length }}
           <font-awesome-icon icon="fa-solid fa-thumbs-down" />
         </button>
       </div>
@@ -62,6 +64,10 @@
 import { ref, watchEffect } from 'vue'
 import { timePassed } from '@/utils/index'
 import { usePostsStore } from '@/stores/posts'
+import { VOTE_POST_MUTATION } from '@/graphql/mutations/votePost'
+import { GET_VOTES_QUERY } from '@/graphql/queries/getVotes'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+
 const postsStore = usePostsStore()
 export interface Post {
   id: number
@@ -92,4 +98,33 @@ const updatePresignedUrls = async () => {
 watchEffect(() => {
   if (presignedUrls.value.length != props.files.length) updatePresignedUrls()
 })
+
+const votes = ref<any>([])
+
+const { mutate: createVoteForPost } = useMutation(VOTE_POST_MUTATION)
+const { onResult, refetch } = useQuery(GET_VOTES_QUERY, {
+  filter: {
+    postId: props.id,
+    voteType: null,
+    userId: null,
+    commentId: null
+  }
+})
+onResult(({ data, loading }) => {
+  if (loading) return
+  votes.value = data.votes
+})
+
+const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+  await createVoteForPost({
+    data: {
+      commentId: null,
+      postId: props.id,
+      // TODO: get userId from auth
+      userId: 1,
+      voteType: voteType
+    }
+  })
+  refetch()
+}
 </script>

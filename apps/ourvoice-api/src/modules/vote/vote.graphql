@@ -3,15 +3,29 @@ type Mutation {
   deleteVote(id: Int!): Vote!
 }
 
+type Query {
+  vote(id: Int!): Vote
+  votes(filter: VotesFilterInput): [Vote!]!
+}
+
 type Vote {
   id: Int!
   voteType: String!
   user: User!
   post: Post!
+  comment: Comment
 }
 
 input VoteCreateInput {
   voteType: String!
   userId: Int!
   postId: Int!
+  commentId: Int
+}
+
+input VotesFilterInput {
+  voteType: String
+  userId: Int
+  postId: Int
+  commentId: Int
 }
