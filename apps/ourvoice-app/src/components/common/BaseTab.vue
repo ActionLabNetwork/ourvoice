@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-bind="$attrs">
     <div class="sm:hidden">
       <select id="tabs" name="tabs" class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
         <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
@@ -26,24 +26,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { PropType, ref, watchEffect } from 'vue'
 
 interface Tab {
   name: string;
   current: boolean;
 }
 
-const tabs = ref<Tab[]>([
-  { name: 'Pending', current: true },
-  { name: 'Approved', current: false },
-  { name: 'Rejected', current: false },
-])
+const props = defineProps({
+  tabs: Array as PropType<Tab[]>,
+  initialTab: Object as PropType<Tab>,
+})
 
-const currentTab = ref<Tab>(tabs.value[0])
+const emit = defineEmits(['tab-switched']);
+
+let currentTab = ref<Tab>(props.initialTab)
+
+watchEffect(() => {
+  currentTab.value = props.tabs.find(tab => tab.current) || props.initialTab;
+});
+
 const switchTab = (selectedTab: Tab) => {
-  tabs.value.forEach(tab => {
+  props.tabs.forEach(tab => {
     tab.current = tab === selectedTab;
   });
   currentTab.value = selectedTab;
+  emit('tab-switched', selectedTab);
 };
 </script>
