@@ -7,35 +7,53 @@ import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 export interface Comment {
   id: number
   content: string
+  votesDown: number
+  votesUp: number
+  moderated: boolean
+  published: boolean
   createdAt: string
+  moderatedAt: string
+  publishedAt: string
+  disabledAt: string
   author: {
     id: number
     nickname: string
   }
   post: {
     id: number
-    title: string
   }
   parent: {
     id: number
-    content: string
+    author: {
+      id: number
+      nickname: string
+    }
   }
 }
+export interface pageInfo {
+  endCursor: string
+  hasNextPage: boolean
+  startCursor: string
+}
 export interface CommentsState {
-  data: Comment[]
+  data: Comment[] | undefined
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
+  pageInfo: pageInfo | undefined
+  totalCount: number | undefined
 }
 
 provideApolloClient(apolloClient)
 
 export const useCommentsStore = defineStore('comments', {
   state: (): CommentsState => ({
-    data: [],
+    data: undefined,
     loading: false,
     error: undefined,
-    errorMessage: undefined
+    errorMessage: undefined,
+    pageInfo: undefined,
+    totalCount: undefined
   }),
 
   getters: {
@@ -79,6 +97,8 @@ export const useCommentsStore = defineStore('comments', {
         this.data = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
           content: comment.node.content,
+          votesDown: comment.node.votesDown,
+          votesUp: comment.node.votesUp,
           createdAt: comment.node.createdAt,
           authorHash: comment.node.authorHash ?? null,
           authorNickname: comment.node.authorNickname ?? null,
@@ -180,16 +200,30 @@ export const useCommentsStore = defineStore('comments', {
       }
     },
 
-    async commentsByPostId(postId: number) {
-      const { result } = useQuery(GET_COMMENTS_BY_POST_ID_QUERY, {
-        pagination: {
-          first: 2
+    async updateComment(commentId: number) {
+      const { onResult, onError } = useQuery(
+        GET_COMMENT_BY_ID_QUERY,
+        {
+          commentId: commentId
         },
-        filter: {
-          postId
+        {
+          fetchPolicy: 'network-only'
+        }
+      )
+
+      onResult(({ data, loading }) => {
+        this.loading = loading
+        if (loading) return
+        const comment = this.data.find((comment: any) => comment.id === commentId)
+        comment.votesUp = data.comment.votesUp
+        comment.votesDown = data.comment.votesDown
+      })
+      onError((error) => {
+        this.error = error
+        if (error) {
+          this.errorMessage = 'Failed to update comment. Please try again.'
         }
       })
-      return result
     }
   }
 })

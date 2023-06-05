@@ -13,71 +13,99 @@
           @{{ comment?.parent?.author?.nickname ?? 'original post' }}
         </span>
       </b>
+      <span class="text-xs">{{ ' ' + timePassed(comment.createdAt) }}</span>
       <div
-        class="bg-white dark:bg-ourvoice-blue rounded-lg border drop-shadow-md pl-4 pr-2 py-2 leading-relaxed"
+        class="bg-white dark:bg-ourvoice-blue rounded-lg border drop-shadow-md px-6 py-4 leading-relaxed"
       >
         <div class="text-sm md:text-md py-2">
           <p class="break-all">
             <font-awesome-icon icon="fa-solid fa-quote-left" />
-            {{ commentContent }}
+            {{ comment.content }}
             <font-awesome-icon icon="fa-solid fa-quote-right" />
           </p>
         </div>
+        <div class="flex justify-between">
+          <div class="flex">
+            <button
+              @click="voteForComment('UPVOTE')"
+              type="button"
+              class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+            >
+              {{ comment?.votesUp }}
+              <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+            </button>
 
-        <div class="flex text-gray-500 dark:text-gray-300">
-          <div
-            class="hover:text-blue-500 dark:hover:hover:text-blue-500 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-            @click="showReply = !showReply"
-          >
-            <font-awesome-icon icon="fa-solid fa-comment" />
-            <span class="hidden sm:inline-block px-1"> Reply</span>
+            <button
+              @click="voteForComment('DOWNVOTE')"
+              type="button"
+              class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+            >
+              {{ comment?.votesDown }}
+              <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+            </button>
           </div>
-          <div
-            class="hover:text-blue-500 dark:hover:hover:text-blue-500 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-          >
-            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
-            <span class="hidden sm:inline-block px-1"> Vote up </span>
-          </div>
-          <div
-            class="hover:text-blue-500 dark:hover:hover:text-blue-500 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-          >
-            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
-            <span class="hidden sm:inline-block px-1"> Vote down </span>
-          </div>
-          <div class="ml-auto text-right">
-            <span class="text-xs md:text-md">{{ timePassed(comment.createdAt) }}</span>
+          <div>
+            <button
+              @click="showReply = !showReply"
+              type="button"
+              class="hover:underline text-sm lg:text-base"
+            >
+              reply
+            </button>
           </div>
         </div>
       </div>
       <CommentTextarea v-if="showReply" @submit="(payload) => createComment(payload)" />
     </div>
   </div>
+  <!-- <pre>{{ comment }}</pre> -->
 </template>
 
 <script lang="ts" setup>
 import { timePassed } from '@/utils'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useCommentsStore } from '@/stores/comments'
 import CommentTextarea from './CommentTextarea.vue'
+import { storeToRefs } from 'pinia'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { useMutation } from '@vue/apollo-composable'
 
 const props = defineProps({
-  comment: {
-    type: Object,
+  commentId: {
+    type: Number,
     required: true
   }
 })
-
 const commentStore = useCommentsStore()
+const { data } = storeToRefs(commentStore)
+const comment = computed(() => data.value.find((comment) => comment.id === props.commentId))
+
 const showReply = ref(false)
-const commentContent = ref(props.comment.content)
 
 const createComment = (payload: string) => {
   commentStore.createComment({
     authorId: 3,
-    postId: props.comment.post.id,
-    parentId: props.comment.id,
+    postId: comment.value.post.id,
+    parentId: props.commentId,
     content: payload
   })
   showReply.value = false
+}
+
+const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
+const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+  await createVoteForComemnt({
+    data: {
+      commentId: props.commentId,
+      postId: comment.value.post.id,
+      // TODO: get userId from auth
+      userId: 1,
+      voteType: voteType
+    }
+  })
+  await syncVote()
+}
+const syncVote = async () => {
+  await commentStore.updateComment(props.commentId)
 }
 </script>

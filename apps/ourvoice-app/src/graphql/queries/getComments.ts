@@ -27,26 +27,19 @@ export const GET_COMMENTS_QUERY = gql`
 export const GET_COMMENTS_BY_POST_ID_QUERY = gql`
   query Query($pagination: CommentPaginationInput, $filter: CommentsFilterInput) {
     comments(pagination: $pagination, filter: $filter) {
-      totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        startCursor
-      }
       edges {
         cursor
         node {
-          content
-          createdAt
-          id
           author {
             id
             nickname
           }
-          post {
-            id
-            title
-          }
+          content
+          createdAt
+          disabledAt
+          id
+          moderated
+          moderatedAt
           parent {
             id
             author {
@@ -54,8 +47,21 @@ export const GET_COMMENTS_BY_POST_ID_QUERY = gql`
               nickname
             }
           }
+          post {
+            id
+          }
+          published
+          publishedAt
+          votesDown
+          votesUp
         }
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
+      }
+      totalCount
     }
   }
 `
