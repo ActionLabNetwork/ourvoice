@@ -1,7 +1,12 @@
 <template>
-  <form action="#" class="relative">
-    <div class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-      <textarea v-model="moderationReason" rows="6" name="description" id="description" class="block w-full resize-none border-0 py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="Moderation reason..." />
+  <form @submit.prevent="onSubmit" class="relative">
+    <div
+    class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm focus-within:ring-1"
+    :class="{
+      'focus-within:border-red-500  focus-within:ring-red-500': moderationReasonField.errorMessage.value,
+      'focus-within:border-indigo-500 focus-within:ring-indigo-500': !moderationReasonField.errorMessage.value
+    }">
+      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-0 py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" />
     </div>
 
     <!-- Moderation actions -->
@@ -39,7 +44,7 @@
 
         <!-- Submit button -->
         <div class="flex-shrink-0">
-          <button type="submit" @click.prevent="handleSubmit" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Submit Moderation</button>
+          <button type="submit" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed" :disabled="!isValidForm">Submit Moderation</button>
         </div>
       </div>
     </div>
@@ -47,26 +52,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
+import { useField, useForm } from 'vee-validate';
+import { validateModerationReason } from '@/validators/moderation-post-validator'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
 const actions = [
-  { name: 'Accept', icon: 'fa-check' },
-  { name: 'Modify', icon: 'fa-edit' },
-  { name: 'Reject', icon: 'fa-xmark' },
+  { name: 'Accept', icon: 'fa-check', placeholder: 'Moderation reason (optional)...', validate: false },
+  { name: 'Modify', icon: 'fa-edit', placeholder: 'Moderation reason (required)...', validate: true },
+  { name: 'Reject', icon: 'fa-xmark', placeholder: 'Moderation reason (required)...', validate: true },
 ]
 
 const action = ref(actions[0])
-const moderationReason = ref('')
+const fieldPlaceholder = ref('')
 
-const handleSubmit = () => {
-  emit('moderation-submit', { action: action.value.name, reason: moderationReason.value })
+const { resetForm } = useForm()
+
+// VeeValidate Form Fields
+const useVeeValidateField = <T,>(fieldName: string, validationNeeded = true) => {
+  const { errorMessage, value, meta } = useField<T>(fieldName, value => validationNeeded ? validateModerationReason(value as string) : true)
+  return { errorMessage, value, meta }
 }
+let moderationReasonField = useVeeValidateField<string>(
+  'moderationReason', action.value.validate
+)
+
+const isValidForm = computed(() => {
+  const actionRequiresValidation = action.value.validate
+  const fieldIsValidated = moderationReasonField.meta.validated
+  const formHasNoErrors = moderationReasonField.errorMessage.value == null
+
+  return !actionRequiresValidation || (fieldIsValidated && formHasNoErrors)
+})
+
+async function onSubmit() {
+  // This should never happen since we disable the button, but just in case
+  if (moderationReasonField.errorMessage.value != null) {
+    return
+  }
+
+  emit(
+    'moderation-submit',
+    { action: action.value.name, reason: moderationReasonField.value.value }
+  )
+};
+
+watch(action, (newAction) => {
+  moderationReasonField = useVeeValidateField<string>(
+    'moderationReason', newAction.validate
+  )
+  resetForm()
+}, { immediate: true })
 
 watchEffect(() => {
   emit('moderation-action-change', action.value.name)
+  fieldPlaceholder.value = action.value.placeholder
 })
 
 </script>

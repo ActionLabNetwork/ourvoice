@@ -11,12 +11,18 @@
     <div class="group block flex-shrink-0 mb-3">
       <div class="flex items-center">
         <div>
-          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nicknameInParts.first}+${nicknameInParts.last}`" alt="PseudoNickname" />
+          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`" alt="PseudoNickname" />
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium text-gray-700">
-            {{ userStore.nickname }}</p>
-          <p class="text-xs font-medium text-gray-500">{{ `${formattedDate(version)}` }}</p>
+            {{ nickname.author.nickname }}
+            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-700">
+              (Modified by {{ nickname.moderator.nickname }})
+            </span>
+          </p>
+          <p class="text-xs font-medium text-gray-500">
+            {{ `${formattedDate(version)}` }}
+          </p>
         </div>
       </div>
     </div>
@@ -69,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch, watchEffect } from 'vue';
+import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue';
 import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
@@ -79,7 +85,6 @@ import { useField } from 'vee-validate';
 import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
-import { useUserStore } from '@/stores/user';
 
 interface DecisionIcon {
   text: string;
@@ -99,14 +104,41 @@ const props = defineProps({
 
 const emit = defineEmits(['update']);
 
-const userStore = useUserStore()
-const { nicknameInParts } = storeToRefs(userStore)
+const nickname = computed(() => {
+  const authorNickname = post.value?.versions.at(-1).authorNickname
+  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : null
+
+  const nicknameSeparator = '_'
+  const [aFirst, aMiddle, aLast] = authorNickname.split(nicknameSeparator)
+  const [mFirst, mMiddle, mLast] = moderatorNickname?.split(nicknameSeparator) || []
+  return {
+    author: {
+      nickname: authorNickname,
+      parts: {
+        first: aFirst,
+        middle: aMiddle,
+        last: aLast
+      }
+    },
+    moderator: {
+      nickname: moderatorNickname,
+      parts: {
+        first: mFirst,
+        middle: mMiddle,
+        last: mLast
+      }
+    }
+  }
+})
 
 const moderationPostsStore = useModerationPostsStore();
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
 
 const categoriesStore = useCategoriesStore()
-await categoriesStore.fetchCategories()
+
+onMounted(async () => {
+  await categoriesStore.fetchCategories()
+})
 
 // VeeValidate Form Fields
 const useVeeValidateField = <T,>(fieldName: string) => {
@@ -117,7 +149,6 @@ const useVeeValidateField = <T,>(fieldName: string) => {
 const titleField = useVeeValidateField<string>('title')
 const contentField = useVeeValidateField<string>('content')
 const categoriesField = useVeeValidateField<number[]>('categories')
-const attachmentsField = useVeeValidateField<FileList | null>('attachments')
 
 // Form fields
 const selectedCategories = ref<number[]>([])

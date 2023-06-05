@@ -6,6 +6,14 @@ import {
   maxAttachmentFilesSize
 } from '@/constants/post'
 
+export const validateModerationReason = (value: string) => {
+  if (value && value.trim()) {
+    return true
+  }
+
+  return 'Moderation reason is required'
+}
+
 export const validateTitle = (value: string) => {
   if (!value) return 'This field is required'
   if (value.length > createPostTitleCharacterLimit)

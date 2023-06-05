@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="version?.reason || (version?.moderations && version.moderations.length)" class="flex justify-end">
+    <div v-if="hasModerationHistory" class="flex justify-end">
+      <!-- Side pane button -->
       <div @click="toggleSidePane" class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md">
         <p>
           Moderation History
@@ -26,12 +27,12 @@
 
         <div class="grid grid-cols-4">
           <!-- Moderation Controls -->
-          <div v-if="isLatestVersion && hasNotBeenModerated"
+          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf"
             class="col-span-4"
           >
             <ModerationControls @moderation-submit="handleModerationControlsSubmit" @moderation-action-change="handleModerationControlsActionChange" />
           </div>
-          <div v-if="isLatestVersion && !hasNotBeenModerated" class="col-span-4">
+          <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
             <!-- Renew button -->
             <div class="mt-4 flex justify-end">
               <div>
@@ -78,54 +79,57 @@ interface PostFields {
   files?: string[] | null;
 }
 
-// Verify user session
+const route = useRoute();
+const router = useRouter()
 const userStore = useUserStore()
-await userStore.verifyUserSession()
-
-// Init post moderation store
 const moderationPostsStore = useModerationPostsStore()
 
 // Post and Version refs
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
-
-// Side pane interaction
 const showSidePane = ref(false)
+const modifyValues = ref<PostFields | null>(null)
+const showModifyForm = ref<boolean>(false)
 
-const toggleSidePane = () => {
-  showSidePane.value = !showSidePane.value
+const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
+const hasNotBeenModeratedBySelf = computed(() => !moderationPostsStore.userHasModeratedPost)
+const hasModerationHistory = computed(() => {
+  const wasModified =
+    version.value?.authorHash !== post.value?.versions.at(-1).authorHash
+  const hasModerations =
+    (version.value?.moderations && version.value?.moderations.length > 0)
+
+  return wasModified || hasModerations
+})
+
+const decisionIcon = {
+  ACCEPTED: {
+    text: 'Accepted',
+    indicatorClass: 'text-green-500 bg-green-400/10'
+  },
+  REJECTED: {
+    text: 'Rejected',
+    indicatorClass: 'text-rose-500 bg-rose-400/10'
+  }
 }
-
-const handleSidePaneToggle = (open: boolean) => {
-  showSidePane.value = open
-}
-
-// Route handling
-const route = useRoute();
-const router = useRouter()
 
 onMounted(async () => {
-  // Fetch and set Post and Version, defaulting to latest version
+  await initializeModerationPosts()
+});
+
+async function initializeModerationPosts() {
+  await userStore.verifyUserSession()
+
   moderationPostsStore.$reset()
   await moderationPostsStore.fetchPostById(+route.params.id)
 
   if (version.value) {
-    refreshVersion(version.value)
+    await refreshVersion(version.value)
   }
-});
-
-const modifyValues = ref<PostFields | null>(null)
-const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
-const hasNotBeenModerated = computed(() => !moderationPostsStore.userHasModeratedPost)
-
-// Methods
-const handleVersionChange = async (newVersion: PostVersion) => {
-  moderationPostsStore.versionInModeration = newVersion
-  refreshVersion(newVersion)
 }
 
-const refreshVersion = async (newVersion: PostVersion) => {
+async function refreshVersion(newVersion: PostVersion) {
   // Check if user has moderated this version
   await moderationPostsStore.checkIfUserHasModerated(userStore.userId)
 
@@ -140,12 +144,54 @@ const refreshVersion = async (newVersion: PostVersion) => {
     )
 }
 
-const decisionIcon = { ACCEPTED: { text: 'Accepted', indicatorClass: 'text-green-500 bg-green-400/10' }, REJECTED: { text: 'Rejected', indicatorClass: 'text-rose-500 bg-rose-400/10' } }
+function toggleSidePane() {
+  showSidePane.value = !showSidePane.value
+}
 
-// Component show flags
-const showModifyForm = ref<boolean>(false)
+function handleSidePaneToggle(open: boolean) {
+  showSidePane.value = open
+}
 
-const acceptPost = async (reason: string) => {
+async function handleVersionChange(newVersion: PostVersion) {
+  moderationPostsStore.versionInModeration = newVersion
+  await refreshVersion(newVersion)
+}
+
+function handleModerationControlsSubmit(
+  { action, reason }: { action: ModerationActions, reason: string }
+) {
+  const moderationHandlers = {
+    'Accept': acceptPost,
+    'Modify': modifyPost,
+    'Reject': rejectPost
+  }
+  moderationHandlers[action](reason);
+}
+
+function handleModerationControlsActionChange(action: ModerationActions) {
+  if (action === 'Modify') {
+    showModifyForm.value = true
+  } else {
+    showModifyForm.value = false
+  }
+}
+
+function handleModifyFormUpdate(editedVersion: PostVersion) {
+  moderationPostsStore.modifiedPostVersion = editedVersion
+  modifyValues.value = {
+    title: editedVersion.title,
+    content: editedVersion.content,
+    categoryIds: editedVersion.categoryIds,
+    files: editedVersion.files
+  }
+}
+
+async function handleRenewModeration() {
+  await moderationPostsStore.renewPostModeration()
+  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+}
+
+async function performModeration({ actionHandler, reason }: { actionHandler: Function, reason: string }) {
   const version = moderationPostsStore.versionInModeration
 
   if (!userStore.userId) {
@@ -158,12 +204,25 @@ const acceptPost = async (reason: string) => {
     return
   }
 
-  await moderationPostsStore.approvePostVersion(version.id, userStore.sessionHash, userStore.nickname, reason)
+  await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
-};
+}
 
-const modifyPost = async (values: PostFields, reason: string) => {
-  const post = moderationPostsStore.postInModeration
+function acceptPost(reason: string) {
+  performModeration({
+    actionHandler: moderationPostsStore.approvePostVersion,
+    reason
+  })
+}
+
+function rejectPost(reason: string) {
+  performModeration({
+    actionHandler: moderationPostsStore.rejectPostVersion,
+    reason
+  })
+}
+
+const modifyPost = async (reason: string) => {
   const version = moderationPostsStore.versionInModeration
 
   if (!userStore.userId) {
@@ -171,6 +230,12 @@ const modifyPost = async (values: PostFields, reason: string) => {
     return
   }
 
+  if (modifyValues.value === null) {
+    console.error('No post modify values')
+    return
+  }
+
+  const post = moderationPostsStore.postInModeration
   if (!post) {
     console.error('No post selected')
     return
@@ -181,71 +246,10 @@ const modifyPost = async (values: PostFields, reason: string) => {
     return
   }
 
-  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, userStore.nickname, reason, values)
+  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, userStore.nickname, reason, modifyValues.value)
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 
   // Reload the page
   router.go(0)
-}
-
-const rejectPost = async (reason: string) => {
-  const version = moderationPostsStore.versionInModeration
-
-  if (!userStore.userId) {
-    console.error('User not logged in')
-    return
-  }
-
-  if (!version) {
-    console.error('No version selected')
-    return
-  }
-
-  await moderationPostsStore.rejectPostVersion(version.id, userStore.sessionHash, userStore.nickname, reason)
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
-};
-
-const handleModerationControlsSubmit = ({ action, reason }: { action: ModerationActions, reason: string }) => {
-  switch (action) {
-    case 'Accept':
-      acceptPost(reason);
-      break;
-    case 'Modify':
-      if (modifyValues.value === null) {
-        console.error('No post modify values')
-        return
-      }
-      modifyPost(modifyValues.value, reason);
-      break;
-    case 'Reject':
-      rejectPost(reason);
-      break;
-    default:
-      console.error(`Unexpected action: ${action}`);
-  }
-}
-
-const handleModerationControlsActionChange = (action: ModerationActions) => {
-  if (action === 'Modify') {
-    showModifyForm.value = true
-  } else {
-    showModifyForm.value = false
-  }
-}
-
-const handleModifyFormUpdate = (editedVersion: PostVersion) => {
-  console.log({ editedVersion })
-  moderationPostsStore.modifiedPostVersion = editedVersion
-  modifyValues.value = {
-    title: editedVersion.title,
-    content: editedVersion.content,
-    categoryIds: editedVersion.categoryIds,
-    files: editedVersion.files
-  }
-}
-
-const handleRenewModeration = async () => {
-  await moderationPostsStore.renewPostModeration()
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 }
 </script>

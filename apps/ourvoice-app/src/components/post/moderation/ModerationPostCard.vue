@@ -12,12 +12,18 @@
     <div class="group block flex-shrink-0 mb-3">
       <div class="flex items-center">
         <div>
-          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nicknameInParts.first}+${nicknameInParts.last}`" alt="PseudoNickname" />
+          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`" alt="PseudoNickname" />
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium text-gray-700">
-            {{ version.authorNickname }}</p>
-          <p class="text-xs font-medium text-gray-500">{{ `${formattedDate(version)}` }}</p>
+            {{ nickname.author.nickname }}
+            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-700">
+              (Modified by {{ nickname.moderator.nickname }})
+            </span>
+          </p>
+          <p class="text-xs font-medium text-gray-500">
+            {{ `${formattedDate(version)}` }}
+          </p>
         </div>
       </div>
     </div>
@@ -72,8 +78,6 @@ import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderatio
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
-import { useUserStore } from '@/stores/user';
-import { storeToRefs } from 'pinia';
 
 interface DecisionIcon {
   text: string;
@@ -99,11 +103,35 @@ const props = defineProps({
   }
 });
 
-const userStore = useUserStore()
-const { nicknameInParts } = storeToRefs(userStore)
-
 const version = computed(() => props.version)
-console.log('version', version.value)
+const post = computed(() => props.post)
+
+const nickname = computed(() => {
+  const authorNickname = post.value?.versions.at(-1).authorNickname
+  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : null
+
+  const nicknameSeparator = '_'
+  const [aFirst, aMiddle, aLast] = authorNickname.split(nicknameSeparator)
+  const [mFirst, mMiddle, mLast] = moderatorNickname?.split(nicknameSeparator) || []
+  return {
+    author: {
+      nickname: authorNickname,
+      parts: {
+        first: aFirst,
+        middle: aMiddle,
+        last: aLast
+      }
+    },
+    moderator: {
+      nickname: moderatorNickname,
+      parts: {
+        first: mFirst,
+        middle: mMiddle,
+        last: mLast
+      }
+    }
+  }
+})
 
 const moderationResultGroups = computed(() => {
   const groups = version.value?.moderations.reduce((acc, moderation) => {
