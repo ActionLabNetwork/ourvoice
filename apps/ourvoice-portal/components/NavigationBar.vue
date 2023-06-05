@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="container-fluid flex flex-row items-center px-16 pt-[45px] pb-[28px] bg-black w-full"
+    class="container-fluid flex flex-row items-center px-8 lg:px-16 pt-[45px] pb-[28px] bg-black w-full"
   >
     <img :src="img" class="lg:w-20" />
     <div
@@ -37,7 +37,7 @@
         <MenuButton>
           <ClientOnly>
             <font-awesome-icon
-              class="text-ourvoice-portal-navbar-gray"
+              class="text-ourvoice-portal-yellow"
               icon="bars"
               size="2x"
             />

@@ -1,6 +1,6 @@
 <template>
   <div class="container px-5 py-4 lg:py-24 mx-auto lg:w-10/12">
-    <p class="font-bold text-[32px] mb-4">
+    <p class="font-bold text-[24px] md:text-[32px] mb-4">
       OurVoice helped to discuss and realise opportunities in how we promote and
       reach Aboriginal and Torres Strait Islander staff with the available
       professional development options, creating an inclusive and enabling

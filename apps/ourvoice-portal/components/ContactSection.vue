@@ -11,106 +11,100 @@
         for your workplace environment, please send us a hi through this form.
       </p>
     </div>
-    <div class="lg:w-1/2 md:w-2/3 mx-auto">
-      <div class="flex flex-wrap -m-2">
-        <div class="p-2 w-screen md:w-1/2">
-          <div class="relative">
-            <label for="name" class="leading-7 text-lg font-semibold font-Inter"
-              >Name</label
-            >
-            <input
-              id="name"
-              v-model="form.name"
-              type="text"
-              name="name"
-              class="w-full contact-form-input text-base outline-none text-ourvoice-grey py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-              @input="v$.name.$reset()"
-              @blur="v$.name.$touch()"
-              :disabled="state.formState != 'open'"
-            />
-            <div class="h-4 mt-0.5">
-              <p v-if="v$.name.$error" class="text-xs text-red-500">
-                {{ v$.name.$errors[0].$message }}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="p-2 w-screen md:w-1/2">
-          <div class="relative">
-            <label
-              for="email"
-              class="leading-7 text-lg font-semibold font-Inter"
-              >Email</label
-            >
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
-              name="email"
-              class="w-full contact-form-input text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-              @input="v$.email.$reset()"
-              @blur="v$.email.$touch()"
-              :disabled="state.formState != 'open'"
-            />
-            <div class="h-4 mt-0.5">
-              <p v-if="v$.email.$error" class="text-xs text-red-500">
-                {{ v$.email.$errors[0].$message }}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="p-2 w-full">
-          <div class="relative left-0">
-            <label
-              for="message"
-              class="leading-7 text-lg font-semibold font-Inter"
-              >Message</label
-            >
-            <textarea
-              id="message"
-              v-model="form.message"
-              name="message"
-              class="w-full contact-form-input h-32 text-base outline-none text-ourvoice-grey py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-              @input="v$.message.$reset()"
-              @blur="v$.message.$touch()"
-              :disabled="state.formState != 'open'"
-            />
-            <div class="h-4 mt-0.5">
-              <p v-if="v$.message.$error" class="text-xs text-red-500">
-                {{ v$.message.$errors[0].$message }}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="p-2">
-          <button
-            type="button"
-            class="flex mx-auto btn-base py-2 px-6 btn-yellow btn-hover w-40"
-            :disabled="state.formState != 'open'"
-            @click="submitForm"
+    <div class="md:max-w-4xl mx-auto flex flex-wrap -m-2">
+      <div class="p-2 w-screen md:w-1/2">
+        <div class="relative">
+          <label for="name" class="leading-7 text-lg font-semibold font-Inter"
+            >Name</label
           >
-            <div class="m-auto">
-              <span v-if="state.formState == 'open'"
-                ><span class="mr-1.5">Submit</span>
-                <ClientOnly>
-                  <font-awesome-icon icon="arrow-right"
-                /></ClientOnly>
-              </span>
-              <span v-else-if="state.formState == 'loading'">Loading...</span>
-              <span v-else>Submitted</span>
-            </div>
-          </button>
+          <input
+            id="name"
+            v-model="form.name"
+            type="text"
+            name="name"
+            class="w-full contact-form-input text-base outline-none py-1 px-3 h-[60px] leading-8 transition-colors duration-200 ease-in-out"
+            @input="v$.name.$reset()"
+            @blur="v$.name.$touch()"
+            :disabled="state.formState != 'open'"
+          />
+          <div class="h-4 mt-0.5">
+            <p v-if="v$.name.$error" class="text-xs text-red-500">
+              {{ v$.name.$errors[0].$message }}
+            </p>
+          </div>
         </div>
-        <!--        <div-->
-        <!--          class="p-2 w-full pt-8 mt-8 border-t border-ourvoice-grey text-center"-->
-        <!--        >-->
-        <!--          <a class="text-black">admin@actionlab.dev</a>-->
-        <!--          <p class="leading-normal my-5">-->
-        <!--            25 Exhibition Walk, Clayton <br />-->
-        <!--            Clayton, Melbourne, Australia, 3168-->
-        <!--          </p>-->
-        <!--        </div>-->
       </div>
+      <div class="p-2 w-screen md:w-1/2">
+        <div class="relative">
+          <label for="email" class="leading-7 text-lg font-semibold font-Inter"
+            >Email</label
+          >
+          <input
+            id="email"
+            v-model="form.email"
+            type="email"
+            name="email"
+            class="w-full contact-form-input text-base outline-none py-1 px-3 h-[60px] leading-8 transition-colors duration-200 ease-in-out"
+            @input="v$.email.$reset()"
+            @blur="v$.email.$touch()"
+            :disabled="state.formState != 'open'"
+          />
+          <div class="h-4 mt-0.5">
+            <p v-if="v$.email.$error" class="text-xs text-red-500">
+              {{ v$.email.$errors[0].$message }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="p-2 w-full">
+        <div class="relative left-0">
+          <label
+            for="message"
+            class="leading-7 text-lg font-semibold font-Inter"
+            >Message</label
+          >
+          <textarea
+            id="message"
+            v-model="form.message"
+            name="message"
+            class="w-full contact-form-input h-[250px] text-base outline-none py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
+            @input="v$.message.$reset()"
+            @blur="v$.message.$touch()"
+            :disabled="state.formState != 'open'"
+          />
+          <div class="h-4 mt-0.5">
+            <p v-if="v$.message.$error" class="text-xs text-red-500">
+              {{ v$.message.$errors[0].$message }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="p-2">
+        <button
+          type="button"
+          class="flex mx-auto btn-base py-4 px-6 btn-yellow btn-hover w-40"
+          :disabled="state.formState != 'open'"
+          @click="submitForm"
+        >
+          <div class="m-auto">
+            <span v-if="state.formState == 'open'"
+              ><span class="mr-1.5">Submit</span>
+              <ClientOnly> <font-awesome-icon icon="arrow-right" /></ClientOnly>
+            </span>
+            <span v-else-if="state.formState == 'loading'">Loading...</span>
+            <span v-else>Submitted</span>
+          </div>
+        </button>
+      </div>
+      <!--        <div-->
+      <!--          class="p-2 w-full pt-8 mt-8 border-t border-ourvoice-grey text-center"-->
+      <!--        >-->
+      <!--          <a class="text-black">admin@actionlab.dev</a>-->
+      <!--          <p class="leading-normal my-5">-->
+      <!--            25 Exhibition Walk, Clayton <br />-->
+      <!--            Clayton, Melbourne, Australia, 3168-->
+      <!--          </p>-->
+      <!--        </div>-->
     </div>
   </div>
 </template>

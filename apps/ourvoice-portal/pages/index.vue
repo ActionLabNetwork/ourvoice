@@ -30,7 +30,7 @@
     <section id="contact" class="relative bg-ourvoice-white">
       <ContactSection />
     </section>
-    <section id="footer" class="bg-black h-16">
+    <section id="footer" class="bg-black">
       <FooterSection />
     </section>
   </div>
