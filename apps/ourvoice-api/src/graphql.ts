@@ -388,6 +388,8 @@ export class CategoryPageInfo {
 export class Comment {
     id: number;
     content: string;
+    votesDown?: Nullable<number>;
+    votesUp?: Nullable<number>;
     moderated: boolean;
     published: boolean;
     createdAt?: Nullable<DateTime>;

@@ -79,6 +79,8 @@
     },
     {
       "content": "This is a comment on post 2",
+      "votesUp": 1,
+      "votesDown": 0,
       "moderated": true,
       "published": true,
       "authorHash": "user2hash",

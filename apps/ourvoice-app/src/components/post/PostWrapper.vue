@@ -64,7 +64,7 @@
 import { ref, watchEffect } from 'vue'
 import { timePassed } from '@/utils/index'
 import { usePostsStore } from '@/stores/posts'
-import { VOTE_POST_MUTATION } from '@/graphql/mutations/votePost'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY } from '@/graphql/queries/getVotes'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 
@@ -101,7 +101,7 @@ watchEffect(() => {
 
 const votes = ref<any>([])
 
-const { mutate: createVoteForPost } = useMutation(VOTE_POST_MUTATION)
+const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
 const { onResult, refetch } = useQuery(GET_VOTES_QUERY, {
   filter: {
     postId: props.id,
