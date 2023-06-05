@@ -16,7 +16,6 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 
-
 import deployment from './config/deployment';
 
 @Module({
