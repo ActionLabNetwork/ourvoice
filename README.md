@@ -44,12 +44,11 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 - Run from deployment `docker compose up -d` to start services (`reverse-proxy`, `supertokens`, `databases`, `localstack`)
 - Run from the root `pnpm install` to install dependencies (also runs `pnpm postinstall` and copies all `.env` files)
 - Run from the root `pnpm generate:api:all` and `pnpm migrate:api:all` for database setup.
-- Run `pnpm dev:apps` to start all applications in development mode
-  > NOTE: if you get any Prisma errors then run the generate and migrate scrips one by one.
 
 #### Regular use:
 
-- Run from the root `pnpm dev:apps` to start all the apps
+- Run `pnpm dev:apps` to start all applications in development mode
+  > NOTE: if you get any Prisma errors then run the generate and migrate scrips one by one.
 
 Navigate to `http://demo.ourvoice.test/` to access the OurVoice App or `http://admin.ourvoice.test` for OurVoice Admin app
 

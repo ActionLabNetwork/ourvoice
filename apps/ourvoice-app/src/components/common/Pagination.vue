@@ -90,20 +90,21 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { defineProps } from 'vue'
-defineProps({
-  total: {
-    type: Number,
-    required: true
-  },
-  perPage: {
-    type: Number,
-    required: true
-  },
-  currentPage: {
-    type: Number,
-    required: true
+<script lang="ts">
+export default {
+  props: {
+    total: {
+      type: Number,
+      required: true
+    },
+    perPage: {
+      type: Number,
+      required: true
+    },
+    currentPage: {
+      type: Number,
+      required: true
+    }
   }
-})
+}
 </script>
