@@ -14,13 +14,11 @@
       style="border-radius: 70%/12px 12px 0 0"
     >
       <!-- Heading -->
-      <div class="container flex flex-col px-2 items-center">
-        <h1 class="max-w-[708px] font-Inter">
+      <div class="container lg:max-w-[700px] flex flex-col px-4 items-center">
+        <h1 class="mb-2 text-[32px] lg:text-[48px] lg:leading-tight">
           {{ cardTitle }}
         </h1>
-        <p
-          class="text-center font-Inter font-normal text-xl mt-4 max-w-[600px]"
-        >
+        <p class="text-center text-[16px] lg:text-[20px] font-normal">
           {{ cardSubTitle }}
         </p>
       </div>

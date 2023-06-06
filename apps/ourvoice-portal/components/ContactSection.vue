@@ -2,11 +2,11 @@
   <div class="container px-5 py-24 mx-auto">
     <div class="flex flex-col text-center w-full mb-12 items-center">
       <h2
-        class="sm:text-3xl text-2xl font-bold title-font mb-4 text-ourvoice-blue"
+        class="text-[32px] lg:text-[48px] font-bold title-font mb-4 text-ourvoice-blue"
       >
         Contact Us
       </h2>
-      <p class="text-lg text-center mb-6 max-w-2xl">
+      <p class="text-[16px] lg:text-[18px] text-center mb-6 max-w-2xl">
         For more specific information on how to start and configure the platform
         for your workplace environment, please send us a hi through this form.
       </p>

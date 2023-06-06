@@ -5,7 +5,7 @@
     <p class="text-white text-lg font-Inter font-medium">
       OurVoice is developed and maintained by Action Lab, Monash University
     </p>
-    <img :src="logo" class="w-[82px]" />
+    <img :src="logo" class="w-[82px]" alt="" />
   </div>
 </template>
 

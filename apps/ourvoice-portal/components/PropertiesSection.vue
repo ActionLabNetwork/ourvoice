@@ -1,9 +1,11 @@
 <template>
   <div class="sm:px-8 md:px-16 lg:px-32">
     <!-- Heading -->
-    <div class="sm:w-3/4 md:w-8/12 lg:w-7/12 mx-auto px-2">
-      <h1 class="mb-2">Making everyone feel heard</h1>
-      <p class="text-center text-xl font-normal">
+    <div class="max-w-[700px] mx-auto px-4">
+      <h1 class="mb-2 text-[32px] lg:text-[48px]">
+        Making everyone feel heard
+      </h1>
+      <p class="text-center text-[16px] lg:text-[20px] font-normal">
         Our aim is to make it easy and fear free to share opinions, start
         discussions around important but sometimes sensitive topics.
       </p>

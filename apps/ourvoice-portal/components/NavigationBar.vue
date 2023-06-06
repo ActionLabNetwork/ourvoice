@@ -2,7 +2,7 @@
   <nav
     class="container-fluid flex flex-row items-center px-8 lg:px-16 pt-[45px] pb-[28px] bg-black w-full"
   >
-    <img :src="img" class="lg:w-20" />
+    <img :src="img" class="lg:w-20" alt="OurVoice" />
     <div
       class="hidden sm:flex flex-1 justify-end items-center gap-12 text-ourvoice-blue text-xs"
     >

@@ -12,12 +12,12 @@
       <!-- Content -->
       <div class="flex flex-1 flex-col items-center">
         <h1
-          class="text-3xl font-bold font-Inter md:text-start md:w-full lg:w-10/12"
+          class="text-[32px] font-bold font-Inter md:text-start md:w-full lg:w-10/12"
         >
           {{ systemProperty.title }}
         </h1>
         <p
-          class="font-Inter text-center md:text-start mx-2 my-4 md:w-full lg:w-10/12"
+          class="text-[18px] lg:text-[16px] text-center md:text-start mx-2 my-4 md:w-full lg:w-10/12"
         >
           {{ systemProperty.description }}
         </p>

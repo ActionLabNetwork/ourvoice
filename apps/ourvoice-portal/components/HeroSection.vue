@@ -4,7 +4,7 @@
       class="container flex flex-col items-center z-10 mt-14 pt-24 pb-8 lg:py-40 lg:pb-20"
     >
       <h2
-        class="text-5xl font-Roboto font-semibold self-center text-center max-w-[680px]"
+        class="text-5xl font-Roboto font-semibold self-center text-center max-w-[680px] leading-tight"
       >
         Safe digital space for workplace-related discussion
       </h2>
@@ -43,12 +43,18 @@
       <img
         :src="leftImg"
         class="hidden h-auto md:block md:w-[300px] xl:w-[450px] -z-10"
+        alt=""
       />
       <img
         :src="imgs.right"
         class="hidden h-auto md:block relative md:bottom-[-35px] md:w-[300px] xl:bottom-[-70px] xl:w-[450px] -z-10"
+        alt=""
       />
-      <img :src="imgs.small" class="md:hidden mx-auto h-auto w-[300px] -z-10" />
+      <img
+        :src="imgs.small"
+        class="md:hidden mx-auto h-auto w-[300px] -z-10"
+        alt=""
+      />
     </div>
   </div>
 </template>

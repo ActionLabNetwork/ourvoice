@@ -5,10 +5,12 @@
     >
       <!-- Content -->
       <div class="flex flex-1 flex-col items-center">
-        <h2 class="text-5xl font-bold md:text-4 lg:text-5xl text-center mb-6">
+        <h2
+          class="font-bold text-[32px] lg:text-[48px] text-center mb-2 lg:mb-4"
+        >
           Interested in trying it out?
         </h2>
-        <p class="text-lg text-center mb-6">
+        <p class="text-[16px] lg:text-[20px] text-center mb-6">
           Dive in and check OurVoice public demo version.
         </p>
         <div class="flex justify-center flex-wrap gap-6 mx-auto min-w-full">

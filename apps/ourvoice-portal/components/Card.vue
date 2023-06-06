@@ -2,15 +2,13 @@
   <div
     class="rounded-2xl border-black border-2 p-3 bg-white w-[282px] lg:w-[560px] shrink-0"
   >
-    <img :src="cardFeature.image" />
-    <h3
+    <img :src="cardFeature.image" alt="" />
+    <h2
       class="mt-5 mb-2 text-2xl font-semibold text-ourvoice-blue group-hover:text-white"
     >
       {{ cardFeature.title }}
-    </h3>
-    <p
-      class="mb-2 text-black font-normal text-[17px] group-hover:text-white text-justify"
-    >
+    </h2>
+    <p class="mb-2 text-black font-normal text-[17px] group-hover:text-white">
       {{ cardFeature.description }}
     </p>
   </div>
