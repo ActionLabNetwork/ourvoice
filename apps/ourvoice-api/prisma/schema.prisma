@@ -10,34 +10,6 @@ datasource db {
   url      = env("DATABASE_MAIN_URL")
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  orgId    Int
-  hash     String   @unique
-  title    String?
-  nickname String?
-  type     UserType @relation(fields: [typeId], references: [id])
-  typeId   Int
-
-  // Meta
-  active     Boolean?  @default(true)
-  createdAt  DateTime? @default(now())
-  disabledAt DateTime?
-  updatedAt  DateTime? @default(now())
-  verifiedAt DateTime?
-
-  // Relations
-  comments Comment[]
-  posts    Post[]
-  votes    Vote[]
-}
-
-model UserType {
-  id    Int    @id @default(autoincrement())
-  type  String
-  users User[]
-}
-
 model Post {
   id        Int     @id @default(autoincrement())
   title     String
@@ -54,11 +26,11 @@ model Post {
   moderatedAt DateTime?
   publishedAt DateTime?
 
-  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  authorId   Int
-  categories Category[]
-  comments   Comment[]
-  votes      Vote[]
+  authorHash     String
+  authorNickname String
+  categories     Category[]
+  comments       Comment[]
+  votes          Vote[]
 }
 
 model Category {
@@ -92,20 +64,20 @@ model Comment {
   disabledAt  DateTime?
 
   // Relations
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  authorId Int
-  post     Post?     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  postId   Int?
-  parent   Comment?  @relation("ChildComments", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  parentId Int?
-  children Comment[] @relation("ChildComments")
+  authorHash     String
+  authorNickname String
+  post           Post?     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId         Int?
+  parent         Comment?  @relation("ChildComments", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentId       Int?
+  children       Comment[] @relation("ChildComments")
 }
 
 model Vote {
-  id       Int    @id @default(autoincrement())
-  voteType String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId   Int
-  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  postId   Int
+  id             Int    @id @default(autoincrement())
+  voteType       String
+  authorHash     String
+  authorNickname String
+  post           Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId         Int
 }

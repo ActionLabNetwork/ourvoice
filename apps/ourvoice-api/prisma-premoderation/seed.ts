@@ -79,7 +79,6 @@ async function main() {
     const authorHash = uniqueNamesGenerator({
       dictionaries: [adjectives, colors, animals],
       style: 'lowerCase',
-      separator: '-',
     });
 
     // Create posts
@@ -98,7 +97,6 @@ async function main() {
     const commentAuthorHash = uniqueNamesGenerator({
       dictionaries: [adjectives, colors, animals],
       style: 'lowerCase',
-      separator: '-',
     });
 
     const comment = await prisma.comment.create({
@@ -124,7 +122,6 @@ async function main() {
     const moderatorHash = uniqueNamesGenerator({
       dictionaries: [adjectives, colors, animals],
       style: 'lowerCase',
-      separator: '-',
     });
 
     await prisma.postModeration.create({

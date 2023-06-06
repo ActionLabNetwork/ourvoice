@@ -49,20 +49,18 @@ model Comment {
   id Int @id @default(autoincrement())
 
   // Moderation
-  status    PostStatus @default(PENDING)
-  version   Int        @default(0)
-  timestamp DateTime   @default(now())
-  latest    Boolean    @default(true)
+  status              PostStatus       @default(PENDING)
+  versions            CommentVersion[]
+  requiredModerations Int              @default(1)
 
   // Relations
   authorHash     String
   authorNickname String
-  post           Post?            @relation(fields: [postId], references: [id])
+  post           Post?     @relation(fields: [postId], references: [id])
   postId         Int?
   parentId       Int?
-  parent         Comment?         @relation("CommentToComment", fields: [parentId], references: [id])
-  children       Comment[]        @relation("CommentToComment")
-  versions       CommentVersion[]
+  parent         Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children       Comment[] @relation("CommentToComment")
 }
 
 model CommentVersion {
@@ -104,7 +102,6 @@ model CommentModeration {
   decision          Decision
   reason            String?
   timestamp         DateTime       @default(now())
-  modifiedContent   String?
 
   @@index([commentVersionId])
 }
