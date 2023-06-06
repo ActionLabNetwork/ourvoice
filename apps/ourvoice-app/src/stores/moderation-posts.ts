@@ -359,7 +359,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
 
       if (!version) return
 
-      const versionModerators = Array.from(
+      const versionModerators: string[] = Array.from(
         version.moderations.reduce((acc, moderation) => {
           if (moderation) acc.add(moderation.moderatorHash)
           return acc

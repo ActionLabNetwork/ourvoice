@@ -113,7 +113,9 @@ export const usePostsStore = defineStore('posts', {
 
       const authorHash = useUserStore().sessionHash
       const authorNickname = useUserStore().nickname
-      const requiredModerations = 1
+
+      // TODO: Fetch this from deployment config instead of hardcoding
+      const requiredModerations = 3
 
       try {
         await apolloClient.mutate({

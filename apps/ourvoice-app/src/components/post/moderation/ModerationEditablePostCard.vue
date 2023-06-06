@@ -81,7 +81,6 @@
 <script setup lang="ts">
 import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue';
 import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
-import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import { storeToRefs } from 'pinia';
 import { useCategoriesStore } from '@/stores/categories';
@@ -90,7 +89,6 @@ import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
 import { validateCategories, validateContent, validateTitle } from '@/validators/moderation-post-validator';
-import { json } from 'body-parser';
 
 const emit = defineEmits(['update']);
 
@@ -174,6 +172,11 @@ if (version.value) {
   selectedCategories.value = version.value.categories.map(({ id }) => id)
 }
 
+// The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
+watch(selectedCategories, async () => {
+  categoriesField.value.value = selectedCategories.value
+})
+
 const formHasNoErrors = computed(() => {
   return Object.keys(errors.value).length === 0
 })
@@ -189,12 +192,6 @@ const formWasUpdated = computed(() => {
   const categoriesFieldUpdated = JSON.stringify(sortedCategoryIds) !== JSON.stringify(sortedCategoryFieldIds)
 
   return titleFieldUpdated || contentFieldUpdated || categoriesFieldUpdated
-})
-
-// The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
-watch(selectedCategories, async () => {
-  categoriesField.value.value = selectedCategories.value
-  // localVersion.categoryIds = selectedCategories.value
 })
 
 // Counts the number of accepted/rejected moderations by past moderators
@@ -222,13 +219,13 @@ const moderationResultGroups = computed(() => {
 const formattedDate = (version: PostVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
 
-// Reactive copies of post and version
+// Reactive copies of version
 const localVersion = reactive({
   ...version.value,
   title: titleField.value.value,
   content: contentField.value.value,
-  categories: categoriesField.value.value,
-  files: { ...version.value.files }
+  categoryIds: categoriesField.value.value,
+  files: version.value.files ?? null
 });
 
 const handleRemoveFile = (file: { key: string; url: string; }) => {
@@ -248,21 +245,19 @@ watchEffect(() => {
   // Keep local version in sync with VeeValidate fields
   localVersion.title = titleField.value.value
   localVersion.content = contentField.value.value
-  localVersion.categories = categoriesField.value.value
+  localVersion.categoryIds = categoriesField.value.value
 
   if (formWasUpdated.value && formHasNoErrors.value) {
     moderationPostsStore.versionInModification = {
       version: localVersion,
       isValid: true
     }
-    console.log("Emitting localVersion without error ", localVersion)
     emit('update', { version: localVersion, isValid: true });
   } else {
     moderationPostsStore.versionInModification = {
       ...moderationPostsStore.versionInModification,
       isValid: false
     }
-    console.log("Emitting localVersion with error ", localVersion)
     emit('update', { version: localVersion, isValid: false });
   }
 })

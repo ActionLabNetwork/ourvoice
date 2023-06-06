@@ -1,6 +1,11 @@
 import { PostModifyDto } from './dto/post-modify.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post, Prisma } from '@internal/prisma/client';
+import {
+  Post,
+  Prisma,
+  PostVersion,
+  PostModeration,
+} from '@internal/prisma/client';
 import { PrismaService } from 'src/database/premoderation/prisma.service';
 import {
   ModerationPostsFilterInput,
@@ -8,6 +13,31 @@ import {
 } from 'src/graphql';
 import { cursorToNumber } from 'src/utils/cursor-pagination';
 import { PostCreateDto } from './dto/post-create.dto';
+
+function countPostVersionModerationDecisions(
+  version: PostVersion & {
+    moderations: PostModeration[];
+  },
+) {
+  const groups = version.moderations.reduce((acc, moderation) => {
+    const group = moderation.decision;
+    if (!acc[group]) {
+      acc[group] = [];
+    }
+    acc[group].push(moderation);
+    return acc;
+  }, {});
+
+  const groupsCount = {} as Record<'ACCEPTED' | 'REJECTED', number>;
+
+  if (groups) {
+    Object.keys(groups).forEach((key) => {
+      groupsCount[key] = groups[key].length;
+    });
+
+    return groupsCount;
+  }
+}
 
 @Injectable()
 export class PostModerationRepository {
@@ -29,6 +59,8 @@ export class PostModerationRepository {
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
   ): Promise<{ totalCount: number; moderationPosts: Post[] }> {
+    this.publishPost(2);
+
     const { status } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {
@@ -284,6 +316,42 @@ export class PostModerationRepository {
           include: { moderations: { orderBy: { timestamp: 'desc' } } },
         },
       },
+    });
+  }
+
+  async publishPost(postId: number) {
+    await this.prisma.$transaction(async (tx) => {
+      // Check if the post has enough number of moderations
+      const post = await tx.post.findUnique({
+        where: { id: postId },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      const latestVersion = post.versions[0];
+      const decisionsCount = countPostVersionModerationDecisions(latestVersion);
+
+      if (!decisionsCount) {
+        throw new Error('Post has no moderations');
+      }
+
+      if (decisionsCount.REJECTED > 0) {
+        throw new Error(`Post has ${decisionsCount.REJECTED} rejections`);
+      }
+
+      if (decisionsCount.ACCEPTED >= post.requiredModerations) {
+        await tx.post.update({
+          where: { id: postId },
+          data: { status: 'APPROVED' },
+        });
+        // TODO: Add as a new post entry in the main db
+      }
+      console.log(decisionsCount);
     });
   }
 }

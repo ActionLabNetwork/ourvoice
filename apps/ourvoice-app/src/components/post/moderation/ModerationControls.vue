@@ -103,7 +103,6 @@ const isValidForm = computed(() => {
   }
 });
 
-
 async function onSubmit() {
   // This should never happen since we disable the button, but just in case
   if (moderationReasonField.errorMessage.value != null) {
