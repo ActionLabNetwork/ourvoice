@@ -15,6 +15,7 @@ export const validateModerationReason = (value: string) => {
 }
 
 export const validateTitle = (value: string) => {
+  console.log('validating title')
   if (!value) return 'This field is required'
   if (value.length > createPostTitleCharacterLimit)
     return `Title must not exceed ${createPostTitleCharacterLimit} characters.`
@@ -26,7 +27,7 @@ export const validateTitle = (value: string) => {
 }
 
 export const validateContent = (value: string) => {
-  if (!value) return 'This field is required'
+  if (!value || !value.trim()) return 'This field is required'
   if (value.length > createPostContentCharacterLimit)
     return `Content must not exceed ${createPostContentCharacterLimit} characters.`
 

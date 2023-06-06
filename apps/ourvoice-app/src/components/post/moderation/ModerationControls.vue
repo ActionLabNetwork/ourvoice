@@ -1,12 +1,12 @@
 <template>
   <form @submit.prevent="onSubmit" class="relative">
     <div
-    class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm focus-within:ring-1"
+    class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm"
     :class="{
       'focus-within:border-red-500  focus-within:ring-red-500': moderationReasonField.errorMessage.value,
       'focus-within:border-indigo-500 focus-within:ring-indigo-500': !moderationReasonField.errorMessage.value
     }">
-      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-0 py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" />
+      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" />
     </div>
 
     <!-- Moderation actions -->
@@ -15,7 +15,7 @@
         <div>
           <Listbox as="div" v-model="action" class="flex-shrink-0">
             <div class="relative">
-              <ListboxButton class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3">
+              <ListboxButton class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300">
                 <font-awesome-icon :icon="['fas', action.icon]" />
                 <span :class="[action.name === null ? '' : 'text-gray-900', 'hidden truncate sm:ml-2 sm:block']">
                   {{ action.name }}
@@ -56,6 +56,7 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { useField, useForm } from 'vee-validate';
 import { validateModerationReason } from '@/validators/moderation-post-validator'
+import { useModerationPostsStore } from '@/stores/moderation-posts';
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
@@ -64,6 +65,8 @@ const actions = [
   { name: 'Modify', icon: 'fa-edit', placeholder: 'Moderation reason (required)...', validate: true },
   { name: 'Reject', icon: 'fa-xmark', placeholder: 'Moderation reason (required)...', validate: true },
 ]
+
+const moderationPostsStore = useModerationPostsStore()
 
 const action = ref(actions[0])
 const fieldPlaceholder = ref('')
@@ -80,12 +83,26 @@ let moderationReasonField = useVeeValidateField<string>(
 )
 
 const isValidForm = computed(() => {
-  const actionRequiresValidation = action.value.validate
-  const fieldIsValidated = moderationReasonField.meta.validated
-  const formHasNoErrors = moderationReasonField.errorMessage.value == null
+  const modifyFormHasNoErrors = moderationPostsStore.versionInModification.isValid;
+  const reasonFieldHasNoErrors = moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null;
 
-  return !actionRequiresValidation || (fieldIsValidated && formHasNoErrors)
-})
+  switch (action.value.name) {
+    case 'Accept':
+      // No validations for accepting the post
+      return true;
+
+    case 'Modify':
+      return modifyFormHasNoErrors && reasonFieldHasNoErrors;
+
+    case 'Reject':
+      return reasonFieldHasNoErrors;
+
+    default:
+      // If the action name does not match any case
+      return false;  // Should never happen
+  }
+});
+
 
 async function onSubmit() {
   // This should never happen since we disable the button, but just in case

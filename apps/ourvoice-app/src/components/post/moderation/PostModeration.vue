@@ -22,7 +22,7 @@
 
       <!-- Post Preview -->
       <div v-if="post && version" class="col-span-3">
-        <ModerationEditablePostCard v-if="showModifyForm" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" @update="handleModifyFormUpdate" />
+        <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
         <ModerationPostCard v-else :post="post" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
 
         <div class="grid grid-cols-4">
@@ -170,14 +170,18 @@ function handleModerationControlsSubmit(
 
 function handleModerationControlsActionChange(action: ModerationActions) {
   if (action === 'Modify') {
+    moderationPostsStore.resetVersionInModification()
     showModifyForm.value = true
   } else {
     showModifyForm.value = false
   }
 }
 
-function handleModifyFormUpdate(editedVersion: PostVersion) {
-  moderationPostsStore.modifiedPostVersion = editedVersion
+function handleModifyFormUpdate(
+  { version: editedVersion, isValid }: { version: PostVersion, isValid: boolean }
+) {
+  if (!isValid) return;
+
   modifyValues.value = {
     title: editedVersion.title,
     content: editedVersion.content,

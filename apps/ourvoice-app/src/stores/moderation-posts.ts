@@ -78,7 +78,11 @@ export interface ModerationPostsState {
   posts: ModerationPost[]
   postInModeration: ModerationPost | undefined
   versionInModeration: PostVersion | undefined
-  modifiedPostVersion: PostVersion | undefined
+  // modifiedPostVersion: PostVersion | undefined
+  versionInModification: {
+    version: PostVersionWithCategoryIds | undefined
+    isValid: boolean
+  }
   categories: Map<number, Category>
   totalCount: number
   pageInfo: pageInfo | undefined
@@ -121,7 +125,10 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     posts: [],
     postInModeration: undefined,
     versionInModeration: undefined,
-    modifiedPostVersion: undefined,
+    versionInModification: {
+      version: undefined,
+      isValid: false
+    },
     categories: new Map(),
     totalCount: 0,
     pageInfo: undefined,
@@ -144,6 +151,12 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     }
   },
   actions: {
+    resetVersionInModification() {
+      this.versionInModification = {
+        version: undefined,
+        isValid: false
+      }
+    },
     async fetchPosts(loadMore = false) {
       try {
         // Fetch posts from Moderation DB

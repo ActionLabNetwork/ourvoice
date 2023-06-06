@@ -1,12 +1,5 @@
 <template>
   <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
-    <div class="absolute right-10" v-if="props.decisionIcon">
-      <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
-        <div class="h-2 w-2 rounded-full bg-current" />
-        <p>{{ props.decisionIcon?.text }} by you</p>
-      </div>
-    </div>
-
     <!-- Author -->
     <div class="group block flex-shrink-0 mb-3">
       <div class="flex items-center">
@@ -16,7 +9,7 @@
         <div class="ml-3">
           <p class="text-sm font-medium text-gray-700">
             {{ nickname.author.nickname }}
-            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-700">
+            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-500">
               (Modified by {{ nickname.moderator.nickname }})
             </span>
           </p>
@@ -28,14 +21,25 @@
     </div>
 
     <!-- Title -->
-    <h3 class="text-2xl font-extrabold text-black-700 mb-3">
-       <textarea v-model="localVersion.title" class="border rounded p-2 w-full"></textarea>
-    </h3>
+    <div>
+      <div class="text-2xl font-extrabold text-black-700 mb-3">
+        <input type="text" name="title" v-model="titleField.value.value" class="border rounded p-2 w-full" />
+      </div>
+      <p v-if="titleField.errorMessage.value" class="text-red-500 mb-5 text-sm">
+        {{ titleField.errorMessage.value }}
+      </p>
+    </div>
 
     <!-- Content -->
-    <p class="text-gray-700 text-lg leading-relaxed mb-3">
-      <textarea v-model="localVersion.content" class="border rounded p-2 w-full"></textarea>
-    </p>
+    <div>
+      <div class="text-gray-700 text-lg leading-relaxed mb-3">
+        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full"></textarea>
+      </div>
+      <p v-if="contentField.errorMessage.value"
+      class="text-red-700 mb-5 text-sm">
+        {{ contentField.errorMessage.value }}
+      </p>
+    </div>
 
     <!-- Categories -->
     <FormInput v-if="!categoriesStore.loading" id="categoriesWrapper" name="categories" labelText="Categories" labelSpan="select 1 to 2" :error-message="categoriesField.errorMessage.value" :meta="categoriesField.meta">
@@ -81,26 +85,12 @@ import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import { storeToRefs } from 'pinia';
 import { useCategoriesStore } from '@/stores/categories';
-import { useField } from 'vee-validate';
+import { useField, useForm } from 'vee-validate';
 import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
-
-interface DecisionIcon {
-  text: string;
-  indicatorClass: string;
-}
-
-const props = defineProps({
-  preview: {
-    type: Boolean,
-    defaultValue: false
-  },
-  decisionIcon: {
-    type: Object as PropType<DecisionIcon>,
-    required: false
-  }
-});
+import { validateCategories, validateContent, validateTitle } from '@/validators/moderation-post-validator';
+import { json } from 'body-parser';
 
 const emit = defineEmits(['update']);
 
@@ -131,6 +121,7 @@ const nickname = computed(() => {
   }
 })
 
+// Pinia Stores
 const moderationPostsStore = useModerationPostsStore();
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
 
@@ -140,37 +131,73 @@ onMounted(async () => {
   await categoriesStore.fetchCategories()
 })
 
+const modifyModerationPostValidationSchema = {
+  title(value: string) {
+    return validateTitle(value)
+  },
+  content(value: string) {
+    return validateContent(value)
+  },
+  categories(value: string[]) {
+    return validateCategories(value)
+  },
+}
+
+const { errors } = useForm(
+  { validationSchema: modifyModerationPostValidationSchema }
+)
+
 // VeeValidate Form Fields
-const useVeeValidateField = <T,>(fieldName: string) => {
-  const { errorMessage, value, meta } = useField<T>(fieldName)
+const useVeeValidateField = <T,>(fieldName: string, initialValue?: T) => {
+  const { errorMessage, value, meta } = useField<T>(
+    fieldName, undefined, { initialValue }
+  )
+
   return { errorMessage, value, meta }
 }
 
-const titleField = useVeeValidateField<string>('title')
-const contentField = useVeeValidateField<string>('content')
-const categoriesField = useVeeValidateField<number[]>('categories')
+const titleField = useVeeValidateField<string>('title', version.value?.title)
+const contentField = useVeeValidateField<string>(
+  'content', version.value?.content
+)
+const categoriesField = useVeeValidateField<number[]>('categories', version.value?.categoryIds)
 
-// Form fields
+// Form field refs
 const selectedCategories = ref<number[]>([])
-const attachmentsInputRef = ref<HTMLInputElement | null>(null)
-const characterCount = ref(0)
-// const presignedUrls = ref<PresignedUrlResponse[]>([])
 
 const categoriesOptions = computed(() => {
-  return categoriesStore.data.map(({ id, name }) => ({ label: name, value: id }))
+  return categoriesStore.data
+    .map(({ id, name }) => ({ label: name, value: id }))
 })
 
 if (version.value) {
   selectedCategories.value = version.value.categories.map(({ id }) => id)
 }
 
+const formHasNoErrors = computed(() => {
+  return Object.keys(errors.value).length === 0
+})
+
+const formWasUpdated = computed(() => {
+  const titleFieldUpdated = version.value?.title?.trim() !== titleField.value?.value?.trim()
+  const contentFieldUpdated = version.value?.content?.trim() !== contentField.value?.value?.trim()
+
+  // Order insensitive comparison for categories
+  const sortedCategoryIds = JSON.parse(JSON.stringify(version.value?.categoryIds))?.sort()
+  const sortedCategoryFieldIds = JSON.parse(JSON.stringify(categoriesField.value?.value))?.sort()
+
+  const categoriesFieldUpdated = JSON.stringify(sortedCategoryIds) !== JSON.stringify(sortedCategoryFieldIds)
+
+  return titleFieldUpdated || contentFieldUpdated || categoriesFieldUpdated
+})
+
 // The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
 watch(selectedCategories, async () => {
   categoriesField.value.value = selectedCategories.value
-  localVersion.categoryIds = selectedCategories.value
+  // localVersion.categoryIds = selectedCategories.value
 })
 
-
+// Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
   const groups = version.value?.moderations.reduce((acc, moderation) => {
     const group = moderation.decision
@@ -196,7 +223,13 @@ const formattedDate = (version: PostVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
 
 // Reactive copies of post and version
-const localVersion = reactive({ ...version.value });
+const localVersion = reactive({
+  ...version.value,
+  title: titleField.value.value,
+  content: contentField.value.value,
+  categories: categoriesField.value.value,
+  files: { ...version.value.files }
+});
 
 const handleRemoveFile = (file: { key: string; url: string; }) => {
   if (!moderationPostsStore.versionInModeration) return
@@ -211,11 +244,26 @@ const handleRemoveFile = (file: { key: string; url: string; }) => {
   localVersion.files = modifiedAttachments?.map(({ key }) => key)
 }
 
-watch(
-  localVersion,
-  () => {
-    emit('update', localVersion);
-  },
-  { deep: true }
-);
+watchEffect(() => {
+  // Keep local version in sync with VeeValidate fields
+  localVersion.title = titleField.value.value
+  localVersion.content = contentField.value.value
+  localVersion.categories = categoriesField.value.value
+
+  if (formWasUpdated.value && formHasNoErrors.value) {
+    moderationPostsStore.versionInModification = {
+      version: localVersion,
+      isValid: true
+    }
+    console.log("Emitting localVersion without error ", localVersion)
+    emit('update', { version: localVersion, isValid: true });
+  } else {
+    moderationPostsStore.versionInModification = {
+      ...moderationPostsStore.versionInModification,
+      isValid: false
+    }
+    console.log("Emitting localVersion with error ", localVersion)
+    emit('update', { version: localVersion, isValid: false });
+  }
+})
 </script>
