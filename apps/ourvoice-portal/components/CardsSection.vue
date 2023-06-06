@@ -1,31 +1,44 @@
 <template>
-  <!-- Yellow backbround-->
+  <!-- black div to simulate the border -->
   <div
-    class="w-screen py-[142px] flex flex-col justify-center bg-ourvoice-portal-yellow"
+    style="
+      border-radius: 70%/12px 12px 0 0;
+      padding-top: 3px;
+      background: black;
+      margin-top: -12px;
+    "
   >
-    <!-- Heading -->
-    <div class="container flex flex-col px-2 items-center">
-      <h1 class="max-w-[708px] font-Inter">
-        {{ cardTitle }}
-      </h1>
-      <p class="text-center font-Inter font-normal text-xl mt-4 max-w-[600px]">
-        {{ cardSubTitle }}
-      </p>
-    </div>
+    <!-- Yellow background-->
     <div
-      class="flex flex-row px-10 lg:px-36 gap-4 lg:gap-8 w-full overflow-x-scroll mt-8 lg:mt-16"
-      ref="sidescrollRef"
+      class="w-screen py-[142px] flex flex-col justify-center bg-ourvoice-portal-yellow"
+      style="border-radius: 70%/12px 12px 0 0"
     >
-      <ClientOnly>
-        <card
-          v-for="(feature, idx) in features"
-          :id="idx"
-          :key="idx"
-          :feature="feature"
-          :class="feature.url ? 'cursor-pointer' : 'cursor-auto'"
-          @click="onClick(feature.url)"
-        />
-      </ClientOnly>
+      <!-- Heading -->
+      <div class="container flex flex-col px-2 items-center">
+        <h1 class="max-w-[708px] font-Inter">
+          {{ cardTitle }}
+        </h1>
+        <p
+          class="text-center font-Inter font-normal text-xl mt-4 max-w-[600px]"
+        >
+          {{ cardSubTitle }}
+        </p>
+      </div>
+      <div
+        class="flex flex-row px-10 lg:px-36 gap-4 lg:gap-8 w-full overflow-x-scroll mt-8 lg:mt-16"
+        ref="sidescrollRef"
+      >
+        <ClientOnly>
+          <card
+            v-for="(feature, idx) in features"
+            :id="idx"
+            :key="idx"
+            :feature="feature"
+            :class="feature.url ? 'cursor-pointer' : 'cursor-auto'"
+            @click="onClick(feature.url)"
+          />
+        </ClientOnly>
+      </div>
     </div>
   </div>
 </template>

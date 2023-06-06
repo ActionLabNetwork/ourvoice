@@ -42,13 +42,13 @@
     <div class="flex flex-row justify-between items-end">
       <img
         :src="leftImg"
-        class="hidden h-auto md:block md:w-[300px] xl:w-[450px]"
+        class="hidden h-auto md:block md:w-[300px] xl:w-[450px] -z-10"
       />
       <img
         :src="imgs.right"
         class="hidden h-auto md:block relative md:bottom-[-35px] md:w-[300px] xl:bottom-[-70px] xl:w-[450px] -z-10"
       />
-      <img :src="imgs.small" class="md:hidden mx-auto h-auto w-[300px]" />
+      <img :src="imgs.small" class="md:hidden mx-auto h-auto w-[300px] -z-10" />
     </div>
   </div>
 </template>
