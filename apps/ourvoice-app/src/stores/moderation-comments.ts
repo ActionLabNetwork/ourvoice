@@ -6,6 +6,13 @@ import { provideApolloClient } from '@vue/apollo-composable'
 
 import authService from '@/services/auth-service'
 import type { ApolloError } from '@apollo/client/errors'
+import { GET_MODERATION_COMMENTS_QUERY } from '@/graphql/queries/getModerationComments'
+import { GET_MODERATION_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getModerationComment'
+import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
+import { APPROVE_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/approveModerationCommentVersion'
+import { REJECT_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/rejectModerationCommentVersion'
+import { MODIFY_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/modifyModerationComment'
+import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewCommentModeration'
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
