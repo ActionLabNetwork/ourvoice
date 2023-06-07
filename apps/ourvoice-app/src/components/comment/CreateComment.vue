@@ -37,7 +37,7 @@
               :groups="true"
               valueProp="id"
               label="content"
-              :options="commentsData.getGroupedComments"
+              :options="commentsStore.getGroupedComments"
               mode="single"
               :searchable="true"
               required
@@ -51,7 +51,7 @@
               v-model="selectedPost"
               valueProp="id"
               label="title"
-              :options="postsData.data"
+              :options="postsStore.data"
               mode="single"
               :searchable="true"
               required
@@ -99,92 +99,73 @@
   <pre class="bg-white text-orange-400">{{ commentsData.getGroupedComments }}</pre> -->
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useCommentsStore } from '@/stores/comments'
 import { usePostsStore } from '@/stores/posts'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import { createPostContentCharacterLimit } from '@/constants/post'
 
-export default {
-  components: {
-    Multiselect
-  },
-  setup() {
-    // Fetch comments and initial state
-    const commentsStore = useCommentsStore()
-    const postsStore = usePostsStore()
-    commentsStore.fetchComments()
-    postsStore.fetchPosts()
+const commentsStore = useCommentsStore()
+const postsStore = usePostsStore()
 
-    // Form fields
-    const commentFor = ref('comment')
-    const selectedComment = ref<number[] | number>([])
-    const selectedPost = ref<number[] | number>([])
-    const content = ref<string>('')
-    const characterCount = ref(0)
+onMounted(() => {
+  commentsStore.fetchComments()
+  postsStore.fetchPosts()
+})
 
-    const submitForm = async () => {
-      //Todo: Perform validation and api call here
-      console.log('selectedComment:', selectedComment.value)
-      console.log('selectedPost:', selectedPost.value)
-      console.log('commentFor:', commentFor.value)
-      console.log('content:', content.value)
-      //Create comment
-      await commentsStore
-        .createComment({
-          content: content.value,
-          postId:
-            commentFor.value === 'post' && typeof selectedPost.value == 'number'
-              ? selectedPost.value
-              : commentsStore.data.find((comment) => comment.id == selectedComment.value)?.post?.id,
-          parentId:
-            commentFor.value === 'comment' && typeof selectedComment.value == 'number'
-              ? selectedComment.value
-              : undefined,
-          //Todo: Get authorId from auth
-          authorId: 1
-        })
-        .then(() => {
-          console.log('Comment created successfully')
-          //Rest form after successfully submitting the form
-          selectedComment.value = []
-          selectedPost.value = []
-          content.value = ''
-          characterCount.value = 0
-        })
-        .catch((error) => {
-          console.log('Error creating comment:', error)
-        })
-    }
+const commentFor = ref('comment')
+const selectedComment = ref<number[] | number>([])
+const selectedPost = ref<number[] | number>([])
+const content = ref<string>('')
+const characterCount = ref(0)
 
-    //Errors
-    const contentError = ref('')
+const submitForm = async () => {
+  //Todo: Perform validation and api call here
+  console.log('selectedComment:', selectedComment.value)
+  console.log('selectedPost:', selectedPost.value)
+  console.log('commentFor:', commentFor.value)
+  console.log('content:', content.value)
+  //Create comment
+  await commentsStore
+    .createComment({
+      content: content.value,
+      postId:
+        commentFor.value === 'post' && typeof selectedPost.value == 'number'
+          ? selectedPost.value
+          : commentsStore.data.find((comment) => comment.id == selectedComment.value)?.post?.id,
+      parentId:
+        commentFor.value === 'comment' && typeof selectedComment.value == 'number'
+          ? selectedComment.value
+          : undefined,
+      //Todo: Get authorId from auth
+      authorId: 1
+    })
+    .then(() => {
+      console.log('Comment created successfully')
+      //Rest form after successfully submitting the form
+      selectedComment.value = []
+      selectedPost.value = []
+      content.value = ''
+      characterCount.value = 0
+    })
+    .catch((error) => {
+      console.log('Error creating comment:', error)
+    })
+}
 
-    // Update character count and validate content length
-    const updateCharacterCount = () => {
-      characterCount.value = content.value.length
-      contentError.value =
-        content.value.length > createPostContentCharacterLimit
-          ? `Content must not exceed ${createPostContentCharacterLimit} characters.`
-          : ''
-    }
+//Errors
+const contentError = ref('')
 
-    return {
-      commentsData: commentsStore,
-      postsData: postsStore,
-      content,
-      submitForm,
-      selectedComment,
-      selectedPost,
-      commentFor,
-      updateCharacterCount,
-      characterCount,
-      contentError,
-      createPostContentCharacterLimit
-    }
-  }
+// Update character count and validate content length
+const updateCharacterCount = () => {
+  characterCount.value = content.value.length
+  contentError.value =
+    content.value.length > createPostContentCharacterLimit
+      ? `Content must not exceed ${createPostContentCharacterLimit} characters.`
+      : ''
 }
 </script>
 
-<style></style>
+<style>
+</style>

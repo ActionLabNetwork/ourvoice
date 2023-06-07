@@ -87,7 +87,8 @@ export class CommentCreateInput {
     content: string;
     moderated?: Nullable<boolean>;
     published?: Nullable<boolean>;
-    authorId: number;
+    authorHash: string;
+    authorNickname: string;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
 }
@@ -96,14 +97,16 @@ export class CommentUpdateInput {
     content?: Nullable<string>;
     moderated?: Nullable<boolean>;
     published?: Nullable<boolean>;
-    authorId?: Nullable<number>;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
 }
 
 export class CommentsFilterInput {
     content?: Nullable<string>;
     moderated?: Nullable<boolean>;
     published?: Nullable<boolean>;
-    authorId?: Nullable<number>;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
     createdAfter?: Nullable<DateTime>;
@@ -174,18 +177,6 @@ export class ModerationPostModifyInput {
     files?: Nullable<Nullable<string>[]>;
 }
 
-export class PostCreateInput {
-    title: string;
-    content: string;
-    files?: Nullable<string[]>;
-    moderated?: Nullable<boolean>;
-    published?: Nullable<boolean>;
-    votesDown?: Nullable<number>;
-    votesUp?: Nullable<number>;
-    authorId: number;
-    categoryIds: number[];
-}
-
 export class PostUpdateInput {
     title?: Nullable<string>;
     content?: Nullable<string>;
@@ -194,7 +185,8 @@ export class PostUpdateInput {
     published?: Nullable<boolean>;
     votesDown?: Nullable<number>;
     votesUp?: Nullable<number>;
-    authorId?: Nullable<number>;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
     categoryIds?: Nullable<number[]>;
 }
 
@@ -205,7 +197,8 @@ export class PostsFilterInput {
     published?: Nullable<boolean>;
     votesDown?: Nullable<number>;
     votesUp?: Nullable<number>;
-    authorId?: Nullable<number>;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
     categoryIds?: Nullable<number[]>;
     createdAfter?: Nullable<DateTime>;
     createdBefore?: Nullable<DateTime>;
@@ -375,7 +368,8 @@ export class Comment {
     moderatedAt?: Nullable<DateTime>;
     publishedAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
-    author: User;
+    authorHash: string;
+    authorNickname: string;
     post?: Nullable<Post>;
     parent?: Nullable<Comment>;
     children: Comment[];
@@ -519,10 +513,11 @@ export class Post {
     disabledAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;
     publishedAt?: Nullable<DateTime>;
-    author: User;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
     categories: Category[];
-    comments: Comment[];
-    votes: Vote[];
+    comments?: Nullable<Comment[]>;
+    votes?: Nullable<Vote[]>;
 }
 
 export class PresignedUrl {

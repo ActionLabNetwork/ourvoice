@@ -8,10 +8,8 @@ export const GET_COMMENTS_QUERY = gql`
           id
           content
           createdAt
-          author {
-            id
-            nickname
-          }
+          authorHash
+          authorNickname
           post {
             id
             title

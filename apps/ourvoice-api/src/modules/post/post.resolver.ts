@@ -1,6 +1,5 @@
 import {
   PostPaginationInput,
-  PostCreateInput,
   PostsFilterInput,
   PostUpdateInput,
 } from './../../graphql';
@@ -86,11 +85,6 @@ export class PostResolver {
     );
     return urls;
   }
-
-  // @Mutation()
-  // async createPost(@Args('data') data: PostCreateInput) {
-  //   return this.postService.createPost(data);
-  // }
 
   @Mutation()
   async updatePost(

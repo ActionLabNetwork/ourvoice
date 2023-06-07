@@ -23,6 +23,7 @@ model Post {
   comments       Comment[]
   authorHash     String
   authorNickname String
+  postIdInMainDb Int?
 }
 
 model PostVersion {
@@ -54,13 +55,14 @@ model Comment {
   requiredModerations Int              @default(1)
 
   // Relations
-  authorHash     String
-  authorNickname String
-  post           Post?     @relation(fields: [postId], references: [id])
-  postId         Int?
-  parentId       Int?
-  parent         Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
-  children       Comment[] @relation("CommentToComment")
+  authorHash        String
+  authorNickname    String
+  post              Post?     @relation(fields: [postId], references: [id])
+  postId            Int?
+  parentId          Int?
+  parent            Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children          Comment[] @relation("CommentToComment")
+  commentIdInMainDb Int?
 }
 
 model CommentVersion {

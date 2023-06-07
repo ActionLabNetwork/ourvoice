@@ -6,7 +6,7 @@ import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
 import { CREATE_POST_MUTATION } from './../graphql/mutations/createPost'
 import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
-import { provideApolloClient, useQuery, useMutation } from '@vue/apollo-composable'
+import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 
 import authService from '@/services/auth-service'
@@ -63,14 +63,15 @@ export const usePostsStore = defineStore('posts', {
     async fetchPosts() {
       try {
         const { data } = await apolloClient.query({
-          query: GET_POSTS_QUERY,
-          variables: { limit: 3 }
+          query: GET_POSTS_QUERY
         })
 
         this.data = data.posts.edges.map((edge: any) => edge.node)
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
+        console.log({ data })
       } catch (error) {
+        console.log(error)
         this.error = error
         if (error) {
           this.errorMessage = 'Failed to load posts. Please try again.'

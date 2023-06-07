@@ -1,5 +1,3 @@
-import { PremoderationService } from './../moderation/premoderation.service';
-import { PostCreateDto } from './dto/post-create.dto';
 import { PrismaService } from '../../database/main/prisma.service';
 import { PostService } from './post.service';
 import { Test, TestingModule } from '@nestjs/testing';

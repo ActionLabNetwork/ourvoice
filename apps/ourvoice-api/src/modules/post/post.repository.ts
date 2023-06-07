@@ -8,10 +8,6 @@ import { cursorToNumber } from '../../utils/cursor-pagination';
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createPost(data: Prisma.PostCreateInput) {
-    return this.prisma.post.create({ data });
-  }
-
   async getPostById(id: number, include?: Prisma.PostInclude) {
     return this.prisma.post.findUnique({
       where: { id },
@@ -30,7 +26,8 @@ export class PostRepository {
       published,
       votesDown,
       votesUp,
-      authorId,
+      authorHash,
+      authorNickname,
       categoryIds,
       createdAfter,
       createdBefore,
@@ -47,6 +44,8 @@ export class PostRepository {
       published: published ?? undefined,
       votesDown: votesDown ?? undefined,
       votesUp: votesUp ?? undefined,
+      authorHash: authorHash ?? undefined,
+      authorNickname: authorNickname ?? undefined,
       categories: categoryIds
         ? { some: { id: { in: categoryIds } } }
         : undefined,
