@@ -8,7 +8,7 @@ export const MODIFY_MODERATION_COMMENT_MUTATION = gql`
     $reason: String!
     $data: ModerationCommentModifyInput!
   ) {
-    modifyModerationPost(
+    modifyModerationComment(
       commentId: $commentId
       moderatorHash: $moderatorHash
       moderatorNickname: $moderatorNickname

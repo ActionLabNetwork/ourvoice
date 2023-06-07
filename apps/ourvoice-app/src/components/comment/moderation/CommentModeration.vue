@@ -20,8 +20,13 @@
         <ModerationVersionList @versionClicked="handleVersionChange" :versions="comment?.versions ?? []" />
       </div>
 
-      <!-- Comment Preview -->
+      <!-- Post Context Preview -->
       <div v-if="comment && version" class="col-span-3">
+        <ModerationPostCard :post="comment.post" :version="comment.post.versions[0]" :preview="true"  />
+      </div>
+
+      <!-- Comment Preview -->
+      <div v-if="comment && version" class="col-span-2 col-start-3">
         <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
         <ModerationCommentCard v-else :comment="comment" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
 
@@ -61,6 +66,7 @@ import { useModerationCommentsStore, type Moderation, type CommentVersion, } fro
 import { useUserStore } from '@/stores/user';
 import { ref, onMounted, computed, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
 import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue';
 import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue';
 import ModerationHistory from '@/components/comment/moderation/ModerationHistory.vue';
@@ -94,8 +100,9 @@ const showModifyForm = ref<boolean>(false)
 const isLatestVersion = computed(() => moderationCommentsStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !moderationCommentsStore.userHasModeratedComment)
 const hasModerationHistory = computed(() => {
+  // The second check is for development. It shouldn't happen in reality (a moderator shouldn't be able to moderate their own comment, less so modify it)
   const wasModified =
-    version.value?.authorHash !== comment.value?.versions.at(-1).authorHash
+    (version.value?.authorHash !== comment.value?.versions.at(-1).authorHash) || (version.value?.version > 1)
   const hasModerations =
     (version.value?.moderations && version.value?.moderations.length > 0)
 
@@ -114,6 +121,7 @@ const decisionIcon = {
 }
 
 onMounted(async () => {
+  console.log(comment.value)
   await initializeModerationComments()
 });
 

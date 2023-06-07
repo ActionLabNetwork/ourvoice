@@ -7,6 +7,21 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
       authorHash
       authorNickname
       requiredModerations
+      post {
+        id
+        authorHash
+        authorNickname
+        versions {
+          id
+          title
+          content
+          categoryIds
+          files
+          timestamp
+          authorHash
+          authorNickname
+        }
+      }
       versions {
         id
         content

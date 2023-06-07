@@ -16,6 +16,22 @@ import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewComm
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
+export interface PostVersion {
+  id: number
+  title: string
+  content: string
+  categoryIds: number[]
+  files: string[]
+  timestamp: string
+  authorHash: string
+  authorNickname: string
+}
+export interface ModerationPost {
+  id: number
+  authorHash: string
+  authorNickname: string
+  versions: PostVersion
+}
 export interface CommentVersion {
   id: number
   content: string
@@ -35,6 +51,7 @@ export interface ModerationComment {
   authorNickname: string
   requiredModerations: number
   status: CommentStatus
+  post: ModerationPost
   versions: CommentVersion[]
 }
 

@@ -47,9 +47,16 @@ export class CommentModerationRepository {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
+        post: {
+          include: {
+            versions: { orderBy: { version: 'desc' }, take: 1 },
+          },
+        },
         versions: {
           orderBy: { version: 'desc' },
-          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          include: {
+            moderations: { orderBy: { timestamp: 'desc' } },
+          },
         },
       },
     });
@@ -109,7 +116,9 @@ export class CommentModerationRepository {
         } else {
           connectData = { post: { connect: { id: post.id } } };
         }
-      } else if (parentId) {
+      }
+
+      if (parentId) {
         console.log('Creating comment for comment');
         const parentComment = await tx.comment.findFirst({
           where: { commentIdInMainDb: parentId },

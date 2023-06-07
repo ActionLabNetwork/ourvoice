@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
+import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-comments';
 import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
