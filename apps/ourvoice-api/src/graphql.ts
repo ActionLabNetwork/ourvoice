@@ -277,8 +277,6 @@ export abstract class IMutation {
 
     abstract deleteCategory(id: number): Category | Promise<Category>;
 
-    abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
-
     abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
 
     abstract deleteComment(id: number): Comment | Promise<Comment>;
@@ -304,8 +302,6 @@ export abstract class IMutation {
     abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
-
-    abstract createPost(data: PostCreateInput): Post | Promise<Post>;
 
     abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
 

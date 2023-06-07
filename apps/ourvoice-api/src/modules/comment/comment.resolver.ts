@@ -26,10 +26,10 @@ export class CommentResolver {
     return { totalCount, edges, pageInfo };
   }
 
-  @Mutation()
-  async createComment(@Args('data') data: CommentCreateInput) {
-    return this.commentService.createComment(data);
-  }
+  // @Mutation()
+  // async createComment(@Args('data') data: CommentCreateInput) {
+  //   return this.commentService.createComment(data);
+  // }
 
   @Mutation()
   async updateComment(

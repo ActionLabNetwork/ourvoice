@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Post, Prisma } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { PostRepository } from './post.repository';
 import { PostCreateDto } from './dto/post-create.dto';
 import { validate } from 'class-validator';
@@ -17,31 +17,27 @@ import { numberToCursor } from '../../utils/cursor-pagination';
 export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
-  async createPost(data: PostCreateDto): Promise<Post> {
-    const postCreateDto = plainToClass(PostCreateDto, data);
-    const errors = await validate(postCreateDto);
+  // async createPost(data: PostCreateDto): Promise<Post> {
+  //   const postCreateDto = plainToClass(PostCreateDto, data);
+  //   const errors = await validate(postCreateDto);
 
-    if (errors.length > 0) {
-      throw new BadRequestException(errors);
-    }
+  //   if (errors.length > 0) {
+  //     throw new BadRequestException(errors);
+  //   }
 
-    const { authorId, categoryIds: categories, ...restData } = data;
+  //   const { authorId, categoryIds: categories, ...restData } = data;
 
-    const postData = {
-      ...restData,
-      author: { connect: { id: authorId } },
-      categories: {
-        connect: categories.map((id) => ({ id })),
-      },
-    };
+  //   const postData = {
+  //     ...restData,
+  //     author: { connect: { id: authorId } },
+  //     categories: {
+  //       connect: categories.map((id) => ({ id })),
+  //     },
+  //   };
 
-    const newPost = await this.postRepository.createPost(postData);
-    // const newPostWithAuthor: Prisma.PromiseReturnType<typeof this.getPostById> =
-    //   await this.postRepository.getPostById(newPost.id, { author: true });
-    // await this.premoderationService.copyPostToPremoderation(newPostWithAuthor);
-
-    return newPost;
-  }
+  //   const newPost = await this.postRepository.createPost(postData);
+  //   return newPost;
+  // }
 
   async getPostById(id: number): Promise<Post> {
     return this.postRepository.getPostById(id);

@@ -7,7 +7,7 @@ type Query {
 }
 
 type Mutation {
-  createComment(data: CommentCreateInput!): Comment!
+  # createComment(data: CommentCreateInput!): Comment!
   updateComment(id: Int!, data: CommentUpdateInput!): Comment!
   deleteComment(id: Int!): Comment!
 }

@@ -12,7 +12,6 @@ export class CommentRepository {
     return this.prisma.comment.create({
       data,
       include: {
-        author: true,
         post: true,
         parent: true,
       },
@@ -55,7 +54,6 @@ export class CommentRepository {
       content: content ? { contains: content, mode: 'insensitive' } : undefined,
       moderated: moderated ?? undefined,
       published: published ?? undefined,
-      authorId: authorId ?? undefined,
       postId: postId ?? undefined,
       parentId: parentId ?? undefined,
       createdAt: createdAfter || createdBefore ? {} : undefined,
@@ -92,7 +90,6 @@ export class CommentRepository {
     const comments = await this.prisma.comment.findMany({
       where,
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,
@@ -120,7 +117,6 @@ export class CommentRepository {
       where: { id },
       data,
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,
@@ -138,7 +134,6 @@ export class CommentRepository {
     return this.prisma.comment.delete({
       where: { id },
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,

@@ -1,6 +1,6 @@
 import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Category, Post, Prisma, User, Vote } from '@prisma/client';
+import { Post, Prisma } from '@prisma/client';
 import { PostsFilterInput, PostPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 
@@ -47,7 +47,6 @@ export class PostRepository {
       published: published ?? undefined,
       votesDown: votesDown ?? undefined,
       votesUp: votesUp ?? undefined,
-      authorId: authorId ?? undefined,
       categories: categoryIds
         ? { some: { id: { in: categoryIds } } }
         : undefined,
@@ -80,7 +79,6 @@ export class PostRepository {
     const posts = await this.prisma.post.findMany({
       where,
       include: {
-        author: true,
         categories: true,
         comments: true,
         votes: true,
