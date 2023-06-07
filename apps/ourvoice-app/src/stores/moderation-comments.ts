@@ -52,6 +52,7 @@ export interface ModerationComment {
   requiredModerations: number
   status: CommentStatus
   post: ModerationPost
+  parent: ModerationComment | null
   versions: CommentVersion[]
 }
 

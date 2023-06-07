@@ -47,6 +47,14 @@ export class CommentModerationRepository {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
+        parent: {
+          include: {
+            versions: {
+              orderBy: { version: 'desc' },
+              take: 1,
+            },
+          },
+        },
         post: {
           include: {
             versions: { orderBy: { version: 'desc' }, take: 1 },
@@ -102,9 +110,10 @@ export class CommentModerationRepository {
     const { content, postId, parentId, authorHash, authorNickname } = data;
 
     return await this.prisma.$transaction(async (tx) => {
-      let connectData;
+      const connectData = { post: null, parent: null };
       let errorMessage;
 
+      // 1. Fetch post to be connected with the comment
       if (postId) {
         console.log('Creating comment for post');
         const post = await tx.post.findFirst({
@@ -114,10 +123,11 @@ export class CommentModerationRepository {
         if (!post) {
           errorMessage = 'Post for comment not found in the moderation DB';
         } else {
-          connectData = { post: { connect: { id: post.id } } };
+          connectData.post = { connect: { id: post.id } };
         }
       }
 
+      // 1a. If there is a parent comment, fetch it to be connected with the comment
       if (parentId) {
         console.log('Creating comment for comment');
         const parentComment = await tx.comment.findFirst({
@@ -127,7 +137,7 @@ export class CommentModerationRepository {
           errorMessage =
             'Parent comment for comment not found in the moderation DB';
         } else {
-          connectData = { parent: { connect: { id: parentComment.id } } };
+          connectData.parent = { connect: { id: parentComment.id } };
         }
       }
 

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="comment && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
+  <div v-if="comment && version" class="bg-slate-100 shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
     <!-- Self moderation indicator -->
     <div class="absolute right-10" v-if="props.decisionIcon">
       <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">

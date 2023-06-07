@@ -22,6 +22,23 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
           authorNickname
         }
       }
+      parent {
+        id
+        authorHash
+        authorNickname
+        requiredModerations
+        versions {
+          id
+          content
+          timestamp
+          version
+          authorHash
+          authorNickname
+          reason
+          latest
+          status
+        }
+      }
       versions {
         id
         content

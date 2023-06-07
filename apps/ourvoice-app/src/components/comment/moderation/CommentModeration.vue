@@ -21,12 +21,17 @@
       </div>
 
       <!-- Post Context Preview -->
-      <div v-if="comment && version" class="col-span-3">
+      <div v-if="comment && comment.post && comment.post.versions" class="col-span-3">
         <ModerationPostCard :post="comment.post" :version="comment.post.versions[0]" :preview="true"  />
       </div>
 
+      <!-- Parent Comment Context Preview -->
+      <div v-if="comment && comment.parent && comment.parent.versions" class="col-span-3 col-start-2 pl-10">
+        <ModerationCommentCard :comment="comment.parent" :version="comment.parent.versions[0]" :preview="true" />
+      </div>
+
       <!-- Comment Preview -->
-      <div v-if="comment && version" class="col-span-2 col-start-3">
+      <div v-if="comment && version" class="col-span-3 col-start-2 pl-10">
         <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
         <ModerationCommentCard v-else :comment="comment" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
 
