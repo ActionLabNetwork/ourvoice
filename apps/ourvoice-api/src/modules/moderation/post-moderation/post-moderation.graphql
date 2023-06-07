@@ -57,7 +57,7 @@ type ModerationPostVersion {
   status: ModerationPostStatus!
   latest: Boolean!
   timestamp: String!
-  post: Post!
+  post: ModerationPost!
   moderations: [PostModeration!]
 }
 

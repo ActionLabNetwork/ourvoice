@@ -128,17 +128,24 @@ export class ContactFormEntryCreateInput {
     recaptchaToken: string;
 }
 
+export class ModerationCommentCreateInput {
+    content: string;
+    authorHash: string;
+    authorNickname: string;
+    requiredModerations: number;
+}
+
 export class ModerationCommentsFilterInput {
-    content?: Nullable<string>;
     status?: Nullable<ModerationCommentStatus>;
-    authorHash?: Nullable<string>;
-    postId?: Nullable<number>;
-    parentId?: Nullable<number>;
 }
 
 export class ModerationCommentPaginationInput {
     cursor?: Nullable<string>;
     limit?: Nullable<number>;
+}
+
+export class ModerationCommentModifyInput {
+    content?: Nullable<string>;
 }
 
 export class ModerationPostCreateInput {
@@ -232,6 +239,8 @@ export abstract class IQuery {
 
     abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
 
+    abstract commentVersion(id: number): Nullable<ModerationCommentVersion> | Promise<Nullable<ModerationCommentVersion>>;
+
     abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
@@ -275,6 +284,16 @@ export abstract class IMutation {
     abstract deleteComment(id: number): Comment | Promise<Comment>;
 
     abstract createContactFormEntry(data: ContactFormEntryCreateInput): string | Promise<string>;
+
+    abstract createModerationComment(data: ModerationCommentCreateInput): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
+    abstract approveModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
+    abstract rejectModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
+    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
+    abstract renewCommentModeration(commentModerationId: number, moderatorHash: string): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
     abstract createModerationPost(data: ModerationPostCreateInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
@@ -385,23 +404,26 @@ export class CommentPageInfo {
 
 export class ModerationComment {
     id: number;
-    status: ModerationPostStatus;
-    version: number;
+    status: ModerationCommentStatus;
+    versions: ModerationCommentVersion[];
+    requiredModerations: number;
     timestamp: string;
-    latest: boolean;
     authorHash: string;
+    authorNickname: string;
     post?: Nullable<ModerationPost>;
     parentId?: Nullable<number>;
     parent?: Nullable<ModerationComment>;
     children: ModerationComment[];
-    versions: ModerationCommentVersion[];
 }
 
 export class ModerationCommentVersion {
     id: number;
     content: string;
     version: number;
-    status: ModerationPostStatus;
+    authorHash: string;
+    authorNickname: string;
+    reason?: Nullable<string>;
+    status: ModerationCommentStatus;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -415,7 +437,6 @@ export class CommentModeration {
     decision: ModerationDecision;
     reason?: Nullable<string>;
     timestamp: string;
-    modifiedContent?: Nullable<string>;
 }
 
 export class ModerationCommentEdge {
@@ -458,7 +479,7 @@ export class ModerationPostVersion {
     status: ModerationPostStatus;
     latest: boolean;
     timestamp: string;
-    post: Post;
+    post: ModerationPost;
     moderations?: Nullable<PostModeration[]>;
 }
 

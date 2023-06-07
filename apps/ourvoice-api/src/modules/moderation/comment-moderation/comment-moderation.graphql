@@ -4,27 +4,58 @@ type Query {
     filter: ModerationCommentsFilterInput
     pagination: ModerationCommentPaginationInput
   ): ModerationCommentConnection
+  commentVersion(id: Int!): ModerationCommentVersion
+}
+
+type Mutation {
+  createModerationComment(data: ModerationCommentCreateInput!): ModerationComment
+  approveModerationCommentVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String
+  ): ModerationComment
+  rejectModerationCommentVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String
+  ): ModerationComment
+  modifyModerationComment(
+    commentId: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String!
+    data: ModerationCommentModifyInput!
+  ): ModerationComment
+  renewCommentModeration(
+    commentModerationId: Int!
+    moderatorHash: String!
+  ): ModerationComment
 }
 
 type ModerationComment {
   id: Int!
-  status: ModerationPostStatus!
-  version: Int!
+  status: ModerationCommentStatus!
+  versions: [ModerationCommentVersion!]!
+  requiredModerations: Int!
   timestamp: String!
-  latest: Boolean!
   authorHash: String!
+  authorNickname: String!
   post: ModerationPost
   parentId: Int
   parent: ModerationComment
   children: [ModerationComment!]!
-  versions: [ModerationCommentVersion!]!
 }
 
 type ModerationCommentVersion {
   id: Int!
   content: String!
   version: Int!
-  status: ModerationPostStatus!
+  authorHash: String!
+  authorNickname: String!
+  reason: String
+  status: ModerationCommentStatus!
   latest: Boolean!
   timestamp: String!
   comment: ModerationComment!
@@ -38,7 +69,6 @@ type CommentModeration {
   decision: ModerationDecision!
   reason: String
   timestamp: String!
-  modifiedContent: String
 }
 
 enum ModerationDecision {
@@ -52,12 +82,15 @@ enum ModerationCommentStatus {
   REJECTED
 }
 
+input ModerationCommentCreateInput {
+  content: String!
+  authorHash: String!
+  authorNickname: String!
+  requiredModerations: Int!
+}
+
 input ModerationCommentsFilterInput {
-  content: String
   status: ModerationCommentStatus
-  authorHash: String
-  postId: Int
-  parentId: Int
 }
 
 input ModerationCommentPaginationInput {
@@ -80,4 +113,8 @@ type ModerationCommentPageInfo {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean
+}
+
+input ModerationCommentModifyInput {
+  content: String
 }
