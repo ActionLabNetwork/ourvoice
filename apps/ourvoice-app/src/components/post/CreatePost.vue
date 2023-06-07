@@ -312,7 +312,6 @@ const onSubmit = handleSubmit(async (values) => {
     }
   }
 
-  // TODO: Replace authorId with the actual user ID when integrating with auth.
   await postsStore.createPost({
     title: values.title, content: values.content, categoryIds: values.categories, files: presignedUrls.value.map(({ key }) => key)
   })

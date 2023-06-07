@@ -84,6 +84,8 @@ enum ModerationCommentStatus {
 
 input ModerationCommentCreateInput {
   content: String!
+  postId: Int
+  parentId: Int
   authorHash: String!
   authorNickname: String!
   requiredModerations: Int!

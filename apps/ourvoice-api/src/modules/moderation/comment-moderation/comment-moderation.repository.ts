@@ -92,27 +92,62 @@ export class CommentModerationRepository {
   }
 
   async createModerationComment(data: CommentCreateDto) {
-    const { content, authorHash, authorNickname } = data;
-    const newComment = await this.prisma.comment.create({
-      data: {
-        authorHash,
-        authorNickname,
-      },
-    });
+    const { content, postId, parentId, authorHash, authorNickname } = data;
 
-    await this.prisma.commentVersion.create({
-      data: {
-        content,
-        authorHash,
-        authorNickname,
-        status: 'PENDING',
-        comment: { connect: { id: newComment.id } },
-        latest: true,
-        version: 1,
-      },
-    });
+    return await this.prisma.$transaction(async (tx) => {
+      let connectData;
+      let errorMessage;
 
-    return newComment;
+      if (postId) {
+        console.log('Creating comment for post');
+        const post = await tx.post.findFirst({
+          where: { postIdInMainDb: postId },
+        });
+        console.log({ post });
+        if (!post) {
+          errorMessage = 'Post for comment not found in the moderation DB';
+        } else {
+          connectData = { post: { connect: { id: post.id } } };
+        }
+      } else if (parentId) {
+        console.log('Creating comment for comment');
+        const parentComment = await tx.comment.findFirst({
+          where: { commentIdInMainDb: parentId },
+        });
+        if (!parentComment) {
+          errorMessage =
+            'Parent comment for comment not found in the moderation DB';
+        } else {
+          connectData = { parent: { connect: { id: parentComment.id } } };
+        }
+      }
+
+      if (errorMessage) {
+        throw new Error(errorMessage);
+      }
+
+      const newComment = await tx.comment.create({
+        data: {
+          authorHash,
+          authorNickname,
+          ...connectData,
+        },
+      });
+
+      await tx.commentVersion.create({
+        data: {
+          content,
+          authorHash,
+          authorNickname,
+          status: 'PENDING',
+          comment: { connect: { id: newComment.id } },
+          latest: true,
+          version: 1,
+        },
+      });
+
+      return newComment;
+    });
   }
 
   async getCommentVersionById(id: number) {

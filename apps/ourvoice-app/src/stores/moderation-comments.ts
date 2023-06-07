@@ -174,7 +174,15 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
         console.error(`Failed to load comment with ID ${id}. Please try again.`, error)
       }
     },
-    async createComment({ content }: { content: string }) {
+    async createComment({
+      content,
+      postId,
+      parentId
+    }: {
+      content: string
+      postId: number | undefined
+      parentId: number | undefined
+    }) {
       // Check for valid deployment and user session
       const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
@@ -185,20 +193,26 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
         throw new Error('User session is invalid')
       }
 
-      const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
+      const authorHash = userStore.sessionHash
+      const authorNickname = userStore.nickname
       const requiredModerations = 1
 
       try {
-        await apolloClient.mutate({
+        const { data } = await apolloClient.mutate({
           mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
             data: {
               content,
+              postId,
+              parentId,
               authorHash,
+              authorNickname,
               requiredModerations
             }
           }
         })
+
+        console.log('Moderation comment creation success: ', data)
       } catch (error) {
         console.error(error)
       }

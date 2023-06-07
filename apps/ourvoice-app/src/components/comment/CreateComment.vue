@@ -105,8 +105,10 @@ import { usePostsStore } from '@/stores/posts'
 import { onMounted, ref } from 'vue'
 import Multiselect from '@vueform/multiselect'
 import { createPostContentCharacterLimit } from '@/constants/post'
+import { useModerationCommentsStore } from '@/stores/moderation-comments'
 
 const commentsStore = useCommentsStore()
+const moderationCommentsStore = useModerationCommentsStore()
 const postsStore = usePostsStore()
 
 onMounted(() => {
@@ -126,32 +128,26 @@ const submitForm = async () => {
   console.log('selectedPost:', selectedPost.value)
   console.log('commentFor:', commentFor.value)
   console.log('content:', content.value)
-  //Create comment
-  await commentsStore
-    .createComment({
-      content: content.value,
-      postId:
-        commentFor.value === 'post' && typeof selectedPost.value == 'number'
-          ? selectedPost.value
-          : commentsStore.data.find((comment) => comment.id == selectedComment.value)?.post?.id,
-      parentId:
-        commentFor.value === 'comment' && typeof selectedComment.value == 'number'
+
+  try {
+    await moderationCommentsStore.createComment(
+      {
+        content: content.value,
+        postId: commentFor.value === 'post' && typeof selectedPost.value == 'number' ? selectedPost.value : commentsStore.data.find((comment) => comment.id == selectedComment.value)?.post?.id,
+        parentId: commentFor.value === 'comment' && typeof selectedComment.value == 'number'
           ? selectedComment.value
           : undefined,
-      //Todo: Get authorId from auth
-      authorId: 1
-    })
-    .then(() => {
-      console.log('Comment created successfully')
-      //Rest form after successfully submitting the form
-      selectedComment.value = []
-      selectedPost.value = []
-      content.value = ''
-      characterCount.value = 0
-    })
-    .catch((error) => {
-      console.log('Error creating comment:', error)
-    })
+      }
+    )
+
+    // Reset form after successfully submitting the form
+    selectedComment.value = []
+    selectedPost.value = []
+    content.value = ''
+    characterCount.value = 0
+  } catch (error) {
+    console.log('Error creating comment:', error)
+  }
 }
 
 //Errors

@@ -133,6 +133,8 @@ export class ContactFormEntryCreateInput {
 
 export class ModerationCommentCreateInput {
     content: string;
+    postId?: Nullable<number>;
+    parentId?: Nullable<number>;
     authorHash: string;
     authorNickname: string;
     requiredModerations: number;
