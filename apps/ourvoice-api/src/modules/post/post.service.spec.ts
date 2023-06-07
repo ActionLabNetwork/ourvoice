@@ -278,8 +278,8 @@ describe('PostService', () => {
   it('should return no posts when categories is empty', async () => {
     // Arrange
     const categoryNames = [];
-    const skip = 0;
-    const take = 10;
+    // const skip = 0;
+    // const take = 10;
 
     const posts = [];
 

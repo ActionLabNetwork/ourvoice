@@ -1,35 +1,54 @@
 <template>
   <div class="min-h-screen">
     <div class="container mx-auto p-4">
-      <div
-        class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto"
-      >
+      <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto">
         <!-- Form for creating new post -->
         <form @submit="onSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
 
           <!-- Title input field -->
-          <FormInput id="title" labelText="Title" name="title" labelSpan="required" :error-message="titleField.errorMessage.value" :meta="titleField.meta">
+          <FormInput
+            id="title"
+            labelText="Title"
+            name="title"
+            labelSpan="required"
+            :error-message="titleField.errorMessage.value"
+            :meta="titleField.meta"
+          >
             <template #icon>
               <span
-              class="bg-gray-200 p-2 rounded-l-md border border-solid border-gray-300"
-              :class="{
-                'focus:border-blue-500 focus:ring-blue-500': !titleField.errorMessage.value,
-                'border-red-500 :border-red-500 focus:ring-red-500': titleField.errorMessage.value
-              }">
+                class="bg-gray-200 p-2 rounded-l-md border border-solid border-gray-300"
+                :class="{
+                  'focus:border-blue-500 focus:ring-blue-500': !titleField.errorMessage.value,
+                  'border-red-500 :border-red-500 focus:ring-red-500': titleField.errorMessage.value
+                }"
+              >
                 <font-awesome-icon :icon="['fas', 'heading']" class="icon-color" />
               </span>
             </template>
-            <input v-model="titleField.value.value" type="text" id="title" name="title"     :placeholder="inputPlaceholders.title"
-            class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 outline-none transition duration-200 font-semibold text-gray-800"
-            :class="{
-              'focus:border-blue-500 focus:ring-blue-500': !titleField.errorMessage.value,
-              'border-red-500 :border-red-500 focus:ring-red-500': titleField.errorMessage.value
-            }" />
+            <input
+              v-model="titleField.value.value"
+              type="text"
+              id="title"
+              name="title"
+              :placeholder="inputPlaceholders.title"
+              class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 outline-none transition duration-200 font-semibold text-gray-800"
+              :class="{
+                'focus:border-blue-500 focus:ring-blue-500': !titleField.errorMessage.value,
+                'border-red-500 :border-red-500 focus:ring-red-500': titleField.errorMessage.value
+              }"
+            />
           </FormInput>
 
           <!-- Content text area-->
-          <FormInput id="content" labelText="Content" name="content"  labelSpan="required" :error-message="contentField.errorMessage.value" :meta="contentField.meta">
+          <FormInput
+            id="content"
+            labelText="Content"
+            name="content"
+            labelSpan="required"
+            :error-message="contentField.errorMessage.value"
+            :meta="contentField.meta"
+          >
             <textarea
               id="content"
               name="content"
@@ -37,22 +56,34 @@
               class="w-full mt-1 border border-solid border-gray-300 rounded-md px-4 pl-12 py-2 outline-none transition duration-200"
               :class="{
                 'focus:border-blue-500 focus:ring-blue-500': !contentField.errorMessage.value,
-                'border-red-500 focus:border-red-500 focus:ring-red-500': contentField.errorMessage.value
+                'border-red-500 focus:border-red-500 focus:ring-red-500':
+                  contentField.errorMessage.value
               }"
               rows="4"
               :placeholder="inputPlaceholders.content"
-              @input="updateCharacterCount" />
+              @input="updateCharacterCount"
+            />
 
             <!-- Character count and error message -->
             <template #info>
               <div class="flex flex-row-reverse justify-between text-sm">
-                <span :class="contentError ? 'text-red-500' : 'text-green-500'">{{ characterCount }} / {{ createPostContentCharacterLimit }}</span>
+                <span :class="contentError ? 'text-red-500' : 'text-green-500'"
+                  >{{ characterCount }} / {{ createPostContentCharacterLimit }}</span
+                >
               </div>
             </template>
           </FormInput>
 
           <!-- Categories input field -->
-          <FormInput v-if="!categoriesStore.loading" id="categoriesWrapper" name="categories" labelText="Categories" labelSpan="select 1 to 2" :error-message="categoriesField.errorMessage.value" :meta="categoriesField.meta">
+          <FormInput
+            v-if="!categoriesStore.loading"
+            id="categoriesWrapper"
+            name="categories"
+            labelText="Categories"
+            labelSpan="select 1 to 2"
+            :error-message="categoriesField.errorMessage.value"
+            :meta="categoriesField.meta"
+          >
             <div class="flex flex-col w-full">
               <Multiselect
                 id="categories"
@@ -64,7 +95,7 @@
                 :caret="true"
                 :placeholder="inputPlaceholders.categories"
                 class="px-8 multiselect-blue"
-                />
+              />
               <!-- Show error message if there's an error fetching categories -->
               <div v-if="categoriesStore.errorMessage" class="text-red-500 text-sm">
                 {{ categoriesStore.errorMessage }}
@@ -76,14 +107,23 @@
           </div>
 
           <!-- Attachments input field -->
-          <FormInput id="attachments" name="attachments" labelText="Attachments" labelSpan="optional" :error-message="attachmentsField.errorMessage.value" :meta="attachmentsField.meta">
+          <FormInput
+            id="attachments"
+            name="attachments"
+            labelText="Attachments"
+            labelSpan="optional"
+            :error-message="attachmentsField.errorMessage.value"
+            :meta="attachmentsField.meta"
+          >
             <template #icon>
               <span
                 class="bg-gray-200 px-2 py-3 rounded-l-md border border-solid border-gray-300"
                 :class="{
                   'focus:border-blue-500 focus:ring-blue-500': !attachmentsField.errorMessage.value,
-                  'border-red-500 focus:border-red-500 focus:ring-red-500': attachmentsField.errorMessage.value
-                }">
+                  'border-red-500 focus:border-red-500 focus:ring-red-500':
+                    attachmentsField.errorMessage.value
+                }"
+              >
                 <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />
               </span>
             </template>
@@ -96,14 +136,18 @@
               class="w-full border border-solid border-gray-300 rounded-md rounded-l-none px-4 py-2 focus:border-blue-500 focus:ring-blue-500 outline-none transition duration-200"
               :class="{
                 'focus:border-blue-500 focus:ring-blue-500': !attachmentsField.errorMessage.value,
-                'border-red-500 focus:border-red-500 focus:ring-red-500': attachmentsField.errorMessage.value
+                'border-red-500 focus:border-red-500 focus:ring-red-500':
+                  attachmentsField.errorMessage.value
               }"
               multiple
             />
           </FormInput>
 
           <!-- Uploaded Attachments -->
-          <AttachmentList v-if="attachmentsField.value.value && !attachmentsField.errorMessage.value" :attachments="attachmentsField.value.value" />
+          <AttachmentList
+            v-if="attachmentsField.value.value && !attachmentsField.errorMessage.value"
+            :attachments="attachmentsField.value.value"
+          />
 
           <!-- Submit button -->
           <div v-if="!categoriesStore.loading" class="flex justify-end gap-2">
@@ -134,20 +178,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type Ref } from 'vue';
-import Multiselect from '@vueform/multiselect';
+import { ref, computed, watch } from 'vue'
+import Multiselect from '@vueform/multiselect'
 import FormInput from '@/components/inputs/FormInput.vue'
-import { useCategoriesStore } from '@/stores/categories';
-import AttachmentList from '../inputs/AttachmentList.vue';
-import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
-import { usePostsStore } from '@/stores/posts';
-import { uploadFileUsingPresignedUrl } from '@/services/s3-service';
-import { useForm, useField } from 'vee-validate';
-import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
+import { useCategoriesStore } from '@/stores/categories'
+import AttachmentList from '../inputs/AttachmentList.vue'
+import {
+  createPostContentCharacterLimit,
+  postFilesBucket,
+  postFilesPresignedUrlTTL,
+  inputPlaceholders
+} from '@/constants/post'
+import { usePostsStore } from '@/stores/posts'
+import { uploadFileUsingPresignedUrl } from '@/services/s3-service'
+import { useForm, useField } from 'vee-validate'
+import {
+  validateAttachments,
+  validateCategories,
+  validateContent,
+  validateTitle
+} from '@/validators'
 
 interface PresignedUrlResponse {
-  key: string;
-  url: string;
+  key: string
+  url: string
 }
 
 const createPostValidationSchema = {
@@ -171,7 +225,9 @@ categoriesStore.fetchCategories()
 
 const postsStore = usePostsStore()
 
-const { handleSubmit, resetForm, errors } = useForm({ validationSchema: createPostValidationSchema })
+const { handleSubmit, resetForm, errors } = useForm({
+  validationSchema: createPostValidationSchema
+})
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -180,7 +236,7 @@ const characterCount = ref(0)
 const presignedUrls = ref<PresignedUrlResponse[]>([])
 
 // VeeValidate Form Fields
-const useVeeValidateField = <T,>(fieldName: string) => {
+const useVeeValidateField = function <T>(fieldName: string) {
   const { errorMessage, value, meta } = useField<T>(fieldName)
   return { errorMessage, value, meta }
 }
@@ -196,34 +252,41 @@ const contentError = ref('')
 // Update character count and validate content length
 const updateCharacterCount = () => {
   characterCount.value = contentField.value.value.length
-  contentError.value = contentField.value.value.length > createPostContentCharacterLimit ? `Content must not exceed ${createPostContentCharacterLimit} characters.` : '';
+  contentError.value =
+    contentField.value.value.length > createPostContentCharacterLimit
+      ? `Content must not exceed ${createPostContentCharacterLimit} characters.`
+      : ''
 }
 
 const generateUniqueKey = (userIdentifier: string, file: File, index: number) => {
-  const timestamp = Date.now();
-  return `${userIdentifier}/${timestamp}_${index}_${file.name}`;
-};
+  const timestamp = Date.now()
+  return `${userIdentifier}/${timestamp}_${index}_${file.name}`
+}
 
 const updateAttachments = async (event: Event) => {
-  const inputElement = event.target as HTMLInputElement;
-  const files = inputElement.files;
+  const inputElement = event.target as HTMLInputElement
+  const files = inputElement.files
 
   if (!files) {
-    attachmentsField.value.value = null;
-    return;
+    attachmentsField.value.value = null
+    return
   }
 
   attachmentsField.value.value = files
 
   // Generate unique keys for each attachment
   // TODO: Replace with dynamic user identifier when integrating with auth
-  const keys = Array.from(files).map((file, index) => generateUniqueKey('user123', file, index));
+  const keys = Array.from(files).map((file, index) => generateUniqueKey('user123', file, index))
 
   try {
-    const response = await postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
-    presignedUrls.value = response as { key: string; url: string; }[] ?? [];
+    const response = await postsStore.getPresignedUrls(
+      postFilesBucket,
+      keys,
+      postFilesPresignedUrlTTL
+    )
+    presignedUrls.value = (response as { key: string; url: string }[]) ?? []
   } catch (error) {
-    console.error('Error getting presigned URLs:', error);
+    console.error('Error getting presigned URLs:', error)
     return
   }
 }
@@ -231,8 +294,8 @@ const updateAttachments = async (event: Event) => {
 const requiredFields = [titleField, contentField, categoriesField]
 
 const allRequiredFieldsValidated = computed(() => {
-  return requiredFields.every(field => field.meta.validated);
-});
+  return requiredFields.every((field) => field.meta.validated)
+})
 
 const formHasNoErrors = computed(() => {
   return Object.keys(errors.value).length === 0
@@ -248,13 +311,14 @@ const onSubmit = handleSubmit(async (values) => {
   // Upload files to S3 using the presigned URLs
   if (values.attachments && presignedUrls.value.length > 0) {
     try {
-      const uploadPromises = presignedUrls.value.map((presignedUrl, index) =>
-        values.attachments && uploadFileUsingPresignedUrl(presignedUrl, values.attachments[index])
-      );
+      const uploadPromises = presignedUrls.value.map(
+        (presignedUrl, index) =>
+          values.attachments && uploadFileUsingPresignedUrl(presignedUrl, values.attachments[index])
+      )
 
-      await Promise.all(uploadPromises);
+      await Promise.all(uploadPromises)
     } catch (error) {
-      console.error('Error uploading files using presigned URLs:', error);
+      console.error('Error uploading files using presigned URLs:', error)
       // TODO: Handle error accordingly (e.g., show an error message to the user)
       return
     }
@@ -262,7 +326,11 @@ const onSubmit = handleSubmit(async (values) => {
 
   // TODO: Replace authorId with the actual user ID when integrating with auth.
   await postsStore.createPost({
-    title: values.title, content: values.content, categoryIds: values.categories, files: presignedUrls.value.map(({ key }) => key), authorId: 1
+    title: values.title,
+    content: values.content,
+    categoryIds: values.categories,
+    files: presignedUrls.value.map(({ key }) => key),
+    authorId: 1
   })
 
   // After successfully submitting the form, reset the form fields
@@ -271,19 +339,19 @@ const onSubmit = handleSubmit(async (values) => {
 
 const resetFormFields = () => {
   // Clear selected categories
-  selectedCategories.value = [];
+  selectedCategories.value = []
 
   // Clear attachments
-  attachmentsField.value.value = null;
+  attachmentsField.value.value = null
   if (attachmentsInputRef.value) {
-    attachmentsInputRef.value.value = '';
+    attachmentsInputRef.value.value = ''
   }
 
   // Reset character count
-  characterCount.value = 0;
+  characterCount.value = 0
 
   // Reset the form
-  resetForm();
+  resetForm()
 }
 
 const categoriesOptions = computed(() => {
@@ -296,16 +364,15 @@ watch(selectedCategories, () => {
 })
 </script>
 
-<style src="@vueform/multiselect/themes/default.css">
-</style>
+<style src="@vueform/multiselect/themes/default.css"></style>
 <style>
 :root {
   --form-brand-blue: #2196f3;
 }
 
 .multiselect-blue {
-  --ms-tag-bg: #DBEAFE;
-  --ms-tag-color: #2563EB;
+  --ms-tag-bg: #dbeafe;
+  --ms-tag-color: #2563eb;
   --ms-border-color-active: var(--form-brand-blue);
   --ms-ring-width: 0;
 }
@@ -315,7 +382,7 @@ watch(selectedCategories, () => {
   color: #5c5e61;
 }
 
-input[type="file"] {
+input[type='file'] {
   cursor: pointer;
 }
 </style>
