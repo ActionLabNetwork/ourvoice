@@ -43,6 +43,7 @@ const commentsStore = useModerationCommentsStore();
 
 onMounted(async () => {
   await commentsStore.fetchComments()
+  console.log(moderationComments.value)
 })
 
 const allComments = computed(() => commentsStore.comments);

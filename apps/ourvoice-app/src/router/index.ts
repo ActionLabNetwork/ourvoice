@@ -6,6 +6,7 @@ import CreatePostView from '../views/CreatePostView.vue'
 import PostModerationListView from '../views/PostModerationListView.vue'
 import PostModerationView from '../views/PostModerationView.vue'
 import CommentModerationListView from '../views/CommentModerationListView.vue'
+import CommentModerationView from '../views/CommentModerationView.vue'
 
 import YamlContent from '../../../../config/config.yml'
 import Session from 'supertokens-web-js/recipe/session'
@@ -71,6 +72,11 @@ const router = createRouter({
       path: '/moderation/comments',
       name: 'moderate-comment-list',
       component: CommentModerationListView
+    },
+    {
+      path: '/moderation/comment/:id',
+      name: 'moderate-comment',
+      component: CommentModerationView
     },
     {
       path: '/noauth/post',

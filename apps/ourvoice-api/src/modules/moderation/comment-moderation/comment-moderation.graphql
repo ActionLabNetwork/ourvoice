@@ -66,6 +66,7 @@ type CommentModeration {
   id: Int!
   commentVersion: ModerationCommentVersion!
   moderatorHash: String!
+  moderatorNickname: String!
   decision: ModerationDecision!
   reason: String
   timestamp: String!

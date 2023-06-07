@@ -426,6 +426,7 @@ export class CommentModeration {
     id: number;
     commentVersion: ModerationCommentVersion;
     moderatorHash: string;
+    moderatorNickname: string;
     decision: ModerationDecision;
     reason?: Nullable<string>;
     timestamp: string;
