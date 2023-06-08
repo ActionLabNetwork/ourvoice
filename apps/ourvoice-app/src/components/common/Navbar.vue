@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-black">
+  <header class="bg-black" v-if="userStore.sessionHash">
     <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
       <!-- Logo -->
       <div class="flex lg:flex-1">
@@ -159,9 +159,6 @@ const moderation = ref([
 ])
 
 const mobileMenuOpen = ref(false)
-onMounted(async () => {
-  await userStore.verifyUserSession()
-})
 
 const handleItemClick = (id: number) => {
   for (let item of navItems.value) {

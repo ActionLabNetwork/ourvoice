@@ -33,16 +33,14 @@ export const useUserStore = defineStore('user', {
       const userId = (await authService.getSessionInfo()).data.userId
       this.userId = userId
 
-      if (!this.sessionHash) {
-        const sessionHash = await authService.hashInput(userId, deployment)
-        this.sessionHash = sessionHash
+      const sessionHash = await authService.hashInput(userId, deployment)
+      this.sessionHash = sessionHash
 
-        const nickname = uniqueNamesGenerator({
-          dictionaries: [adjectives, colors, animals],
-          seed: sessionHash
-        })
-        this.nickname = nickname
-      }
+      const nickname = uniqueNamesGenerator({
+        dictionaries: [adjectives, colors, animals],
+        seed: sessionHash
+      })
+      this.nickname = nickname
     }
   }
 })
