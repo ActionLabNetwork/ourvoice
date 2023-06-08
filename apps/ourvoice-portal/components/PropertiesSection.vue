@@ -1,5 +1,5 @@
 <template>
-  <div class="px-[70px]">
+  <div class="sm:px-8 md:px-16 lg:px-32">
     <!-- Heading -->
     <div class="sm:w-3/4 md:w-8/12 lg:w-7/12 mx-auto px-2">
       <h1 class="mb-2">Making everyone feel heard</h1>

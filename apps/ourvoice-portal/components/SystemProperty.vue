@@ -1,20 +1,24 @@
 <template>
   <div class="relative mt-20 lg:mt-24">
-    <div :class="divClass[0]">
+    <div :class="divClass">
       <!-- Image -->
       <div class="flex flex-1 justify-center z-10 mb-10 lg:mb-0">
         <img
-          class="transform transition-all hover:scale-110 w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+          class="transform transition-all hover:scale-110 w-[300px] sm:max-w-3/4 sm:max-h-3/4 md:w-full md:h-full md:max-w-[300px]"
           :src="systemProperty.image"
           alt=""
         />
       </div>
       <!-- Content -->
       <div class="flex flex-1 flex-col items-center">
-        <h1 class="text-3xl font-bold font-Inter lg:text-start lg:w-8/12">
+        <h1
+          class="text-3xl font-bold font-Inter md:text-start md:w-full lg:w-10/12"
+        >
           {{ systemProperty.title }}
         </h1>
-        <p class="my-4 font-Inter lg:text-start sm:w-3/4 lg:w-8/12">
+        <p
+          class="font-Inter text-center md:text-start mx-2 my-4 md:w-full lg:w-10/12"
+        >
           {{ systemProperty.description }}
         </p>
         <!-- Read more button -->
@@ -49,19 +53,10 @@ export default defineComponent({
     const conditionedClass = computed(() => {
       if (id.value) {
         return id.value % 2
-          ? [
-              'container flex flex-col lg:flex-row items-center justify-center gap-x-24',
-              'hidden lg:block overflow-hidden bg-ourvoice-red rounded-r-full absolute h-80 w-2/4 -bottom-24 -left-36',
-            ]
-          : [
-              'container flex flex-col lg:flex-row-reverse items-center justify-center gap-x-24',
-              'hidden lg:block overflow-hidden bg-ourvoice-purple rounded-l-full absolute h-80 w-2/4 -bottom-24 -right-36',
-            ]
+          ? 'container flex flex-col md:flex-row items-center justify-center gap-x-24 md:gap-x-12 lg:gap-x-24'
+          : 'container flex flex-col md:flex-row-reverse items-center justify-center gap-x-24 md:gap-x-12 lg:gap-x-24'
       } else {
-        return [
-          'container flex flex-col lg:flex-row-reverse items-center justify-center gap-x-24',
-          'hidden lg:block overflow-hidden bg-ourvoice-purple rounded-l-full absolute h-80 w-2/4 -bottom-24 -right-36',
-        ]
+        return 'container flex flex-col md:flex-row-reverse items-center justify-center gap-x-24'
       }
     })
     return {

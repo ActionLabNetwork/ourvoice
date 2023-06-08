@@ -1,9 +1,11 @@
 <template>
-  <div class="container px-5 pt-6 flex flex-row items-center justify-between">
+  <div
+    class="container px-5 pt-4 pb-4 flex flex-row items-center justify-between"
+  >
     <p class="text-white text-lg font-Inter font-medium">
-      Copyright Action Inc 2021
+      OurVoice is developed and maintained by Action Lab, Monash University
     </p>
-    <img :src="logo" class="lg:w-[82px]" />
+    <img :src="logo" class="w-[82px]" />
   </div>
 </template>
 
