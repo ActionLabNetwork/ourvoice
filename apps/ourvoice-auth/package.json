@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@tsconfig/node18": "^2.0.1",
+    "@unhead/vue": "^1.1.27",
     "pinia": "^2.1.3",
     "supertokens-web-js": "^0.6.0",
     "vite-plugin-vue-markdown": "^0.23.5",
