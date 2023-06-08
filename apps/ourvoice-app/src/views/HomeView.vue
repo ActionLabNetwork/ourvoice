@@ -19,6 +19,11 @@
           ><button type="button" class="btn btn-purple btn-hover">Get Started</button></a
         >
       </div>
+      <div v-else class="flex justify-center flex-wrap gap-6">
+        <a href="/noauth/post"
+          ><button type="button" class="btn btn-purple btn-hover">Get Started</button></a
+        >
+      </div>
       <!-- Deployment info -->
       <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
       <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"

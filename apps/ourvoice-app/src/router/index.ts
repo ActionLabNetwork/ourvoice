@@ -4,13 +4,13 @@ import AboutView from '../views/AboutView.vue'
 import NoAuthView from '../views/NoAuthView.vue'
 import PostsView from '../views/PostsView.vue'
 
-import YamlContent from '../../../../config/config.yml'
+// import YamlContent from '../../../../config/config.yml'
 
-const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
-const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
+// const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
+// const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 
-// TODO: this list might be coming from the database later
-const deployment = YamlContent.deployment
+// // TODO: this list might be coming from the database later
+// const deployment = YamlContent.deployment
 
 function addDeployment() {
   const host = window.location.host

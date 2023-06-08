@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createHead } from '@unhead/vue'
 import { createPinia } from 'pinia'
 import SuperTokens from 'supertokens-web-js'
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
@@ -29,6 +30,7 @@ SuperTokens.init({
 const app = createApp(App)
 
 app.use(createPinia())
+app.use(createHead())
 app.use(router)
 
 app.mount('#app')
