@@ -142,7 +142,6 @@ const redirectTo = (url: string) => {
 
 // Check if deployment exists, if not redirect to portal
 router.beforeEach(async (to, from, next) => {
-  const isDev = import.meta.env.DEV
   const host = window.location.host
   const deployment = getDeployment(host, deploymentDomain, deployments)
 
@@ -155,7 +154,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (!(await checkForSession())) {
-    redirectTo(authURL)
+    redirectTo(portalURL)
   }
 
   next()

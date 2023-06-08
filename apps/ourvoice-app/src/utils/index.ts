@@ -1,17 +1,18 @@
 import { formatDistance } from 'date-fns'
 
-export function formatDate(dateString: string) {
-  const date = new Date(dateString)
-
-  const options: Intl.DateTimeFormatOptions = {
+export function formatDate(
+  dateString: string,
+  locale: string = 'en-AU',
+  options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric'
   }
-
-  return new Intl.DateTimeFormat('en-AU', options).format(date)
+): string {
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat(locale, options).format(date)
 }
 
 export function formatTimestampToReadableDate(unixTs: number) {
