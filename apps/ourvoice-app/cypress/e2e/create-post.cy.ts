@@ -45,7 +45,32 @@ describe('Create Post', () => {
       []
     ).as('putPresignedUrl')
 
-    cy.visit('/noauth')
+    cy.intercept({ method: 'POST', url: 'http://authapi.ourvoice.test/auth/signinup/code' }).as(
+      'postLogin'
+    )
+
+    cy.intercept({
+      method: 'POST',
+      url: 'http://authapi.ourvoice.test/auth/signinup/code/consume'
+    }).as('postLoginConsume')
+
+    // Create/Restore auth session
+    cy.session('auth', () => {
+      // Visit the auth page and trigger the passwordless login auth flow
+      cy.visit('http://auth.ourvoice.test/signinWithoutPassword?d=demo')
+      cy.get('.input').type('test@ourvoice.app')
+      cy.get('.button').click()
+      cy.wait('@postLogin')
+
+      // Visit the auth page
+      cy.visit(
+        'http://auth.ourvoice.test/verify?rid=passwordless&preAuthSessionId=4a3L55ZNKye5p6Rmk4tBEdUMBY79OoTAqtIHEyo_HL4=#OMz5kaYzzyFh_RF5UeIl6u81W2gwb2T-rp1lj9Hh5W8='
+      )
+      cy.wait('@postLoginConsume')
+    })
+
+    // Should be authenticated, now visit the create post page
+    cy.visit('/post')
   })
 
   describe('Form rendering', () => {

@@ -7,7 +7,11 @@ import Passwordless from 'supertokens-node/recipe/passwordless';
 import { SMTPService } from 'supertokens-node/recipe/passwordless/emaildelivery';
 import { SMTPService as EmailVerificationSMTPService } from 'supertokens-node/recipe/emailverification/emaildelivery';
 
-import { ConfigInjectionToken, AuthModuleConfig } from '../config.interface';
+import {
+  ConfigInjectionToken,
+  AuthModuleConfig,
+  SuperTokenAuthBypass,
+} from '../config.interface';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
@@ -39,6 +43,13 @@ export class SupertokensService {
   }
 
   private getAuthModules(config: AuthModuleConfig) {
+    const isTestMode = String(config.authBypassTest.isTestMode) == 'true';
+    console.log(
+      typeof isTestMode,
+      String(config.authBypassTest.isTestMode) == 'true',
+    );
+    const smtpSettings = config.smtpSettings;
+
     const recipeList = {
       EmailPassword: EmailPassword.init({
         override: {
@@ -86,21 +97,32 @@ export class SupertokensService {
       Passwordless: Passwordless.init({
         contactMethod: 'EMAIL',
         flowType: 'MAGIC_LINK',
-        emailDelivery: {
-          service: new SMTPService({
-            smtpSettings: {
-              host: config.smtpSettings.host,
-              authUsername: config.smtpSettings.user,
-              password: config.smtpSettings.password,
-              port: config.smtpSettings.port || 2525,
-              from: {
-                name: 'OurVoice',
-                email: 'no-reply@ourvoice.app',
+        emailDelivery: isTestMode
+          ? {
+              override: (originalImplementation) => {
+                return {
+                  ...originalImplementation,
+                  sendEmail: async function () {
+                    // Do nothing as we don't want to send emails in test mode
+                  },
+                };
               },
-              // secure: true,
+            }
+          : {
+              service: new SMTPService({
+                smtpSettings: {
+                  host: smtpSettings.host,
+                  authUsername: smtpSettings.user,
+                  password: smtpSettings.password,
+                  port: config.smtpSettings.port || 2525,
+                  from: {
+                    name: 'OurVoice',
+                    email: 'no-reply@ourvoice.app',
+                  },
+                  // secure: true,
+                },
+              }),
             },
-          }),
-        },
         override: {
           functions: (originalImplementation) => {
             return {
@@ -115,7 +137,27 @@ export class SupertokensService {
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/createCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/CreateCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L62
-                return await originalImplementation.createCode(input);
+                const {
+                  preAuthSessionId,
+                  codeId,
+                  deviceId,
+                  userInputCode,
+                  linkCode,
+                } = config.authBypassTest.createCode;
+                const code: SuperTokenAuthBypass['createCode'] = isTestMode
+                  ? {
+                      status: 'OK',
+                      preAuthSessionId,
+                      codeId,
+                      deviceId,
+                      userInputCode,
+                      linkCode,
+                      timeCreated: Date.now(),
+                      codeLifetime: 900000,
+                    }
+                  : await originalImplementation.createCode(input);
+
+                return code;
               },
               consumeCode: async function (input) {
                 // TODO: create custom code consumption logic
@@ -124,7 +166,22 @@ export class SupertokensService {
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/consumeCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/ConsumeCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L165
-                return await originalImplementation.consumeCode(input);
+                const { email, id, timeJoined } =
+                  config.authBypassTest.consumeCode;
+                const testResponse: SuperTokenAuthBypass['consumeCode'] = {
+                  status: 'OK',
+                  createdNewUser: false,
+                  user: {
+                    email,
+                    id,
+                    timeJoined,
+                  },
+                };
+                const response = await originalImplementation.consumeCode(
+                  input,
+                );
+
+                return isTestMode ? testResponse : response;
               },
             };
           },
