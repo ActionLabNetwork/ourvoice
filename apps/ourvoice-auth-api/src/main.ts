@@ -53,10 +53,10 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-  // create user roles
+  // create roles
   configService
-    .get<string[]>('roles')
-    .map(async (role) => await createRole(role));
+    .get<Role[]>('roles')
+    .map(async (role) => await createRole(role.name, role.permissions));
   await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
 }
 

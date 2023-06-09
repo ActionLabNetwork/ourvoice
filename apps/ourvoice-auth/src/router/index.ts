@@ -51,21 +51,23 @@ const router = createRouter({
       beforeEnter: () => {
         redirect.set(adminURL)
       },
+      props: (route) => ({ deployment: route.query.d || 'demo' }),
       alias: ['/signinWithEmailPassword', '/auth']
     },
     {
       path: '/signinWithoutPassword',
       name: 'passwordless',
       component: PasswordlessView,
-      // TODO: could use a url param here as well
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
           redirect.set(`http://${to.query.d || 'demo'}${domain}`)
         } else {
+          // fallback redirect to demo application
           redirect.set(`http://demo${domain}`)
         }
         // return { path: to.path, query: {}, hash: to.hash }
       },
+      props: (route) => ({ deployment: route.query.d || 'demo' }),
       alias: ['/magicLink', '/passwordless']
     },
     {

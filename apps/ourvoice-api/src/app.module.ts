@@ -16,6 +16,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
+import { MetadataModule } from './metadata/metadata.module';
 
 import deployment from './config/deployment';
 
@@ -67,6 +68,8 @@ import deployment from './config/deployment';
     }),
     ModerationModule,
     ScheduleModule.forRoot(),
+    // TODO: perhaps move to other modules
+    MetadataModule,
   ],
   controllers: [AppController],
   providers: [AppService],

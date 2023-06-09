@@ -52,6 +52,13 @@ export class SupertokensService {
 
     const recipeList = {
       EmailPassword: EmailPassword.init({
+        // signUpFeature: {
+        //   formFields: [
+        //     {
+        //       id: 'deployment',
+        //     },
+        //   ],
+        // },
         override: {
           apis: (originalImplementation) => {
             return {
@@ -69,6 +76,10 @@ export class SupertokensService {
                   const id = response.user.id;
                   // add `user` role to all registered users
                   addRoleToUser(id);
+                  // add deployment
+                  // await UserMetadata.updateUserMetadata(id, {
+                  //   deployment: input.formFields['deployment'],
+                  // });
                 }
                 return response;
               },
@@ -92,6 +103,34 @@ export class SupertokensService {
               // secure: true,
             },
           }),
+        },
+        override: {
+          apis: (originalImplementation) => {
+            return {
+              ...originalImplementation,
+              verifyEmailPOST: async function (input) {
+                if (originalImplementation.verifyEmailPOST === undefined) {
+                  throw Error('Should never come here');
+                }
+
+                // First we call the original implementation
+                const response = await originalImplementation.verifyEmailPOST(
+                  input,
+                );
+
+                // Then we check if it was successfully completed
+                if (response.status === 'OK') {
+                  const { id, email } = response.user;
+                  // TODO: post email verification logic
+                  // send email to ourvoice that new admin account is created
+                  // await UserMetadata.updateUserMetadata(id, {
+                  //   approved: false,
+                  // });
+                }
+                return response;
+              },
+            };
+          },
         },
       }),
       Passwordless: Passwordless.init({

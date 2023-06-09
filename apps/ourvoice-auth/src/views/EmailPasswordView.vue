@@ -147,6 +147,7 @@ const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 // const organisation = YamlContent.organisation
 
 export default defineComponent({
+  props: ['deployment'],
   data() {
     return {
       // we allow the user to switch between sign in and sign up view
@@ -272,6 +273,10 @@ export default defineComponent({
             id: 'password',
             value: this.password
           }
+          // {
+          //   id: 'deployment',
+          //   value: this.deployment
+          // }
         ]
       })
       if (response.status === 'FIELD_ERROR') {

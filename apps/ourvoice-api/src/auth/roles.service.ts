@@ -1,4 +1,5 @@
 import UserRoles from 'supertokens-node/recipe/userroles';
+import { PermissionClaim } from 'supertokens-node/recipe/userroles';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 
 export async function createRole(name: string, permissions: string[] = []) {
