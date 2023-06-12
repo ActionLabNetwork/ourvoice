@@ -11,6 +11,7 @@
     "isolatedModules": false,
     "target": "ES2018",
     "lib": ["ES2018", "dom"],
-    "types": ["cypress", "cypress-file-upload"]
+    "types": ["cypress", "cypress-file-upload"],
+    "baseUrl": "./"
   }
 }
