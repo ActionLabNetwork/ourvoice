@@ -13,17 +13,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, type PropType } from 'vue';
+import { type PropType } from 'vue';
 import ModerationCommentCard from './ModerationCommentCard.vue';
 import type { ModerationComment } from '@/stores/moderation-comments';
-import { useUserStore } from '@/stores/user';
 
 const props = defineProps({
   comments: { type: Array as PropType<ModerationComment[]>, required: true }
-})
-
-onMounted(() => {
-  useUserStore().verifyUserSession()
 })
 </script>
 

@@ -22,50 +22,36 @@
 <script setup lang="ts">
 import Header from '@/components/common/Header.vue'
 import CommentModerationList from '@/components/comment/moderation/CommentModerationList.vue'
+import { LIST_TABS } from '@/constants/moderation';
 import BaseTab from '@/components/common/BaseTab.vue'
-
+import { getGroupsByProperty } from '@/utils/groupByProperty';
 import { computed, onMounted, ref } from 'vue';
 import { useModerationCommentsStore } from '@/stores/moderation-comments';
+
 import type { ModerationComment } from '@/stores/moderation-comments';
+import type { ModerationVersionStatus } from '@/types/moderation'
 
-const tabs = ref([
-  { name: 'Pending', current: true },
-  { name: 'Accepted', current: false },
-  { name: 'Rejected', current: false },
-])
-
-const handleTabSwitched = (selectedTab) => {
-  // If we need to know when the tab is switched, we can do it here
-};
-
-// Fetch all comments for moderation
 const commentsStore = useModerationCommentsStore();
-
 onMounted(async () => {
   await commentsStore.fetchComments()
-  console.log(moderationComments.value)
 })
 
+const tabs = ref(LIST_TABS)
 const allComments = computed(() => commentsStore.comments);
 
 // Group the comments by their moderation status
 const moderationComments = computed(() => {
-  const initialGroups: Record<string, ModerationComment[]> = {
+  const initialGroups: Record<ModerationVersionStatus, ModerationComment[]> = {
     PENDING: [],
-    ACCEPTED: [],
+    APPROVED: [],
     REJECTED: [],
   };
 
-  return allComments.value.reduce((groups, comment) => {
-    if (!groups[comment.status]) {
-      groups[comment.status] = [];
-    }
-    groups[comment.status].push(comment);
-    return groups;
-  }, initialGroups);
+  return allComments.value.reduce((groups, post) =>
+    getGroupsByProperty('status', groups, post), initialGroups);
 });
 
-defineProps({
-  deployment: String
-})
+const handleTabSwitched = (selectedTab) => {
+  // If we need to know when the tab is switched, we can do it here
+};
 </script>

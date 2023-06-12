@@ -59,8 +59,6 @@ export class PostModerationRepository {
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
   ): Promise<{ totalCount: number; moderationPosts: Post[] }> {
-    this.publishPost(2);
-
     const { status } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {

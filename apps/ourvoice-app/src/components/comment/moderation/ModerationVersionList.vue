@@ -37,7 +37,8 @@
 
 <script setup lang="ts">
 import type { CommentVersion } from '@/stores/moderation-comments'
-import { computed, onMounted, ref, watch, type PropType } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import type { PropType } from 'vue'
 
 import { formatTimestampToReadableDate } from '@/utils'
 

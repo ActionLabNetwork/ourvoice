@@ -34,14 +34,15 @@
 </template>
 
 <script setup lang="ts">
-import { useModerationPostsStore } from '@/stores/moderation-posts';
+import { PostVersion, useModerationPostsStore } from '@/stores/moderation-posts';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
+import type { Moderation, ModerationVersionDecisionHistory } from '@/types/moderation'
 
 interface History {
   id: number;
-  decision: 'ACCEPTED' | 'REJECTED' | 'MODIFIED';
+  decision: ModerationVersionDecisionHistory;
   reason: string;
   timestamp: string;
   moderatorHash: string;
@@ -55,20 +56,35 @@ const { versionInModeration: version } = storeToRefs(moderationPostsStore);
 const moderations = computed(() => {
   if (!version.value) return []
 
-  const acceptOrRejectModerations: History[] = version.value?.moderations.map(({ id, decision, reason, timestamp, moderatorHash, moderatorNickname }) => ({
-    id,
-    decision,
-    reason,
-    timestamp,
-    moderatorHash,
-    moderatorNickname
-  })) ?? []
+  const getAcceptOrRejectModerations = (moderations: Moderation[]): History[] => {
+    return moderations.map(({ id, decision, reason, timestamp, moderatorHash, moderatorNickname }) => ({
+      id,
+      decision,
+      reason,
+      timestamp,
+      moderatorHash,
+      moderatorNickname
+    }))
+  }
 
-  const modifyModerations: History[] = version.value.version > 1 ? [{ id: version.value.id, decision: 'MODIFIED', reason: version.value?.reason, timestamp: version.value?.timestamp, moderatorHash: version.value?.authorHash, moderatorNickname: version.value?.authorNickname }] : []
+  const getModifyModerations = (version: PostVersion): History[] =>
+    version.version > 1
+      ? [
+        {
+          id: version.id,
+          decision: "MODIFIED",
+          reason: version?.reason,
+          timestamp: version?.timestamp,
+          moderatorHash: version?.authorHash,
+          moderatorNickname: version?.authorNickname,
+        },
+      ]
+      : [];
 
-  const moderations = acceptOrRejectModerations.concat(modifyModerations)
+  const acceptOrRejectModerations = getAcceptOrRejectModerations(version.value?.moderations || []);
+  const modifyModerations = getModifyModerations(version.value);
 
-  return moderations
+  return [...acceptOrRejectModerations, ...modifyModerations];
 });
 
 const actions = {

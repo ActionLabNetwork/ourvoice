@@ -9,24 +9,12 @@
     </div>
 
     <!-- Author -->
-    <div class="group block flex-shrink-0 mb-3">
-      <div class="flex items-center">
-        <div>
-          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`" alt="PseudoNickname" />
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-gray-700">
-            {{ nickname.author.nickname }}
-            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-700">
-              (Modified by {{ nickname.moderator.nickname }})
-            </span>
-          </p>
-          <p class="text-xs font-medium text-gray-500">
-            {{ `${formattedDate(version)}` }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <AuthorBadge
+      :authorName="nickname.author.nickname"
+      :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
+      :modificationDate="formattedDate(version)"
+      :modifierName="nickname.moderator.nickname"
+    />
 
     <!-- Title -->
     <h3 class="text-2xl font-extrabold text-black-700 mb-3">
@@ -34,7 +22,9 @@
     </h3>
 
     <!-- Content -->
-    <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
+    <p class="text-gray-700 text-lg leading-relaxed mb-3">
+      {{ version.content }}
+    </p>
 
     <!-- Categories -->
     <div class="flex flex-wrap">
@@ -74,10 +64,15 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-comments';
-import type { PropType } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
+import { ModeratedPostNicknames, ModerationVersionDecision } from '@/types/moderation';
+import { getGroupsByProperty } from '@/utils/groupByProperty';
+import AuthorBadge from '@/components/common/AuthorBadge.vue';
+
+import type { ComputedRef } from 'vue'
+import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
+import type { PropType } from 'vue';
 
 interface DecisionIcon {
   text: string;
@@ -106,13 +101,14 @@ const props = defineProps({
 const version = computed(() => props.version)
 const post = computed(() => props.post)
 
-const nickname = computed(() => {
+const nickname: ComputedRef<ModeratedPostNicknames> = computed(() => {
   const authorNickname = post.value?.versions.at(-1).authorNickname
   const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : null
 
   const nicknameSeparator = '_'
   const [aFirst, aMiddle, aLast] = authorNickname.split(nicknameSeparator)
   const [mFirst, mMiddle, mLast] = moderatorNickname?.split(nicknameSeparator) || []
+
   return {
     author: {
       nickname: authorNickname,
@@ -134,16 +130,14 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
-  const groups = version.value?.moderations.reduce((acc, moderation) => {
-    const group = moderation.decision
-    if (!acc[group]) {
-      acc[group] = [];
-    }
-    acc[group].push(moderation);
-    return acc;
-  }, {} as Record<string, Moderation[]>);
+  const groups: Record<ModerationVersionDecision, Moderation[]> = version.value?.moderations.reduce((acc, moderation) => {
+    return getGroupsByProperty('decision', acc, moderation)
+  }, { ACCEPTED: [], REJECTED: [] });
 
-  const groupsCount = {} as Record<string, number>
+  const groupsCount: Record<ModerationVersionDecision, number> = {
+    ACCEPTED: 0,
+    REJECTED: 0
+  }
 
   if (groups) {
     Object.keys(groups).forEach((key) => {

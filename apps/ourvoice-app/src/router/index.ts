@@ -1,8 +1,10 @@
+import { useUserStore } from './../stores/user'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import PostsView from '../views/PostsView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
+import CreateCommentView from '../views/CreateCommentView.vue'
 import PostModerationListView from '../views/PostModerationListView.vue'
 import PostModerationView from '../views/PostModerationView.vue'
 import CommentModerationListView from '../views/CommentModerationListView.vue'
@@ -51,17 +53,16 @@ const router = createRouter({
       path: '/post',
       name: 'create-post',
       component: CreatePostView,
-      props: () => {
-        return addDeployment()
-      }
+    },
+    {
+      path: '/comment',
+      name: 'create-comment',
+      component: CreateCommentView,
     },
     {
       path: '/moderation/posts',
       name: 'moderate-post-list',
-      component: PostModerationListView,
-      props: () => {
-        return addDeployment()
-      }
+      component: PostModerationListView
     },
     {
       path: '/moderation/post/:id',
@@ -145,10 +146,6 @@ router.beforeEach(async (to, from, next) => {
   const host = window.location.host
   const deployment = getDeployment(host, deploymentDomain, deployments)
 
-  // Save deployment in Pinia store
-  const deploymentStore = useDeploymentStore()
-  deploymentStore.deployment = deployment || ''
-
   if (!deployment) {
     redirectTo(portalURL)
   }
@@ -156,6 +153,14 @@ router.beforeEach(async (to, from, next) => {
   if (!(await checkForSession())) {
     redirectTo(portalURL)
   }
+
+  // Save deployment in Pinia store
+  const deploymentStore = useDeploymentStore()
+  deploymentStore.deployment = deployment || ''
+
+  // Init user store
+  const userStore = useUserStore()
+  await userStore.verifyUserSession()
 
   next()
 })

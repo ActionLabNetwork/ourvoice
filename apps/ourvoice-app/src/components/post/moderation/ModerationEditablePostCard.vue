@@ -1,24 +1,12 @@
 <template>
   <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
     <!-- Author -->
-    <div class="group block flex-shrink-0 mb-3">
-      <div class="flex items-center">
-        <div>
-          <img class="inline-block h-9 w-9 rounded-full" :src="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`" alt="PseudoNickname" />
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-gray-700">
-            {{ nickname.author.nickname }}
-            <span v-if="!!nickname.moderator.nickname" class="italic font-light text-orange-500">
-              (Modified by {{ nickname.moderator.nickname }})
-            </span>
-          </p>
-          <p class="text-xs font-medium text-gray-500">
-            {{ `${formattedDate(version)}` }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <AuthorBadge
+      :authorName="nickname.author.nickname"
+      :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
+      :modificationDate="formattedDate(version)"
+      :modifierName="nickname.moderator.nickname"
+    />
 
     <!-- Title -->
     <div>
@@ -89,6 +77,9 @@ import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
 import { validateCategories, validateContent, validateTitle } from '@/validators/moderation-post-validator';
+import AuthorBadge from '@/components/common/AuthorBadge.vue';
+import { getGroupsByProperty } from '@/utils/groupByProperty';
+import { ModerationVersionDecision } from '@/types/moderation';
 
 const emit = defineEmits(['update']);
 
@@ -124,11 +115,11 @@ const moderationPostsStore = useModerationPostsStore();
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
 
 const categoriesStore = useCategoriesStore()
-
 onMounted(async () => {
   await categoriesStore.fetchCategories()
 })
 
+// VeeValidate Form Validation
 const modifyModerationPostValidationSchema = {
   title(value: string) {
     return validateTitle(value)
@@ -196,16 +187,15 @@ const formWasUpdated = computed(() => {
 
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
-  const groups = version.value?.moderations.reduce((acc, moderation) => {
-    const group = moderation.decision
-    if (!acc[group]) {
-      acc[group] = [];
-    }
-    acc[group].push(moderation);
-    return acc;
-  }, {} as Record<string, Moderation[]>);
+  const groups: Record<ModerationVersionDecision, Moderation[]> = version.value?.moderations.reduce((acc, moderation) => {
+    return getGroupsByProperty('decision', acc, moderation)
+  }, {
+    ACCEPTED: [], REJECTED: []
+  });
 
-  const groupsCount = {} as Record<string, number>
+  const groupsCount: Record<ModerationVersionDecision, number> = {
+    ACCEPTED: 0, REJECTED: 0
+  }
 
   if (groups) {
     Object.keys(groups).forEach((key) => {

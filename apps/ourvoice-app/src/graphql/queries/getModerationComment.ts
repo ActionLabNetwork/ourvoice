@@ -11,6 +11,8 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
         id
         authorHash
         authorNickname
+        requiredModerations
+        status
         versions {
           id
           title

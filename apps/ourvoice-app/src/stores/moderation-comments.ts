@@ -31,6 +31,8 @@ export interface ModerationPost {
   authorHash: string
   authorNickname: string
   versions: PostVersion
+  requiredModerations: number
+  status: CommentStatus
 }
 export interface CommentVersion {
   id: number

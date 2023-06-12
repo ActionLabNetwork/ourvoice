@@ -57,17 +57,13 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headless
 import { useField, useForm } from 'vee-validate';
 import { validateModerationReason } from '@/validators/moderation-comment-validator'
 import { useModerationCommentsStore } from '@/stores/moderation-comments';
+import { MODERATION_ACTIONS } from '@/constants/moderation';
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
-const actions = [
-  { name: 'Accept', icon: 'fa-check', placeholder: 'Moderation reason (optional)...', validate: false },
-  { name: 'Modify', icon: 'fa-edit', placeholder: 'Moderation reason (required)...', validate: true },
-  { name: 'Reject', icon: 'fa-xmark', placeholder: 'Moderation reason (required)...', validate: true },
-]
-
 const moderationCommentsStore = useModerationCommentsStore()
 
+const actions = MODERATION_ACTIONS
 const action = ref(actions[0])
 const fieldPlaceholder = ref('')
 

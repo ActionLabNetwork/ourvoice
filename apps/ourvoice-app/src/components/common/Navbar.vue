@@ -26,7 +26,7 @@
         <Popover class="relative">
           <PopoverButton
           class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
-          :class="{'border-b-2': isModerationPage}">
+          :class="{ 'border-b-2': isModerationPage }">
             Moderation
             <font-awesome-icon :icon="['fas', 'fa-chevron-down']" />
           </PopoverButton>
@@ -133,6 +133,7 @@ import {
 } from '@headlessui/vue'
 import { useUserStore } from '@/stores/user';
 import { useRoute } from 'vue-router';
+import { useDeploymentStore } from '@/stores/deployment';
 
 const userStore = useUserStore()
 const route = useRoute()
@@ -140,8 +141,7 @@ const currentPath = computed(() => route.fullPath)
 
 onMounted(() => {
   console.log("Current path: ", currentPath.value)
-  console.log({ navItems })
-  console.log({ moderation })
+  console.log("Deployment", useDeploymentStore().deployment)
 })
 
 // Single level nav items

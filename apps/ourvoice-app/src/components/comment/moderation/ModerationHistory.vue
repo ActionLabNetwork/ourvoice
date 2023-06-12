@@ -38,10 +38,11 @@ import { useModerationCommentsStore } from '@/stores/moderation-comments';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';
+import type { Moderation, ModerationVersionDecisionHistory } from '@/types/moderation'
 
 interface History {
   id: number;
-  decision: 'ACCEPTED' | 'REJECTED' | 'MODIFIED';
+  decision: ModerationVersionDecisionHistory;
   reason: string;
   timestamp: string;
   moderatorHash: string;
