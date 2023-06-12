@@ -59,7 +59,7 @@ jobs:
   api-db-test:
     name: API (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
     runs-on: ubuntu-latest
-    # needs: lint
+    needs: lint
 
     env:
       DB_TEST_APP_API_DB_MAIN_DRIVER: postgres
@@ -96,7 +96,7 @@ jobs:
       
       - name: Create main databases
         run: |
-          PGPASSWORD=${{ env.DB_TEST_MAIN_PASSWORD }} psql -h ${{ env.DB_TEST_APP_API_DB_MAIN_HOST }} -p ${{env.DB_TEST_APP_API_DB_MAIN_PORT}} -U ${{ env.DB_TEST_MAIN_USERNAME }} -c 'CREATE DATABASE ${{ env.DB_TEST_MAIN_DATABASE }};'
+          PGPASSWORD=${{ env.DB_TEST_MAIN_PASSWORD }} psql -h ${{ env.DB_TEST_APP_API_DB_MAIN_HOST }} -p ${{env.DB_TEST_APP_API_DB_MAIN_PORT}} -U ${{ env.DB_TEST_MAIN_USERNAME }} -d postgres -c 'CREATE DATABASE ${{ env.DB_TEST_MAIN_DATABASE }};'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.2.4
