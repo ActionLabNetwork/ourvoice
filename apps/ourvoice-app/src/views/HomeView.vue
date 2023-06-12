@@ -72,7 +72,7 @@ export default defineComponent({
   },
   methods: {
     // TODO: this list might be coming from the database later
-    getConfig(option) {
+    getConfig(option: string) {
       return YamlContent[option]
     },
     signOut: async function () {

@@ -57,14 +57,12 @@
 import leftImgUrl from '@/assets/img/family-left.png'
 import rightImgUrl from '@/assets/img/family-right.png'
 import smallImgUrl from '@/assets/img/family-small.png'
-import imgUrl from '@/assets/img/hero_image.png'
 import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'HeroSection',
 
   setup() {
-    const img = ref(imgUrl)
     const leftImg = ref(leftImgUrl)
     const imgs = ref({
       left: leftImgUrl,
@@ -73,7 +71,6 @@ export default defineComponent({
     })
 
     return {
-      img: img.value,
       imgs: imgs.value,
       leftImg: leftImg.value,
     }

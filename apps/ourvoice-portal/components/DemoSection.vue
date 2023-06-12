@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import imgUrl from '@/assets/img/try_it.png'
 import Modal from '@/components/utils/Modal.vue'
 import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -41,7 +40,6 @@ export default defineComponent({
   },
 
   setup() {
-    const img = ref(imgUrl)
     const modalActive = ref(false)
     const router = useRouter()
 
@@ -51,7 +49,6 @@ export default defineComponent({
     }
 
     return {
-      img: img.value,
       modalActive,
       toggleModal,
     }

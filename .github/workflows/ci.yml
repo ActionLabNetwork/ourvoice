@@ -116,6 +116,50 @@ jobs:
         working-directory: apps/ourvoice-api
         run: pnpm test:integration
 
+  # APPS Build
+  build-apps:
+    name: Build APPS (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v3.5.3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: API - build
+        working-directory: apps/ourvoice-api
+        run: pnpm build
+
+      - name: ADMIN - build
+        working-directory: apps/ourvoice-admin
+        run: pnpm build
+
+      - name: WEB APP - build
+        working-directory: apps/ourvoice-app
+        run: pnpm build:ci
+
+      - name: WEB PORTAL - build
+        working-directory: apps/ourvoice-portal
+        run: pnpm build
+
   # API auth
   # api-auth:
   #   name: Auth API (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
