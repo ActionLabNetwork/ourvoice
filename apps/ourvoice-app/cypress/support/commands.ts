@@ -1,5 +1,3 @@
-import 'cypress-file-upload'
-
 /// <reference types="cypress" />
 // ***********************************************
 // This example commands.ts shows you how to
@@ -37,5 +35,7 @@ import 'cypress-file-upload'
 //     }
 //   }
 // }
+
+import 'cypress-file-upload'
 
 export {}
