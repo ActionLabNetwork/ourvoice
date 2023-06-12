@@ -17,12 +17,12 @@ permissions:
   contents: read
 
 env:
-  DB_TEST_MAIN_DATABASE: ourvoice_db
-  DB_TEST_MAIN_USERNAME: db_user
-  DB_TEST_MAIN_PASSWORD: ourvoice_db_test
-  # DB_TEST_PREMOD_DATABASE: it24_foods_test
-  # DB_TEST_PREMOD_USERNAME: it24
-  # DB_TEST_PREMOD_PASSWORD: Intake24!
+  DB_TEST_MAIN_DATABASE: ourvoice_db_test
+  DB_TEST_MAIN_USERNAME: your_db_user
+  DB_TEST_MAIN_PASSWORD: your_db_password
+  # DB_TEST_PREMOD_DATABASE: ourvoice_db_test_premod
+  # DB_TEST_PREMOD_USERNAME: your_db_user
+  # DB_TEST_PREMOD_PASSWORD: your_db_password!
 
 jobs:
   lint:
@@ -78,9 +78,9 @@ jobs:
       postgres-app-db-main:
         image: postgres:${{ matrix.postgres-version }}
         env:
-          POSTGRES_USER: db_user
-          POSTGRES_PASSWORD: ourvoice_db_test
-          POSTGRES_DB: ourvoice_db
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db_test
           # POSTGRES_DB_PREMODERATION: ourvoice_db_pre
           options: >-
             --health-cmd pg_isready
