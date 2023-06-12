@@ -2,7 +2,7 @@
   "name": "ourvoice",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@8.6.1",
+  "packageManager": "pnpm@8.6.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -65,7 +65,7 @@
   },
   "homepage": "https://github.com/Our-Voice-Inc/ourvoice#readme",
   "devDependencies": {
-    "@types/node": "^18.16.16",
+    "@types/node": "^18.16.17",
     "copyfiles": "^2.4.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
