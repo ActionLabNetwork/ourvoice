@@ -1,49 +1,12 @@
 import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
 import {
-  uniqueNamesGenerator,
   adjectives,
-  colors,
   animals,
+  colors,
+  uniqueNamesGenerator,
 } from 'unique-names-generator';
 
 const prisma = new PrismaClient();
-
-function getRandomSelection(arr: number[]): number[] {
-  const count = Math.floor(Math.random() * 2) + 1;
-  const shuffled = [...arr];
-
-  for (let i = arr.length; i; i--) {
-    const j = Math.floor(Math.random() * i);
-    [shuffled[i - 1], shuffled[j]] = [shuffled[j], shuffled[i - 1]];
-  }
-  return shuffled.slice(0, count);
-}
-
-function generateVersions(
-  i: number,
-  postStatuses: ('REJECTED' | 'APPROVED' | 'PENDING')[],
-  authorHash: string,
-) {
-  const numVersions = Math.floor(Math.random() * 4) + 2; // Random integer between 2 and 5 inclusive
-  const versions = Array(numVersions)
-    .fill({})
-    .map((_, versionIndex) => ({
-      title: `Post ${i + 1}`,
-      content:
-        `This is the content of post ${i + 1}` +
-        (versionIndex > 0 ? `. This is version ${versionIndex + 1}` : ''),
-      categoryIds: getRandomSelection([1, 2, 3, 4, 5]),
-      status: postStatuses[i % postStatuses.length],
-      version: versionIndex + 1,
-      authorHash,
-      authorNickname: authorHash,
-      reason: versionIndex > 0 ? 'Modified by moderator' : '',
-      latest: versionIndex === numVersions - 1, // Mark the last version as the latest
-      timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
-    }));
-
-  return versions;
-}
 
 async function clearDatabase() {
   console.log('Clearing database...');
@@ -58,16 +21,11 @@ async function clearDatabase() {
   await prisma.$executeRaw`ALTER SEQUENCE "PostVersion_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Comment_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "CommentVersion_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "PostModeration_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "CommentModeration_id_seq" RESTART WITH 1;`;
 }
 
 async function main() {
-  const userHashes = [
-    'user1hash',
-    'user2hash',
-    'user3hash',
-    'user4hash',
-    'user5hash',
-  ];
   const decisions = [Decision.ACCEPTED, Decision.REJECTED];
   const postStatuses = [
     PostStatus.APPROVED,
@@ -76,74 +34,124 @@ async function main() {
   ];
 
   for (let i = 0; i < 10; i++) {
-    const authorHash = uniqueNamesGenerator({
-      dictionaries: [adjectives, colors, animals],
-      style: 'lowerCase',
-    });
+    const authorHash = `user${i + 1}hash`;
 
-    // Create posts
     const post = await prisma.post.create({
       data: {
         authorHash,
-        authorNickname: authorHash,
+        authorNickname: uniqueNamesGenerator({
+          dictionaries: [adjectives, colors, animals],
+          seed: authorHash,
+        }),
         status: postStatuses[i % postStatuses.length],
         versions: {
-          create: generateVersions(i, postStatuses, authorHash),
+          create: Array(3)
+            .fill({})
+            .map((_, versionIndex) => ({
+              title: `Post ${i + 1}`,
+              content: `This is the content of post ${i + 1}. This is version ${
+                versionIndex + 1
+              }`,
+              categoryIds: [1, 2],
+              status: postStatuses[(i + versionIndex) % postStatuses.length],
+              version: versionIndex + 1,
+              authorHash,
+              authorNickname: authorHash,
+              reason: versionIndex > 0 ? 'Modified by moderator' : '',
+              latest: versionIndex === 2,
+              timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
+            })),
         },
       },
     });
 
-    // Create comments
-    const commentAuthorHash = uniqueNamesGenerator({
-      dictionaries: [adjectives, colors, animals],
-      style: 'lowerCase',
-    });
+    const moderatorHash = `moderator${i + 1}hash`;
 
-    const comment = await prisma.comment.create({
-      data: {
-        authorHash: commentAuthorHash,
-        authorNickname: commentAuthorHash,
-        post: { connect: { id: post.id } },
-        versions: {
-          create: {
-            content: `This is a comment on post ${i + 1}`,
-            status: postStatuses[(i + 1) % postStatuses.length],
-            version: i,
-            authorHash: commentAuthorHash,
-            authorNickname: commentAuthorHash,
-            latest: true,
-            timestamp: new Date(`2023-04-${13 + i}T10:30:00Z`),
+    // Create multiple comments for a post and child comments for each comment
+    for (let j = 0; j < 3; j++) {
+      const commentAuthorHash = `commentAuthor${j + 1}hash`;
+
+      const comment = await prisma.comment.create({
+        data: {
+          authorHash: commentAuthorHash,
+          authorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: authorHash,
+          }),
+          post: { connect: { id: post.id } },
+          versions: {
+            create: Array(3)
+              .fill({})
+              .map((_, versionIndex) => ({
+                content: `This is a comment on post ${i + 1}. This is version ${
+                  versionIndex + 1
+                }`,
+                status: postStatuses[(j + versionIndex) % postStatuses.length],
+                version: versionIndex + 1,
+                authorHash: commentAuthorHash,
+                authorNickname: commentAuthorHash,
+                reason: versionIndex > 0 ? 'Modified by moderator' : '',
+                latest: versionIndex === 2,
+                timestamp: new Date(`2023-04-${13 + i + j}T10:30:00Z`),
+              })),
           },
         },
-      },
-    });
+      });
 
-    // Create post moderations
-    const moderatorHash = uniqueNamesGenerator({
-      dictionaries: [adjectives, colors, animals],
-      style: 'lowerCase',
-    });
+      // Create child comment for the comment
+      const childCommentAuthorHash = `childCommentAuthor${j + 1}hash`;
 
-    await prisma.postModeration.create({
-      data: {
-        postVersionId: post.id,
-        moderatorHash,
-        moderatorNickname: moderatorHash,
-        decision: decisions[i % decisions.length],
-        reason: `Moderation reason for post ${i + 1}`,
-      },
-    });
+      await prisma.comment.create({
+        data: {
+          authorHash: childCommentAuthorHash,
+          authorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: authorHash,
+          }),
+          parent: { connect: { id: comment.id } },
+          post: { connect: { id: post.id } },
+          versions: {
+            create: {
+              content: `This is a child comment of comment ${j + 1} on post ${
+                i + 1
+              }`,
+              status: postStatuses[j % postStatuses.length],
+              version: 1,
+              authorHash: childCommentAuthorHash,
+              authorNickname: childCommentAuthorHash,
+              latest: true,
+              timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
+            },
+          },
+        },
+      });
 
-    // Create comment moderations
-    await prisma.commentModeration.create({
-      data: {
-        commentVersionId: comment.id,
-        moderatorHash,
-        moderatorNickname: moderatorHash,
-        decision: decisions[i % decisions.length],
-        reason: `Moderation reason for comment on post ${i + 1}`,
-      },
-    });
+      await prisma.postModeration.create({
+        data: {
+          postVersionId: post.id,
+          moderatorHash,
+          moderatorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: moderatorHash,
+          }),
+          decision: decisions[i % decisions.length],
+          reason: `Moderation reason for post ${i + 1}`,
+        },
+      });
+
+      await prisma.commentModeration.create({
+        data: {
+          commentVersionId: comment.id,
+          moderatorHash,
+          moderatorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: moderatorHash,
+          }),
+          decision: decisions[i % decisions.length],
+          reason: `Moderation reason for comment on post ${i + 1}`,
+        },
+      });
+    }
   }
 
   await prisma.$disconnect();

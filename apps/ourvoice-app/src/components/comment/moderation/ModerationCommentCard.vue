@@ -29,7 +29,7 @@
     </div>
 
     <!-- Moderate button -->
-    <div class="mt-4" v-if="!preview && version.status === 'PENDING'">
+    <div class="mt-4" v-if="!preview && comment.status === 'PENDING'">
       <router-link v-if="comment && comment.id"
         :to="{ name: 'moderate-comment', params: { id: comment.id } }"
         class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
