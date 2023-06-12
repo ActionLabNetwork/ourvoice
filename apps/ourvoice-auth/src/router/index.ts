@@ -5,8 +5,11 @@ import EmailPasswordView from '../views/EmailPasswordView.vue'
 import PasswordlessView from '../views/PasswordlessView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
+import { DeploymentService } from '../utils/deployment.service'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
+const deployment: DeploymentService = new DeploymentService()
+
 const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
@@ -48,7 +51,16 @@ const router = createRouter({
       name: 'emailpassword',
       component: EmailPasswordView,
       // TODO: could use a url param here as well
-      beforeEnter: () => {
+      beforeEnter: (to) => {
+        if (Object.keys(to.query).length) {
+          // set deployment and redirect url
+          deployment.set(`${to.query.d || 'demo'}`)
+          return { path: to.path, query: {}, hash: to.hash }
+        } else {
+          // fallback redirect to demo application
+          deployment.set('demo')
+        }
+        // set redirect to admin URL
         redirect.set(adminURL)
       },
       props: (route) => ({ deployment: route.query.d || 'demo' }),
@@ -60,12 +72,15 @@ const router = createRouter({
       component: PasswordlessView,
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
+          // set deployment and redirect url
+          deployment.set(`${to.query.d || 'demo'}`)
           redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+          return { path: to.path, query: {}, hash: to.hash }
         } else {
           // fallback redirect to demo application
+          deployment.set('demo')
           redirect.set(`http://demo${domain}`)
         }
-        // return { path: to.path, query: {}, hash: to.hash }
       },
       props: (route) => ({ deployment: route.query.d || 'demo' }),
       alias: ['/magicLink', '/passwordless']

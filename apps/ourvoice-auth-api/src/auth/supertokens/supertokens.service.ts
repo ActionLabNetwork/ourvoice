@@ -52,13 +52,13 @@ export class SupertokensService {
 
     const recipeList = {
       EmailPassword: EmailPassword.init({
-        // signUpFeature: {
-        //   formFields: [
-        //     {
-        //       id: 'deployment',
-        //     },
-        //   ],
-        // },
+        signUpFeature: {
+          formFields: [
+            {
+              id: 'deployment',
+            },
+          ],
+        },
         override: {
           apis: (originalImplementation) => {
             return {
@@ -75,11 +75,14 @@ export class SupertokensService {
                 if (response.status === 'OK') {
                   const id = response.user.id;
                   // add `user` role to all registered users
-                  addRoleToUser(id);
+                  addRoleToUser(id, 'user');
                   // add deployment
-                  // await UserMetadata.updateUserMetadata(id, {
-                  //   deployment: input.formFields['deployment'],
-                  // });
+                  const deployment = input.formFields.filter((obj) => {
+                    return obj.id === 'deployment';
+                  });
+                  await UserMetadata.updateUserMetadata(id, {
+                    deployment: deployment[0].value,
+                  });
                 }
                 return response;
               },
@@ -239,8 +242,29 @@ export class SupertokensService {
                 if (response.status === 'OK') {
                   // const { id, email, phoneNumber } = response.user;
                   if (response.createdNewUser) {
+                    let deployment = '';
+                    const request = supertokens.getRequestFromUserContext(
+                      input.userContext,
+                    );
+
+                    if (request !== undefined) {
+                      deployment = request.getHeaderValue('deployment');
+                    } else {
+                      /**
+                       * This is possible if the function is triggered from the user management dashboard
+                       *
+                       * In this case set a reasonable default value to use
+                       */
+                      deployment = 'demo';
+                    }
+
                     // add `user` role to all registered users
-                    addRoleToUser(response.user.id);
+                    addRoleToUser(response.user.id, 'user');
+
+                    // add deployment
+                    await UserMetadata.updateUserMetadata(response.user.id, {
+                      deployment,
+                    });
                   }
                 }
                 return response;

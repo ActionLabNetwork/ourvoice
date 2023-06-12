@@ -56,11 +56,17 @@ import Session from 'supertokens-web-js/recipe/session'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
+import { DeploymentService } from '../utils/deployment.service'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
+const deployment: DeploymentService = new DeploymentService()
+
 const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 export default defineComponent({
+  setup() {
+    return { deployment: deployment.exists() ? deployment.get() : 'demo' }
+  },
   data() {
     return {
       processing: true
@@ -77,7 +83,26 @@ export default defineComponent({
     },
     handleMagicLinkClicked: async function () {
       try {
-        let response = await Passwordless.consumeCode()
+        let response = await Passwordless.consumeCode({
+          options: {
+            preAPIHook: async (context) => {
+              let requestInit = context.requestInit
+
+              let headers = {
+                ...requestInit.headers,
+                deployment: this.deployment
+              }
+              requestInit = {
+                ...requestInit,
+                headers
+              }
+              return {
+                url: context.url,
+                requestInit
+              }
+            }
+          }
+        })
 
         if (response.status === 'OK') {
           if (response.createdNewUser) {
@@ -86,6 +111,8 @@ export default defineComponent({
             // user sign in success
           }
           Passwordless.clearLoginAttemptInfo()
+          // remove deployment info
+          deployment.purge()
           this.handleRedirect()
         } else {
           // this can happen if the magic link has expired or is invalid

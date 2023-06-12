@@ -7,6 +7,7 @@ import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { createRole } from './auth/roles.service';
 import { ConfigService } from '@nestjs/config';
+import deployment from './config/deployment';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -46,7 +47,11 @@ async function bootstrap() {
         );
       }
     },
-    allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
+    allowedHeaders: [
+      'content-type',
+      'deployment',
+      ...supertokens.getAllCORSHeaders(),
+    ],
     credentials: true,
   });
 

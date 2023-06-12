@@ -272,11 +272,11 @@ export default defineComponent({
           {
             id: 'password',
             value: this.password
+          },
+          {
+            id: 'deployment',
+            value: this.deployment
           }
-          // {
-          //   id: 'deployment',
-          //   value: this.deployment
-          // }
         ]
       })
       if (response.status === 'FIELD_ERROR') {
