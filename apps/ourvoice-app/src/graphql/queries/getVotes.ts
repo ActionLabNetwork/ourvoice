@@ -14,3 +14,13 @@ export const GET_VOTES_QUERY = gql`
     }
   }
 `
+export interface Vote {
+  id: number
+  voteType: 'UPVOTE' | 'DOWNVOTE'
+  comment: {
+    id: number
+  }
+  post: {
+    id: number
+  }
+}

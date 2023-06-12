@@ -236,7 +236,10 @@ export const useCommentsStore = defineStore('comments', {
       onResult(({ data, loading }) => {
         this.loading = loading
         if (loading) return
-        const comment = this.data.find((comment: any) => comment.id === commentId)
+        const comment = this.data?.find((comment: Comment) => comment.id === commentId)
+        if (!comment) {
+          return
+        }
         comment.votesUp = data.comment.votesUp
         comment.votesDown = data.comment.votesDown
       })

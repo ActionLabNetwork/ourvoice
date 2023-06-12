@@ -34,7 +34,7 @@ async function bootstrap() {
   ];
   app.enableCors({
     origin: function (origin, callback) {
-      const parts = origin?.split('.');
+      const parts = origin ? origin.split('.') : origin;
       if (
         !origin ||
         whitelist.indexOf(origin) !== -1 ||

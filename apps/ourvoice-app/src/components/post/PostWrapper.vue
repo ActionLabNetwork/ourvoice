@@ -3,6 +3,7 @@
     class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl"
   >
     <!-- <h1>id: {{ props.id }}</h1> -->
+    <!-- <pre>{{ votes }}</pre> -->
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ props.title }}
       <div>
@@ -65,11 +66,12 @@ import { ref, watchEffect } from 'vue'
 import { timePassed } from '@/utils/index'
 import { usePostsStore } from '@/stores/posts'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { GET_VOTES_QUERY } from '@/graphql/queries/getVotes'
+import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 
 const postsStore = usePostsStore()
-export interface Post {
+
+interface Post {
   id: number
   title: string
   author: {
@@ -99,7 +101,7 @@ watchEffect(() => {
   if (presignedUrls.value.length != props.files.length) updatePresignedUrls()
 })
 
-const votes = ref<any>([])
+const votes = ref<Vote[]>([])
 
 const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
 const { onResult, refetch } = useQuery(GET_VOTES_QUERY, {
@@ -112,7 +114,7 @@ const { onResult, refetch } = useQuery(GET_VOTES_QUERY, {
 })
 onResult(({ data, loading }) => {
   if (loading) return
-  votes.value = data.votes
+  votes.value = data.votes.filter((vote: any) => !vote.comment)
 })
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {

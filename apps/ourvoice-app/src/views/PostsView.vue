@@ -1,13 +1,13 @@
 <template>
   <div class="lg:grid grid-cols-5 w-screen">
     <!--First Grid Fraction-->
-    <AppNavBar class="h-[5vh] lg:h-full col-span-1" />
+    <!-- <AppNavBar class="h-[5vh] lg:h-full col-span-1" /> -->
 
     <!-- Second Grid Fraction-->
-    <div class="border-red-400 h-[95vh] lg:h-screen flex flex-col col-span-4">
+    <div class="border-red-400 h-[95vh] lg:h-screen flex flex-col col-span-5">
       <main class="px-0 lg:px-0 border-green-400 flex flex-col overflow-hidden grow relative">
         <!-- Overlay container for a single post with comments start -->
-        <TransitionRoot :show="posttOverlayOpen">
+        <TransitionRoot :show="postOverlayOpen">
           <TransitionChild
             enter="transition-all duration-200"
             enter-from="opacity-0"
@@ -45,7 +45,7 @@
                   <!-- Remove comment butten in the standalone post page -->
                 </div>
               </PostWrapper>
-              <CommentTile class="max-w-4xl mx-auto" :postId="posts[postIndex].node?.id" />
+              <CommentList class="max-w-4xl mx-auto" :postId="posts[postIndex].node?.id" />
             </div>
           </TransitionChild>
         </TransitionRoot>
@@ -110,14 +110,7 @@
                       </MenuButton>
                     </div>
 
-                    <transition
-                      enter-active-class="transition ease-out duration-100"
-                      enter-from-class="transform opacity-0 scale-95"
-                      enter-to-class="transform opacity-100 scale-100"
-                      leave-active-class="transition ease-in duration-75"
-                      leave-from-class="transform opacity-100 scale-100"
-                      leave-to-class="transform opacity-0 scale-95"
-                    >
+                    <transition>
                       <MenuItems
                         class="absolute right-0 z-20 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
                       >
@@ -371,7 +364,7 @@
 <script lang="ts" setup>
 import Modal from '@/components/common/Modal.vue'
 import PostWrapper from '@/components/post/PostWrapper.vue'
-import CommentTile from '@/components/comment/CommentTile.vue'
+import CommentList from '@/components/comment/CommentList.vue'
 import CreatePost from '@/components/post/CreatePost.vue'
 import {
   Dialog,
@@ -558,13 +551,13 @@ watch(filters.value.TimeRange[1], (newValue) => {
 })
 
 // Todo: Comment Overlay Logic
-const posttOverlayOpen = ref(false)
+const postOverlayOpen = ref(false)
 const postIndex = ref<number>(0)
 const closePostOverlay = () => {
-  posttOverlayOpen.value = false
+  postOverlayOpen.value = false
 }
 const openPostOverlay = (index: number) => {
-  posttOverlayOpen.value = true
+  postOverlayOpen.value = true
   postIndex.value = index
 }
 </script>

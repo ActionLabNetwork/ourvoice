@@ -72,7 +72,7 @@
           </div>
         </div>
       </div>
-      <CommentTile
+      <CommentList
         v-if="showComment"
         :postId="post.id"
         :noOfComments="post?.comments?.length ?? 0"
@@ -89,7 +89,7 @@
 <script lang="ts" setup>
 import { timePassed } from '@/utils'
 import { ref, watchEffect } from 'vue'
-import CommentTile from '../comment/CommentTile.vue'
+import CommentList from '../comment/CommentList.vue'
 import { usePostsStore } from '@/stores/posts'
 const postsStore = usePostsStore()
 const props = defineProps({

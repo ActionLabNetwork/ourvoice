@@ -1,7 +1,7 @@
 import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
-import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
+import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
 import { GET_POSTS_QUERY, GET_POSTS_BY_CATEGORIES_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
@@ -149,7 +149,7 @@ export const usePostsStore = defineStore('posts', {
       voteType: string
     }) {
       await apolloClient.mutate({
-        mutation: VOTE_POST_MUTATION,
+        mutation: VOTE_MUTATION,
         variables: { data: { postId, userId, voteType } }
       })
     }
