@@ -13,6 +13,12 @@ roles:
      - delete:all
   - name: admin
     permissions:
+      - manage:self
+      - read:all
+      - edit:all
+      - delete:all
+  - name: super
+    permissions:
       - manage:all
       - read:all
       - edit:all
