@@ -116,6 +116,10 @@ export class PostRepository {
     });
   }
 
+  async createPost(data: Prisma.PostCreateInput) {
+    return this.prisma.post.create({ data });
+  }
+
   async updatePost(id: number, data: Prisma.PostUpdateInput) {
     const postExists = await this.prisma.post.findUnique({ where: { id } });
 

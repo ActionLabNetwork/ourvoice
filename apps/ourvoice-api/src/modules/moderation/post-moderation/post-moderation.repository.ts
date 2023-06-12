@@ -13,6 +13,7 @@ import {
 } from 'src/graphql';
 import { cursorToNumber } from 'src/utils/cursor-pagination';
 import { PostCreateDto } from './dto/post-create.dto';
+import { PostService } from 'src/modules/post/post.service';
 
 function countPostVersionModerationDecisions(
   version: PostVersion & {
@@ -41,7 +42,10 @@ function countPostVersionModerationDecisions(
 
 @Injectable()
 export class PostModerationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly postService: PostService,
+  ) {}
 
   async getModerationPostById(id: number): Promise<Post> {
     return await this.prisma.post.findUnique({
@@ -317,7 +321,7 @@ export class PostModerationRepository {
     });
   }
 
-  async publishPost(postId: number) {
+  async approvePost(postId: number) {
     await this.prisma.$transaction(async (tx) => {
       // Check if the post has enough number of moderations
       const post = await tx.post.findUnique({
@@ -347,9 +351,53 @@ export class PostModerationRepository {
           where: { id: postId },
           data: { status: 'APPROVED' },
         });
+
+        console.log('Finished approving post with post id', postId);
+
         // TODO: Add as a new post entry in the main db
+        const newPostInMainDb = await this.postService.createPost({
+          title: post.versions[0].title,
+          content: post.versions[0].content,
+          categoryIds: post.versions[0].categoryIds,
+          files: (post.versions[0].files as string[]) ?? undefined,
+          authorHash: post.versions[0].authorHash,
+          authorNickname: post.versions[0].authorNickname,
+        });
+        console.log('Created new post in main db with id', newPostInMainDb.id);
+
+        await tx.post.update({
+          where: { id: post.id },
+          data: { postIdInMainDb: newPostInMainDb.id },
+        });
+        console.log(
+          'Updated post with id',
+          post.id,
+          ' to have main db id',
+          newPostInMainDb.id,
+        );
       }
-      console.log(decisionsCount);
+      console.log('DecisionsCount for ', postId, decisionsCount);
     });
+  }
+
+  async approveOrRejectPosts() {
+    const pendingPosts = await this.prisma.post.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        versions: { orderBy: { version: 'desc' }, take: 1 },
+      },
+    });
+
+    for (const post of pendingPosts) {
+      try {
+        await this.approvePost(post.id);
+      } catch (error) {
+        console.log(
+          `Error approving post with post id ${post.id}. ${error.message}`,
+        );
+      }
+    }
+
+    // TODO: Reject posts (awaiting conditions/business logic)
   }
 }

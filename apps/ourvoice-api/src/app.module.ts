@@ -3,6 +3,7 @@ import { PostModule } from './modules/post/post.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -65,6 +66,7 @@ import deployment from './config/deployment';
       recaptchaSecret: process.env.CONTACT_FORM_RECAPTCHA_SECRET,
     }),
     ModerationModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

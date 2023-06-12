@@ -11,6 +11,7 @@ import { plainToClass } from 'class-transformer';
 import { PostsFilterDto } from './dto/posts-filter.dto';
 import { PostUpdateDto } from './dto/post-update.dto';
 import { numberToCursor } from '../../utils/cursor-pagination';
+import { PostCreateDto } from './dto/post-create.dto';
 
 @Injectable()
 export class PostService {
@@ -72,6 +73,28 @@ export class PostService {
       filter,
       pagination,
     );
+  }
+
+  async createPost(data: PostCreateDto): Promise<Post> {
+    const postCreateDto = plainToClass(PostCreateDto, data);
+    const errors = await validate(postCreateDto);
+
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+
+    const { categoryIds: categories, ...restData } = data;
+
+    const postData = {
+      ...restData,
+      categories: {
+        connect: categories.map((id) => ({ id })),
+      },
+    };
+
+    const newPost = await this.postRepository.createPost(postData);
+
+    return newPost;
   }
 
   async updatePost(id: number, data: PostUpdateDto): Promise<Post> {
