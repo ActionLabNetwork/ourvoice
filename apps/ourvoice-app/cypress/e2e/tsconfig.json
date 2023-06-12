@@ -9,8 +9,8 @@
   ],
   "compilerOptions": {
     "isolatedModules": false,
-    "target": "es2018",
-    "lib": ["es2018", "dom"],
-    "types": ["cypress"]
+    "target": "ES2018",
+    "lib": ["ES2018", "dom"],
+    "types": ["cypress", "cypress-file-upload"]
   }
 }
