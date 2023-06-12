@@ -61,14 +61,36 @@ export const useCommentsStore = defineStore('comments', {
       return state.data.length
     },
 
-    getGroupedComments(state) {
-      const commentsForPosts: Comment[] = []
-      const commentsForComments: Comment[] = []
-      state.data.forEach((c) => {
-        if (c.parent) {
-          commentsForComments.push(c)
-        } else if (c.post) {
-          commentsForPosts.push(c)
+  //   getGroupedComments(state) {
+  //     const commentsForPosts: Comment[] = []
+  //     const commentsForComments: Comment[] = []
+  //     state.data.forEach((c) => {
+  //       if (c.parent) {
+  //         commentsForComments.push(c)
+  //       } else if (c.post) {
+  //         commentsForPosts.push(c)
+  //       }
+  //     })
+  //     return [
+  //       {
+  //         label: 'Comments for Posts',
+  //         options: commentsForPosts
+  //       },
+  //       {
+  //         label: 'Comments for Comments',
+  //         options: commentsForComments
+  //       }
+  //     ]
+  //   }
+  // },
+
+  actions: {
+    async fetchComments(postId?: number) {
+      const { onResult, onError } = useQuery(GET_COMMENTS_QUERY, {
+        filter: postId ? { postId: postId } : null,
+        pagination: {
+          cursor: null,
+          limit: null
         }
       })
       return [
