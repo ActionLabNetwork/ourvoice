@@ -28,7 +28,9 @@
     "prisma:generate:premoderation": "prisma generate --schema ./prisma-premoderation/schema.prisma",
     "prisma:generate:main:test": "NODE_ENV=test prisma generate --schema ./prisma/test/schema.prisma",
     "graphql:generate": "pnpm exec tsx ./src/graphql/generate-typings.ts",
-    "prisma:generate:contactform": "prisma generate --schema ./prisma-contactform/schema.prisma"
+    "prisma:generate:contactform": "prisma generate --schema ./prisma-contactform/schema.prisma",
+    "prisma:seed:main": "pnpm exec tsx ./prisma/seed.ts",
+    "prisma:seed:premoderation": "pnpm exec tsx ./prisma-premoderation/seed.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.7.3",

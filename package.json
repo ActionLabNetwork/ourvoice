@@ -43,6 +43,9 @@
     "generate:api:main": "pnpm --filter ./apps/ourvoice-api prisma:generate:main",
     "generate:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:generate:premoderation",
     "generate:api:contactform": "pnpm --filter ./apps/ourvoice-api prisma:generate:contactform",
+    "seed:api:all": "pnpm seed:api:main && pnpm seed:api:premoderation",
+    "seed:api:main": "pnpm --filter ./apps/ourvoice-api prisma:seed:main",
+    "seed:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:seed:premoderation",
     "postinstall": "pnpm tsx scripts/copy-config.ts"
   },
   "simple-git-hooks": {
