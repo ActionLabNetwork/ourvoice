@@ -51,7 +51,7 @@ const moderationComments = computed(() => {
     getGroupsByProperty('status', groups, post), initialGroups);
 });
 
-const handleTabSwitched = (selectedTab) => {
+const handleTabSwitched = (selectedTab: Tab) => {
   // If we need to know when the tab is switched, we can do it here
 };
 </script>

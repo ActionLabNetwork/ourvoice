@@ -47,7 +47,10 @@ export const useCategoriesStore = defineStore('categories', {
 
         this.data = data.categories.edges.map(extractCategories)
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
+
         if (error) {
           this.errorMessage = 'Failed to load categories. Please try again.'
         }

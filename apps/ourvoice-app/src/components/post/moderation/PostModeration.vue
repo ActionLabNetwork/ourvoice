@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { useModerationPostsStore, type Moderation, type PostVersion, } from '@/stores/moderation-posts';
 import { useUserStore } from '@/stores/user';
-import { ref, onMounted, computed, watchEffect } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue';
@@ -68,7 +68,7 @@ import ModerationVersionList from '@/components/post/moderation/ModerationVersio
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import { storeToRefs } from 'pinia';
-import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -96,7 +96,7 @@ const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !moderationPostsStore.userHasModeratedPost)
 const hasModerationHistory = computed(() => {
   const wasModified =
-    version.value?.authorHash !== post.value?.versions.at(-1).authorHash
+    version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
   const hasModerations =
     (version.value?.moderations && version.value?.moderations.length > 0)
 

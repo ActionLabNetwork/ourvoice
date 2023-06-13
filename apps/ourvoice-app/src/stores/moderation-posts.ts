@@ -40,7 +40,6 @@ interface PostVersionWithCategoryIds {
 export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
   categories: Category[]
 }
-
 export interface ModerationPostModel {
   id: number
   authorHash: string
@@ -49,7 +48,9 @@ export interface ModerationPostModel {
   status: PostStatus
   versions: PostVersionWithCategoryIds[]
 }
-
+export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
+  versions: PostVersion[]
+}
 export interface Moderation {
   id: number
   decision: 'ACCEPTED' | 'REJECTED'
@@ -57,10 +58,6 @@ export interface Moderation {
   moderatorNickname: string
   reason: string
   timestamp: string
-}
-
-export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
-  versions: PostVersion[]
 }
 
 export interface Category {
@@ -78,9 +75,8 @@ export interface ModerationPostsState {
   posts: ModerationPost[]
   postInModeration: ModerationPost | undefined
   versionInModeration: PostVersion | undefined
-  // modifiedPostVersion: PostVersion | undefined
   versionInModification: {
-    version: PostVersionWithCategoryIds | undefined
+    version: Partial<PostVersionWithCategoryIds> | undefined
     isValid: boolean
   }
   categories: Map<number, Category>

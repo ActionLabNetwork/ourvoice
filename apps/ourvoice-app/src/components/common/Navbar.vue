@@ -31,7 +31,7 @@
             <font-awesome-icon :icon="['fas', 'fa-chevron-down']" />
           </PopoverButton>
 
-          <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-1">
+          <TransitionRoot enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-1">
             <PopoverPanel class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5">
               <div class="p-4">
                 <div v-for="item in moderation" :key="item.name" class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700">
@@ -44,7 +44,7 @@
                 </div>
               </div>
             </PopoverPanel>
-          </transition>
+          </TransitionRoot>
         </Popover>
       </PopoverGroup>
       <div class="hidden lg:flex lg:flex-1 lg:justify-end">

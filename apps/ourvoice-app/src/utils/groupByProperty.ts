@@ -58,6 +58,6 @@ export function getGroupsByProperty<
   if (!groups[key]) {
     groups[key] = []
   }
-  groups[key].push(item)
+  groups[key]?.push(item)
   return groups as PropertyGroups<TKey, TValue, TItem>
 }

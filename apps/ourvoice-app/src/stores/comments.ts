@@ -88,7 +88,10 @@ export const useCommentsStore = defineStore('comments', {
         }))
         this.loading = false
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
+
         if (error) {
           this.errorMessage = 'Failed to load comments. Please try again.'
         }
@@ -123,7 +126,9 @@ export const useCommentsStore = defineStore('comments', {
           state.data.push(response?.data.createComment)
         })
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
       }
     },
 
@@ -137,7 +142,9 @@ export const useCommentsStore = defineStore('comments', {
         })
         console.log(response)
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
       }
     },
 
@@ -168,7 +175,9 @@ export const useCommentsStore = defineStore('comments', {
         })
         console.log(response)
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
       }
     }
   }

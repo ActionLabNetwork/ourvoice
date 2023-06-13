@@ -22,7 +22,7 @@
                 </span>
               </ListboxButton>
 
-              <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
+              <TransitionRoot leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
                 <ListboxOptions class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                   <ListboxOption as="template" v-for="action in actions" :key="action.name" :value="action" v-slot="{ active }">
                     <ul>
@@ -37,7 +37,7 @@
                     </ul>
                   </ListboxOption>
                 </ListboxOptions>
-              </transition>
+              </TransitionRoot>
             </div>
           </Listbox>
         </div>

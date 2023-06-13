@@ -13,24 +13,15 @@ import { APPROVE_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations
 import { REJECT_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/rejectModerationCommentVersion'
 import { MODIFY_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/modifyModerationComment'
 import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewCommentModeration'
+import type { PostVersion } from './moderation-posts'
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
-export interface PostVersion {
-  id: number
-  title: string
-  content: string
-  categoryIds: number[]
-  files: string[]
-  timestamp: string
-  authorHash: string
-  authorNickname: string
-}
 export interface ModerationPost {
   id: number
   authorHash: string
   authorNickname: string
-  versions: PostVersion
+  versions: PostVersion[]
   requiredModerations: number
   status: CommentStatus
 }
@@ -78,7 +69,7 @@ export interface ModerationCommentsState {
   commentInModeration: ModerationComment | undefined
   versionInModeration: CommentVersion | undefined
   versionInModification: {
-    version: CommentVersion | undefined
+    version: Partial<CommentVersion> | undefined
     isValid: boolean
   }
   totalCount: number

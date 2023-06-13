@@ -1,7 +1,7 @@
 <template>
   <div v-if="comment && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
     <!-- Author -->
-    <AuthorBadge
+    <AuthorBadge v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
       :modificationDate="formattedDate(version)"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watchEffect, onMounted } from 'vue';
+import { computed, reactive, watchEffect, onMounted, watch } from 'vue';
 import { useModerationCommentsStore, type Moderation, type CommentVersion } from '@/stores/moderation-comments';
 import { formatTimestampToReadableDate } from '@/utils';
 import { storeToRefs } from 'pinia';
@@ -40,16 +40,16 @@ import { useField, useForm } from 'vee-validate';
 import { validateContent } from '@/validators/moderation-comment-validator';
 import AuthorBadge from '@/components/common/AuthorBadge.vue';
 import { getGroupsByProperty } from '@/utils/groupByProperty';
-import { ModerationVersionDecision } from '@/types/moderation';
+import type { ModerationVersionDecision } from '@/types/moderation';
 
 const emit = defineEmits(['update']);
 
 const nickname = computed(() => {
-  const authorNickname = comment.value?.versions.at(-1).authorNickname
-  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : null
+  const authorNickname = comment.value?.versions?.at(-1)?.authorNickname
+  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
 
   const nicknameSeparator = '_'
-  const [aFirst, aMiddle, aLast] = authorNickname.split(nicknameSeparator)
+  const [aFirst, aMiddle, aLast] = authorNickname?.split(nicknameSeparator) || []
   const [mFirst, mMiddle, mLast] = moderatorNickname?.split(nicknameSeparator) || []
   return {
     author: {
@@ -116,14 +116,14 @@ const formWasUpdated = computed(() => {
 
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
-  const groups: Record<ModerationVersionDecision, Moderation[]> = version.value?.moderations.reduce((acc, moderation) => {
+  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined = version.value?.moderations.reduce((acc, moderation) => {
     return getGroupsByProperty('decision', acc, moderation)
-  }, { ACCEPTED: [], REJECTED: [] });
+  }, { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] });
 
   const groupsCount: Record<ModerationVersionDecision, number> = { ACCEPTED: 0, REJECTED: 0 }
 
   if (groups) {
-    Object.keys(groups).forEach((key) => {
+    (Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
       groupsCount[key] = groups[key].length;
     });
   }
@@ -135,7 +135,7 @@ const formattedDate = (version: CommentVersion) =>
   formatTimestampToReadableDate(+version.timestamp);
 
 // Reactive copies of version
-const localVersion = reactive({
+let localVersion = reactive({
   ...version.value,
   content: contentField.value.value,
 });

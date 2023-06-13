@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { useModerationCommentsStore, type Moderation, type CommentVersion, } from '@/stores/moderation-comments';
 import { useUserStore } from '@/stores/user';
-import { ref, onMounted, computed, watchEffect } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
 import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue';
@@ -107,7 +107,7 @@ const hasNotBeenModeratedBySelf = computed(() => !moderationCommentsStore.userHa
 const hasModerationHistory = computed(() => {
   // The second check is for development. It shouldn't happen in reality (a moderator shouldn't be able to moderate their own comment, less so modify it)
   const wasModified =
-    (version.value?.authorHash !== comment.value?.versions.at(-1).authorHash) || (version.value?.version > 1)
+    (version.value?.authorHash !== comment.value?.versions?.at(-1)?.authorHash) || (version.value?.version && version.value?.version > 1)
   const hasModerations =
     (version.value?.moderations && version.value?.moderations.length > 0)
 
@@ -137,11 +137,11 @@ async function initializeModerationComments() {
   await moderationCommentsStore.fetchCommentById(+route.params.id)
 
   if (version.value) {
-    await refreshVersion(version.value)
+    await refreshVersion()
   }
 }
 
-async function refreshVersion(newVersion: CommentVersion) {
+async function refreshVersion() {
   // Check if user has moderated this version
   await moderationCommentsStore.checkIfUserHasModerated(userStore.userId)
 
@@ -158,7 +158,7 @@ function handleSidePaneToggle(open: boolean) {
 
 async function handleVersionChange(newVersion: CommentVersion) {
   moderationCommentsStore.versionInModeration = newVersion
-  await refreshVersion(newVersion)
+  await refreshVersion()
 }
 
 function handleModerationControlsSubmit(

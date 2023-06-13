@@ -26,16 +26,11 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watchEffect } from 'vue'
-
-interface Tab {
-  name: string;
-  current: boolean;
-}
+import { type PropType, ref, watchEffect } from 'vue'
 
 const props = defineProps({
-  tabs: Array as PropType<Tab[]>,
-  initialTab: Object as PropType<Tab>,
+  tabs: { type: Array as PropType<Tab[]>, required: true },
+  initialTab: { type: Object as PropType<Tab>, required: true },
 })
 
 const emit = defineEmits(['tab-switched']);

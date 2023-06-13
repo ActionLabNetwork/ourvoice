@@ -57,7 +57,11 @@ export class CommentModerationRepository {
         },
         post: {
           include: {
-            versions: { orderBy: { version: 'desc' }, take: 1 },
+            versions: {
+              include: { moderations: { orderBy: { timestamp: 'desc' } } },
+              orderBy: { version: 'desc' },
+              take: 1,
+            },
           },
         },
         versions: {

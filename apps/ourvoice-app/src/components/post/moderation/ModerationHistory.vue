@@ -34,7 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { PostVersion, useModerationPostsStore } from '@/stores/moderation-posts';
+import { useModerationPostsStore } from '@/stores/moderation-posts';
+import type { PostVersion } from '@/stores/moderation-posts'
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { formatTimestampToReadableDate } from '@/utils';

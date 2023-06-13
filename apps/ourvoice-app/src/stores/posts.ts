@@ -3,13 +3,10 @@ import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
-import { CREATE_POST_MUTATION } from './../graphql/mutations/createPost'
 import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
-
-import authService from '@/services/auth-service'
 
 export interface Post {
   id: number
@@ -71,8 +68,10 @@ export const usePostsStore = defineStore('posts', {
         this.pageInfo = data.posts.pageInfo
         console.log({ data })
       } catch (error) {
-        console.log(error)
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
+
         if (error) {
           this.errorMessage = 'Failed to load posts. Please try again.'
         }
@@ -87,7 +86,9 @@ export const usePostsStore = defineStore('posts', {
         })
         return data.getPresignedUrls
       } catch (error) {
-        this.error = error
+        if (error instanceof Error) {
+          this.error = error
+        }
       }
     },
 
@@ -103,7 +104,6 @@ export const usePostsStore = defineStore('posts', {
       files: string[]
     }) {
       // Check for valid deployment and user session
-      const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
       // Check if we can access the session and generate a user hash for storing in the db
@@ -133,9 +133,10 @@ export const usePostsStore = defineStore('posts', {
             }
           }
         })
-      } catch (error) {
-        this.error = error
-        console.log({ error })
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.error = error
+        }
       }
     },
 

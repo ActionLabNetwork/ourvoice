@@ -28,4 +28,3 @@ export interface Moderation {
   moderatorHash: any
   moderatorNickname: any
 }
-

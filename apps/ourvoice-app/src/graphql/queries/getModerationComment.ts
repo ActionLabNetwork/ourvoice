@@ -20,8 +20,20 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
           categoryIds
           files
           timestamp
+          version
           authorHash
           authorNickname
+          reason
+          latest
+          status
+          moderations {
+            id
+            decision
+            moderatorHash
+            moderatorNickname
+            reason
+            timestamp
+          }
         }
       }
       parent {

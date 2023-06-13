@@ -9,7 +9,7 @@
     </div>
 
     <!-- Author -->
-    <AuthorBadge
+    <AuthorBadge v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
       :modificationDate="formattedDate(version)"
@@ -77,13 +77,14 @@ const props = defineProps({
 const version = computed(() => props.version)
 const comment = computed(() => props.comment)
 
-const nickname: ComputedRef<ModeratedPostNicknames> = computed(() => {
-  const authorNickname = comment.value?.versions.at(-1).authorNickname
-  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : null
+const nickname = computed(() => {
+  const authorNickname = comment.value?.versions?.at(-1)?.authorNickname
+  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
 
   const nicknameSeparator = '_'
-  const [aFirst, aMiddle, aLast] = authorNickname.split(nicknameSeparator)
+  const [aFirst, aMiddle, aLast] = authorNickname?.split(nicknameSeparator) || []
   const [mFirst, mMiddle, mLast] = moderatorNickname?.split(nicknameSeparator) || []
+
   return {
     author: {
       nickname: authorNickname,
@@ -105,17 +106,14 @@ const nickname: ComputedRef<ModeratedPostNicknames> = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
-  const groups: Record<ModerationVersionDecision, Moderation[]> = version.value?.moderations.reduce((acc, moderation) => {
+  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined = version.value?.moderations?.reduce((acc, moderation) => {
     return getGroupsByProperty('decision', acc, moderation)
-  }, {
-    ACCEPTED: [],
-    REJECTED: []
-  });
+  }, { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] });
 
   const groupsCount: Record<ModerationVersionDecision, number> = { ACCEPTED: 0, REJECTED: 0 }
 
   if (groups) {
-    Object.keys(groups).forEach((key) => {
+    (Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
       groupsCount[key] = groups[key].length;
     });
   }
