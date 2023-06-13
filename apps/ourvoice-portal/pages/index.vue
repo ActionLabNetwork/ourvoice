@@ -20,7 +20,7 @@
       <PropertiesSection />
     </section>
     <!-- Testimonials -->
-    <section id="testimonial" class="bg-ourvoice-portal-yellow py-20 relative">
+    <section id="testimonial">
       <TestimonialSection />
     </section>
     <section id="demo" class="py-20 relative">
