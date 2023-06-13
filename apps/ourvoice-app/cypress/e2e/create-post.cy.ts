@@ -14,7 +14,7 @@ describe('Create Post', () => {
 
   beforeEach(() => {
     // Create/Restore auth session
-    cy.login()
+    cy.session('login', cy.login)
 
     // Intercept and stub API calls
     cy.intercept({ method: 'POST', url: 'http://api.ourvoice.test/graphql' }, (req) => {
