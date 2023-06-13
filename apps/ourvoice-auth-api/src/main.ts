@@ -6,8 +6,9 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { createRole } from './auth/roles.service';
+import { addEmailsToAllowlist } from './auth/metadata.service';
+import { addSuperAdmin } from './seed';
 import { ConfigService } from '@nestjs/config';
-import deployment from './config/deployment';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,6 +33,7 @@ async function bootstrap() {
       // const match = origin
       //   .toLowerCase()
       //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
+      // const domainWhiteList = /^(https?:\/\/([a-z0-9]+[.])ourvoice[.]test(?::\d{1,5})?)$/;
       const parts = origin ? origin.split('.') : origin;
       if (
         !origin ||
@@ -62,6 +64,16 @@ async function bootstrap() {
   configService
     .get<Role[]>('roles')
     .map(async (role) => await createRole(role.name, role.permissions));
+  //add allowed moderator emails
+  await addEmailsToAllowlist(configService.get<string[]>('moderators'));
+  // add super admin user
+  await addSuperAdmin(
+    configService.get<string>('SUPERTOKENS_ADMIN_EMAIL') ||
+      'admin@ourvoice.app',
+    configService.get<string>(
+      'SUPERTOKENS_ADMIN_PASSWORD' || 'super-admin-pass',
+    ),
+  );
   await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
 }
 

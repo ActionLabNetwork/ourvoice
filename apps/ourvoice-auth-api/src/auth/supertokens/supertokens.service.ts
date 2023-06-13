@@ -17,6 +17,7 @@ import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 import { addRoleToUser } from '../roles.service';
+import { isEmailAllowed } from '../metadata.service';
 
 @Injectable()
 export class SupertokensService {
@@ -34,6 +35,26 @@ export class SupertokensService {
       recipeList: [
         Session.init({
           cookieDomain: config.cookieDomain,
+          override: {
+            functions: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                createNewSession: async function (input) {
+                  const userId = input.userId;
+                  const { metadata } = await UserMetadata.getUserMetadata(
+                    userId,
+                  );
+                  // This goes in the access token, and is availble to read on the frontend.
+                  input.accessTokenPayload = {
+                    ...input.accessTokenPayload,
+                    deployment: metadata.deployment || 'demo',
+                  };
+
+                  return originalImplementation.createNewSession(input);
+                },
+              };
+            },
+          },
         }),
         UserMetadata.init(),
         UserRoles.init(),
@@ -56,6 +77,17 @@ export class SupertokensService {
           formFields: [
             {
               id: 'deployment',
+            },
+            {
+              id: 'email',
+              validate: async (email: string) => {
+                // TODO: this should eventually come from admin database
+                if (!(await isEmailAllowed(email))) {
+                  return 'Sign up disabled. Please contact the admin.';
+                } else {
+                  return undefined;
+                }
+              },
             },
           ],
         },

@@ -1,12 +1,12 @@
 <template>
   <div class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28 fill">
-    <div v-if="session" class="top-bar">
+    <!-- <div v-if="session" class="top-bar">
       <div class="sign-out" v-on:click="signOut">SIGN OUT</div>
-    </div>
+    </div> -->
     <!-- Content -->
     <div class="flex fill flex-1 flex-col items-center lg:items-start">
       <h1 class="text-ourvoice-blue text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
-        <span class="text-ourvoice-red">OurVoice</span> App
+        <span class="text-ourvoice-red">OurVoice</span> {{ this.deployment.toUpperCase() }} App
       </h1>
       <!-- Deployment description -->
       <Description class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
@@ -77,14 +77,16 @@ export default defineComponent({
     getConfig(option: string) {
       return YamlContent[option]
     },
-    signOut: async function () {
-      await Session.signOut()
-      window.location.assign('/')
-    },
+    // signOut: async function () {
+    //   await Session.signOut()
+    //   window.location.assign('/')
+    // },
 
     checkForSession: async function () {
       if (!(await Session.doesSessionExist())) return
       let validationErrors = await Session.validateClaims()
+      // let payload = await Session.getAccessTokenPayloadSecurely()
+      // console.log(payload)
 
       if (validationErrors.length === 0) {
         // user has verified their email address

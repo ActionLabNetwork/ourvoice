@@ -280,6 +280,7 @@ export default defineComponent({
         ]
       })
       if (response.status === 'FIELD_ERROR') {
+        this.processing = false
         response.formFields.forEach((item) => {
           if (item.id === 'email') {
             // this means that something was wrong with the entered email.

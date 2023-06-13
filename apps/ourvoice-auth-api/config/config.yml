@@ -23,6 +23,10 @@ roles:
       - read:all
       - edit:all
       - delete:all
+moderators:
+  - admin@ourvoice.app
+  - moderator1@ourvoice.app
+  - moderator2@ourvoice.app
 auth:
   - EmailPassword
   - Passwordless

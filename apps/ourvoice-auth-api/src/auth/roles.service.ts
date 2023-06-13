@@ -31,6 +31,9 @@ export async function addRoleToUser(
   if (response.didUserAlreadyHaveRole === true) {
     // The user already had the role
   }
+  if (response.status === 'OK') {
+    console.log('Role added to user ', userId);
+  }
 }
 
 export async function getRolesForUser(userId: string): Promise<string[]> {

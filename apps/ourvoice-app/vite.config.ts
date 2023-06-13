@@ -10,7 +10,13 @@ import Markdown from 'vite-plugin-vue-markdown'
 export default defineConfig({
   plugins: [
     vue({
-      include: [/\.vue$/, /\.md$/]
+      include: [/\.vue$/, /\.md$/],
+      template: {
+        compilerOptions: {
+          // i am ignorning my custom '<TransitionRoot>' tag
+          isCustomElement: (tag) => ['TransitionRoot'].includes(tag)
+        }
+      }
     }),
     ViteYaml(),
     Markdown({ headEnabled: true })

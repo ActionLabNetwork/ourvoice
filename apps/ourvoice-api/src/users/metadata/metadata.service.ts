@@ -25,10 +25,44 @@ export class MetadataService {
     const adminMetadata = await this.get(adminId);
     const userMetadata = await this.get(userId);
     if (
-      adminMetadata.metadata.deployment === userMetadata.metadata.deployment
+      adminMetadata.metadata.deployment === userMetadata.metadata.deployment ||
+      adminMetadata.metadata.deployment === '*'
     ) {
       return userMetadata.metadata;
     }
     return false;
+  }
+  async addEmailToAllowlist(email: string) {
+    const existingData = await UserMetadata.getUserMetadata('emailAllowList');
+    let allowList: string[] = existingData.metadata.allowList || [];
+    allowList = [...allowList, email];
+    await UserMetadata.updateUserMetadata('emailAllowList', {
+      allowList,
+    });
+  }
+
+  async isEmailAllowed(email: string) {
+    const existingData = await UserMetadata.getUserMetadata('emailAllowList');
+    const allowList: string[] = existingData.metadata.allowList || [];
+    return allowList.includes(email);
+  }
+
+  async addPhoneNumberToAllowlist(phoneNumber: string) {
+    const existingData = await UserMetadata.getUserMetadata(
+      'phoneNumberAllowList',
+    );
+    let allowList: string[] = existingData.metadata.allowList || [];
+    allowList = [...allowList, phoneNumber];
+    await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
+      allowList,
+    });
+  }
+
+  async isPhoneNumberAllowed(phoneNumber: string) {
+    const existingData = await UserMetadata.getUserMetadata(
+      'phoneNumberAllowList',
+    );
+    const allowList: string[] = existingData.metadata.allowList || [];
+    return allowList.includes(phoneNumber);
   }
 }

@@ -19,6 +19,7 @@ import UserRoles from 'supertokens-node/recipe/userroles';
 import { UsersService } from './users.service';
 import { MetadataService } from './metadata/metadata.service';
 import { RolesService } from './roles/roles.service';
+import { Error as STError } from 'supertokens-node/recipe/session';
 
 @Controller('users')
 export class UserController {
@@ -111,64 +112,98 @@ export class UserController {
   // get all users in specific deployment
   @Get()
   @UseGuards(
-    new AuthGuard({
-      overrideGlobalClaimValidators: async (
-        globalValidators: SessionClaimValidator[],
-      ) => [
-        ...globalValidators,
-        // check if user is admin
-        UserRoles.UserRoleClaim.validators.includes('admin'),
-        // check if user can manage deployment
-        UserRoles.PermissionClaim.validators.includes('manage:self'),
-      ],
-    }),
+    new AuthGuard(),
+    //   {
+    //   overrideGlobalClaimValidators: async (
+    //     globalValidators: SessionClaimValidator[],
+    //   ) => [
+    //     ...globalValidators,
+    //     // check if user is admin
+    //     UserRoles.UserRoleClaim.validators.includes('admin'),
+    //     // check if user can manage deployment
+    //     UserRoles.PermissionClaim.validators.includes('manage:self'),
+    //   ],
+    // }
   )
   async getUsers(
     @Session() session: SessionContainer,
   ): Promise<{ users: any }> {
+    const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
+    if (
+      roles === undefined ||
+      (!roles.includes('admin') && !roles.includes('super'))
+    ) {
+      // this error tells SuperTokens to return a 403 to the frontend.
+      throw new STError({
+        type: 'INVALID_CLAIMS',
+        message: 'User is not an admin',
+        payload: [
+          {
+            id: UserRoles.UserRoleClaim.key,
+          },
+        ],
+      });
+    }
+    const allUsers = await this.userService.getUsers('emailpassword');
+    // user is an admin or super admin
     const adminId = session.getUserId();
-    const users = await this.rolesService.getUsersThatHaveRole('user');
-    const moderators = await this.rolesService.getUsersThatHaveRole(
-      'moderator',
-    );
-    const deploymentUsers = users.map(async (user) => {
+    // const users = await this.rolesService.getUsersThatHaveRole('user');
+    // const moderators = await this.rolesService.getUsersThatHaveRole(
+    //   'moderator',
+    // );
+    const deploymentUsers = allUsers.users.map(async (object) => {
       // check if admin can manage this user's metadata
-      const metadata = await this.metadataService.checkDeployment(
-        adminId,
-        user,
-      );
-      if (metadata) {
+      if (adminId !== object.user.id) {
+        const metadata = await this.metadataService.checkDeployment(
+          adminId,
+          object.user.id,
+        );
+        if (metadata) {
+          const roles = this.rolesService.getRolesForUser(object.user.id);
+          return {
+            id: object.user.id,
+            email: object.user.email,
+            roles,
+            ...metadata,
+          };
+        }
       }
-      return { id: user, role: 'user', ...metadata };
     });
-    const deploymentModerators = moderators.map(async (user) => {
-      // check if admin can manage this user's metadata
-      const metadata = await this.metadataService.checkDeployment(
-        adminId,
-        user,
-      );
-      if (metadata) {
-      }
-      return { id: user, role: 'moderator', ...metadata };
-    });
+    // const deploymentUsers = users.map(async (user) => {
+    //   // check if admin can manage this user's metadata
+    //   const metadata = await this.metadataService.checkDeployment(
+    //     adminId,
+    //     user,
+    //   );
+    //   if (metadata) return { id: user, role: 'user', ...metadata };
+    // });
+    // const deploymentModerators = moderators.map(async (user) => {
+    //   // check if admin can manage this user's metadata
+    //   const metadata = await this.metadataService.checkDeployment(
+    //     adminId,
+    //     user,
+    //   );
+    //   if (metadata) return { id: user, role: 'moderator', ...metadata };
+    // });
     return {
-      users: await Promise.all([...deploymentUsers, ...deploymentModerators]),
+      users: await Promise.all([...deploymentUsers]),
     };
   }
   // get all users in specific deployment
   @Put('role/:id')
   @UseGuards(
-    new AuthGuard({
-      overrideGlobalClaimValidators: async (
-        globalValidators: SessionClaimValidator[],
-      ) => [
-        ...globalValidators,
-        // check if user is admin
-        UserRoles.UserRoleClaim.validators.includes('admin'),
-        // check if user can manage deployment
-        UserRoles.PermissionClaim.validators.includes('manage:self'),
-      ],
-    }),
+    new AuthGuard(),
+    //   {
+    //   overrideGlobalClaimValidators: async (
+    //     globalValidators: SessionClaimValidator[],
+    //   ) => [
+    //     ...globalValidators,
+    //     // check if user is admin
+    //     UserRoles.UserRoleClaim.validators.includes('admin'),
+    //     // check if user can manage deployment
+    //     UserRoles.PermissionClaim.validators.includes('manage:self'),
+    //   ],
+    // }
   )
   async updateRole(
     @Session() session: SessionContainer,
@@ -179,7 +214,22 @@ export class UserController {
       newRole: 'user' | 'moderator' | 'admin' | 'super';
     },
   ): Promise<{ message: string }> {
-    console.log(updateRole);
+    const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
+    if (
+      roles === undefined ||
+      (!roles.includes('admin') && !roles.includes('super'))
+    ) {
+      // this error tells SuperTokens to return a 403 to the frontend.
+      throw new STError({
+        type: 'INVALID_CLAIMS',
+        message: 'User is not an admin',
+        payload: [
+          {
+            id: UserRoles.UserRoleClaim.key,
+          },
+        ],
+      });
+    }
     const adminId = session.getUserId();
     // check if is deployment matches
     const metadata = await this.metadataService.checkDeployment(adminId, id);

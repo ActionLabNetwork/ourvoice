@@ -37,6 +37,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: false },
       props: () => {
         return addDeployment()
       }
@@ -45,6 +46,7 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+      meta: { requiresAuth: true },
       props: () => {
         return addDeployment()
       }
@@ -53,36 +55,43 @@ const router = createRouter({
       path: '/post',
       name: 'create-post',
       component: CreatePostView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/comment',
       name: 'create-comment',
       component: CreateCommentView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/moderation/posts',
       name: 'moderate-post-list',
-      component: PostModerationListView
+      component: PostModerationListView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/moderation/post/:id',
       name: 'moderate-post',
-      component: PostModerationView
+      component: PostModerationView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/moderation/comments',
       name: 'moderate-comment-list',
-      component: CommentModerationListView
+      component: CommentModerationListView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/moderation/comment/:id',
       name: 'moderate-comment',
-      component: CommentModerationView
+      component: CommentModerationView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/noauth/post',
       name: 'post',
-      component: PostsView
+      component: PostsView,
+      meta: { requiresAuth: false }
     }
   ]
 })
@@ -134,35 +143,62 @@ const checkForSession = async () => {
         return false
       }
     }
+    // other error
+    return false
   }
+}
+const checkDeployment = async (deployment: string): Promise<boolean> => {
+  const payload = await Session.getAccessTokenPayloadSecurely()
+  return (payload.deployment || '') === deployment
+}
+
+const initUserStore = async () => {
+  // Init user store
+  const userStore = useUserStore()
+  // TODO: userstore should use supertokens session functionality rather than making requests to API
+  // needs rewriting a bit
+  await userStore.verifyUserSession()
 }
 
 const redirectTo = (url: string) => {
   window.location.replace(url)
 }
 
-// Check if deployment exists, if not redirect to portal
+// Check deployment and session
 router.beforeEach(async (to, from, next) => {
-  const host = window.location.host
-  const deployment = getDeployment(host, deploymentDomain, deployments)
+  // const host = window.location.host
+  // const deployment = getDeployment(host, deploymentDomain, deployments)
+  const deployment = addDeployment().deployment
 
-  if (!deployment) {
-    redirectTo(portalURL)
-  }
-
-  if (!(await checkForSession())) {
-    redirectTo(portalURL)
-  }
-
-  // Save deployment in Pinia store
+  // Save current page deployment in Pinia store
   const deploymentStore = useDeploymentStore()
   deploymentStore.deployment = deployment || ''
 
-  // Init user store
-  const userStore = useUserStore()
-  await userStore.verifyUserSession()
+  // check for user session
+  const isSession = await checkForSession()
 
-  next()
+  if (isSession) {
+    // if deployment matches and init user store
+    if (await checkDeployment(deployment)) {
+      initUserStore()
+    }
+  }
+
+  if (to.matched.some((record: any) => record.meta.requiresAuth)) {
+    if (isSession) {
+      if (await checkDeployment(deployment)) {
+        next()
+      } else {
+        // TODO: handle wrong deployment
+        console.log('WRONG DEPLOYMENT NOTICE')
+        next()
+      }
+    } else {
+      redirectTo(authURL)
+    }
+  } else {
+    next()
+  }
 })
 
 export default router
