@@ -17,7 +17,7 @@ describe('Create Post', () => {
     cy.session('login', cy.login)
 
     // Intercept and stub API calls
-    cy.intercept({ method: 'POST', url: 'http://api.ourvoice.test/graphql' }, (req) => {
+    cy.intercept({ method: 'POST', url: `${Cypress.env('apiUrl')}/graphql` }, (req) => {
       // Query Aliases
       aliasQuery(req, 'GetPresignedUrls')
       aliasQuery(req, 'GetCategories')
@@ -43,7 +43,9 @@ describe('Create Post', () => {
     cy.intercept(
       {
         method: 'PUT',
-        url: 'http://localhost:4566/test-bucket/user123/1683163606594_0_dummy.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=test%2F20230504%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230504T012646Z&X-Amz-Expires=300&X-Amz-Signature=063eba130bfd93d1814ab194960d178dc0fbf8754c5a7c2266c09887c9ff3034&X-Amz-SignedHeaders=host&x-id=PutObject'
+        url: `${Cypress.env(
+          'localstackUrl'
+        )}/test-bucket/user123/1683163606594_0_dummy.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=test%2F20230504%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230504T012646Z&X-Amz-Expires=300&X-Amz-Signature=063eba130bfd93d1814ab194960d178dc0fbf8754c5a7c2266c09887c9ff3034&X-Amz-SignedHeaders=host&x-id=PutObject`
       },
       []
     ).as('putPresignedUrl')
