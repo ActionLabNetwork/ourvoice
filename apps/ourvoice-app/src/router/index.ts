@@ -108,6 +108,10 @@ const router = createRouter({
       path: '/test',
       name: 'test',
       component: TestView
+    },
+    {
+      path: '/post/:id',
+      component: () => import('@/components/post/PostPage.vue')
     }
   ]
 })

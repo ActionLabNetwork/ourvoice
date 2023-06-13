@@ -36,7 +36,7 @@ export interface pageInfo {
   startCursor: string
 }
 export interface CommentsState {
-  data: Comment[] | undefined
+  data: Comment[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -48,7 +48,7 @@ provideApolloClient(apolloClient)
 
 export const useCommentsStore = defineStore('comments', {
   state: (): CommentsState => ({
-    data: undefined,
+    data: [],
     loading: false,
     error: undefined,
     errorMessage: undefined,

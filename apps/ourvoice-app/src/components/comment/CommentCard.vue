@@ -3,24 +3,24 @@
     <div class="flex-shrink-0 mr-1 md:mr-3">
       <img
         class="rounded-full w-6 h-6 sm:w-8 sm:h-8 hover:cursor-pointer"
-        :src="`https://ui-avatars.com/api/?size=48?&name=${comment.author.nickname}`"
+        :src="`https://ui-avatars.com/api/?size=48?&name=${comment?.author.nickname}`"
       />
     </div>
     <div class="flex-1">
       <b class="text-sm">
-        {{ comment.author.nickname }} reply to
+        {{ comment?.author.nickname }} reply to
         <span class="text-blue-500 hover:underline hover:cursor-pointer">
           @{{ comment?.parent?.author?.nickname ?? 'original post' }}
         </span>
       </b>
-      <span class="text-xs">{{ ' ' + timePassed(comment.createdAt) }}</span>
+      <span class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</span>
       <div
         class="bg-white dark:bg-ourvoice-blue rounded-lg border drop-shadow-md px-6 py-4 leading-relaxed"
       >
         <div class="text-sm md:text-md py-2">
           <p class="break-all">
             <font-awesome-icon icon="fa-solid fa-quote-left" />
-            {{ comment.content }}
+            {{ comment?.content }}
             <font-awesome-icon icon="fa-solid fa-quote-right" />
           </p>
         </div>
@@ -83,6 +83,7 @@ const comment = computed(() => data.value.find((comment) => comment.id === props
 const showReply = ref(false)
 
 const createComment = (payload: string) => {
+  if (!comment.value) return
   commentStore.createComment({
     authorId: 3,
     postId: comment.value.post.id,
@@ -94,6 +95,7 @@ const createComment = (payload: string) => {
 
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
 const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+  if (!comment.value) return
   await createVoteForComemnt({
     data: {
       commentId: props.commentId,

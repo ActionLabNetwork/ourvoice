@@ -2,7 +2,7 @@ import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
-import { GET_POSTS_QUERY, GET_POSTS_BY_CATEGORIES_QUERY } from './../graphql/queries/getPosts'
+import { GET_POSTS_BY_CATEGORIES_QUERY, FETCH_POST_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
@@ -12,6 +12,10 @@ export interface Post {
   title: string
   content: string
   createdAt: string
+  moderatedAt: string
+  publishedAt: string
+  published: boolean
+  moderated: boolean
   author: {
     id: number
     nickname: string
@@ -20,12 +24,18 @@ export interface Post {
     id: number
     name: string
   }[]
+  //Todo: move commets to separate store
   comments: {
     id: number
     content: string
   }[]
   votesUp: number
   votesDown: number
+  // votes: {
+  //   id: number
+  //   type: string
+  // }[]
+  files: string[]
 }
 
 export interface pageInfo {
@@ -54,7 +64,11 @@ export const usePostsStore = defineStore('posts', {
     error: undefined,
     errorMessage: undefined
   }),
-
+  getters: {
+    getPostById: (state) => (id: number) => {
+      return state.data.find((post) => post.id === id)
+    }
+  },
   actions: {
     async fetchPosts() {
       try {

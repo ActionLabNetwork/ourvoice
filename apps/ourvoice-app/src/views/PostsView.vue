@@ -1,12 +1,10 @@
 <template>
   <div class="lg:grid grid-cols-5 w-screen">
-    <!--First Grid Fraction-->
     <!-- <AppNavBar class="h-[5vh] lg:h-full col-span-1" /> -->
 
-    <!-- Second Grid Fraction-->
-    <div class="border-red-400 h-[95vh] lg:h-screen flex flex-col col-span-5">
+    <div class="border-red-400 lg:h-screen flex flex-col col-span-5">
       <main class="px-0 lg:px-0 border-green-400 flex flex-col overflow-hidden grow relative">
-        <!-- Overlay container for a single post with comments start -->
+        <!-- Overlay container for a single post with comments-->
         <TransitionRoot :show="postOverlayOpen">
           <TransitionChild
             enter="transition-all duration-200"
@@ -50,27 +48,25 @@
           </TransitionChild>
         </TransitionRoot>
 
-        <!-- Overlay container for a single post with comments end -->
-
         <section
           class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-4 border-yellow-400 flex-1 overflow-auto"
         >
           <!-- Post grid/take 3 columns -->
           <div class="lg:col-span-3 border-r overflow-y-auto h-full relative" ref="scrollContainer">
             <!-- <div class="border-2 border-red-400" v-for="(value, key) in filters" :key="key">
-            {{ key }}:{{ value }}
-          </div>
-          <div class="border-2 border-indigo-400">
-            <p>sort by: {{ sortOptions }}</p>
-            <p>sort order: {{ sortDescending ? 'descending' : 'ascending' }}</p>
-          </div>
+              {{ key }}:{{ value }}
+            </div>
+            <div class="border-2 border-indigo-400">
+              <p>sort by: {{ sortOptions }}</p>
+              <p>sort order: {{ sortDescending ? 'descending' : 'ascending' }}</p>
+            </div>
 
-          <div class="border-2 border-green-400">
-            gqlPostsSort(computed): {{ gqlPostsSort }} <br />
-            gqlPostsFilter(computed):
-            {{ gqlPostsFilter }}
-          </div>
-          <div class="border-2 border-black">currentVariables: {{ variables }}</div> -->
+            <div class="border-2 border-green-400">
+              gqlPostsSort(computed): {{ gqlPostsSort }} <br />
+              gqlPostsFilter(computed):
+              {{ gqlPostsFilter }}
+            </div>
+            <div class="border-2 border-black">currentVariables: {{ variables }}</div> -->
 
             <!-- stiky page header -->
             <div class="sticky top-0 z-10 backdrop-blur-lg">
@@ -162,8 +158,8 @@
 
             <!-- Post Card List-->
             <PostWrapper
-              v-for="(post, index) in posts"
-              :key="index"
+              v-for="post in posts"
+              :key="post.node?.id"
               :id="post.node?.id"
               :title="post.node?.title"
               :content="post.node?.content"
@@ -179,7 +175,10 @@
               :categories="post.node?.categories"
               class="hover:drop-shadow-lg transition duration-300 ease-in-out"
             >
-              <button @click="openPostOverlay(index)" class="hover:underline text-sm lg:text-base">
+              <button
+                @click="openPostOverlay(post.node?.id)"
+                class="hover:underline text-sm lg:text-base"
+              >
                 comments({{ post.node?.comments.length }})
               </button>
             </PostWrapper>
@@ -356,7 +355,7 @@
           </TransitionRoot>
         </section>
       </main>
-      <AppFooter />
+      <!-- <AppFooter /> -->
     </div>
   </div>
 </template>
@@ -386,6 +385,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
 import { useToggle, useScroll } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { y } = useScroll(scrollContainer)
@@ -480,7 +480,7 @@ const gqlPostsSort = computed(() => {
 
 const { onResult, onError, variables } = useQuery(GET_POST_QUERY, {
   pagination: {
-    limit: 100,
+    limit: null,
     cursor: null
   } as any,
   filter: null as any,
@@ -495,9 +495,10 @@ onResult(({ data, loading }) => {
 })
 
 onError((err) => console.log(err))
+
 const categoriesStore = useCategoriesStore()
 categoriesStore.fetchCategories()
-const categories = computed(() => categoriesStore)
+const categories = storeToRefs(categoriesStore)
 const handleSortChange = (sortOption: string) => {
   sortOptions.value.forEach((option) => {
     option.current = option.name === sortOption
@@ -527,7 +528,7 @@ watch(gqlPostsFilter, () => {
 })
 
 watchEffect(() => {
-  const cats = categories.value.data.map((category) => {
+  const cats = categories.data.value.map((category) => {
     return reactive({
       id: category.id,
       value: category.name,
@@ -550,14 +551,13 @@ watch(filters.value.TimeRange[1], (newValue) => {
   }
 })
 
-// Todo: Comment Overlay Logic
 const postOverlayOpen = ref(false)
 const postIndex = ref<number>(0)
 const closePostOverlay = () => {
   postOverlayOpen.value = false
 }
-const openPostOverlay = (index: number) => {
+const openPostOverlay = (id: number) => {
   postOverlayOpen.value = true
-  postIndex.value = index
+  postIndex.value = posts.value.findIndex((post: any) => post.node.id === id)
 }
 </script>

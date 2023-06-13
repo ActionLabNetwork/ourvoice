@@ -84,8 +84,8 @@ interface Post {
   moderatedAt: string | null
   votesUp: number
   votesDown: number
-  comments: []
-  files: []
+  comments: { id: number; content: string }[]
+  files: string[]
   categories: { id: number; name: string }[]
 }
 const props = defineProps<Post>()

@@ -71,3 +71,53 @@ export const GET_POSTS_BY_CATEGORIES_QUERY = gql`
     }
   }
 `
+
+export const FETCH_POST_QUERY = gql`
+  query Posts(
+    $filter: PostsFilterInput
+    $pagination: PostPaginationInput
+    $sort: PostSortingInput
+  ) {
+    posts(filter: $filter, pagination: $pagination, sort: $sort) {
+      edges {
+        cursor
+        node {
+          author {
+            id
+            nickname
+          }
+          categories {
+            name
+            id
+          }
+          createdAt
+          disabledAt
+          moderatedAt
+          moderated
+          publishedAt
+          published
+          title
+          votes {
+            id
+            voteType
+          }
+          votesDown
+          votesUp
+          files
+          id
+          content
+          comments {
+            id
+            content
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
+      }
+      totalCount
+    }
+  }
+`
