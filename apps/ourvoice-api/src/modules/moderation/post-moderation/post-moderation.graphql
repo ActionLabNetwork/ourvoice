@@ -1,0 +1,126 @@
+type Query {
+  moderationPost(id: Int!): ModerationPost
+  moderationPosts(
+    filter: ModerationPostsFilterInput
+    pagination: ModerationPostPaginationInput
+  ): ModerationPostConnection
+  postVersion(id: Int!): ModerationPostVersion
+}
+
+type Mutation {
+  createModerationPost(data: ModerationPostCreateInput!): ModerationPost
+  approveModerationPostVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String
+  ): ModerationPost
+  rejectModerationPostVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String!
+  ): ModerationPost
+  modifyModerationPost(
+    postId: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String!
+    data: ModerationPostModifyInput!
+  ): ModerationPost
+  renewPostModeration(
+    postModerationId: Int!
+    moderatorHash: String!
+  ): ModerationPost
+}
+
+type ModerationPost {
+  id: Int!
+  status: ModerationPostStatus!
+  versions: [ModerationPostVersion!]!
+  requiredModerations: Int!
+  comments: [ModerationComment!]!
+  authorHash: String!
+  authorNickname: String!
+}
+
+type ModerationPostVersion {
+  id: Int!
+  title: String!
+  content: String!
+  categoryIds: [Int!]!
+  files: [String!]
+  version: Int!
+  authorHash: String!
+  authorNickname: String!
+  reason: String
+  status: ModerationPostStatus!
+  latest: Boolean!
+  timestamp: String!
+  post: ModerationPost!
+  moderations: [PostModeration!]
+}
+
+type PostModeration {
+  id: Int!
+  postVersion: ModerationPostVersion!
+  moderatorHash: String!
+  moderatorNickname: String!
+  decision: ModerationDecision!
+  reason: String
+  timestamp: String!
+}
+
+enum ModerationDecision {
+  ACCEPTED
+  REJECTED
+}
+
+enum ModerationPostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+input ModerationPostCreateInput {
+  title: String!
+  content: String!
+  categoryIds: [Int!]!
+  files: [String]
+  authorHash: String!
+  authorNickname: String!
+  requiredModerations: Int!
+}
+
+input ModerationPostsFilterInput {
+  status: ModerationPostStatus
+}
+
+input ModerationPostPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type ModerationPostEdge {
+  node: ModerationPost!
+  cursor: String!
+}
+
+type ModerationPostConnection {
+  totalCount: Int
+  pageInfo: ModerationPostPageInfo!
+  edges: [ModerationPostEdge]
+}
+
+type ModerationPostPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}
+
+input ModerationPostModifyInput {
+  title: String
+  content: String
+  categoryIds: [Int!]
+  files: [String]
+}

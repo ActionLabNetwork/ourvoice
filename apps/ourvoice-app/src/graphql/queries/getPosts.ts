@@ -8,15 +8,13 @@ export const GET_POSTS_QUERY = gql`
           id
           title
           content
-          createdAt
-          author {
-            id
-            nickname
-          }
           categories {
             id
             name
           }
+          createdAt
+          authorHash
+          authorNickname
           comments {
             id
             content

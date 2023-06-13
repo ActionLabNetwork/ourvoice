@@ -3,6 +3,7 @@ import { PostModule } from './modules/post/post.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,7 +13,9 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+
 import { ContactFormModule } from './modules/contactform/contactform.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
 
 import deployment from './config/deployment';
 
@@ -62,6 +65,8 @@ import deployment from './config/deployment';
       },
       recaptchaSecret: process.env.CONTACT_FORM_RECAPTCHA_SECRET,
     }),
+    ModerationModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

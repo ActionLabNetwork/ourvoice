@@ -24,6 +24,10 @@ async function bootstrap() {
   // TODO : use regex for all deployment names
   app.enableCors({
     origin: function (origin, callback) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
       // const match = origin
       //   .toLowerCase()
       //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);

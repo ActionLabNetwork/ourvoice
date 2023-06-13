@@ -18,6 +18,22 @@ export class PostCreateDto {
   @Length(1, 255)
   content: string;
 
+  @ArrayNotEmpty()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(2)
+  @IsInt({ each: true })
+  categoryIds: number[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  files?: string[];
+
+  @IsString()
+  authorHash: string;
+
+  @IsString()
+  authorNickname: string;
+
   @IsBoolean()
   @IsOptional()
   moderated?: boolean;
@@ -33,17 +49,4 @@ export class PostCreateDto {
   @IsInt()
   @IsOptional()
   votesUp?: number;
-
-  @IsInt()
-  authorId: number;
-
-  @ArrayNotEmpty()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(2)
-  @IsInt({ each: true })
-  categoryIds: number[];
-
-  @IsString({ each: true })
-  @IsOptional()
-  files?: string[];
 }

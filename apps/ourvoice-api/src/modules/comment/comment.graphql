@@ -7,7 +7,7 @@ type Query {
 }
 
 type Mutation {
-  createComment(data: CommentCreateInput!): Comment!
+  # createComment(data: CommentCreateInput!): Comment!
   updateComment(id: Int!, data: CommentUpdateInput!): Comment!
   deleteComment(id: Int!): Comment!
 }
@@ -21,7 +21,8 @@ type Comment {
   moderatedAt: DateTime
   publishedAt: DateTime
   disabledAt: DateTime
-  author: User!
+  authorHash: String!
+  authorNickname: String!
   post: Post
   parent: Comment
   children: [Comment!]!
@@ -31,7 +32,8 @@ input CommentCreateInput {
   content: String!
   moderated: Boolean
   published: Boolean
-  authorId: Int!
+  authorHash: String!
+  authorNickname: String!
   postId: Int
   parentId: Int
 }
@@ -40,14 +42,16 @@ input CommentUpdateInput {
   content: String
   moderated: Boolean
   published: Boolean
-  authorId: Int
+  authorHash: String
+  authorNickname: String
 }
 
 input CommentsFilterInput {
   content: String
   moderated: Boolean
   published: Boolean
-  authorId: Int
+  authorHash: String
+  authorNickname: String
   postId: Int
   parentId: Int
   createdAfter: DateTime

@@ -1,10 +1,17 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
-  "include": ["./**/*", "../support/**/*"],
+  // "extends": "@vue/tsconfig/tsconfig.web.json",
+  "include": [
+    "./**/*",
+    "../support/**/*",
+    "cypress/utils/graphql-test-utils.ts",
+    "node_modules/cypress",
+    "node_modules/cypress-file-upload"
+  ],
   "compilerOptions": {
     "isolatedModules": false,
-    "target": "es2018",
-    "lib": ["es2018", "dom"],
-    "types": ["cypress"]
+    "target": "ES2018",
+    "lib": ["ES2018", "dom"],
+    "types": ["cypress", "cypress-file-upload"],
+    "baseUrl": "./"
   }
 }

@@ -27,5 +27,6 @@
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
   },
-  "typescript.inlayHints.enumMemberValues.enabled": true
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

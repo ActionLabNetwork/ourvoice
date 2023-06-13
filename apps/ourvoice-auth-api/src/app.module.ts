@@ -65,6 +65,23 @@ import deployment from './config/deployment';
           },
           authModules: configService.get<AuthOptions[]>('auth'),
           cookieDomain: configService.get<string>('SUPERTOKENS_COOKIE_DOMAIN'),
+          authBypassTest: {
+            isTestMode: configService.get<boolean>('TEST_MODE'),
+            createCode: {
+              preAuthSessionId: configService.get<string>(
+                'PRE_AUTH_SESSION_ID',
+              ),
+              codeId: configService.get<string>('CODE_ID'),
+              deviceId: configService.get<string>('DEVICE_ID'),
+              userInputCode: configService.get<string>('USER_INPUT_CODE'),
+              linkCode: configService.get<string>('LINK_CODE'),
+            },
+            consumeCode: {
+              email: configService.get<string>('USER_EMAIL'),
+              id: configService.get<string>('USER_ID'),
+              timeJoined: configService.get<number>('USER_TIME_JOINED'),
+            },
+          },
         };
       },
     }),

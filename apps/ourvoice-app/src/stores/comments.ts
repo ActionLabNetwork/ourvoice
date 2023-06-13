@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import { useQuery, useMutation } from '@vue/apollo-composable'
+import { apolloClient } from './../graphql/client/index'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
+import { provideApolloClient } from '@vue/apollo-composable'
 
 export interface Comment {
   id: number
@@ -28,6 +29,8 @@ export interface CommentsState {
   error: Error | undefined
   errorMessage: string | undefined
 }
+
+provideApolloClient(apolloClient)
 
 export const useCommentsStore = defineStore('comments', {
   state: (): CommentsState => ({
@@ -70,26 +73,29 @@ export const useCommentsStore = defineStore('comments', {
   },
   actions: {
     async fetchComments() {
-      const { onResult, onError } = useQuery(GET_COMMENTS_QUERY)
+      try {
+        this.loading = true
+        const { data } = await apolloClient.query({ query: GET_COMMENTS_QUERY })
 
-      onResult(({ data, loading }) => {
         this.data = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
           content: comment.node.content,
           createdAt: comment.node.createdAt,
-          author: comment.node.author ?? null,
+          authorHash: comment.node.authorHash ?? null,
+          authorNickname: comment.node.authorNickname ?? null,
           post: comment.node.post ?? null,
           parent: comment.node.parent ?? null
         }))
-        this.loading = loading
-      })
+        this.loading = false
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
 
-      onError((error) => {
-        this.error = error
         if (error) {
           this.errorMessage = 'Failed to load comments. Please try again.'
         }
-      })
+      }
     },
 
     async createComment({
@@ -103,27 +109,43 @@ export const useCommentsStore = defineStore('comments', {
       parentId: number | undefined
       authorId: number
     }) {
-      const { mutate } = useMutation(CREATE_COMMENT_MUTATION)
-      await mutate({
-        data: {
-          content,
-          postId,
-          parentId,
-          authorId
-        }
-      }).then((response) => {
+      try {
+        const response = await apolloClient.mutate({
+          mutation: CREATE_COMMENT_MUTATION,
+          variables: {
+            data: {
+              content,
+              postId,
+              parentId,
+              authorId
+            }
+          }
+        })
         console.log('response: ', response)
         this.$patch((state) => {
           state.data.push(response?.data.createComment)
         })
-      })
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
     },
 
     async deleteComment(id: number) {
-      const { mutate } = useMutation(DELETE_COMMENT_MUTATION)
-      await mutate({ deleteCommentId: id }).then((response) => {
-        console.log('response: ', response)
-      })
+      try {
+        const response = await apolloClient.mutate({
+          mutation: DELETE_COMMENT_MUTATION,
+          variables: {
+            deleteCommentId: id
+          }
+        })
+        console.log(response)
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
     },
 
     async updateComment({
@@ -138,18 +160,25 @@ export const useCommentsStore = defineStore('comments', {
         moderated: boolean
       }
     }) {
-      const { mutate } = useMutation(UPDATE_COMMENT_MUTATION)
-      await mutate({
-        updateCommentId: id,
-        data: {
-          content: data.content,
-          authorId: data.authorId,
-          published: data.published,
-          moderated: data.moderated
+      try {
+        const response = await apolloClient.mutate({
+          mutation: UPDATE_COMMENT_MUTATION,
+          variables: {
+            updateCommentId: id,
+            data: {
+              content: data.content,
+              authorId: data.authorId,
+              published: data.published,
+              moderated: data.moderated
+            }
+          }
+        })
+        console.log(response)
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
         }
-      }).then((response) => {
-        console.log('response: ', response)
-      })
+      }
     }
   }
 })

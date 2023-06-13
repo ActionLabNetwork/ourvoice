@@ -1,6 +1,6 @@
 {
   "data": {
-    "createPost": {
+    "createModerationPost": {
       "id": "id",
       "title": "title",
       "content": "content",

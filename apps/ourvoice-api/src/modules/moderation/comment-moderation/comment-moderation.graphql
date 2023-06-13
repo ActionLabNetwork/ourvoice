@@ -1,0 +1,123 @@
+type Query {
+  moderationComment(id: Int!): ModerationComment
+  moderationComments(
+    filter: ModerationCommentsFilterInput
+    pagination: ModerationCommentPaginationInput
+  ): ModerationCommentConnection
+  commentVersion(id: Int!): ModerationCommentVersion
+}
+
+type Mutation {
+  createModerationComment(data: ModerationCommentCreateInput!): ModerationComment
+  approveModerationCommentVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String
+  ): ModerationComment
+  rejectModerationCommentVersion(
+    id: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String
+  ): ModerationComment
+  modifyModerationComment(
+    commentId: Int!
+    moderatorHash: String!
+    moderatorNickname: String!
+    reason: String!
+    data: ModerationCommentModifyInput!
+  ): ModerationComment
+  renewCommentModeration(
+    commentModerationId: Int!
+    moderatorHash: String!
+  ): ModerationComment
+}
+
+type ModerationComment {
+  id: Int!
+  status: ModerationCommentStatus!
+  versions: [ModerationCommentVersion!]!
+  requiredModerations: Int!
+  timestamp: String!
+  authorHash: String!
+  authorNickname: String!
+  post: ModerationPost
+  parentId: Int
+  parent: ModerationComment
+  children: [ModerationComment!]!
+}
+
+type ModerationCommentVersion {
+  id: Int!
+  content: String!
+  version: Int!
+  authorHash: String!
+  authorNickname: String!
+  reason: String
+  status: ModerationCommentStatus!
+  latest: Boolean!
+  timestamp: String!
+  comment: ModerationComment!
+  moderations: [CommentModeration!]!
+}
+
+type CommentModeration {
+  id: Int!
+  commentVersion: ModerationCommentVersion!
+  moderatorHash: String!
+  moderatorNickname: String!
+  decision: ModerationDecision!
+  reason: String
+  timestamp: String!
+}
+
+enum ModerationDecision {
+  ACCEPTED
+  REJECTED
+}
+
+enum ModerationCommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+input ModerationCommentCreateInput {
+  content: String!
+  postId: Int
+  parentId: Int
+  authorHash: String!
+  authorNickname: String!
+  requiredModerations: Int!
+}
+
+input ModerationCommentsFilterInput {
+  status: ModerationCommentStatus
+}
+
+input ModerationCommentPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type ModerationCommentEdge {
+  node: ModerationComment!
+  cursor: String!
+}
+
+type ModerationCommentConnection {
+  totalCount: Int
+  pageInfo: ModerationCommentPageInfo!
+  edges: [ModerationCommentEdge]
+}
+
+type ModerationCommentPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}
+
+input ModerationCommentModifyInput {
+  content: String
+}

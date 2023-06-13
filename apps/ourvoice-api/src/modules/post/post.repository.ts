@@ -1,4 +1,4 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma } from '@prisma/client';
 import { PostsFilterInput, PostPaginationInput } from 'src/graphql';
@@ -8,14 +8,10 @@ import { cursorToNumber } from '../../utils/cursor-pagination';
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createPost(data: Prisma.PostCreateInput) {
-    return this.prisma.post.create({ data });
-  }
-
-  async getPostById(id: number) {
+  async getPostById(id: number, include?: Prisma.PostInclude) {
     return this.prisma.post.findUnique({
       where: { id },
-      include: { categories: true },
+      include,
     });
   }
 
@@ -30,7 +26,8 @@ export class PostRepository {
       published,
       votesDown,
       votesUp,
-      authorId,
+      authorHash,
+      authorNickname,
       categoryIds,
       createdAfter,
       createdBefore,
@@ -47,7 +44,8 @@ export class PostRepository {
       published: published ?? undefined,
       votesDown: votesDown ?? undefined,
       votesUp: votesUp ?? undefined,
-      authorId: authorId ?? undefined,
+      authorHash: authorHash ?? undefined,
+      authorNickname: authorNickname ?? undefined,
       categories: categoryIds
         ? { some: { id: { in: categoryIds } } }
         : undefined,
@@ -80,7 +78,6 @@ export class PostRepository {
     const posts = await this.prisma.post.findMany({
       where,
       include: {
-        author: true,
         categories: true,
         comments: true,
         votes: true,
@@ -117,6 +114,10 @@ export class PostRepository {
         categories: true,
       },
     });
+  }
+
+  async createPost(data: Prisma.PostCreateInput) {
+    return this.prisma.post.create({ data });
   }
 
   async updatePost(id: number, data: Prisma.PostUpdateInput) {

@@ -178,26 +178,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import Multiselect from '@vueform/multiselect'
+import { ref, computed, watch, onMounted } from 'vue';
+import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
-import { useCategoriesStore } from '@/stores/categories'
-import AttachmentList from '../inputs/AttachmentList.vue'
-import {
-  createPostContentCharacterLimit,
-  postFilesBucket,
-  postFilesPresignedUrlTTL,
-  inputPlaceholders
-} from '@/constants/post'
-import { usePostsStore } from '@/stores/posts'
-import { uploadFileUsingPresignedUrl } from '@/services/s3-service'
-import { useForm, useField } from 'vee-validate'
-import {
-  validateAttachments,
-  validateCategories,
-  validateContent,
-  validateTitle
-} from '@/validators'
+import { useCategoriesStore } from '@/stores/categories';
+import AttachmentList from '../inputs/AttachmentList.vue';
+import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
+import { usePostsStore } from '@/stores/posts';
+import { generateUniqueKey, uploadFileUsingPresignedUrl } from '@/services/s3-service';
+import { useForm, useField } from 'vee-validate';
+import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
+import { useUserStore } from '@/stores/user';
 
 interface PresignedUrlResponse {
   key: string
@@ -219,15 +210,18 @@ const createPostValidationSchema = {
   }
 }
 
+const userStore = useUserStore()
+
 // Fetch categories and initial state
 const categoriesStore = useCategoriesStore()
-categoriesStore.fetchCategories()
-
 const postsStore = usePostsStore()
 
-const { handleSubmit, resetForm, errors } = useForm({
-  validationSchema: createPostValidationSchema
+onMounted(async () => {
+  await userStore.verifyUserSession()
+  await categoriesStore.fetchCategories()
 })
+
+const { handleSubmit, resetForm, errors } = useForm({ validationSchema: createPostValidationSchema })
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -258,11 +252,6 @@ const updateCharacterCount = () => {
       : ''
 }
 
-const generateUniqueKey = (userIdentifier: string, file: File, index: number) => {
-  const timestamp = Date.now()
-  return `${userIdentifier}/${timestamp}_${index}_${file.name}`
-}
-
 const updateAttachments = async (event: Event) => {
   const inputElement = event.target as HTMLInputElement
   const files = inputElement.files
@@ -275,8 +264,7 @@ const updateAttachments = async (event: Event) => {
   attachmentsField.value.value = files
 
   // Generate unique keys for each attachment
-  // TODO: Replace with dynamic user identifier when integrating with auth
-  const keys = Array.from(files).map((file, index) => generateUniqueKey('user123', file, index))
+  const keys = Array.from(files).map((file, index) => generateUniqueKey(userStore.sessionHash, file, index));
 
   try {
     const response = await postsStore.getPresignedUrls(
@@ -324,13 +312,8 @@ const onSubmit = handleSubmit(async (values) => {
     }
   }
 
-  // TODO: Replace authorId with the actual user ID when integrating with auth.
   await postsStore.createPost({
-    title: values.title,
-    content: values.content,
-    categoryIds: values.categories,
-    files: presignedUrls.value.map(({ key }) => key),
-    authorId: 1
+    title: values.title, content: values.content, categoryIds: values.categories, files: presignedUrls.value.map(({ key }) => key)
   })
 
   // After successfully submitting the form, reset the form fields
@@ -359,12 +342,13 @@ const categoriesOptions = computed(() => {
 })
 
 // The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
-watch(selectedCategories, () => {
+watch(selectedCategories, async () => {
   categoriesField.value.value = selectedCategories.value
 })
 </script>
 
-<style src="@vueform/multiselect/themes/default.css"></style>
+<style src="@vueform/multiselect/themes/default.css">
+</style>
 <style>
 :root {
   --form-brand-blue: #2196f3;

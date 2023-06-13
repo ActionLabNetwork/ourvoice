@@ -1,5 +1,4 @@
-import { PostCreateDto } from './dto/post-create.dto';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { PostService } from './post.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostRepository } from './post.repository';
@@ -45,6 +44,10 @@ describe('PostService', () => {
         PostService,
         { provide: PostRepository, useValue: createMock<PostRepository>() },
         { provide: PrismaService, useValue: createMock<PrismaService>() },
+        {
+          provide: PremoderationService,
+          useValue: createMock<PremoderationService>(),
+        },
       ],
     }).compile();
 

@@ -11,99 +11,101 @@ datasource premoderation {
   url      = env("DATABASE_PREMODERATION_URL")
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  orgId    Int
-  hash     String   @unique
-  title    String?
-  nickname String?
-  type     UserType @relation(fields: [typeId], references: [id])
-  typeId   Int
-
-  // Meta
-  active     Boolean
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @default(now())
-  verifiedAt DateTime?
-  disabledAt DateTime?
-
-  // Relations
-  posts             Post[]              @relation("PostAuthor")
-  moderatedPosts    PostModeration[]
-  comments          Comment[]           @relation("CommentAuthor")
-  moderatedComments CommentModeration[]
-}
-
-model UserType {
-  id    Int    @id @default(autoincrement())
-  type  String
-  users User[]
-}
-
 model Post {
-  id         Int     @id @default(autoincrement())
-  title      String?
-  content    String
-  file       String?
-  identifier String
-  sequence   Int     @default(0)
+  id Int @id @default(autoincrement())
 
   // Moderation
-  status     PostStatus       @default(PENDING)
-  version    Int              @default(0)
-  timestamp  DateTime         @default(now())
-  latest     Boolean          @default(true)
-  moderators PostModeration[]
+  status              PostStatus    @default(PENDING)
+  versions            PostVersion[]
+  requiredModerations Int           @default(1)
 
   // Relations
-  comments Comment[]
-  author   User?     @relation("PostAuthor", fields: [authorId], references: [id])
-  authorId Int?
+  comments       Comment[]
+  authorHash     String
+  authorNickname String
+  postIdInMainDb Int?
+}
+
+model PostVersion {
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  categoryIds    Int[]
+  files          Json?
+  version        Int              @default(0)
+  authorHash     String
+  authorNickname String
+  reason         String?
+  status         PostStatus
+  latest         Boolean          @default(false)
+  timestamp      DateTime         @default(now())
+  postId         Int
+  post           Post             @relation(fields: [postId], references: [id])
+  moderations    PostModeration[]
+
+  @@unique([postId, version])
 }
 
 model Comment {
-  id      Int    @id @default(autoincrement())
-  content String
+  id Int @id @default(autoincrement())
 
   // Moderation
-  status     PostStatus          @default(PENDING)
-  version    Int                 @default(0)
-  timestamp  DateTime            @default(now())
-  latest     Boolean             @default(true)
-  moderators CommentModeration[]
+  status              PostStatus       @default(PENDING)
+  versions            CommentVersion[]
+  requiredModerations Int              @default(1)
 
   // Relations
-  author   User      @relation("CommentAuthor", fields: [authorId], references: [id])
-  authorId Int
-  post     Post?     @relation(fields: [postId], references: [id])
-  postId   Int?
-  parentId Int?
-  parent   Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
-  children Comment[] @relation("CommentToComment")
+  authorHash        String
+  authorNickname    String
+  post              Post?     @relation(fields: [postId], references: [id])
+  postId            Int?
+  parentId          Int?
+  parent            Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children          Comment[] @relation("CommentToComment")
+  commentIdInMainDb Int?
+}
+
+model CommentVersion {
+  id             Int                 @id @default(autoincrement())
+  content        String
+  version        Int                 @default(0)
+  authorHash     String
+  authorNickname String
+  reason         String?
+  status         PostStatus
+  latest         Boolean             @default(false)
+  timestamp      DateTime            @default(now())
+  commentId      Int
+  comment        Comment             @relation(fields: [commentId], references: [id])
+  moderations    CommentModeration[]
+
+  @@unique([commentId, version])
 }
 
 model PostModeration {
-  postId      Int
-  post        Post     @relation(fields: [postId], references: [id])
-  moderatorId Int
-  moderator   User     @relation(fields: [moderatorId], references: [id])
-  decision    Decision
-  reason      String?
-  timestamp   DateTime @default(now())
+  id                Int         @id @default(autoincrement())
+  postVersionId     Int
+  postVersion       PostVersion @relation(fields: [postVersionId], references: [id])
+  moderatorHash     String
+  moderatorNickname String
+  decision          Decision
+  reason            String?
+  timestamp         DateTime    @default(now())
 
-  @@id([postId, moderatorId])
+  @@index([postVersionId])
 }
 
 model CommentModeration {
-  commentId   Int
-  comment     Comment  @relation(fields: [commentId], references: [id])
-  moderatorId Int
-  moderator   User     @relation(fields: [moderatorId], references: [id])
-  decision    Decision
-  reason      String?
-  timestamp   DateTime @default(now())
+  id                Int            @id @default(autoincrement())
+  commentVersionId  Int
+  commentVersion    CommentVersion @relation(fields: [commentVersionId], references: [id])
+  moderatorHash     String
+  moderatorNickname String
+  decision          Decision
+  reason            String?
+  timestamp         DateTime       @default(now())
 
-  @@id([commentId, moderatorId])
+  @@index([commentVersionId])
 }
 
 enum Decision {

@@ -38,6 +38,7 @@ input CategoryUpdateInput {
 }
 
 input CategoriesFilterInput {
+  ids: [Int]
   name: String
   description: String
   weight: Int

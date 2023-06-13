@@ -1,6 +1,6 @@
 import { Category, Prisma } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { CategoriesFilterInput, CategoryPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 
@@ -27,6 +27,7 @@ export class CategoryRepository {
     const where: Prisma.CategoryWhereInput = {};
 
     if (filter) {
+      applyIdsFilter(where, filter);
       applyNameFilter(where, filter);
       applyDescriptionFilter(where, filter);
       applyActiveFilter(where, filter);
@@ -83,6 +84,11 @@ export class CategoryRepository {
 }
 
 // Helper functions for applying filters
+function applyIdsFilter(where, filter) {
+  if (filter.ids) {
+    where.id = { in: filter.ids };
+  }
+}
 function applyNameFilter(where, filter) {
   if (filter.name) {
     where.name = { contains: filter.name, mode: 'insensitive' };

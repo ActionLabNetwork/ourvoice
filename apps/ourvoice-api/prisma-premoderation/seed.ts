@@ -1,211 +1,166 @@
-import { PrismaClient, Decision } from '@internal/prisma/client';
+import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
+import {
+  adjectives,
+  animals,
+  colors,
+  uniqueNamesGenerator,
+} from 'unique-names-generator';
 
 const prisma = new PrismaClient();
 
 async function clearDatabase() {
-  // Delete records
+  console.log('Clearing database...');
   await prisma.commentModeration.deleteMany();
+  await prisma.commentVersion.deleteMany();
   await prisma.postModeration.deleteMany();
+  await prisma.postVersion.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.post.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.userType.deleteMany();
 
-  // Reset autoincrement IDs for PostgreSQL
-  await prisma.$executeRaw`ALTER SEQUENCE "User_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "UserType_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Post_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "PostVersion_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Comment_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "CommentVersion_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "PostModeration_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "CommentModeration_id_seq" RESTART WITH 1;`;
 }
 
 async function main() {
-  await clearDatabase();
+  const decisions = [Decision.ACCEPTED, Decision.REJECTED];
+  const postStatuses = [
+    PostStatus.APPROVED,
+    PostStatus.PENDING,
+    PostStatus.REJECTED,
+  ];
 
-  // User Types
-  const userTypeAdmin = await prisma.userType.create({
-    data: { type: 'Admin' },
-  });
-  const userTypeModerator = await prisma.userType.create({
-    data: { type: 'Moderator' },
-  });
-  const userTypeUser = await prisma.userType.create({ data: { type: 'User' } });
+  for (let i = 0; i < 10; i++) {
+    const authorHash = `user${i + 1}hash`;
 
-  // Users
-  const user1 = await prisma.user.create({
-    data: {
-      orgId: 1,
-      hash: 'user1hash',
-      title: 'User 1',
-      nickname: 'user1',
-      type: { connect: { id: userTypeAdmin.id } },
-      active: true,
-    },
-  });
+    const post = await prisma.post.create({
+      data: {
+        authorHash,
+        authorNickname: uniqueNamesGenerator({
+          dictionaries: [adjectives, colors, animals],
+          seed: authorHash,
+        }),
+        status: postStatuses[i % postStatuses.length],
+        versions: {
+          create: Array(3)
+            .fill({})
+            .map((_, versionIndex) => ({
+              title: `Post ${i + 1}`,
+              content: `This is the content of post ${i + 1}. This is version ${
+                versionIndex + 1
+              }`,
+              categoryIds: [1, 2],
+              status: postStatuses[(i + versionIndex) % postStatuses.length],
+              version: versionIndex + 1,
+              authorHash,
+              authorNickname: authorHash,
+              reason: versionIndex > 0 ? 'Modified by moderator' : '',
+              latest: versionIndex === 2,
+              timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
+            })),
+        },
+      },
+    });
 
-  const user2 = await prisma.user.create({
-    data: {
-      orgId: 2,
-      hash: 'user2hash',
-      title: 'User 2',
-      nickname: 'user2',
-      type: { connect: { id: userTypeModerator.id } },
-      active: true,
-    },
-  });
+    const moderatorHash = `moderator${i + 1}hash`;
 
-  const user3 = await prisma.user.create({
-    data: {
-      orgId: 3,
-      hash: 'user3hash',
-      title: 'User 3',
-      nickname: 'user3',
-      type: { connect: { id: userTypeUser.id } },
-      active: true,
-    },
-  });
+    // Create multiple comments for a post and child comments for each comment
+    for (let j = 0; j < 3; j++) {
+      const commentAuthorHash = `commentAuthor${j + 1}hash`;
 
-  // Posts
-  const post1 = await prisma.post.create({
-    data: {
-      title: 'Post 1',
-      content: 'This is the content of post 1',
-      file: 'https://example.com/file1.jpg',
-      identifier: 'post-1',
-      sequence: 0,
-      author: { connect: { id: user1.id } },
-      status: 'PENDING',
-      version: 1,
-      timestamp: new Date('2023-04-13T10:00:00Z'),
-      latest: true,
-    },
-  });
+      const comment = await prisma.comment.create({
+        data: {
+          authorHash: commentAuthorHash,
+          authorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: authorHash,
+          }),
+          post: { connect: { id: post.id } },
+          versions: {
+            create: Array(3)
+              .fill({})
+              .map((_, versionIndex) => ({
+                content: `This is a comment on post ${i + 1}. This is version ${
+                  versionIndex + 1
+                }`,
+                status: postStatuses[(j + versionIndex) % postStatuses.length],
+                version: versionIndex + 1,
+                authorHash: commentAuthorHash,
+                authorNickname: commentAuthorHash,
+                reason: versionIndex > 0 ? 'Modified by moderator' : '',
+                latest: versionIndex === 2,
+                timestamp: new Date(`2023-04-${13 + i + j}T10:30:00Z`),
+              })),
+          },
+        },
+      });
 
-  const post2 = await prisma.post.create({
-    data: {
-      title: 'Post 2',
-      content: 'This is the content of post 2',
-      file: 'https://example.com/file2.jpg',
-      identifier: 'post-2',
-      sequence: 0,
-      author: { connect: { id: user2.id } },
-      status: 'PENDING',
-      version: 1,
-      timestamp: new Date('2023-04-13T11:00:00Z'),
-      latest: true,
-    },
-  });
+      // Create child comment for the comment
+      const childCommentAuthorHash = `childCommentAuthor${j + 1}hash`;
 
-  await prisma.post.create({
-    data: {
-      title: 'Post 3',
-      content: 'This is the content of post 3',
-      file: 'https://example.com/file3.jpg',
-      identifier: 'post-3',
-      sequence: 0,
-      author: { connect: { id: user3.id } },
-      status: 'PENDING',
-      version: 0,
-      timestamp: new Date('2023-04-14T10:00:00Z'),
-      latest: true,
-    },
-  });
+      await prisma.comment.create({
+        data: {
+          authorHash: childCommentAuthorHash,
+          authorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: authorHash,
+          }),
+          parent: { connect: { id: comment.id } },
+          post: { connect: { id: post.id } },
+          versions: {
+            create: {
+              content: `This is a child comment of comment ${j + 1} on post ${
+                i + 1
+              }`,
+              status: postStatuses[j % postStatuses.length],
+              version: 1,
+              authorHash: childCommentAuthorHash,
+              authorNickname: childCommentAuthorHash,
+              latest: true,
+              timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
+            },
+          },
+        },
+      });
 
-  // Comments
-  const comment1 = await prisma.comment.create({
-    data: {
-      content: 'This is a comment on post 1',
-      status: 'PENDING',
-      version: 1,
-      timestamp: new Date('2023-04-13T10:30:00Z'),
-      latest: true,
-      author: { connect: { id: user1.id } },
-      post: { connect: { id: post1.id } },
-    },
-  });
+      await prisma.postModeration.create({
+        data: {
+          postVersionId: post.id,
+          moderatorHash,
+          moderatorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: moderatorHash,
+          }),
+          decision: decisions[i % decisions.length],
+          reason: `Moderation reason for post ${i + 1}`,
+        },
+      });
 
-  const comment2 = await prisma.comment.create({
-    data: {
-      content: 'This is a comment on post 2',
-      status: 'PENDING',
-      version: 1,
-      timestamp: new Date('2023-04-13T11:30:00Z'),
-      latest: true,
-      author: { connect: { id: user2.id } },
-      post: { connect: { id: post2.id } },
-    },
-  });
+      await prisma.commentModeration.create({
+        data: {
+          commentVersionId: comment.id,
+          moderatorHash,
+          moderatorNickname: uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            seed: moderatorHash,
+          }),
+          decision: decisions[i % decisions.length],
+          reason: `Moderation reason for comment on post ${i + 1}`,
+        },
+      });
+    }
+  }
 
-  const comment3 = await prisma.comment.create({
-    data: {
-      content: 'This is a reply to comment 1',
-      status: 'PENDING',
-      version: 0,
-      timestamp: new Date('2023-04-14T10:30:00Z'),
-      latest: true,
-      author: { connect: { id: user1.id } },
-      post: { connect: { id: post1.id } },
-      parent: { connect: { id: comment1.id } },
-    },
-  });
-
-  // Post Moderation
-  await prisma.postModeration.create({
-    data: {
-      decision: Decision.ACCEPTED,
-      reason: 'This post looks good',
-      moderator: { connect: { id: user2.id } },
-      post: { connect: { id: post1.id } },
-    },
-  });
-
-  await prisma.postModeration.create({
-    data: {
-      decision: Decision.REJECTED,
-      reason: 'This post violates our community guidelines',
-      moderator: { connect: { id: user1.id } },
-      post: { connect: { id: post2.id } },
-    },
-  });
-
-  // Comment Moderation
-  await prisma.commentModeration.create({
-    data: {
-      decision: Decision.ACCEPTED,
-      reason: 'This comment is helpful',
-      moderator: { connect: { id: user2.id } },
-      comment: { connect: { id: comment1.id } },
-    },
-  });
-
-  await prisma.commentModeration.create({
-    data: {
-      decision: Decision.REJECTED,
-      reason: 'This comment is inappropriate',
-      moderator: { connect: { id: user1.id } },
-      comment: { connect: { id: comment2.id } },
-    },
-  });
-
-  // Comment to Comment
-  await prisma.comment.create({
-    data: {
-      content: 'This is a reply to comment 3',
-      status: 'PENDING',
-      version: 0,
-      timestamp: new Date('2023-04-14T11:00:00Z'),
-      latest: true,
-      author: { connect: { id: user2.id } },
-      post: { connect: { id: post1.id } },
-      parent: { connect: { id: comment3.id } },
-    },
-  });
+  await prisma.$disconnect();
+  console.log('Seeding completed.');
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+async function run() {
+  await clearDatabase();
+  await main();
+}
+
+run();

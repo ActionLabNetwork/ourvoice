@@ -1,4 +1,4 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Comment } from '@prisma/client';
 import { CommentsFilterInput, CommentPaginationInput } from 'src/graphql';
@@ -12,7 +12,6 @@ export class CommentRepository {
     return this.prisma.comment.create({
       data,
       include: {
-        author: true,
         post: true,
         parent: true,
       },
@@ -38,7 +37,8 @@ export class CommentRepository {
       content,
       moderated,
       published,
-      authorId,
+      authorHash,
+      authorNickname,
       postId,
       parentId,
       createdAfter,
@@ -55,7 +55,8 @@ export class CommentRepository {
       content: content ? { contains: content, mode: 'insensitive' } : undefined,
       moderated: moderated ?? undefined,
       published: published ?? undefined,
-      authorId: authorId ?? undefined,
+      authorHash: authorHash ?? undefined,
+      authorNickname: authorNickname ?? undefined,
       postId: postId ?? undefined,
       parentId: parentId ?? undefined,
       createdAt: createdAfter || createdBefore ? {} : undefined,
@@ -92,7 +93,6 @@ export class CommentRepository {
     const comments = await this.prisma.comment.findMany({
       where,
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,
@@ -120,7 +120,6 @@ export class CommentRepository {
       where: { id },
       data,
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,
@@ -138,7 +137,6 @@ export class CommentRepository {
     return this.prisma.comment.delete({
       where: { id },
       include: {
-        author: true,
         post: true,
         parent: true,
         children: true,

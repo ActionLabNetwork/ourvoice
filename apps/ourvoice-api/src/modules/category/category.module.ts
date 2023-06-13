@@ -1,4 +1,4 @@
-import { PrismaModule } from 'src/database/prisma.module';
+import { PrismaModule } from 'src/database/main/prisma.module';
 import { Module } from '@nestjs/common';
 import { CategoryRepository } from './category.repository';
 import { CategoryResolver } from './category.resolver';

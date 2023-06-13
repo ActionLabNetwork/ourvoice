@@ -7,10 +7,15 @@ type Query {
     keys: [String!]!
     expiresIn: Int!
   ): [PresignedUrl!]!
+  getPresignedDownloadUrls(
+    bucket: String!
+    keys: [String!]!
+    expiresIn: Int!
+  ): [PresignedUrl!]!
 }
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
+  # createPost(data: PostCreateInput!): Post!
   updatePost(id: Int!, data: PostUpdateInput!): Post!
   deletePost(id: Int!): Post!
 }
@@ -28,22 +33,11 @@ type Post {
   disabledAt: DateTime
   moderatedAt: DateTime
   publishedAt: DateTime
-  author: User!
+  authorHash: String
+  authorNickname: String
   categories: [Category!]!
-  comments: [Comment!]!
-  votes: [Vote!]!
-}
-
-input PostCreateInput {
-  title: String!
-  content: String!
-  files: [String!]
-  moderated: Boolean
-  published: Boolean
-  votesDown: Int
-  votesUp: Int
-  authorId: Int!
-  categoryIds: [Int!]!
+  comments: [Comment!]
+  votes: [Vote!]
 }
 
 input PostUpdateInput {
@@ -54,7 +48,8 @@ input PostUpdateInput {
   published: Boolean
   votesDown: Int
   votesUp: Int
-  authorId: Int
+  authorHash: String
+  authorNickname: String
   categoryIds: [Int!]
 }
 
@@ -65,7 +60,8 @@ input PostsFilterInput {
   published: Boolean
   votesDown: Int
   votesUp: Int
-  authorId: Int
+  authorHash: String
+  authorNickname: String
   categoryIds: [Int!]
   createdAfter: DateTime
   createdBefore: DateTime

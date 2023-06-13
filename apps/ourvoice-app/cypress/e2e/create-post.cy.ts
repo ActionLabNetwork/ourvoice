@@ -13,24 +13,27 @@ describe('Create Post', () => {
   }
 
   beforeEach(() => {
+    // Create/Restore auth session
+    cy.login()
+
     // Intercept and stub API calls
-    cy.intercept({ method: 'POST', url: 'http://localhost:3000/graphql' }, (req) => {
+    cy.intercept({ method: 'POST', url: 'http://api.ourvoice.test/graphql' }, (req) => {
       // Query Aliases
       aliasQuery(req, 'GetPresignedUrls')
       aliasQuery(req, 'GetCategories')
 
       // Mutation Aliases
-      aliasMutation(req, 'CreatePost')
+      aliasMutation(req, 'CreateModerationPost')
 
-      if (req.body.query.includes('categories')) {
+      if (req.body?.query?.includes('categories')) {
         req.reply({
           fixture: `${fixtureRoot}/mockedCategoriesQueryResponse.json`
         })
-      } else if (req.body.query.includes('getPresignedUrls')) {
+      } else if (req.body?.query?.includes('getPresignedUrls')) {
         req.reply({
           fixture: `${fixtureRoot}/mockedPresignedUrlsQueryResponse.json`
         })
-      } else if (req.body.query.includes('createPost')) {
+      } else if (req.body?.query?.includes('createModerationPost')) {
         req.reply({
           fixture: `${fixtureRoot}/mockedCreatePostMutationResponse.json`
         })
@@ -45,7 +48,8 @@ describe('Create Post', () => {
       []
     ).as('putPresignedUrl')
 
-    cy.visit('/noauth')
+    // Should be authenticated, now visit the create post page
+    cy.visit('/post')
   })
 
   describe('Form rendering', () => {
@@ -267,16 +271,16 @@ describe('Create Post', () => {
         expect(response?.statusCode).to.equal(200)
       })
 
-      cy.wait('@gqlCreatePostMutation').then(({ request, response }) => {
+      cy.wait('@gqlCreateModerationPostMutation').then(({ request, response }) => {
         // Request assertions
-        expect(request.body.query).to.include('createPost')
+        expect(request.body.query).to.include('createModerationPost')
 
         // Response assertions
         expect(response?.statusCode).to.equal(200)
-        expect(response?.body.data.createPost).to.be.an('object')
-        expect(response?.body.data.createPost).to.have.property('id')
-        expect(response?.body.data.createPost).to.have.property('title')
-        expect(response?.body.data.createPost).to.have.property('content')
+        expect(response?.body.data.createModerationPost).to.be.an('object')
+        expect(response?.body.data.createModerationPost).to.have.property('id')
+        expect(response?.body.data.createModerationPost).to.have.property('title')
+        expect(response?.body.data.createModerationPost).to.have.property('content')
 
         // Assert form reset
         cy.get('#title').should('have.value', '')

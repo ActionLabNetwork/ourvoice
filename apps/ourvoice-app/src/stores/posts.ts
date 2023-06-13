@@ -1,9 +1,11 @@
+import { useDeploymentStore } from './deployment'
+import { useUserStore } from './user'
+import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_POST_MUTATION } from './../graphql/mutations/votePost'
-import { CREATE_POST_MUTATION } from './../graphql/mutations/createPost'
 import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
-import { provideApolloClient, useQuery, useMutation } from '@vue/apollo-composable'
+import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 
 export interface Post {
@@ -56,63 +58,86 @@ export const usePostsStore = defineStore('posts', {
 
   actions: {
     async fetchPosts() {
-      const { onResult, onError } = useQuery(GET_POSTS_QUERY, {
-        limit: 3
-      })
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_POSTS_QUERY
+        })
 
-      onResult(({ data, loading }) => {
         this.data = data.posts.edges.map((edge: any) => edge.node)
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
-        this.loading = loading
-      })
+        console.log({ data })
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
 
-      onError((error) => {
-        this.error = error
         if (error) {
           this.errorMessage = 'Failed to load posts. Please try again.'
         }
-      })
+      }
     },
 
     async getPresignedUrls(bucket: string, keys: string[], expiresIn: number) {
-      const { onResult, onError } = useQuery(GET_PRESIGNED_URLS_QUERY, {
-        bucket,
-        keys,
-        expiresIn
-      })
-
-      return new Promise((resolve, reject) => {
-        onResult(({ data, loading }) => {
-          if (!loading) {
-            resolve(data.getPresignedUrls)
-          }
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_PRESIGNED_URLS_QUERY,
+          variables: { bucket, keys, expiresIn }
         })
-
-        onError((error) => {
-          reject(error)
-        })
-      })
+        return data.getPresignedUrls
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
     },
 
     async createPost({
       title,
       content,
       categoryIds,
-      files,
-      authorId
+      files
     }: {
       title: string
       content: string
       categoryIds: number[]
       files: string[]
-      authorId: number
     }) {
-      const { mutate } = useMutation(CREATE_POST_MUTATION)
+      // Check for valid deployment and user session
+      const userStore = useUserStore()
 
-      await mutate({
-        data: { title, content, categoryIds, files, authorId }
-      })
+      // Check if we can access the session and generate a user hash for storing in the db
+      if (!userStore.isLoggedIn) {
+        // TODO: Set up a proper error handling module
+        throw new Error('User session is invalid')
+      }
+
+      const authorHash = useUserStore().sessionHash
+      const authorNickname = useUserStore().nickname
+
+      // TODO: Fetch this from deployment config instead of hardcoding
+      const requiredModerations = 3
+
+      try {
+        await apolloClient.mutate({
+          mutation: CREATE_MODERATION_POST_MUTATION,
+          variables: {
+            data: {
+              title,
+              content,
+              categoryIds,
+              files,
+              authorHash,
+              authorNickname,
+              requiredModerations
+            }
+          }
+        })
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
     },
 
     async votePost({
@@ -124,10 +149,9 @@ export const usePostsStore = defineStore('posts', {
       userId: number
       voteType: string
     }) {
-      const { mutate } = useMutation(VOTE_POST_MUTATION)
-
-      await mutate({
-        data: { postId, userId, voteType }
+      await apolloClient.mutate({
+        mutation: VOTE_POST_MUTATION,
+        variables: { data: { postId, userId, voteType } }
       })
     }
   }

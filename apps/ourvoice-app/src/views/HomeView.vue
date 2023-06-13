@@ -50,6 +50,7 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
 import Information from '../../../../config/content/information.md'
+import { useDeploymentStore } from '@/stores/deployment'
 
 const apiURL = import.meta.env.VITE_APP_API_URL
 
@@ -67,7 +68,8 @@ export default defineComponent({
       // else we render the UI
       session: false,
       userId: '',
-      authURL: `${authBaseURL}?d=${this.deployment}`
+      authURL: `${authBaseURL}?d=${this.deployment}`,
+      deploymentStore: useDeploymentStore()
     }
   },
   methods: {
@@ -115,10 +117,10 @@ export default defineComponent({
     }
   },
 
-  mounted() {
+  async mounted() {
     // this function checks if a session exists, and if not,
     // it will redirect to the login screen.
-    this.checkForSession()
+    await this.checkForSession()
   }
 })
 </script>
