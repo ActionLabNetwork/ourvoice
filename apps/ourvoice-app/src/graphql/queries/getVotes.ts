@@ -5,6 +5,8 @@ export const GET_VOTES_QUERY = gql`
     votes(filter: $filter) {
       id
       voteType
+      authorHash
+      authorNickname
       comment {
         id
       }
@@ -16,6 +18,8 @@ export const GET_VOTES_QUERY = gql`
 `
 export interface Vote {
   id: number
+  authorHash: string
+  authorNickname: string
   voteType: 'UPVOTE' | 'DOWNVOTE'
   comment: {
     id: number

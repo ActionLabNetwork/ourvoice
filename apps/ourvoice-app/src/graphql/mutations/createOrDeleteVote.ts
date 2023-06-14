@@ -5,9 +5,8 @@ export const VOTE_MUTATION = gql`
     createVote(data: $data) {
       id
       voteType
-      user {
-        id
-      }
+      authorHash
+      authorNickname
       post {
         id
       }

@@ -3,6 +3,7 @@ import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createMo
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
 import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
+import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
@@ -22,17 +23,12 @@ export interface Post {
     id: number
     name: string
   }[]
-  //Todo: move commets to separate store
   comments: {
     id: number
     content: string
   }[]
   votesUp: number
   votesDown: number
-  // votes: {
-  //   id: number
-  //   type: string
-  // }[]
   files: string[]
 }
 
@@ -74,7 +70,29 @@ export const usePostsStore = defineStore('posts', {
           query: GET_POSTS_QUERY
         })
 
-        this.data = data.posts.edges.map((edge: any) => edge.node)
+        this.data = data.posts.edges.map((edge: any) => ({
+          id: edge.node.id,
+          title: edge.node.title,
+          content: edge.node.content,
+          createdAt: edge.node.createdAt,
+          moderatedAt: edge.node.moderatedAt,
+          publishedAt: edge.node.publishedAt,
+          published: edge.node.published,
+          moderated: edge.node.moderated,
+          authorHash: edge.node.authorHash,
+          authorNickname: edge.node.authorNickname,
+          categories: edge.node.categories.map((category: any) => ({
+            id: category.id,
+            name: category.name
+          })),
+          comments: edge.node.comments.map((comment: any) => ({
+            id: comment.id,
+            content: comment.content
+          })),
+          votesUp: edge.node.votesUp,
+          votesDown: edge.node.votesDown,
+          files: edge.node.files
+        }))
 
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
@@ -165,6 +183,23 @@ export const usePostsStore = defineStore('posts', {
         mutation: VOTE_MUTATION,
         variables: { data: { postId, userId, voteType } }
       })
+    },
+
+    async syncPostVotesById(postId: number) {
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_POST_BY_ID_QUERY,
+          variables: { postId },
+          fetchPolicy: 'no-cache'
+        })
+        //sync votesUp/votesDown state with the post table
+        this.data.find((post) => post.id === postId)!.votesUp = data.post.votesUp
+        this.data.find((post) => post.id === postId)!.votesDown = data.post.votesDown
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
     }
   }
 })
