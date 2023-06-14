@@ -258,17 +258,6 @@ describe('Moderate Post', () => {
           cy.get(selectors.sidePaneCloseButton).click()
         }
 
-        const validateDecisionsCount = (acceptedCount, rejectedCount) => {
-          cy.get(selectors.moderationDecisionsCount)
-            .children()
-            .first()
-            .should('contain', `ACCEPTED: ${acceptedCount}`)
-          cy.get(selectors.moderationDecisionsCount)
-            .children()
-            .last()
-            .should('contain', `REJECTED: ${rejectedCount}`)
-        }
-
         // Act & Assert
         cy.get(selectors.actionListBoxButton).click()
         cy.get(selectors.actionListBox).should('exist')
@@ -335,20 +324,6 @@ describe('Moderate Post', () => {
           method: 'POST',
           body: { query: rollbackMutation, variables: { postId: 2 } }
         })
-
-        // // Modify the post
-        // cy.get(selectors.submitModerationButton).click()
-        // cy.get(selectors.renewModerationButton).should('exist')
-        // cy.get(selectors.selfModerationIndicator).should('exist')
-        // validateDecisionsCount(0, 4)
-        // cy.get(selectors.moderationReasonTextArea).should('not.exist')
-        // validateModerationHistory(5)
-
-        // // Renew the moderation
-        // cy.get(selectors.renewModerationButton).click()
-        // cy.get(selectors.moderationReasonTextArea).should('exist')
-        // validateDecisionsCount(0, 3)
-        // validateModerationHistory(4)
       })
     })
   })

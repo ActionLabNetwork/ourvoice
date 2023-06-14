@@ -40,21 +40,16 @@
 
     <!-- Moderate button -->
     <div class="mt-4" v-if="!preview && comment.status === 'PENDING'">
-      <router-link
-        v-if="comment && comment.id"
-        :to="{ name: 'moderate-comment', params: { id: comment.id } }"
-        class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-      >
-        Moderate
-      </router-link>
+      <CustomButton :visibility-predicate="() => !!(comment && comment.id)" :to="{ name: 'moderate-comment', params: { id: comment.id } }" data-cy="moderate-button" label="Moderate" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { formatTimestampToReadableDate } from '@/utils'
-import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import { computed } from 'vue';
+import { formatTimestampToReadableDate } from '@/utils';
+import AuthorBadge from '@/components/common/AuthorBadge.vue';
+import CustomButton from '@/components/common/CustomButton.vue';
 
 import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments'
 import type { PropType } from 'vue'

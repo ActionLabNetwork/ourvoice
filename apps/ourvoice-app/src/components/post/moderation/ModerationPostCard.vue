@@ -61,14 +61,8 @@
 
     <!-- Moderate button -->
     <div class="mt-4" v-if="!preview && post.status === 'PENDING'">
-      <router-link
-        v-if="post && post.id"
-        :to="{ name: 'moderate-post', params: { id: post.id } }"
-        class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-        data-cy="moderate-button"
-      >
-        Moderate
-      </router-link>
+      <CustomButton :visibilityPredicate="() => !!(post && post.id)"
+        :to="{ name: 'moderate-post', params: { id: post.id } }" data-cy="moderate-button" label="Moderate" />
     </div>
   </div>
 </template>
@@ -80,6 +74,7 @@ import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
 import type { ModerationVersionDecision } from '@/types/moderation';
 import { getGroupsByProperty } from '@/utils/groupByProperty';
 import AuthorBadge from '@/components/common/AuthorBadge.vue';
+import CustomButton from '@/components/common/CustomButton.vue';
 
 import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { ModerationPost as CModerationPost } from '@/stores/moderation-comments'

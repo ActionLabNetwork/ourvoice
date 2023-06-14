@@ -10,7 +10,7 @@
       </div>
     </div>
   </div>
-</template>
+</template>m
 
 <script setup lang="ts">
 import { type PropType } from 'vue';
