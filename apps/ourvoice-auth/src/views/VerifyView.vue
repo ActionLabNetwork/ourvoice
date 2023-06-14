@@ -105,15 +105,25 @@ export default defineComponent({
         })
 
         if (response.status === 'OK') {
+          Passwordless.clearLoginAttemptInfo()
           if (response.createdNewUser) {
-            // user sign up success
+            // attempt refreshing token to get deployment data into payload
+            Session.attemptRefreshingSession().then((success) => {
+              if (success) {
+                // remove deployment info
+                deployment.purge()
+                this.handleRedirect()
+              } else {
+                // we redirect to the login page since the user
+                // is now logged out
+                return window.location.assign('/signinWithoutPassword')
+              }
+            })
           } else {
             // user sign in success
+            deployment.purge()
+            this.handleRedirect()
           }
-          Passwordless.clearLoginAttemptInfo()
-          // remove deployment info
-          deployment.purge()
-          this.handleRedirect()
         } else {
           // this can happen if the magic link has expired or is invalid
           console.log('Login failed. Please try again')

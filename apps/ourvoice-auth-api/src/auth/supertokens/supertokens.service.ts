@@ -33,6 +33,9 @@ export class SupertokensService {
         apiKey: config.apiKey,
       },
       recipeList: [
+        ...recipes,
+        UserMetadata.init(),
+        UserRoles.init(),
         Session.init({
           cookieDomain: config.cookieDomain,
           override: {
@@ -56,9 +59,6 @@ export class SupertokensService {
             },
           },
         }),
-        UserMetadata.init(),
-        UserRoles.init(),
-        ...recipes,
       ],
     });
   }
@@ -158,16 +158,23 @@ export class SupertokensService {
 
                 // Then we check if it was successfully completed
                 if (response.status === 'OK') {
-                  // const { id } = response.user;
-                  // // TODO: post email verification logic
-                  // // send email to ourvoice that new admin account is created
-                  // // await UserMetadata.updateUserMetadata(id, {
-                  // //   approved: false,
-                  // // });
-                  // const { metadata } = await UserMetadata.getUserMetadata(id);
-                  // input.session.mergeIntoAccessTokenPayload({
-                  //   deployment: metadata.deployment || '',
-                  // });
+                  const { id } = response.user;
+                  const { metadata } = await UserMetadata.getUserMetadata(id);
+                  // add
+                  const sessionHandles =
+                    await Session.getAllSessionHandlesForUser(id);
+                  sessionHandles.forEach(async (handle) => {
+                    const currSessionInfo = await Session.getSessionInformation(
+                      handle,
+                    );
+                    if (currSessionInfo === undefined) {
+                      return;
+                    }
+
+                    await Session.mergeIntoAccessTokenPayload(handle, {
+                      deployment: metadata.deployment || '',
+                    });
+                  });
                 }
                 return response;
               },
@@ -301,9 +308,26 @@ export class SupertokensService {
                     // add `user` role to all registered users
                     addRoleToUser(response.user.id, 'user');
 
-                    // add deployment
+                    // add deployment to user metadata
                     await UserMetadata.updateUserMetadata(response.user.id, {
                       deployment,
+                    });
+                    const sessionHandles =
+                      await Session.getAllSessionHandlesForUser(
+                        response.user.id,
+                      );
+
+                    // we update all the session's Access Token payloads for this user
+                    sessionHandles.forEach(async (handle) => {
+                      const currSessionInfo =
+                        await Session.getSessionInformation(handle);
+                      if (currSessionInfo === undefined) {
+                        return;
+                      }
+
+                      await Session.mergeIntoAccessTokenPayload(handle, {
+                        deployment,
+                      });
                     });
                   }
                 }

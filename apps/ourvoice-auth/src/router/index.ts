@@ -53,8 +53,6 @@ const router = createRouter({
       // TODO: could use a url param here as well
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
-          console.log('BeforeEnter IF')
-          console.log(to.query)
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
           redirect.set(`http://${to.query.d || 'demo'}${domain}`)

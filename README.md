@@ -120,7 +120,7 @@ To add deployment administrator and moderator users you need to add them to the 
 
 Once a user with an email (`allowedEmails`) has signed up you can use the super admin user (created on startup with credentials in `.env`) to allocate them admin role via the OurVoice Admin application. Once a user has a role `admin` they can log into the OurVoice Admin application to modify rights for their deployment only. See list roles and right below (can be modified based on need).
 
-> NOTE: currently session is not revoked when role is assigned/removed from user nor is session token updated with `deployment` info on email/password sign up (used in the OurVoice app for matching user deployment with the domain). This functionality needs to be implemented see more in this thread - https://stackoverflow.com/questions/71617819/supertokens-revoke-other-users-active-sessions
+> NOTE: currently session is not revoked/refreshed/claims updated on frontend token when role is assigned/removed from user. This functionality needs to be implemented see more in docs - https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload and https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload#with-session-verification-online-mode
 
 - name: `user`
 - permissions:
