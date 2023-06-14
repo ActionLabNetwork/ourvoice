@@ -29,12 +29,12 @@ export class SupertokensService {
                   const { metadata } = await UserMetadata.getUserMetadata(
                     userId,
                   );
-                  // This goes in the access token, and is availble to read on the frontend.
+                  // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
-                    deployment: metadata.deployment || 'demo',
+                    deployment: metadata.deployment || '',
                   };
-
+                  console.log('CREATESESSION DEPLOYMENT:', metadata.deployment);
                   return originalImplementation.createNewSession(input);
                 },
               };

@@ -19,16 +19,27 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Email</th>
             <th>Deployment</th>
-            <th>Role</th>
+            <th>User</th>
+            <th>Moderator</th>
+            <th>Administrator</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(user, index) in users" :key="index">
             <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
             <td>{{ user.deployment }}</td>
-            <td>
-              <select class="form-control" @change="changeRole($event, user.id, user.role)">
+            <td v-for="(role, index) in roles" :key="index">
+              <input
+                @change="changeRole($event, user.id, role.name)"
+                type="checkbox"
+                :checked="user.roles.includes(role.name)"
+                :fieldId="role.id"
+              />
+              <!-- <check-box :checked="user.roles.includes(role.name)" :fieldId="role.id" /> -->
+              <!-- <select class="form-control" @change="changeRole($event, user.id, user.role)">
                 <option value="" selected disabled>Choose</option>
                 <option
                   v-for="role in roles"
@@ -38,7 +49,7 @@
                 >
                   {{ role.name }}
                 </option>
-              </select>
+              </select> -->
             </td>
           </tr>
         </tbody>
@@ -69,8 +80,9 @@ const authURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithEmailPassword'
 
 export type User = {
   id: string
+  email: string
   deployment: string
-  role: string
+  roles: string[]
 }
 
 export default defineComponent({
@@ -83,7 +95,8 @@ export default defineComponent({
       users: [] as User[],
       roles: [
         { name: 'user', id: 1 },
-        { name: 'moderator', id: 2 }
+        { name: 'moderator', id: 2 },
+        { name: 'admin', id: 2 }
       ]
     }
   },
@@ -148,7 +161,7 @@ export default defineComponent({
           console.error('There was an error!', error)
         })
     },
-    async changeRole(event: any, userId: string, oldRole: string) {
+    async changeRole(event: any, userId: string, role: string) {
       await fetch(`${apiURL}/users/role/${userId}`, {
         method: 'PUT',
         headers: {
@@ -156,8 +169,8 @@ export default defineComponent({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          oldRole,
-          newRole: event.target.options[event.target.options.selectedIndex].text
+          role,
+          assign: event.target.checked
         })
       })
         .then(async (response) => {

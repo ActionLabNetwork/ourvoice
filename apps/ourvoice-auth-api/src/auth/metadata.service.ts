@@ -17,6 +17,10 @@ export async function addEmailsToAllowlist(emails: string[]) {
   });
 }
 
+export async function clearEmailAllowList() {
+  await UserMetadata.clearUserMetadata('emailAllowList');
+}
+
 export async function isEmailAllowed(email: string) {
   const existingData = await UserMetadata.getUserMetadata('emailAllowList');
   const allowList: string[] = existingData.metadata.allowList || [];

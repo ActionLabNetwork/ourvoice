@@ -44,10 +44,10 @@ export class SupertokensService {
                   const { metadata } = await UserMetadata.getUserMetadata(
                     userId,
                   );
-                  // This goes in the access token, and is availble to read on the frontend.
+                  // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
-                    deployment: metadata.deployment || 'demo',
+                    deployment: metadata.deployment || '',
                   };
 
                   return originalImplementation.createNewSession(input);
@@ -82,7 +82,11 @@ export class SupertokensService {
               id: 'email',
               validate: async (email: string) => {
                 // TODO: this should eventually come from admin database
-                if (!(await isEmailAllowed(email))) {
+                if (
+                  !(await isEmailAllowed(email)) &&
+                  // check if this is app super admin who is login in
+                  config.adminEmail !== email
+                ) {
                   return 'Sign up disabled. Please contact the admin.';
                 } else {
                   return undefined;
@@ -147,7 +151,6 @@ export class SupertokensService {
                 if (originalImplementation.verifyEmailPOST === undefined) {
                   throw Error('Should never come here');
                 }
-
                 // First we call the original implementation
                 const response = await originalImplementation.verifyEmailPOST(
                   input,
@@ -155,11 +158,15 @@ export class SupertokensService {
 
                 // Then we check if it was successfully completed
                 if (response.status === 'OK') {
-                  const { id, email } = response.user;
-                  // TODO: post email verification logic
-                  // send email to ourvoice that new admin account is created
-                  // await UserMetadata.updateUserMetadata(id, {
-                  //   approved: false,
+                  // const { id } = response.user;
+                  // // TODO: post email verification logic
+                  // // send email to ourvoice that new admin account is created
+                  // // await UserMetadata.updateUserMetadata(id, {
+                  // //   approved: false,
+                  // // });
+                  // const { metadata } = await UserMetadata.getUserMetadata(id);
+                  // input.session.mergeIntoAccessTokenPayload({
+                  //   deployment: metadata.deployment || '',
                   // });
                 }
                 return response;
@@ -191,6 +198,7 @@ export class SupertokensService {
                   port: config.smtpSettings.port || 2525,
                   from: {
                     name: 'OurVoice',
+                    // TODO: make configurable
                     email: 'no-reply@ourvoice.app',
                   },
                   // secure: true,
@@ -287,7 +295,7 @@ export class SupertokensService {
                        *
                        * In this case set a reasonable default value to use
                        */
-                      deployment = 'demo';
+                      deployment = '';
                     }
 
                     // add `user` role to all registered users

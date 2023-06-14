@@ -151,22 +151,27 @@ export class UserController {
     // const moderators = await this.rolesService.getUsersThatHaveRole(
     //   'moderator',
     // );
-    const deploymentUsers = allUsers.users.map(async (object) => {
+    const deploymentUsers = allUsers.users.flatMap(async (object) => {
       // check if admin can manage this user's metadata
-      if (adminId !== object.user.id) {
+      if (adminId === object.user.id) {
+        return [];
+      } else {
         const metadata = await this.metadataService.checkDeployment(
           adminId,
           object.user.id,
         );
         if (metadata) {
-          const roles = this.rolesService.getRolesForUser(object.user.id);
-          return {
-            id: object.user.id,
-            email: object.user.email,
-            roles,
-            ...metadata,
-          };
+          const roles = await this.rolesService.getRolesForUser(object.user.id);
+          return [
+            {
+              id: object.user.id,
+              email: object.user.email,
+              roles,
+              ...metadata,
+            },
+          ];
         }
+        return [];
       }
     });
     // const deploymentUsers = users.map(async (user) => {
@@ -186,7 +191,7 @@ export class UserController {
     //   if (metadata) return { id: user, role: 'moderator', ...metadata };
     // });
     return {
-      users: await Promise.all([...deploymentUsers]),
+      users: (await Promise.all([...deploymentUsers])).flat(),
     };
   }
   // get all users in specific deployment
@@ -209,9 +214,9 @@ export class UserController {
     @Session() session: SessionContainer,
     @Param('id') id: string,
     @Body()
-    updateRole: {
-      oldRole: 'user' | 'moderator' | 'admin' | 'super';
-      newRole: 'user' | 'moderator' | 'admin' | 'super';
+    update: {
+      role: 'user' | 'moderator' | 'admin' | 'super';
+      assign: boolean;
     },
   ): Promise<{ message: string }> {
     const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
@@ -235,8 +240,9 @@ export class UserController {
     const metadata = await this.metadataService.checkDeployment(adminId, id);
     // TODO: error handling
     if (metadata) {
-      await this.rolesService.addRoleToUser(id, updateRole.newRole);
-      await this.rolesService.removeRoleFromUser(id, updateRole.oldRole);
+      update.assign
+        ? await this.rolesService.addRoleToUser(id, update.role)
+        : await this.rolesService.removeRoleFromUser(id, update.role);
       return { message: 'role changed successfully' };
     }
   }

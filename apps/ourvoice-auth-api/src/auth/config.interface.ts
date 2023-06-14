@@ -23,6 +23,7 @@ export type AuthModuleConfig = {
   apiKey?: string;
   cookieDomain?: string;
   authModules?: AuthOptions[];
+  adminEmail?: string;
   authBypassTest: {
     isTestMode: boolean;
     createCode: {

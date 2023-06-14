@@ -6,9 +6,13 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { createRole } from './auth/roles.service';
-import { addEmailsToAllowlist } from './auth/metadata.service';
+import {
+  addEmailsToAllowlist,
+  // clearEmailAllowList,
+} from './auth/metadata.service';
 import { addSuperAdmin } from './seed';
 import { ConfigService } from '@nestjs/config';
+import { Role } from './auth/roles.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -64,8 +68,10 @@ async function bootstrap() {
   configService
     .get<Role[]>('roles')
     .map(async (role) => await createRole(role.name, role.permissions));
+  // if you need to clear the allowedEmails list
+  // await clearEmailAllowList();
   //add allowed moderator emails
-  await addEmailsToAllowlist(configService.get<string[]>('moderators'));
+  await addEmailsToAllowlist(configService.get<string[]>('allowedEmails'));
   // add super admin user
   await addSuperAdmin(
     configService.get<string>('SUPERTOKENS_ADMIN_EMAIL') ||

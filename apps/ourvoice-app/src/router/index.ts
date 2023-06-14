@@ -10,19 +10,19 @@ import PostModerationView from '../views/PostModerationView.vue'
 import CommentModerationListView from '../views/CommentModerationListView.vue'
 import CommentModerationView from '../views/CommentModerationView.vue'
 
-import YamlContent from '../../../../config/config.yml'
+// import YamlContent from '../../../../config/config.yml'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import { useDeploymentStore } from '@/stores/deployment'
 
-const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
-const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
+// const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
+// const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 
 const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
 const authURL = `${authBaseURL}?d=${addDeployment().deployment}`
 
 // TODO: this list might be coming from the database later
-const deployments = YamlContent.deployment
+// const deployments = YamlContent.deployment
 
 function addDeployment() {
   const host = window.location.host
@@ -116,20 +116,20 @@ const router = createRouter({
 //     next()
 //   } else window.location.replace(portalURL)
 // })
-const getDeployment = (host: string, deploymentDomain: string, deployments: string[]) => {
-  const parts = host.split('.')
-  // NOTE: set proper domain length (localhost has 2 parts)
-  const domainLength = deploymentDomain === 'localhost' ? 2 : 3
-  const deployment =
-    parts[0] !== 'www'
-      ? parts.length === domainLength
-        ? parts[0]
-        : false
-      : parts.length === domainLength
-      ? false
-      : parts[1]
-  return deployment && deployments.indexOf(deployment) > -1 ? deployment : false
-}
+// const getDeployment = (host: string, deploymentDomain: string, deployments: string[]) => {
+//   const parts = host.split('.')
+//   // NOTE: set proper domain length (localhost has 2 parts)
+//   const domainLength = deploymentDomain === 'localhost' ? 2 : 3
+//   const deployment =
+//     parts[0] !== 'www'
+//       ? parts.length === domainLength
+//         ? parts[0]
+//         : false
+//       : parts.length === domainLength
+//       ? false
+//       : parts[1]
+//   return deployment && deployments.indexOf(deployment) > -1 ? deployment : false
+// }
 
 const checkForSession = async () => {
   if (!(await Session.doesSessionExist())) return false
@@ -149,7 +149,9 @@ const checkForSession = async () => {
 }
 const checkDeployment = async (deployment: string): Promise<boolean> => {
   const payload = await Session.getAccessTokenPayloadSecurely()
-  return (payload.deployment || '') === deployment
+  const userDeployment = payload.deployment || ''
+  console.log(userDeployment)
+  return userDeployment === deployment || userDeployment === '*'
 }
 
 const initUserStore = async () => {

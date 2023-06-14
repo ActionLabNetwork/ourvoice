@@ -10,7 +10,7 @@ import { DeploymentService } from '../utils/deployment.service'
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
 
-const adminURL = import.meta.env.VITE_APP_ADMIN_URL
+// const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 const router = createRouter({
@@ -53,18 +53,31 @@ const router = createRouter({
       // TODO: could use a url param here as well
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
+          console.log('BeforeEnter IF')
+          console.log(to.query)
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
+          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
           return { path: to.path, query: {}, hash: to.hash }
-        } else {
-          // fallback redirect to demo application
-          deployment.set('demo')
         }
-        // set redirect to admin URL
-        redirect.set(adminURL)
       },
-      props: (route) => ({ deployment: route.query.d || 'demo' }),
-      alias: ['/signinWithEmailPassword', '/auth']
+      props: (route) => ({ deployment: route.query.d || 'demo' })
+    },
+    {
+      path: '/signinWithEmailPassword',
+      redirect: (to) => {
+        // the function receives the target route as the argument
+        // we return a redirect path/location here.
+        return { path: '/', query: to.query }
+      }
+    },
+    {
+      path: '/auth',
+      redirect: (to) => {
+        // the function receives the target route as the argument
+        // we return a redirect path/location here.
+        return { path: '/', query: to.query }
+      }
     },
     {
       path: '/signinWithoutPassword',
@@ -76,14 +89,33 @@ const router = createRouter({
           deployment.set(`${to.query.d || 'demo'}`)
           redirect.set(`http://${to.query.d || 'demo'}${domain}`)
           return { path: to.path, query: {}, hash: to.hash }
-        } else {
-          // fallback redirect to demo application
-          deployment.set('demo')
-          redirect.set(`http://demo${domain}`)
         }
       },
-      props: (route) => ({ deployment: route.query.d || 'demo' }),
-      alias: ['/magicLink', '/passwordless']
+      props: (route) => ({ deployment: route.query.d || 'demo' })
+    },
+    {
+      path: '/magicLink',
+      redirect: (to) => {
+        // the function receives the target route as the argument
+        // we return a redirect path/location here.
+        return { path: '/signinWithoutPassword', query: to.query }
+      }
+    },
+    {
+      path: '/passwordless',
+      redirect: (to) => {
+        // the function receives the target route as the argument
+        // we return a redirect path/location here.
+        return { path: '/signinWithoutPassword', query: to.query }
+      }
+    },
+    {
+      path: '/signinWithEmailPassword',
+      redirect: (to) => {
+        // the function receives the target route as the argument
+        // we return a redirect path/location here.
+        return { path: '/auth', query: to.query }
+      }
     },
     {
       path: '/reset-password',
