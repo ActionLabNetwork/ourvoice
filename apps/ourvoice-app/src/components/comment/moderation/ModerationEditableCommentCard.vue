@@ -11,10 +11,11 @@
     <!-- Content -->
     <div>
       <div class="text-gray-700 text-lg leading-relaxed mb-3">
-        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full"></textarea>
+        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full" data-cy="modify-content-input"></textarea>
       </div>
       <p v-if="contentField.errorMessage.value"
-      class="text-red-700 mb-5 text-sm">
+      class="text-red-700 mb-5 text-sm"
+      data-cy="content-input-error">
         {{ contentField.errorMessage.value }}
       </p>
     </div>

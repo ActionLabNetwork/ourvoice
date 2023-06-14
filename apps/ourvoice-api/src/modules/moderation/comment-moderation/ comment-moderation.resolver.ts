@@ -91,6 +91,15 @@ export class CommentModerationResolver {
   }
 
   @Mutation()
+  async rollbackModifiedModerationComment(
+    @Args('commentId') commentId: number,
+  ) {
+    return await this.commentModerationService.rollbackModifiedModerationComment(
+      commentId,
+    );
+  }
+
+  @Mutation()
   async renewCommentModeration(
     @Args('commentModerationId') id: number,
     @Args('moderatorHash') moderatorHash: string,

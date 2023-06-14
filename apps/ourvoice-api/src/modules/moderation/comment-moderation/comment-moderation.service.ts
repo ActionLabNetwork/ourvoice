@@ -192,6 +192,13 @@ export class CommentModerationService {
     );
   }
 
+  // Meant to be used in testing to quickly rollback to the previous db state
+  async rollbackModifiedModerationComment(commentId: number) {
+    return await this.moderationCommentRepository.rollbackModifiedModerationComment(
+      commentId,
+    );
+  }
+
   async renewCommentModeration(id: number, moderatorHash: string) {
     const moderationToBeRenewed =
       await this.moderationCommentRepository.getCommentModerationById(id);

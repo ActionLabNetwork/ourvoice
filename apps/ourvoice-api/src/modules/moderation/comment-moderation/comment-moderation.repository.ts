@@ -332,6 +332,40 @@ export class CommentModerationRepository {
     return modifiedModerationComment;
   }
 
+  async rollbackModifiedModerationComment(commentId: number) {
+    return await this.prisma.$transaction(async (tx) => {
+      // Fetch the modified comment
+      const comment = await tx.comment.findUnique({
+        where: { id: commentId },
+        include: { versions: { orderBy: { version: 'desc' } } },
+      });
+
+      // Set 2nd latest version to latest version
+      await tx.commentVersion.update({
+        where: { id: comment.versions[1].id },
+        data: { latest: true },
+      });
+
+      // Delete the latest version
+      await tx.commentVersion.delete({
+        where: { id: comment.versions[0].id },
+      });
+
+      // Fetch the updated comment
+      const updatedComment = await tx.comment.findUnique({
+        where: { id: commentId },
+        include: {
+          versions: {
+            orderBy: { version: 'desc' },
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          },
+        },
+      });
+
+      return updatedComment;
+    });
+  }
+
   async renewCommentModeration(id: number, moderatorHash: string) {
     const renewedCommentId = await this.prisma.$transaction(async (tx) => {
       // Fetch the commentModeration and related comment

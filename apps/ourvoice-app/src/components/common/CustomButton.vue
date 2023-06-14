@@ -1,6 +1,9 @@
 <template>
   <template v-if="!props.to">
-    <button v-if="isVisible">{{ label }}</button>
+    <button v-if="isVisible" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+    :data-cy="props.dataCy" :disabled="isDisabled" >
+      {{ label }}
+    </button>
   </template>
   <template v-else>
     <router-link
@@ -22,6 +25,10 @@ const props = defineProps({
     type: Function as PropType<() => boolean>,
     default: () => true
   },
+  disabledPredicate: {
+    type: Function as PropType<() => boolean>,
+    default: () => true
+  },
   to: {
     type: Object as PropType<{ name: string; params: { id: number; }; }>,
     required: false
@@ -33,8 +40,9 @@ const props = defineProps({
   label: {
     type: String,
     required: true
-  }
+  },
 })
 
 const isVisible = computed(() => props.visibilityPredicate())
+const isDisabled = computed(() => props.disabledPredicate())
 </script>

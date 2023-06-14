@@ -46,8 +46,7 @@
 
         <!-- Submit button -->
         <div class="flex-shrink-0">
-          <button type="submit" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed" :disabled="!isValidForm"
-          data-cy="moderate-button">Submit Moderation</button>
+          <CustomButton data-cy="moderate-button" :disabled-predicate="() => !isValidForm" label="Submit Moderation" />
         </div>
       </div>
     </div>
@@ -61,6 +60,7 @@ import { useField, useForm } from 'vee-validate';
 import { validateModerationReason } from '@/validators/moderation-post-validator'
 import { useModerationPostsStore } from '@/stores/moderation-posts';
 import { MODERATION_ACTIONS } from '@/constants/moderation'
+import CustomButton from '@/components/common/CustomButton.vue';
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 const moderationPostsStore = useModerationPostsStore()

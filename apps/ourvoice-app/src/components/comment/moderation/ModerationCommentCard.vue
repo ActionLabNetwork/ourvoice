@@ -4,13 +4,8 @@
     class="bg-slate-100 shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
   >
     <!-- Self moderation indicator -->
-    <div class="absolute right-10" v-if="props.decisionIcon">
-      <div
-        :class="[
-          props.decisionIcon?.indicatorClass,
-          'flex gap-2 items-center rounded-full p-1 px-2'
-        ]"
-      >
+    <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
+      <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
@@ -29,10 +24,7 @@
     <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
 
     <!-- Moderation decisions count -->
-    <div
-      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
-      class="flex gap-3 justify-around"
-    >
+    <div v-if="props.version?.moderations?.length && props.version.moderations.length > 0" class="flex gap-3 justify-around" data-cy="comment-moderation-decisions-count">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
@@ -51,10 +43,10 @@ import { formatTimestampToReadableDate } from '@/utils';
 import AuthorBadge from '@/components/common/AuthorBadge.vue';
 import CustomButton from '@/components/common/CustomButton.vue';
 
-import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments'
-import type { PropType } from 'vue'
-import type { ModerationVersionDecision } from '@/types/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
+import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments';
+import type { PropType } from 'vue';
+import type { ModerationVersionDecision } from '@/types/moderation';
+import { getGroupsByProperty } from '@/utils/groupByProperty';
 
 interface DecisionIcon {
   text: string

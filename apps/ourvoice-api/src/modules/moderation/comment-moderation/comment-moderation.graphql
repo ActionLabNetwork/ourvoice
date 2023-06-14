@@ -8,7 +8,9 @@ type Query {
 }
 
 type Mutation {
-  createModerationComment(data: ModerationCommentCreateInput!): ModerationComment
+  createModerationComment(
+    data: ModerationCommentCreateInput!
+  ): ModerationComment
   approveModerationCommentVersion(
     id: Int!
     moderatorHash: String!
@@ -28,6 +30,7 @@ type Mutation {
     reason: String!
     data: ModerationCommentModifyInput!
   ): ModerationComment
+  rollbackModifiedModerationComment(commentId: Int!): ModerationComment
   renewCommentModeration(
     commentModerationId: Int!
     moderatorHash: String!

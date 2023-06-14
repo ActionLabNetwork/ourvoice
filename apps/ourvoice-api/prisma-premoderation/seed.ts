@@ -79,6 +79,7 @@ async function main() {
             seed: authorHash,
           }),
           post: { connect: { id: post.id } },
+          status: postStatuses[j % postStatuses.length],
           versions: {
             create: Array(3)
               .fill({})
@@ -110,6 +111,7 @@ async function main() {
           }),
           parent: { connect: { id: comment.id } },
           post: { connect: { id: post.id } },
+          status: postStatuses[j % postStatuses.length],
           versions: {
             create: {
               content: `This is a child comment of comment ${j + 1} on post ${

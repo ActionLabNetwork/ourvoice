@@ -6,7 +6,7 @@
       'focus-within:border-red-500  focus-within:ring-red-500': moderationReasonField.errorMessage.value,
       'focus-within:border-indigo-500 focus-within:ring-indigo-500': !moderationReasonField.errorMessage.value
     }">
-      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" />
+      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" data-cy="moderation-reason-textarea" />
     </div>
 
     <!-- Moderation actions -->
@@ -15,7 +15,7 @@
         <div>
           <Listbox as="div" v-model="action" class="flex-shrink-0">
             <div class="relative">
-              <ListboxButton class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300">
+              <ListboxButton class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300" data-cy="moderation-action-listbox-button">
                 <font-awesome-icon :icon="['fas', action.icon]" />
                 <span :class="[action.name === null ? '' : 'text-gray-900', 'hidden truncate sm:ml-2 sm:block']">
                   {{ action.name }}
@@ -24,7 +24,7 @@
 
               <TransitionRoot leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
                 <ListboxOptions class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  <ListboxOption as="template" v-for="action in actions" :key="action.name" :value="action" v-slot="{ active }">
+                  <ListboxOption as="template" v-for="action in actions" :key="action.name" :value="action" v-slot="{ active }" data-cy="moderation-action-listbox">
                     <ul>
                       <li :class="[active ? 'bg-gray-100' : 'bg-white', 'relative cursor-default select-none px-3 py-2']">
                         <div class="flex items-center gap-2">
@@ -44,7 +44,7 @@
 
         <!-- Submit button -->
         <div class="flex-shrink-0">
-          <button type="submit" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed" :disabled="!isValidForm">Submit Moderation</button>
+          <CustomButton data-cy="moderate-button" :disabled-predicate="() => !isValidForm" label="Submit Moderation" />
         </div>
       </div>
     </div>
@@ -58,6 +58,7 @@ import { useField, useForm } from 'vee-validate';
 import { validateModerationReason } from '@/validators/moderation-comment-validator'
 import { useModerationCommentsStore } from '@/stores/moderation-comments';
 import { MODERATION_ACTIONS } from '@/constants/moderation';
+import CustomButton from '@/components/common/CustomButton.vue';
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
