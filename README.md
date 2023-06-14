@@ -94,17 +94,65 @@ All these files are copied from `.env.template` on initial run of `pnpm postinst
 
 > NOTE: Files are only copied when they do not exist. If additional environment variables are added to the `.env.template` files, they need to be manually added to each respective `.env` file.
 
-## Deployment
+Admin user:
+
+Once the system starts up an `admin` user with credentials from `.env` file is created in the Supertokens database and role `super` with all the permissions assigned. The `admin` user will also have a metadata record of `{ "deployment" : "*" }`, which means it will have access to all existing and future deployment information and can administer users and roles for all deployments.
+
+> NOTE: if `admin` user already exists in the Supertokens database it will just continue.
+
+### Deployment
 
 Deployment configuration is stored in:
 
 - `config/config.yml`
-- `apps/ourvoice-api/config/config/config.yml`
-- `apps/ourvoice-auth-api/config/config/config.yml`
+- `apps/ourvoice-api/config/config/.yml`
+- `apps/ourvoice-auth-api/config/config.yml`
 
 > NOTE: Config files in both of the API applications are copies of the overall configuration files (not to be changed) and are automatically created via `pnpm postinstall` script (automatically run after running `pnpm install`)
 
+Content:
+
 Content such as deployment specific texts are loaded from `config/content` folder as markdown files and rended as html on application views.
+
+User and role management (email and password sign up only):
+
+To add deployment administrator and moderator users you need to add them to the `allowedEmails` in `config/config.yml` (run `pnpm postinstall` after modification to propagate to application configurations). This will restrict email/password sign up to those specified emails, all other emails will raise an error in the backend when signing up.
+
+Once a user with an email (`allowedEmails`) has signed up you can use the super admin user (created on startup with credentials in `.env`) to allocate them admin role via the OurVoice Admin application. Once a user has a role `admin` they can log into the OurVoice Admin application to modify rights for their deployment only. See list roles and right below (can be modified based on need).
+
+> NOTE: currently session is not revoked when role is assigned/removed from user nor is session token updated with `deployment` info on email/password sign up (used in the OurVoice app for matching user deployment with the domain). This functionality needs to be implemented see more in this thread - https://stackoverflow.com/questions/71617819/supertokens-revoke-other-users-active-sessions
+
+- name: `user`
+- permissions:
+  - read:all
+  - edit:self
+  - delete:self
+- name: `moderator`
+- permissions:
+  - read:all
+  - edit:all
+  - delete:all
+- name: `admin`
+- permissions:
+  - manage:self
+  - read:all
+  - edit:all
+  - delete:all
+- name: `super`
+- permissions:
+
+  - manage:all
+  - read:all
+  - edit:all
+  - delete:all
+
+- Read all content in specific deployment: `read:all`
+- Delete all content in specific deployment: `delete:all`
+- Delete content created by self in specific deployment: `delete:self`
+- Edit all content in specific deployment: `edit:all`
+- Edit content created by self in specific deployment: `edit:self`
+- Manage users (and other configurations) in specific deployment: `manage:self`
+- Manage all users (and other configurations): `manage:all`
 
 ## 🕸️ Structure
 
@@ -114,7 +162,7 @@ Content such as deployment specific texts are loaded from `config/content` folde
 
 ### WebApp for admins
 
->
+> TBD
 
 ### API
 

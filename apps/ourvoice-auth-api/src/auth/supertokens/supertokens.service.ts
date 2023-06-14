@@ -117,7 +117,7 @@ export class SupertokensService {
                     return obj.id === 'deployment';
                   });
                   await UserMetadata.updateUserMetadata(id, {
-                    deployment: deployment[0].value,
+                    deployment: deployment[0].value || '',
                   });
                 }
                 return response;
