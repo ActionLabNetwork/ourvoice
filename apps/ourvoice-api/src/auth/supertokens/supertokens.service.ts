@@ -25,9 +25,6 @@ export class SupertokensService {
               return {
                 ...originalImplementation,
                 createNewSession: async function (input) {
-                  const request = supertokens.getRequestFromUserContext(
-                    input.userContext,
-                  );
                   const userId = input.userId;
                   const { metadata } = await UserMetadata.getUserMetadata(
                     userId,
