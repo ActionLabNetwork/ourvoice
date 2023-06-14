@@ -1,7 +1,7 @@
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { NotFoundException } from '@nestjs/common';
 import { seedMainDb } from './../../../prisma/seed';
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CommentRepository } from './comment.repository';
 
@@ -31,12 +31,12 @@ describe('CommentRepository', () => {
   it('should create a new comment', async () => {
     // Arrange
     jest.spyOn(prismaService.comment, 'create');
-    const authorId = { id: 1 };
     const postId = { id: 1 };
     const parentId = { id: 1 };
     const commentData = {
       content: 'Test Content',
-      author: { connect: authorId },
+      authorHash: 'Test Hash',
+      authorNickname: 'Test Nickname',
       post: { connect: postId },
       parent: { connect: parentId },
     };
@@ -46,7 +46,8 @@ describe('CommentRepository', () => {
 
     // Assert
     expect(createdComment.content).toEqual(commentData.content);
-    expect(createdComment.authorId).toEqual(authorId.id);
+    expect(createdComment.authorHash).toEqual(commentData.authorHash);
+    expect(createdComment.authorNickname).toEqual(commentData.authorNickname);
     expect(createdComment.postId).toEqual(postId.id);
     expect(createdComment.parentId).toEqual(parentId.id);
     expect(prismaService.comment.create).toHaveBeenCalledTimes(1);
@@ -64,7 +65,8 @@ describe('CommentRepository', () => {
       moderatedAt: null,
       publishedAt: null,
       disabledAt: null,
-      authorId: 1,
+      authorHash: 'user1hash',
+      authorNickname: 'user1',
       postId: 1,
       parentId: 1,
     };
@@ -155,7 +157,10 @@ describe('CommentRepository', () => {
     jest.spyOn(prismaService.comment, 'findMany');
 
     // Act
-    const comments = await commentRepository.getComments({ authorId: 1 });
+    const comments = await commentRepository.getComments({
+      authorHash: 'user1hash',
+      authorNickname: 'user1',
+    });
 
     // Assert
     expect(comments.comments.length).toEqual(2);

@@ -89,12 +89,11 @@ async function main() {
 }
 
 export const seedMainDb = async () => {
-  console.log('Clearing main database...');
   await clearDatabase();
-  console.log('Seeding main database...');
   await main()
     .catch((e) => {
       console.error(e);
+      console.log(e);
       process.exit(1);
     })
     .finally(async () => {
@@ -102,4 +101,5 @@ export const seedMainDb = async () => {
     });
 };
 
-seedMainDb();
+// Uncomment to run this manually. Remember to comment it out again as it is being used by the integration test
+// seedMainDb();

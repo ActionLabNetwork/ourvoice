@@ -28,27 +28,28 @@ describe('PostRepository', () => {
     await prismaService.$disconnect();
   });
 
-  // it('should create a new post', async () => {
-  //   // Arrange
-  //   jest.spyOn(prismaService.post, 'create');
-  //   const authorId = { id: 1 };
-  //   const categoriesId = [{ id: 1 }, { id: 2 }];
-  //   const postData = {
-  //     title: 'Test Title',
-  //     content: 'Test Content',
-  //     author: { connect: authorId },
-  //     categories: { connect: categoriesId },
-  //   };
+  it('should create a new post', async () => {
+    // Arrange
+    jest.spyOn(prismaService.post, 'create');
+    const categoriesId = [{ id: 1 }, { id: 2 }];
+    const postData = {
+      title: 'Test Title',
+      content: 'Test Content',
+      authorNickname: 'Test Hash',
+      authorHash: 'Test Nickname',
+      categories: { connect: categoriesId },
+    };
 
-  //   // Act
-  //   const createdPost = await postRepository.createPost(postData);
+    // Act
+    const createdPost = await postRepository.createPost(postData);
 
-  //   // Assert
-  //   expect(createdPost.title).toEqual(postData.title);
-  //   expect(createdPost.content).toEqual(postData.content);
-  //   expect(createdPost.authorId).toEqual(authorId.id);
-  //   expect(prismaService.post.create).toHaveBeenCalledTimes(1);
-  // });
+    // Assert
+    expect(createdPost.title).toEqual(postData.title);
+    expect(createdPost.content).toEqual(postData.content);
+    expect(createdPost.authorHash).toEqual(postData.authorHash);
+    expect(createdPost.authorNickname).toEqual(postData.authorNickname);
+    expect(prismaService.post.create).toHaveBeenCalledTimes(1);
+  });
 
   it('should get a post by id', async () => {
     // Arrange
@@ -62,7 +63,8 @@ describe('PostRepository', () => {
       published: true,
       votesUp: 5,
       votesDown: 1,
-      authorId: 1,
+      authorHash: 'user1hash',
+      authorNickname: 'user1',
       createdAt: new Date('2023-04-13T10:00:00Z'),
       disabledAt: null,
       moderatedAt: null,
@@ -82,7 +84,7 @@ describe('PostRepository', () => {
     };
 
     // Act
-    const post = await postRepository.getPostById(1);
+    const post = await postRepository.getPostById(1, { categories: true });
 
     // Assert
     expect(post).toEqual(firstPost);
