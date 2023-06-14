@@ -11,9 +11,9 @@
     <!-- Title -->
     <div>
       <div class="text-2xl font-extrabold text-black-700 mb-3">
-        <input type="text" name="title" v-model="titleField.value.value" class="border rounded p-2 w-full" />
+        <input type="text" name="title" v-model="titleField.value.value" class="border rounded p-2 w-full" data-cy="modify-title-input" />
       </div>
-      <p v-if="titleField.errorMessage.value" class="text-red-500 mb-5 text-sm">
+      <p v-if="titleField.errorMessage.value" class="text-red-500 mb-5 text-sm" data-cy="title-input-error">
         {{ titleField.errorMessage.value }}
       </p>
     </div>
@@ -21,10 +21,11 @@
     <!-- Content -->
     <div>
       <div class="text-gray-700 text-lg leading-relaxed mb-3">
-        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full"></textarea>
+        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full" data-cy="modify-content-input"></textarea>
       </div>
       <p v-if="contentField.errorMessage.value"
-      class="text-red-700 mb-5 text-sm">
+      class="text-red-700 mb-5 text-sm"
+      data-cy="content-input-error">
         {{ contentField.errorMessage.value }}
       </p>
     </div>
@@ -41,9 +42,10 @@
           :searchable="true"
           :caret="true"
           class="px-8 multiselect-blue"
+          data-cy="modify-categories-multiselect"
           />
         <!-- Show error message if there's an error fetching categories -->
-        <div v-if="categoriesStore.errorMessage" class="text-red-500 text-sm">
+        <div v-if="categoriesStore.errorMessage" class="text-red-500 text-sm" data-cy="categories-input-error">
           {{ categoriesStore.errorMessage }}
         </div>
       </div>

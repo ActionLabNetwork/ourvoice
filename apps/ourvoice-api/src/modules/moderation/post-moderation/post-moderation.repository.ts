@@ -285,6 +285,40 @@ export class PostModerationRepository {
     return modifiedModerationPost;
   }
 
+  async rollbackModifiedModerationPost(postId: number) {
+    return await this.prisma.$transaction(async (tx) => {
+      // Fetch the modified post
+      const post = await tx.post.findUnique({
+        where: { id: postId },
+        include: { versions: { orderBy: { version: 'desc' } } },
+      });
+
+      // Set 2nd latest version to latest version
+      await tx.postVersion.update({
+        where: { id: post.versions[1].id },
+        data: { latest: true },
+      });
+
+      // Delete the latest version
+      await tx.postVersion.delete({
+        where: { id: post.versions[0].id },
+      });
+
+      // Fetch the updated post
+      const updatedPost = await tx.post.findUnique({
+        where: { id: postId },
+        include: {
+          versions: {
+            orderBy: { version: 'desc' },
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          },
+        },
+      });
+
+      return updatedPost;
+    });
+  }
+
   async renewPostModeration(id: number, moderatorHash: string) {
     const renewedPostId = await this.prisma.$transaction(async (tx) => {
       // Fetch the postModeration and related post

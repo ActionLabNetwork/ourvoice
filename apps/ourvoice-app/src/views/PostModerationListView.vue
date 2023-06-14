@@ -5,13 +5,13 @@
       <div class="px-10 py-10 bg-gray-100">
         <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
           <template #pending>
-            <PostModerationList :posts="moderationPosts.PENDING" />
+            <PostModerationList :posts="moderationPosts.PENDING"  />
           </template>
           <template #accepted>
-            <PostModerationList :posts="moderationPosts.APPROVED" />
+            <PostModerationList :posts="moderationPosts.APPROVED"  />
           </template>
           <template #rejected>
-            <PostModerationList :posts="moderationPosts.REJECTED" />
+            <PostModerationList :posts="moderationPosts.REJECTED"  />
           </template>
         </BaseTab>
       </div>

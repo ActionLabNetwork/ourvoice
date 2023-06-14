@@ -13,7 +13,7 @@
                     <div class="flex items-start justify-between">
                       <DialogTitle class="text-base font-semibold leading-6 text-gray-900">Moderation History</DialogTitle>
                       <div class="ml-3 flex h-7 items-center">
-                        <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500" @click="open = false">
+                        <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500" @click="open = false" data-cy="side-pane-close-button">
                           <font-awesome-icon class="h-6 w-6" :icon="['fas', 'fa-xmark']" />
                         </button>
                       </div>

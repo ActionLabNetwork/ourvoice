@@ -54,6 +54,11 @@ describe('Create Post', () => {
     cy.visit('/post')
   })
 
+  it('should contain navbar', () => {
+    // Assert
+    cy.get('[data-cy="ourvoice-navbar"]').should('exist')
+  })
+
   describe('Form rendering', () => {
     it('should display the form and required fields', () => {
       // Assert
@@ -188,7 +193,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Categories (API Reliant)', () => {
+  describe('Categories (API reliant & stubbed)', () => {
     it('should display categories received from the API', () => {
       // Arrange
       const expectedCategories = [
@@ -213,7 +218,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Attachments (API reliant)', () => {
+  describe('Attachments (API reliant & stubbed)', () => {
     it('should display uploaded attachments', () => {
       // Arrange
       const pdfFile = `${fixtureRoot}/dummy.pdf`
@@ -248,7 +253,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Form submission (API reliant)', () => {
+  describe('Form submission (API reliant & stubbed)', () => {
     it('should do mutation calls to upload attachments to s3 bucket and create post details on form submit', () => {
       // Arrange
       const pdfFile = `${fixtureRoot}/dummy.pdf`

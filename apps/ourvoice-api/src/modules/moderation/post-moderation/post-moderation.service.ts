@@ -193,6 +193,13 @@ export class PostModerationService {
     );
   }
 
+  // Meant to be used in testing to quickly rollback to the previous db state
+  async rollbackModifiedModerationPost(postId: number) {
+    return await this.moderationPostRepository.rollbackModifiedModerationPost(
+      postId,
+    );
+  }
+
   async renewPostModeration(id: number, moderatorHash: string) {
     const moderationToBeRenewed =
       await this.moderationPostRepository.getPostModerationById(id);

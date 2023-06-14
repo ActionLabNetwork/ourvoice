@@ -2,7 +2,10 @@
   <div class="flex flex-col gap-5">
     <div v-if="hasModerationHistory" class="flex justify-end">
       <!-- Side pane button -->
-      <div @click="toggleSidePane" class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md">
+      <div
+        @click="toggleSidePane"
+        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md" data-cy="moderation-history-button"
+      >
         <p>
           Moderation History
           <span>
@@ -39,6 +42,7 @@
                 <button
                   @click="handleRenewModeration"
                   class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
+                  data-cy="renew-button"
                 >
                   Renew Moderation
                   <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>

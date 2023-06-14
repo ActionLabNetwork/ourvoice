@@ -86,6 +86,13 @@ export class PostModerationResolver {
   }
 
   @Mutation()
+  async rollbackModifiedModerationPost(@Args('postId') postId: number) {
+    return await this.postModerationService.rollbackModifiedModerationPost(
+      postId,
+    );
+  }
+
+  @Mutation()
   async renewPostModeration(
     @Args('postModerationId') id: number,
     @Args('moderatorHash') moderatorHash: string,
