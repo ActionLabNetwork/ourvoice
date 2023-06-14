@@ -28,7 +28,6 @@ export class SupertokensService {
                   const request = supertokens.getRequestFromUserContext(
                     input.userContext,
                   );
-                  console.log(JSON.stringify(request));
                   const userId = input.userId;
                   const { metadata } = await UserMetadata.getUserMetadata(
                     userId,
@@ -38,7 +37,6 @@ export class SupertokensService {
                     ...input.accessTokenPayload,
                     deployment: metadata.deployment || '',
                   };
-                  console.log('CREATESESSION DEPLOYMENT:', metadata.deployment);
                   return originalImplementation.createNewSession(input);
                 },
               };
