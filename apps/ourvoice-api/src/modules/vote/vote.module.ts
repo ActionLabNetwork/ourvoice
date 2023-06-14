@@ -2,7 +2,7 @@ import { VoteResolver } from './vote.resolver';
 import { VoteService } from './vote.service';
 import { VoteRepository } from './vote.repository';
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'src/database/prisma.module';
+import { PrismaModule } from 'src/database/main/prisma.module';
 
 @Module({
   imports: [PrismaModule],

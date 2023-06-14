@@ -1,4 +1,4 @@
-import { PrismaService } from '../../database/prisma.service';
+import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -10,7 +10,7 @@ export class VoteRepository {
     const { post, comment, voteType } = data; //comment is undefined means the vote is for post
     const vote = await this.prisma.vote.create({
       data,
-      include: { user: true, post: true, comment: true },
+      include: { post: true, comment: true },
     });
     if (comment) {
       await this.prisma.comment.update({
@@ -58,7 +58,7 @@ export class VoteRepository {
 
     const vote = await this.prisma.vote.delete({
       where: { id: voteToBeDeleted.id },
-      include: { user: true, post: true, comment: true },
+      include: { post: true, comment: true },
     });
 
     return vote;
@@ -71,7 +71,6 @@ export class VoteRepository {
       //   postId: undefined,
       // },
       include: {
-        user: true,
         post: true,
         comment: true,
       },

@@ -1,7 +1,5 @@
 <template>
   <div class="lg:grid grid-cols-5 w-screen">
-    <!-- <AppNavBar class="h-[5vh] lg:h-full col-span-1" /> -->
-
     <div class="border-red-400 lg:h-screen flex flex-col col-span-5">
       <main class="px-0 lg:px-0 border-green-400 flex flex-col overflow-hidden grow relative">
         <!-- Overlay container for a single post with comments-->
@@ -400,10 +398,8 @@ const GET_POST_QUERY = gql`
       edges {
         cursor
         node {
-          author {
-            id
-            nickname
-          }
+          authorHash
+          authorNickname
           categories {
             name
             id

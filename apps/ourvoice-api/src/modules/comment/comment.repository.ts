@@ -94,11 +94,7 @@ export class CommentRepository {
       where,
       include: {
         post: true,
-        parent: {
-          include: {
-            author: true,
-          },
-        },
+        parent: true,
         children: true,
       },
       skip: pagination?.cursor ? 1 : undefined,

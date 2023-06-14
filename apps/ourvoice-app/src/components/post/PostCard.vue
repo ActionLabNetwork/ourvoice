@@ -1,112 +1,124 @@
 <template>
-  <div class="py-5">
-    <div class="flex m-1 space-x-2">
-      <img
-        class="rounded-full w-8 h-8 sm:w-10 sm:h-10 hover:cursor-pointer"
-        :src="`https://api.multiavatar.com/${post.author.nickname}.png`"
-        :title="post.author.nickname"
-      />
-      <strong class="text-lg">
-        {{ post.author.nickname }}
-      </strong>
-    </div>
-    <div class="flex-1 rounded-lg leading-relaxed m-1">
-      <div
-        class="bg-white dark:text-gray-300 dark:bg-ourvoice-blue px-4 py-2 rounded-lg drop-shadow-md"
-      >
-        <h1 class="flex">
-          <div class="text-xl font-bold">Title: {{ post.title }}</div>
-
-          <div class="ml-auto w-fit space-x-0.5">
-            <span
-              v-for="cat in post.categories"
-              :key="cat.id"
-              class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
-            >
-              {{ cat.name }}
-            </span>
-          </div>
-        </h1>
-        <p class="text-sm md:text-md py-2 break-all">
-          <font-awesome-icon icon="fa-solid fa-quote-left" />
-          {{ post.content }}
-          <font-awesome-icon icon="fa-solid fa-quote-right" />
-        </p>
-        <div id="fileUrlsWrapper" class="text-right">
-          <a
-            class="text-blue-400"
-            v-for="(url, index) in presignedUrls"
-            :key="index"
-            :href="url"
-            target="_blank"
-          >
-            file{{ index + 1 }}
-            <font-awesome-icon icon="fa-solid fa-link" />
-          </a>
-        </div>
-
-        <div class="flex text-gray-500 dark:text-gray-300">
-          <div
-            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-            @click="showComment = !showComment"
-          >
-            <font-awesome-icon icon="fa-solid fa-comment" />
-            <span class="hidden sm:inline-block px-1"> Comment </span>({{
-              post?.comments?.length ?? 0
-            }})
-          </div>
-          <div
-            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-          >
-            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
-            <span class="hidden sm:inline-block px-1"> Vote up </span>({{ post?.votesUp ?? 0 }})
-          </div>
-          <div
-            class="hover:text-indigo-400 dark:hover:hover:text-indigo-400 my-auto mr-1 bg-gray-100 dark:bg-gray-500 px-2 py-1 rounded-full text-xs md:text-sm hover:cursor-pointer"
-          >
-            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
-            <span class="hidden sm:inline-block px-1"> Vote down </span>({{ post?.voteDown ?? 0 }})
-          </div>
-          <div class="text-right ml-auto">
-            <span class="text-xs md:text-md">{{ timePassed(post.createdAt) }}</span>
-          </div>
-        </div>
+  <!-- {{ post }} -->
+  <div
+    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:drop-shadow-lg transition duration-300 ease-in-out"
+  >
+    <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
+      {{ post?.title }}
+      <div>
+        <span
+          v-for="(cat, index) in post?.categories"
+          :key="index"
+          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+          ># {{ cat?.name }}
+        </span>
       </div>
-      <CommentList
-        v-if="showComment"
-        :postId="post.id"
-        :noOfComments="post?.comments?.length ?? 0"
-      />
-      <div v-if="showComment" class="flex justify-center mt-5 mx-5 border-b items-center">
-        <button @click="showComment = false">
-          <font-awesome-icon icon="fa-solid fa-chevron-up" fade /> Fold
+    </h1>
+    <h2 class="text-xs lg:text-sm text-gray-500">
+      <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
+      <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
+    </h2>
+    <p class="text-sm my-2">
+      <font-awesome-icon icon="fa-solid fa-quote-left" />
+      {{ post?.content }}
+      <font-awesome-icon icon="fa-solid fa-quote-right" />
+    </p>
+    <div id="fileUrlsWrapper" class="text-right">
+      <a
+        class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline"
+        v-for="url in presignedUrls"
+        :key="url"
+        :href="url"
+        target="_blank"
+      >
+        file
+      </a>
+    </div>
+    <div class="flex justify-between items-center">
+      <div class="flex">
+        <button
+          @click="voteForPost('UPVOTE')"
+          type="button"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+        >
+          {{ votes?.filter((vote) => vote.voteType === 'UPVOTE').length }}
+          <font-awesome-icon icon="fa-solid fa-thumbs-up" />
         </button>
+
+        <button
+          @click="voteForPost('DOWNVOTE')"
+          type="button"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+        >
+          {{ votes?.filter((vote) => vote.voteType === 'DOWNVOTE').length }}
+          <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+        </button>
+      </div>
+      <div>
+        <slot
+          ><RouterLink :to="postPageLink"
+            >comment({{ post?.comments?.length ?? 0 }})</RouterLink
+          ></slot
+        >
       </div>
     </div>
   </div>
 </template>
-
 <script lang="ts" setup>
-import { timePassed } from '@/utils'
-import { ref, watchEffect } from 'vue'
-import CommentList from '../comment/CommentList.vue'
+import { computed, ref } from 'vue'
+import { timePassed } from '@/utils/index'
 import { usePostsStore } from '@/stores/posts'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+
 const postsStore = usePostsStore()
+
 const props = defineProps({
-  post: {
-    type: Object,
+  postId: {
+    type: Number,
     required: true
   }
 })
-const showComment = ref(false)
+
+const post = postsStore.getPostById(props.postId)
+const postPageLink = computed(() => `/post/${props.postId}`)
+
+const getPresignedUrls = (keys: string[]) => {
+  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
+}
 
 const presignedUrls = ref<string[]>([])
-watchEffect(async () => {
-  const res = (await postsStore.getPresignedUrls(
-    'test-bucket',
-    props.post.files ?? [],
-    60000
-  )) as any
-  presignedUrls.value = res?.map((r: any) => r.url)
+const res = await getPresignedUrls(post?.files ?? [])
+presignedUrls.value = res.map((url: any) => url.url)
+
+const votes = ref<Vote[]>([])
+
+const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
+const { onResult, refetch } = useQuery(GET_VOTES_QUERY, {
+  filter: {
+    postId: props.postId,
+    voteType: null,
+    userId: null,
+    commentId: null
+  }
 })
+onResult(({ data, loading }) => {
+  if (loading) return
+  votes.value = data.votes.filter((vote: any) => !vote.comment)
+})
+
+const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+  await createVoteForPost({
+    data: {
+      commentId: null,
+      postId: props.postId,
+      // TODO: get userId from auth
+      userId: 1,
+      voteType: voteType
+    }
+  })
+  refetch()
+}
 </script>

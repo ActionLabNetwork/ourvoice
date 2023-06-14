@@ -128,91 +128,91 @@ export class PostRepository {
 
     return { totalCount, posts };
   }
-  // TODO: remove lint ignores
-  async getPostsByCategories(
-    categoryNames: string[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    filter?: PostsFilterInput,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pagination?: PostPaginationInput,
-  ): Promise<{ totalCount: number; posts: Post[] }> {
-    const {
-      title,
-      content,
-      moderated,
-      published,
-      votesDown,
-      votesUp,
-      authorId,
-      // categoryIds,
-      createdAfter,
-      createdBefore,
-      moderatedAfter,
-      moderatedBefore,
-      publishedAfter,
-      publishedBefore,
-    } = filter ?? {};
+  // // TODO: remove lint ignores
+  // async getPostsByCategories(
+  //   categoryNames: string[],
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   filter?: PostsFilterInput,
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   pagination?: PostPaginationInput,
+  // ): Promise<{ totalCount: number; posts: Post[] }> {
+  //   const {
+  //     title,
+  //     content,
+  //     moderated,
+  //     published,
+  //     votesDown,
+  //     votesUp,
+  //     authorId,
+  //     // categoryIds,
+  //     createdAfter,
+  //     createdBefore,
+  //     moderatedAfter,
+  //     moderatedBefore,
+  //     publishedAfter,
+  //     publishedBefore,
+  //   } = filter ?? {};
 
-    const where: Prisma.PostWhereInput = {
-      title: title ? { contains: title, mode: 'insensitive' } : undefined,
-      content: content ? { contains: content, mode: 'insensitive' } : undefined,
-      moderated: moderated ?? undefined,
-      published: published ?? undefined,
-      votesDown: votesDown ?? undefined,
-      votesUp: votesUp ?? undefined,
-      authorId: authorId ?? undefined,
-      categories: categoryNames?.length
-        ? {
-            some: {
-              name: {
-                in: categoryNames,
-                mode: 'insensitive',
-              },
-            },
-          }
-        : undefined,
-      createdAt: createdAfter || createdBefore ? {} : undefined,
-      moderatedAt: moderatedAfter || moderatedBefore ? {} : undefined,
-      publishedAt: publishedAfter || publishedBefore ? {} : undefined,
-    };
+  //   const where: Prisma.PostWhereInput = {
+  //     title: title ? { contains: title, mode: 'insensitive' } : undefined,
+  //     content: content ? { contains: content, mode: 'insensitive' } : undefined,
+  //     moderated: moderated ?? undefined,
+  //     published: published ?? undefined,
+  //     votesDown: votesDown ?? undefined,
+  //     votesUp: votesUp ?? undefined,
+  //     authorId: authorId ?? undefined,
+  //     categories: categoryNames?.length
+  //       ? {
+  //           some: {
+  //             name: {
+  //               in: categoryNames,
+  //               mode: 'insensitive',
+  //             },
+  //           },
+  //         }
+  //       : undefined,
+  //     createdAt: createdAfter || createdBefore ? {} : undefined,
+  //     moderatedAt: moderatedAfter || moderatedBefore ? {} : undefined,
+  //     publishedAt: publishedAfter || publishedBefore ? {} : undefined,
+  //   };
 
-    if (createdAfter) {
-      where.createdAt['gte'] = createdAfter;
-    }
-    if (createdBefore) {
-      where.createdAt['lte'] = createdBefore;
-    }
-    if (moderatedAfter) {
-      where.moderatedAt['gte'] = moderatedAfter;
-    }
-    if (moderatedBefore) {
-      where.moderatedAt['lte'] = moderatedBefore;
-    }
-    if (publishedAfter) {
-      where.publishedAt['gte'] = publishedAfter;
-    }
-    if (publishedBefore) {
-      where.publishedAt['lte'] = publishedBefore;
-    }
-    const totalCount = await this.prisma.post.count({ where });
+  //   if (createdAfter) {
+  //     where.createdAt['gte'] = createdAfter;
+  //   }
+  //   if (createdBefore) {
+  //     where.createdAt['lte'] = createdBefore;
+  //   }
+  //   if (moderatedAfter) {
+  //     where.moderatedAt['gte'] = moderatedAfter;
+  //   }
+  //   if (moderatedBefore) {
+  //     where.moderatedAt['lte'] = moderatedBefore;
+  //   }
+  //   if (publishedAfter) {
+  //     where.publishedAt['gte'] = publishedAfter;
+  //   }
+  //   if (publishedBefore) {
+  //     where.publishedAt['lte'] = publishedBefore;
+  //   }
+  //   const totalCount = await this.prisma.post.count({ where });
 
-    const posts = await this.prisma.post.findMany({
-      where,
-      include: {
-        author: true,
-        categories: true,
-        comments: true,
-        votes: true,
-      },
-      skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor) }
-        : undefined,
-      take: pagination?.limit ?? 10,
-    });
+  //   const posts = await this.prisma.post.findMany({
+  //     where,
+  //     include: {
+  //       author: true,
+  //       categories: true,
+  //       comments: true,
+  //       votes: true,
+  //     },
+  //     skip: pagination?.cursor ? 1 : undefined,
+  //     cursor: pagination?.cursor
+  //       ? { id: cursorToNumber(pagination.cursor) }
+  //       : undefined,
+  //     take: pagination?.limit ?? 10,
+  //   });
 
-    return { totalCount, posts };
-  }
+  //   return { totalCount, posts };
+  // }
 
   async createPost(data: Prisma.PostCreateInput) {
     return this.prisma.post.create({ data });

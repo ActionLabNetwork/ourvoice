@@ -1,3 +1,4 @@
+
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -6,11 +7,6 @@
 
 /* tslint:disable */
 /* eslint-disable */
-
-export enum sortOrder {
-    asc = "asc",
-    desc = "desc"
-}
 
 export enum ModerationDecision {
     ACCEPTED = "ACCEPTED",
@@ -27,6 +23,11 @@ export enum ModerationPostStatus {
     PENDING = "PENDING",
     APPROVED = "APPROVED",
     REJECTED = "REJECTED"
+}
+
+export enum sortOrder {
+    asc = "asc",
+    desc = "desc"
 }
 
 export class UserCreateInput {
@@ -226,14 +227,16 @@ export class PostPaginationInput {
 
 export class VoteCreateInput {
     voteType: string;
-    userId: number;
+    authorHash: string;
+    authorNickname: string;
     postId: number;
     commentId?: Nullable<number>;
 }
 
 export class VotesFilterInput {
     voteType?: Nullable<string>;
-    userId?: Nullable<number>;
+    authorHash?: Nullable<string>;
+    authorNickname?: Nullable<string>;
     postId?: Nullable<number>;
     commentId?: Nullable<number>;
 }
@@ -273,11 +276,11 @@ export abstract class IQuery {
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
+    abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+
     abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
 
     abstract votes(filter?: Nullable<VotesFilterInput>): Vote[] | Promise<Vote[]>;
-
-    abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 }
 
 export abstract class IMutation {
@@ -575,7 +578,8 @@ export class PostPageInfo {
 export class Vote {
     id: number;
     voteType: string;
-    user: User;
+    authorHash: string;
+    authorNickname: string;
     post: Post;
     comment?: Nullable<Comment>;
 }

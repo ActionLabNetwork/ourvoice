@@ -8,11 +8,16 @@ export const GET_POSTS_QUERY = gql`
           id
           title
           content
+          files
           categories {
             id
             name
           }
           createdAt
+          moderatedAt
+          publishedAt
+          published
+          moderated
           authorHash
           authorNickname
           comments {
@@ -82,10 +87,8 @@ export const FETCH_POST_QUERY = gql`
       edges {
         cursor
         node {
-          author {
-            id
-            nickname
-          }
+          authorHash
+          authorNickname
           categories {
             name
             id

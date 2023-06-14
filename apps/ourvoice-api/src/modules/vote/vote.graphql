@@ -11,21 +11,24 @@ type Query {
 type Vote {
   id: Int!
   voteType: String!
-  user: User!
+  authorHash: String!
+  authorNickname: String!
   post: Post!
   comment: Comment
 }
 
 input VoteCreateInput {
   voteType: String!
-  userId: Int!
+  authorHash: String!
+  authorNickname: String!
   postId: Int!
   commentId: Int
 }
 
 input VotesFilterInput {
   voteType: String
-  userId: Int
+  authorHash: String
+  authorNickname: String
   postId: Int
   commentId: Int
 }

@@ -12,11 +12,12 @@ export class VoteService {
     if (res.length == 1) {
       return this.deleteVote(res[0].id);
     }
-    const { userId, postId, commentId, voteType } = data;
+    const { authorHash, authorNickname, postId, commentId, voteType } = data;
 
     const voteData = {
       voteType,
-      user: { connect: { id: userId } },
+      authorHash,
+      authorNickname,
       post: postId ? { connect: { id: postId } } : undefined,
       comment: commentId ? { connect: { id: commentId } } : undefined,
     };
@@ -28,10 +29,11 @@ export class VoteService {
   }
 
   async getVote(filter?: VotesFilterInput) {
-    const { userId, postId, commentId, voteType } = filter;
+    const { authorNickname, authorHash, postId, commentId, voteType } = filter;
     const where = {
       voteType: voteType ?? undefined,
-      userId: userId ?? undefined,
+      authorHash: authorHash ?? undefined,
+      authorNickname: authorNickname ?? undefined,
       postId: postId ?? undefined,
       commentId: commentId ?? undefined,
     };

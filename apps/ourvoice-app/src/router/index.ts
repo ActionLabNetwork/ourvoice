@@ -6,7 +6,7 @@ import PostsView from '../views/PostsView.vue'
 import TestView from '@/views/TestView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
-import CreateCommentView from '../views/CreateCommentView.vue'
+// import CreateCommentView from '../views/CreateCommentView.vue'
 import PostModerationListView from '../views/PostModerationListView.vue'
 import PostModerationView from '../views/PostModerationView.vue'
 import CommentModerationListView from '../views/CommentModerationListView.vue'
@@ -99,9 +99,14 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresModerator: true }
     },
     {
-      path: '/post',
-      name: 'post',
-      component: PostsView,
+      path: '/posts',
+      name: 'posts',
+      component: TestView,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/posts/:id',
+      component: () => import('@/components/post/PostPage.vue'),
       meta: { requiresAuth: false }
     },
     {

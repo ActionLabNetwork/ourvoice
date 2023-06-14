@@ -2,7 +2,7 @@ import { useUserStore } from './user'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { apolloClient } from './../graphql/client/index'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
-import { GET_POSTS_BY_CATEGORIES_QUERY, FETCH_POST_QUERY } from './../graphql/queries/getPosts'
+import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
@@ -16,10 +16,8 @@ export interface Post {
   publishedAt: string
   published: boolean
   moderated: boolean
-  author: {
-    id: number
-    nickname: string
-  }
+  authorHash: string
+  authorNickname: string
   categories: {
     id: number
     name: string
@@ -77,6 +75,7 @@ export const usePostsStore = defineStore('posts', {
         })
 
         this.data = data.posts.edges.map((edge: any) => edge.node)
+
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
         console.log({ data })

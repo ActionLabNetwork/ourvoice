@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia'
 import { apolloClient } from './../graphql/client/index'
 import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
-import { GET_COMMENTS_QUERY, GET_COMMENTS_BY_POST_ID_QUERY } from '@/graphql/queries/getComments'
-import { provideApolloClient, useQuery } from '@vue/apollo-composable'
+import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
+import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
+import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
+import { provideApolloClient } from '@vue/apollo-composable'
 
 export interface Comment {
   id: number
@@ -55,60 +57,6 @@ export const useCommentsStore = defineStore('comments', {
     pageInfo: undefined,
     totalCount: undefined
   }),
-
-  getters: {
-    getCommentslength(state) {
-      return state.data.length
-    },
-
-  //   getGroupedComments(state) {
-  //     const commentsForPosts: Comment[] = []
-  //     const commentsForComments: Comment[] = []
-  //     state.data.forEach((c) => {
-  //       if (c.parent) {
-  //         commentsForComments.push(c)
-  //       } else if (c.post) {
-  //         commentsForPosts.push(c)
-  //       }
-  //     })
-  //     return [
-  //       {
-  //         label: 'Comments for Posts',
-  //         options: commentsForPosts
-  //       },
-  //       {
-  //         label: 'Comments for Comments',
-  //         options: commentsForComments
-  //       }
-  //     ]
-  //   }
-  // },
-
-  actions: {
-    async fetchComments(postId?: number) {
-      const { onResult, onError } = useQuery(GET_COMMENTS_QUERY, {
-        filter: postId ? { postId: postId } : null,
-        pagination: {
-          cursor: null,
-          limit: null
-        }
-      })
-      return [
-        {
-          label: 'Comments for Posts',
-          options: commentsForPosts
-        },
-        {
-          label: 'Comments for Comments',
-          options: commentsForComments
-        }
-      ]
-    },
-
-    getCommentsByPostId: (state) => (postId: number) => {
-      return state.data.filter((c) => c.post?.id === postId)
-    }
-  },
 
   actions: {
     async fetchComments() {
@@ -220,35 +168,6 @@ export const useCommentsStore = defineStore('comments', {
           this.error = error
         }
       }
-    },
-
-    async updateComment(commentId: number) {
-      const { onResult, onError } = useQuery(
-        GET_COMMENT_BY_ID_QUERY,
-        {
-          commentId: commentId
-        },
-        {
-          fetchPolicy: 'network-only'
-        }
-      )
-
-      onResult(({ data, loading }) => {
-        this.loading = loading
-        if (loading) return
-        const comment = this.data?.find((comment: Comment) => comment.id === commentId)
-        if (!comment) {
-          return
-        }
-        comment.votesUp = data.comment.votesUp
-        comment.votesDown = data.comment.votesDown
-      })
-      onError((error) => {
-        this.error = error
-        if (error) {
-          this.errorMessage = 'Failed to update comment. Please try again.'
-        }
-      })
     }
   }
 })
