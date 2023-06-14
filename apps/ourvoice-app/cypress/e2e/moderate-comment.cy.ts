@@ -86,14 +86,9 @@ describe('Moderate Comment', () => {
       })
 
       it('should not display moderation history', () => {
-        // const moderationHistoryButton = '[data-cy="moderation-history-button"]'
         const moderationHistory = '[data-cy="moderation-history"]'
 
         cy.get(moderationHistory).should('not.exist')
-        // cy.get(moderationHistoryButton).should('exist')
-        // cy.get(moderationHistoryButton).click()
-        // cy.get(moderationHistory).should('be.visible')
-        // cy.get(`${moderationHistory} li`).should('have.length', 4)
       })
 
       it('should display all moderation controls', () => {
