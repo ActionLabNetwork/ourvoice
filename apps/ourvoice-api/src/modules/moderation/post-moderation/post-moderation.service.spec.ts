@@ -223,8 +223,6 @@ describe('PostModerationService', () => {
       moderationPosts: [dummyPosts[0]] as Post[],
     });
 
-    console.log(dummyPosts);
-
     const filterData = { status: ModerationPostStatus.PENDING };
     const paginationData = { cursor: 'MQ==', limit: 10 };
     const expectedResult = {

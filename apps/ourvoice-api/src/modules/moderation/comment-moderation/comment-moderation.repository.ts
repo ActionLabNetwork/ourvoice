@@ -6,12 +6,12 @@ import {
   CommentVersion,
   CommentModeration,
 } from '@internal/prisma/client';
-import { PrismaService } from 'src/database/premoderation/prisma.service';
+import { PrismaService } from '../../../database/premoderation/prisma.service';
 import {
   ModerationCommentPaginationInput,
   ModerationCommentsFilterInput,
 } from 'src/graphql';
-import { cursorToNumber } from 'src/utils/cursor-pagination';
+import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
 
 function countCommentVersionModerationDecisions(

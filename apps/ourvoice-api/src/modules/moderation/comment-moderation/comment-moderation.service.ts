@@ -6,7 +6,7 @@ import {
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { Comment } from '@internal/prisma/client';
-import { numberToCursor } from 'src/utils/cursor-pagination';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationCommentsFilterDto } from './dto/comments-filter.dto';
 import { CommentModerationRepository } from './comment-moderation.repository';
 import { CommentCreateDto } from './dto/comment-create.dto';
@@ -175,6 +175,11 @@ export class CommentModerationService {
       throw new BadRequestException(errors);
     }
 
+    // Validate reason
+    if (!reason) {
+      throw new BadRequestException('Reason is required');
+    }
+
     // Validate comment id
     const commentToBeModified =
       await this.moderationCommentRepository.getCommentVersionById(commentId);
@@ -202,6 +207,10 @@ export class CommentModerationService {
   async renewCommentModeration(id: number, moderatorHash: string) {
     const moderationToBeRenewed =
       await this.moderationCommentRepository.getCommentModerationById(id);
+
+    if (!moderationToBeRenewed) {
+      throw new NotFoundException('Moderation does not exist');
+    }
 
     if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
       throw new BadRequestException('Invalid moderator hash');
