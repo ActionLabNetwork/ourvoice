@@ -17,10 +17,8 @@ export interface Comment {
   moderatedAt: string
   publishedAt: string
   disabledAt: string
-  author: {
-    id: number
-    nickname: string
-  }
+  authorHash: string
+  authorNickname: string
   post: {
     id: number
   }

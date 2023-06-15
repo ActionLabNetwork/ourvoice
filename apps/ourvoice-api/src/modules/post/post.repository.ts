@@ -15,7 +15,10 @@ export class PostRepository {
   async getPostById(id: number, include?: Prisma.PostInclude) {
     return this.prisma.post.findUnique({
       where: { id },
-      include,
+      include: include ?? {
+        categories: true,
+        comments: true,
+      },
     });
   }
 

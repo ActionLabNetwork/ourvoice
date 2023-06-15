@@ -3,7 +3,7 @@
     <div class="flex-shrink-0 mr-3">
       <img
         class="rounded-full w-6 h-6 sm:w-8 sm:h-8"
-        src="https://ui-avatars.com/api/?size=48?&name=Mingye+Li"
+        :src="`https://ui-avatars.com/api/?size=48?&name=${userStore.nickname}`"
         title="usr999"
       />
     </div>
@@ -27,21 +27,14 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
-export default {
-  name: 'CommentTextarea',
-  emits: ['submit'],
-  setup(props, ctx) {
-    const content = ref('')
-    const submit = () => {
-      ctx.emit('submit', content.value)
-      content.value = ''
-    }
-    return {
-      submit,
-      content
-    }
-  }
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+const emits = defineEmits(['submit'])
+const content = ref('')
+const submit = () => {
+  emits('submit', content.value)
+  content.value = ''
 }
 </script>

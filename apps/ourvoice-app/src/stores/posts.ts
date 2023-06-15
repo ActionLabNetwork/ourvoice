@@ -45,6 +45,9 @@ export interface PostsState {
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
+  selectedCategoryIds: number[]
+  sortBy: string
+  sortOrder: 'asc' | 'desc'
 }
 
 provideApolloClient(apolloClient)
@@ -56,7 +59,10 @@ export const usePostsStore = defineStore('posts', {
     pageInfo: undefined,
     loading: false,
     error: undefined,
-    errorMessage: undefined
+    errorMessage: undefined,
+    selectedCategoryIds: [],
+    sortBy: '',
+    sortOrder: 'asc'
   }),
   getters: {
     getPostById: (state) => (id: number) => {
@@ -195,6 +201,51 @@ export const usePostsStore = defineStore('posts', {
         //sync votesUp/votesDown state with the post table
         this.data.find((post) => post.id === postId)!.votesUp = data.post.votesUp
         this.data.find((post) => post.id === postId)!.votesDown = data.post.votesDown
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+      }
+    },
+
+    async setSelectedCategoryIds(categoryIds: number[]) {
+      this.selectedCategoryIds = categoryIds
+    },
+
+    async setSortBy(sortBy: string) {
+      this.sortBy = sortBy
+    },
+
+    async fetchPostById(postId: number) {
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_POST_BY_ID_QUERY,
+          variables: { postId },
+          fetchPolicy: 'no-cache'
+        })
+        this.data.push({
+          id: data.post.id,
+          title: data.post.title,
+          content: data.post.content,
+          createdAt: data.post.createdAt,
+          moderatedAt: data.post.moderatedAt,
+          publishedAt: data.post.publishedAt,
+          published: data.post.published,
+          moderated: data.post.moderated,
+          authorHash: data.post.authorHash,
+          authorNickname: data.post.authorNickname,
+          categories: data.post.categories.map((category: any) => ({
+            id: category.id,
+            name: category.name
+          })),
+          comments: data.post.comments.map((comment: any) => ({
+            id: comment.id,
+            content: comment.content
+          })),
+          votesUp: data.post.votesUp,
+          votesDown: data.post.votesDown,
+          files: data.post.files
+        })
       } catch (error) {
         if (error instanceof Error) {
           this.error = error

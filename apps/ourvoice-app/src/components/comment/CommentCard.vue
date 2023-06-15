@@ -3,12 +3,12 @@
     <div class="flex-shrink-0 mr-1 md:mr-3">
       <img
         class="rounded-full w-6 h-6 sm:w-8 sm:h-8 hover:cursor-pointer"
-        :src="`https://ui-avatars.com/api/?size=48?&name=${comment?.author.nickname}`"
+        :src="`https://ui-avatars.com/api/?size=48?&name=${comment?.authorNickname}`"
       />
     </div>
     <div class="flex-1">
       <b class="text-sm">
-        {{ comment?.author.nickname }} reply to
+        {{ comment?.authorNickname }} reply to
         <span class="text-blue-500 hover:underline hover:cursor-pointer">
           @{{ comment?.parent?.author?.nickname ?? 'original post' }}
         </span>
@@ -105,9 +105,9 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
       voteType: voteType
     }
   })
-  await syncVote()
+  // await syncVote()
 }
-const syncVote = async () => {
-  await commentStore.updateComment(props.commentId)
-}
+// const syncVote = async () => {
+//   await commentStore.updateComment(props.commentId)
+// }
 </script>

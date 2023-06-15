@@ -101,11 +101,12 @@ const router = createRouter({
     {
       path: '/posts',
       name: 'posts',
-      component: TestView,
+      component: PostsView,
       meta: { requiresAuth: false }
     },
     {
-      path: '/posts/:id',
+      path: '/posts/:id(\\d+)',
+      name: 'postpage',
       component: () => import('@/components/post/PostPage.vue'),
       meta: { requiresAuth: false }
     },
@@ -113,10 +114,6 @@ const router = createRouter({
       path: '/test',
       name: 'test',
       component: TestView
-    },
-    {
-      path: '/post/:id',
-      component: () => import('@/components/post/PostPage.vue')
     }
   ]
 })

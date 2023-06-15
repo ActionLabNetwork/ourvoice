@@ -17,7 +17,7 @@
     </h1>
     <h2 class="text-xs lg:text-sm text-gray-500">
       <span>{{ timePassed(props.createdAt) }} </span> by
-      <span class="font-semibold">{{ props.author?.nickname }}</span>
+      <span class="font-semibold">{{ props.authorNickname }}</span>
     </h2>
     <p class="text-sm my-2">
       <font-awesome-icon icon="fa-solid fa-quote-left" />
@@ -68,16 +68,14 @@ import { usePostsStore } from '@/stores/posts'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
 const postsStore = usePostsStore()
 
 interface Post {
   id: number
   title: string
-  author: {
-    id: number
-    nickname: string
-  }
+  authorHash: string
+  authorNickname: string
   content: string
   createdAt: string
   publishedAt: string | null
@@ -91,15 +89,19 @@ interface Post {
 const props = defineProps<Post>()
 
 const presignedUrls = ref<string[]>([])
-
-const updatePresignedUrls = async () => {
-  const res = (await postsStore.getPresignedUrls('test-bucket', props.files, 60000)) as any
-  presignedUrls.value = res?.map((r: any) => r.url)
+const getPresignedUrls = (keys: string[]) => {
+  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
 }
+const res = await getPresignedUrls(props?.files ?? [])
+presignedUrls.value = res.map((item: any) => item.url) ?? []
+// const updatePresignedUrls = async () => {
+//   const res = (await postsStore.getPresignedUrls('test-bucket', props.files, 60000)) as any
+//   presignedUrls.value = res?.map((r: any) => r.url)
+// }
 
-watchEffect(() => {
-  if (presignedUrls.value.length != props.files.length) updatePresignedUrls()
-})
+// watchEffect(() => {
+//   if (presignedUrls.value.length != props.files.length) updatePresignedUrls()
+// })
 
 const votes = ref<Vote[]>([])
 

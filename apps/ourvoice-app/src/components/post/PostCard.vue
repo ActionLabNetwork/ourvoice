@@ -62,11 +62,11 @@
         </button>
       </div>
       <div>
-        <slot
-          ><RouterLink :to="postPageLink" class="underline"
-            >comment({{ post?.comments?.length ?? 0 }})</RouterLink
-          ></slot
-        >
+        <slot>
+          <RouterLink :to="postPageLink" class="underline"
+            >comment({{ post?.comments?.length ?? 0 }})
+          </RouterLink>
+        </slot>
       </div>
     </div>
   </div>
@@ -92,7 +92,7 @@ const props = defineProps({
 })
 
 const post = postsStore.getPostById(props.postId)
-const postPageLink = computed(() => `/post/${props.postId}`)
+const postPageLink = computed(() => `/posts/${props.postId}`)
 
 const getPresignedUrls = (keys: string[]) => {
   return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
