@@ -15,11 +15,6 @@ import { UsersService } from './users.service';
 import { MetadataService } from './metadata/metadata.service';
 import { RolesService } from './roles/roles.service';
 import { UserRole } from './roles/roles.interface';
-import SupertokensSession from 'supertokens-node/recipe/session';
-import {
-  PermissionClaim,
-  UserRoleClaim,
-} from 'supertokens-node/recipe/userroles';
 
 @Controller('users')
 export class UserController {

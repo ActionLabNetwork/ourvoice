@@ -143,6 +143,8 @@ import { defineComponent } from 'vue'
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
+const adminURL = import.meta.env.VITE_APP_ADMIN_URL
+
 // TODO: this list might be coming from the database later
 // const organisation = YamlContent.organisation
 
@@ -367,7 +369,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://demo${domain}`
+        window.location.href = adminURL
       }
     }
   }

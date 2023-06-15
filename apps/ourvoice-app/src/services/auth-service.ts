@@ -21,5 +21,9 @@ export default {
   async getUserId() {
     if (!(await Session.doesSessionExist())) return
     return await Session.getUserId()
+  },
+  async refreshToken() {
+    const response = await axios.get(`${API_URL}/refreshtoken`)
+    return response
   }
 }

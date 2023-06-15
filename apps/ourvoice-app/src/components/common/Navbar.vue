@@ -35,7 +35,7 @@
             {{ item.name }}
           </span>
         </router-link>
-        <Popover class="relative">
+        <Popover :class="{ hidden: !userStore.isModerator }" class="relative">
           <PopoverButton
             class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
             :class="{ 'border-b-2': isModerationPage }"
