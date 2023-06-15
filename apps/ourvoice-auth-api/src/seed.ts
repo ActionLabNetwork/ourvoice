@@ -21,17 +21,18 @@ async function manuallyVerifyEmail(userId: string) {
 
 export async function addSuperAdmin(email: string, password?: string) {
   const exists = await getUserByEmail(email);
+  console.log('Trying to create super admin user...');
   if (exists) {
     console.log('Super admin user already exists');
     return;
   }
   const response = await signUp(email, password);
   if (response.status === 'OK') {
-    console.log(response);
     await manuallyVerifyEmail(response.user.id);
     await addRoleToUser(response.user.id, 'super');
     await UserMetadata.updateUserMetadata(response.user.id, {
       deployment: '*',
     });
+    console.log('Created super admin user: ', JSON.stringify(response));
   }
 }

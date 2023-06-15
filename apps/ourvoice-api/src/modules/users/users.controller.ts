@@ -8,18 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import {
-  SessionContainer,
-  SessionClaimValidator,
-} from 'supertokens-node/recipe/session';
-import EmailPassword from 'supertokens-node/recipe/emailpassword';
-import { AuthGuard } from '../auth/auth.guard';
-import { Session } from '../auth/session.decorator';
-import UserRoles from 'supertokens-node/recipe/userroles';
+import { SessionContainer } from 'supertokens-node/recipe/session';
+import { AuthGuard } from '../../auth/auth.guard';
+import { Session } from '../../auth/session.decorator';
 import { UsersService } from './users.service';
 import { MetadataService } from './metadata/metadata.service';
 import { RolesService } from './roles/roles.service';
-import { Error as STError } from 'supertokens-node/recipe/session';
+import { UserRole } from './roles/roles.interface';
+import SupertokensSession from 'supertokens-node/recipe/session';
+import {
+  PermissionClaim,
+  UserRoleClaim,
+} from 'supertokens-node/recipe/userroles';
 
 @Controller('users')
 export class UserController {
@@ -28,19 +28,20 @@ export class UserController {
     private metadataService: MetadataService,
     private rolesService: RolesService,
   ) {}
+  // get info for current session user
   @Get('me')
   @UseGuards(new AuthGuard())
   async getProfile(@Session() session: SessionContainer): Promise<string> {
     const userId = session.getUserId();
     // You can learn more about the `User` object over here https://github.com/supertokens/core-driver-interface/wiki
-    // TODO: move to userService
-    const userInfo = await EmailPassword.getUserById(userId);
+    const userInfo = await this.userService.getUserInfo(userId);
     return JSON.stringify({
       userId: userInfo?.id,
       email: userInfo?.email,
       joined: userInfo?.timeJoined,
     });
   }
+  // get metadata for current session user
   @Get('metadata')
   @UseGuards(new AuthGuard())
   async getMetadata(
@@ -53,23 +54,14 @@ export class UserController {
     if (status === 'OK') return { metadata };
   }
   @Get('metadata/:id')
-  @UseGuards(
-    new AuthGuard({
-      overrideGlobalClaimValidators: async (
-        globalValidators: SessionClaimValidator[],
-      ) => [
-        ...globalValidators,
-        // check if user is admin
-        UserRoles.UserRoleClaim.validators.includes('admin'),
-        // check if user can manage deployment
-        UserRoles.PermissionClaim.validators.includes('manage:self'),
-      ],
-    }),
-  )
+  @UseGuards(new AuthGuard())
   async getUserMetadata(
     @Session() session: SessionContainer,
     @Param('id') id: string,
   ): Promise<{ metadata: any }> {
+    // check if admin
+    await this.userService.isAdmin(session);
+
     const adminId = session.getUserId();
     // TODO: error handling
     const metadata = await this.metadataService.checkDeployment(adminId, id);
@@ -111,51 +103,22 @@ export class UserController {
   }
   // get all users in specific deployment
   @Get()
-  @UseGuards(
-    new AuthGuard(),
-    //   {
-    //   overrideGlobalClaimValidators: async (
-    //     globalValidators: SessionClaimValidator[],
-    //   ) => [
-    //     ...globalValidators,
-    //     // check if user is admin
-    //     UserRoles.UserRoleClaim.validators.includes('admin'),
-    //     // check if user can manage deployment
-    //     UserRoles.PermissionClaim.validators.includes('manage:self'),
-    //   ],
-    // }
-  )
+  @UseGuards(new AuthGuard())
   async getUsers(
     @Session() session: SessionContainer,
   ): Promise<{ users: any }> {
-    const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
-    if (
-      roles === undefined ||
-      (!roles.includes('admin') && !roles.includes('super'))
-    ) {
-      // this error tells SuperTokens to return a 403 to the frontend.
-      throw new STError({
-        type: 'INVALID_CLAIMS',
-        message: 'User is not an admin',
-        payload: [
-          {
-            id: UserRoles.UserRoleClaim.key,
-          },
-        ],
-      });
-    }
-    const allUsers = await this.userService.getUsers('emailpassword');
+    // check if has admin rights
+    await this.userService.isAdmin(session);
     // user is an admin or super admin
     const adminId = session.getUserId();
-    // const users = await this.rolesService.getUsersThatHaveRole('user');
-    // const moderators = await this.rolesService.getUsersThatHaveRole(
-    //   'moderator',
-    // );
+    // TODO: add user pagination
+    const allUsers = await this.userService.getUsers('emailpassword');
     const deploymentUsers = allUsers.users.flatMap(async (object) => {
-      // check if admin can manage this user's metadata
+      // check if self
       if (adminId === object.user.id) {
         return [];
       } else {
+        // check if admin is allowed to manage (deployments match)
         const metadata = await this.metadataService.checkDeployment(
           adminId,
           object.user.id,
@@ -174,75 +137,37 @@ export class UserController {
         return [];
       }
     });
-    // const deploymentUsers = users.map(async (user) => {
-    //   // check if admin can manage this user's metadata
-    //   const metadata = await this.metadataService.checkDeployment(
-    //     adminId,
-    //     user,
-    //   );
-    //   if (metadata) return { id: user, role: 'user', ...metadata };
-    // });
-    // const deploymentModerators = moderators.map(async (user) => {
-    //   // check if admin can manage this user's metadata
-    //   const metadata = await this.metadataService.checkDeployment(
-    //     adminId,
-    //     user,
-    //   );
-    //   if (metadata) return { id: user, role: 'moderator', ...metadata };
-    // });
     return {
       users: (await Promise.all([...deploymentUsers])).flat(),
     };
   }
-  // get all users in specific deployment
+  // assign role to specific user
   @Put('role/:id')
-  @UseGuards(
-    new AuthGuard(),
-    //   {
-    //   overrideGlobalClaimValidators: async (
-    //     globalValidators: SessionClaimValidator[],
-    //   ) => [
-    //     ...globalValidators,
-    //     // check if user is admin
-    //     UserRoles.UserRoleClaim.validators.includes('admin'),
-    //     // check if user can manage deployment
-    //     UserRoles.PermissionClaim.validators.includes('manage:self'),
-    //   ],
-    // }
-  )
+  @UseGuards(new AuthGuard())
   async updateRole(
     @Session() session: SessionContainer,
     @Param('id') id: string,
     @Body()
     update: {
-      role: 'user' | 'moderator' | 'admin' | 'super';
+      role: UserRole;
       assign: boolean;
     },
   ): Promise<{ message: string }> {
-    const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
-    if (
-      roles === undefined ||
-      (!roles.includes('admin') && !roles.includes('super'))
-    ) {
-      // this error tells SuperTokens to return a 403 to the frontend.
-      throw new STError({
-        type: 'INVALID_CLAIMS',
-        message: 'User is not an admin',
-        payload: [
-          {
-            id: UserRoles.UserRoleClaim.key,
-          },
-        ],
-      });
-    }
+    // check of admin
+    await this.userService.isAdmin(session);
+
+    // user is an admin or super admin
     const adminId = session.getUserId();
     // check if is deployment matches
     const metadata = await this.metadataService.checkDeployment(adminId, id);
     // TODO: error handling
     if (metadata) {
       update.assign
-        ? await this.rolesService.addRoleToUser(id, update.role)
-        : await this.rolesService.removeRoleFromUser(id, update.role);
+        ? await this.rolesService.addRoleToUserAndTheirSession(id, update.role)
+        : await this.rolesService.removeRoleFromUserAndTheirSession(
+            id,
+            update.role,
+          );
       return { message: 'role changed successfully' };
     }
   }

@@ -92,6 +92,12 @@ const router = createRouter({
       name: 'post',
       component: PostsView,
       meta: { requiresAuth: false }
+    },
+    // default route
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+      // component: PageNotFound
     }
   ]
 })

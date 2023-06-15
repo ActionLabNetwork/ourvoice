@@ -23,7 +23,7 @@ export class AppController {
   }
 
   @Get('sessioninfo')
-  @UseGuards(new AuthGuard())
+  @UseGuards(new AuthGuard({ checkDatabase: true }))
   async getSessioninfo(@Session() session: SessionContainer): Promise<string> {
     // TODO: magic
     return JSON.stringify({

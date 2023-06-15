@@ -66,7 +66,7 @@ const router = createRouter({
       redirect: (to) => {
         // the function receives the target route as the argument
         // we return a redirect path/location here.
-        return { path: '/', query: to.query }
+        return { path: '/', query: to.query, hash: to.hash }
       }
     },
     {
@@ -96,7 +96,7 @@ const router = createRouter({
       redirect: (to) => {
         // the function receives the target route as the argument
         // we return a redirect path/location here.
-        return { path: '/signinWithoutPassword', query: to.query }
+        return { path: '/signinWithoutPassword', query: to.query, hash: to.hash }
       }
     },
     {
@@ -104,7 +104,7 @@ const router = createRouter({
       redirect: (to) => {
         // the function receives the target route as the argument
         // we return a redirect path/location here.
-        return { path: '/signinWithoutPassword', query: to.query }
+        return { path: '/signinWithoutPassword', query: to.query, hash: to.hash }
       }
     },
     {
@@ -112,7 +112,7 @@ const router = createRouter({
       redirect: (to) => {
         // the function receives the target route as the argument
         // we return a redirect path/location here.
-        return { path: '/auth', query: to.query }
+        return { path: '/auth', query: to.query, hash: to.hash }
       }
     },
     {

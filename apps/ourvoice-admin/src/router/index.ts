@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import Session from 'supertokens-web-js/recipe/session'
+import Session, { validateClaims } from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import { UserRoleClaim /*PermissionClaim*/ } from 'supertokens-web-js/recipe/userroles'
 
@@ -22,7 +22,6 @@ const router = createRouter({
 const checkForSession = async () => {
   if (!(await Session.doesSessionExist())) return false
   const validationErrors = await Session.validateClaims()
-
   if (validationErrors.length === 0) {
     return true
   } else {
@@ -62,7 +61,7 @@ router.beforeEach(async (to, from, next) => {
         for (const err of validationErrors) {
           if (err.validatorId === UserRoleClaim.id) {
             // user roles claim check failed
-            // not admin or not super role
+            // not admin or not moderator
             redirectTo(portalURL)
           } else {
             // some other claim check failed (from the global validators list)

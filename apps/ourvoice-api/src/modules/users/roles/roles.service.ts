@@ -1,6 +1,7 @@
 import { Logger, Injectable } from '@nestjs/common';
 import UserRoles from 'supertokens-node/recipe/userroles';
-import { SessionContainer } from 'supertokens-node/recipe/session';
+import Session, { SessionContainer } from 'supertokens-node/recipe/session';
+import { UserRole } from './roles.interface';
 
 @Injectable()
 export class RolesService {
@@ -22,10 +23,7 @@ export class RolesService {
     }
   }
 
-  async addRoleToUser(
-    userId: string,
-    role: 'user' | 'moderator' | 'admin' | 'super',
-  ) {
+  async addRoleToUserAndTheirSession(userId: string, role: UserRole) {
     const response = await UserRoles.addRoleToUser(userId, role);
 
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
@@ -35,6 +33,8 @@ export class RolesService {
 
     if (response.didUserAlreadyHaveRole === true) {
       // The user already had the role
+    } else {
+      this.updateSessionClaims(userId);
     }
   }
 
@@ -43,7 +43,7 @@ export class RolesService {
     return response.roles;
   }
 
-  async getUsersThatHaveRole(role: string): Promise<string[]> {
+  async getUsersThatHaveRole(role: UserRole): Promise<string[] | undefined> {
     const response = await UserRoles.getUsersThatHaveRole(role);
 
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
@@ -54,11 +54,8 @@ export class RolesService {
     return response.users;
   }
 
-  async removeRoleFromUserAndTheirSession(
-    session: SessionContainer,
-    role: string,
-  ) {
-    const response = await UserRoles.removeUserRole(session.getUserId(), role);
+  async removeRoleFromUserAndTheirSession(userId: string, role: UserRole) {
+    const response = await UserRoles.removeUserRole(userId, role);
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
       // No such role exists
       return;
@@ -67,24 +64,21 @@ export class RolesService {
     if (response.didUserHaveRole === false) {
       // The user was never assigned the role
     } else {
-      // We also want to update the session of this user to reflect this change.
-      await session.fetchAndSetClaim(UserRoles.UserRoleClaim);
-      await session.fetchAndSetClaim(UserRoles.PermissionClaim);
+      this.updateSessionClaims(userId);
     }
   }
-  async removeRoleFromUser(
-    userId: string,
-    role: 'user' | 'moderator' | 'admin' | 'super',
-  ) {
-    const response = await UserRoles.removeUserRole(userId, role);
 
-    if (response.status === 'UNKNOWN_ROLE_ERROR') {
-      // No such role exists
-      return;
-    }
-
-    if (response.didUserHaveRole === false) {
-      // The user was never assigned the role
-    }
+  async updateSessionClaims(userId: string) {
+    // we update all the session's Access Token payloads for this user
+    // TODO: still doesn't update frontend token
+    const sessionHandles = await Session.getAllSessionHandlesForUser(userId);
+    sessionHandles.forEach(async (handle) => {
+      const currSessionInfo = await Session.getSessionInformation(handle);
+      if (currSessionInfo === undefined) {
+        return;
+      }
+      await Session.fetchAndSetClaim(handle, UserRoles.UserRoleClaim);
+      await Session.fetchAndSetClaim(handle, UserRoles.PermissionClaim);
+    });
   }
 }
