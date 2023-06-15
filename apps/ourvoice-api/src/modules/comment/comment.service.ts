@@ -16,22 +16,21 @@ import { CommentUpdateDto } from './dto/comment-update.dto';
 export class CommentService {
   constructor(private readonly commentRepository: CommentRepository) {}
 
-  // async createComment(data: CommentCreateDto): Promise<Comment> {
-  //   // Validate data
-  //   const commentCreateDto = plainToClass(CommentCreateDto, data);
-  //   const errors = await validate(commentCreateDto);
-  //   if (errors.length > 0) {
-  //     throw new BadRequestException(errors);
-  //   }
-  //   const { authorId, postId, parentId, ...restData } = data;
-  //   const commentData = {
-  //     ...restData,
-  //     author: { connect: { id: authorId } },
-  //     post: postId ? { connect: { id: postId } } : undefined,
-  //     parent: parentId ? { connect: { id: parentId } } : undefined,
-  //   };
-  //   return this.commentRepository.createComment(commentData);
-  // }
+  async createComment(data: CommentCreateDto): Promise<Comment> {
+    // Validate data
+    const commentCreateDto = plainToClass(CommentCreateDto, data);
+    const errors = await validate(commentCreateDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
+    }
+    const { postId, parentId, ...restData } = data;
+    const commentData = {
+      ...restData,
+      post: postId ? { connect: { id: postId } } : undefined,
+      parent: parentId ? { connect: { id: parentId } } : undefined,
+    };
+    return this.commentRepository.createComment(commentData);
+  }
 
   async getComments(
     filter?: CommentsFilterDto,

@@ -272,6 +272,8 @@ export abstract class IMutation {
 
     abstract deleteCategory(id: number): Category | Promise<Category>;
 
+    abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
+
     abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
 
     abstract deleteComment(id: number): Comment | Promise<Comment>;

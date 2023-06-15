@@ -5,6 +5,7 @@ import { PostRepository } from './post.repository';
 import { createMock, DeepMocked } from '@golevelup/ts-jest';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { PostCreateDto } from './dto/post-create.dto';
+import { PostBuilder } from '../moderation/post-moderation/post-moderation.builder';
 
 describe('PostService', () => {
   let postService: PostService;
@@ -46,10 +47,6 @@ describe('PostService', () => {
         PostService,
         { provide: PostRepository, useValue: createMock<PostRepository>() },
         { provide: PrismaService, useValue: createMock<PrismaService>() },
-        // {
-        //   provide: PremoderationService,
-        //   useValue: createMock<PremoderationService>(),
-        // },
       ],
     }).compile();
 

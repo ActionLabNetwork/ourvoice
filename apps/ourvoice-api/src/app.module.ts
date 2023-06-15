@@ -19,6 +19,7 @@ import { ModerationModule } from './modules/moderation/moderation.module';
 import { UsersModule } from './modules/users/users.module';
 
 import deployment from './config/deployment';
+import { GraphQLError } from 'graphql/error';
 
 @Module({
   imports: [
@@ -58,6 +59,14 @@ import deployment from './config/deployment';
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class',
+      },
+      formatError: (error: GraphQLError) => {
+        const { extensions, message } = error;
+        const { originalError } = extensions;
+        return {
+          message,
+          originalError,
+        };
       },
     }),
     PostModule,

@@ -10,7 +10,7 @@ import {
   ModerationPostsFilterInput,
 } from 'src/graphql';
 import { Post } from '@internal/prisma/client';
-import { numberToCursor } from 'src/utils/cursor-pagination';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
 import { PostCreateDto } from './dto/post-create.dto';
@@ -22,7 +22,7 @@ export class PostModerationService {
     private readonly moderationPostRepository: PostModerationRepository,
   ) {}
 
-  async getModerationPostById(id: number): Promise<Post> {
+  async getModerationPostById(id: number) {
     const moderationPost =
       await this.moderationPostRepository.getModerationPostById(id);
 
@@ -176,6 +176,11 @@ export class PostModerationService {
       throw new BadRequestException(errors);
     }
 
+    // Validate reason
+    if (!reason) {
+      throw new BadRequestException('Reason is required');
+    }
+
     // Validate post id
     const postToBeModified =
       await this.moderationPostRepository.getPostVersionById(postId);
@@ -203,6 +208,10 @@ export class PostModerationService {
   async renewPostModeration(id: number, moderatorHash: string) {
     const moderationToBeRenewed =
       await this.moderationPostRepository.getPostModerationById(id);
+
+    if (!moderationToBeRenewed) {
+      throw new NotFoundException('Moderation does not exist');
+    }
 
     if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
       throw new BadRequestException('Invalid moderator hash');
