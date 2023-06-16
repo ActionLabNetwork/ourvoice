@@ -63,9 +63,13 @@
       </div>
       <div>
         <slot>
-          <RouterLink :to="postPageLink" class="underline"
-            >comment({{ post?.comments?.length ?? 0 }})
-          </RouterLink>
+          <!-- default slot -->
+          <button
+            @click.stop="handleCommentBtnClicked"
+            class="underline hover:bg-gray-200 px-1 rounded-md transition duration-300 ease-in-out"
+          >
+            comment({{ post?.comments?.length ?? 0 }})
+          </button>
         </slot>
       </div>
     </div>
@@ -80,10 +84,10 @@ import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
 import { useUserStore } from '@/stores/user'
-
+import { useRouter } from 'vue-router'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
-
+const router = useRouter()
 const props = defineProps({
   postId: {
     type: Number,
@@ -91,15 +95,24 @@ const props = defineProps({
   }
 })
 
-const post = postsStore.getPostById(props.postId)
-const postPageLink = computed(() => `/posts/${props.postId}`)
+const post = computed(() => postsStore.getPostById(props.postId))
+
+const handleCommentBtnClicked = () => {
+  console.log('comment btn clicked')
+  router.push({
+    name: 'postpage',
+    params: {
+      id: props.postId
+    }
+  })
+}
 
 const getPresignedUrls = (keys: string[]) => {
   return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
 }
 
 const presignedUrls = ref<string[]>([])
-const res = await getPresignedUrls(post?.files ?? [])
+const res = await getPresignedUrls(post.value?.files ?? [])
 presignedUrls.value = res.map((item: any) => item.url) ?? []
 const hasUpvote = computed(() => {
   return votes.value.some(
@@ -135,22 +148,21 @@ onResult(({ data, loading }) => {
 })
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
-  createVoteForPost({
-    data: {
-      commentId: null,
-      postId: props.postId,
-      authorHash: userStore.sessionHash,
-      authorNickname: userStore.nickname,
-      voteType: voteType
-    }
-  })
-    .then(async () => {
-      await refetch()
-      console.log('refetched votes for post', props.postId)
-      postsStore.syncPostVotesById(props.postId)
+  try {
+    await createVoteForPost({
+      data: {
+        commentId: null,
+        postId: props.postId,
+        authorHash: userStore.sessionHash,
+        authorNickname: userStore.nickname,
+        voteType: voteType
+      }
     })
-    .catch((err) => {
-      console.log(err)
-    })
+    await refetch()
+    console.log('refetched votes for post:', props.postId)
+    postsStore.syncPostVotesById(props.postId)
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>

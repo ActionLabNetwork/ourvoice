@@ -11,11 +11,6 @@ export class VoteResolver {
     return this.voteService.createVote(data);
   }
 
-  // @Mutation()
-  // async deleteVote(@Args('id') id: number) {
-  //   return this.voteService.deleteVote(id);
-  // }
-
   @Query()
   async votes(@Args('filter', { nullable: true }) filter?: VotesFilterInput) {
     return this.voteService.getVote(filter);

@@ -23,6 +23,7 @@ const { data } = storeToRefs(postStore)
 postStore.fetchPosts()
 
 const showCommentList = (postId: number) => {
-  console.log('postId: ', postId, 'clicked')
+  // might add certain click logic here
+  console.log('postId:', postId, 'clicked')
 }
 </script>

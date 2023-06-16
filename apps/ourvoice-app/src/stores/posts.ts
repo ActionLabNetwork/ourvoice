@@ -62,7 +62,7 @@ export const usePostsStore = defineStore('posts', {
     errorMessage: undefined,
     selectedCategoryIds: [],
     sortBy: '',
-    sortOrder: 'asc'
+    sortOrder: 'desc'
   }),
   getters: {
     getPostById: (state) => (id: number) => {

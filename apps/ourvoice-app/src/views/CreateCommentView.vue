@@ -5,9 +5,6 @@
         <TabContent title="Create Comment">
           <CreateComment />
         </TabContent>
-        <!-- <TabContent title="Create Post">
-          <CreatePost />
-        </TabContent> -->
       </TabsWrapper>
     </Suspense>
   </div>

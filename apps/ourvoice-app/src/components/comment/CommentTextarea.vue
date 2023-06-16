@@ -12,7 +12,7 @@
         <textarea
           v-model="content"
           class="w-full max-h-20 rounded-lg p-2 border border-black"
-          maxlength="255"
+          maxlength="1000"
           name=""
           id=""
           cols="30"

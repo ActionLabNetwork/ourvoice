@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { apolloClient } from './../graphql/client/index'
-import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+// import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
@@ -24,10 +25,7 @@ export interface Comment {
   }
   parent: {
     id: number
-    author: {
-      id: number
-      nickname: string
-    }
+    authorNickname: string
   }
 }
 export interface pageInfo {
@@ -70,9 +68,18 @@ export const useCommentsStore = defineStore('comments', {
           createdAt: comment.node.createdAt,
           authorHash: comment.node.authorHash ?? null,
           authorNickname: comment.node.authorNickname ?? null,
-          post: comment.node.post ?? null,
-          parent: comment.node.parent ?? null
+          post: {
+            id: comment.node.post.id
+          },
+          parent: comment.node.parent?.id
+            ? {
+                id: comment.node.parent.id,
+                authorNickname: comment.node.parent.authorNickname
+              }
+            : null
         }))
+        this.pageInfo = data.comments.pageInfo
+        this.totalCount = data.comments.totalCount
         this.loading = false
       } catch (error) {
         if (error instanceof Error) {
@@ -89,29 +96,37 @@ export const useCommentsStore = defineStore('comments', {
       content,
       parentId,
       postId,
-      authorId
+      authorHash,
+      authorNickname
     }: {
       content: string
       postId: number | undefined
       parentId: number | undefined
-      authorId: number
+      authorHash: string
+      authorNickname: string
     }) {
       try {
-        const response = await apolloClient.mutate({
-          mutation: CREATE_COMMENT_MUTATION,
+        console.log({
+          content,
+          parentId,
+          postId,
+          authorHash,
+          authorNickname
+        })
+        const { data } = await apolloClient.mutate({
+          mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
             data: {
+              authorHash,
+              authorNickname,
               content,
-              postId,
-              parentId,
-              authorId
+              parentId: parentId ?? null,
+              postId: postId ?? null,
+              requiredModerations: 3
             }
           }
         })
-        console.log('response: ', response)
-        this.$patch((state) => {
-          state.data.push(response?.data.createComment)
-        })
+        console.log(data)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error

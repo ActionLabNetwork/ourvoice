@@ -67,9 +67,6 @@ export class VoteRepository {
   async getVote(filter?: Prisma.VoteWhereInput) {
     return this.prisma.vote.findMany({
       where: filter,
-      // where: {
-      //   postId: undefined,
-      // },
       include: {
         post: true,
         comment: true,

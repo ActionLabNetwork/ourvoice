@@ -8,11 +8,25 @@ export class VoteService {
 
   async createVote(data: VoteCreateInput) {
     // send the same data will delete the vote
-    const res = await this.votetRepository.getVote(data);
-    if (res.length == 1) {
-      return this.deleteVote(res[0].id);
-    }
     const { authorHash, authorNickname, postId, commentId, voteType } = data;
+
+    const votes = await this.votetRepository.getVote({
+      authorHash,
+      authorNickname,
+      postId,
+      commentId,
+    });
+    if (votes.length == 1) {
+      if (votes[0].voteType == voteType) {
+        return this.votetRepository.deleteVote({ id: votes[0].id });
+      }
+      this.votetRepository.deleteVote({ id: votes[0].id });
+    }
+    if (votes.length > 1) {
+      votes.forEach((vote) => {
+        this.votetRepository.deleteVote({ id: vote.id });
+      });
+    }
 
     const voteData = {
       voteType,

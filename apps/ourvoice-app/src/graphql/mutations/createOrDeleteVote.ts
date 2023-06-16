@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const VOTE_MUTATION = gql`
-  mutation VotePost($data: VoteCreateInput!) {
+  mutation CreateOrDeleteVote($data: VoteCreateInput!) {
     createVote(data: $data) {
       id
       voteType

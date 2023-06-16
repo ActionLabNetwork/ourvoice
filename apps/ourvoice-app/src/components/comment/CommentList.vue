@@ -6,7 +6,8 @@
           commentsStore.createComment({
             content: comment,
             postId: postId,
-            authorId: 3,
+            authorHash: userStore.sessionHash,
+            authorNickname: userStore.nickname,
             parentId: undefined
           })
         }
@@ -19,7 +20,12 @@
     </div>
 
     <div class="space-y-10">
-      <CommentCard v-for="comment in comments" :key="comment.id" :comment-id="comment.id" />
+      <CommentCard
+        v-for="comment in comments"
+        :key="comment.id"
+        :comment-id="comment.id"
+        @click="commentCardClick(comment.id)"
+      />
     </div>
   </div>
 </template>
@@ -30,6 +36,8 @@ import CommentCard from './CommentCard.vue'
 import CommentTextarea from './CommentTextarea.vue'
 import { useCommentsStore } from '@/stores/comments'
 import { storeToRefs } from 'pinia'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
 
 const commentsStore = useCommentsStore()
 
@@ -43,4 +51,8 @@ const props = defineProps({
 commentsStore.fetchComments()
 const { data, totalCount } = storeToRefs(commentsStore)
 const comments = computed(() => data.value.filter((comment) => comment.post.id === props.postId))
+const commentCardClick = (commentId: number) => {
+  // might add certain click logic here
+  console.log('commentId:', commentId, 'clicked')
+}
 </script>

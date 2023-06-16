@@ -7,18 +7,30 @@ export const GET_COMMENTS_QUERY = gql`
         node {
           id
           content
+          votesDown
+          votesUp
+          moderated
+          published
           createdAt
+          moderatedAt
+          publishedAt
+          disabledAt
           authorHash
           authorNickname
           post {
             id
-            title
           }
           parent {
             id
-            content
+            authorNickname
           }
         }
+      }
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        startCursor
       }
     }
   }

@@ -1,7 +1,6 @@
 <template>
   <Suspense>
     <div>
-      <!-- {{ postId }}{{ typeof postId }} -->
       <PostCard :postId="postId">
         <div></div>
       </PostCard>

@@ -1,4 +1,5 @@
 <template>
+  <!-- {{ comment }} -->
   <div class="flex">
     <div class="flex-shrink-0 mr-1 md:mr-3">
       <img
@@ -10,12 +11,12 @@
       <b class="text-sm">
         {{ comment?.authorNickname }} reply to
         <span class="text-blue-500 hover:underline hover:cursor-pointer">
-          @{{ comment?.parent?.author?.nickname ?? 'original post' }}
+          @{{ comment?.parent?.authorNickname ?? 'original post' }}
         </span>
       </b>
       <span class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</span>
       <div
-        class="bg-white dark:bg-ourvoice-blue rounded-lg border drop-shadow-md px-6 py-4 leading-relaxed"
+        class="bg-white dark:bg-ourvoice-blue rounded-lg border hover:drop-shadow-md transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
       >
         <div class="text-sm md:text-md py-2">
           <p class="break-all">
@@ -69,7 +70,7 @@ import CommentTextarea from './CommentTextarea.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { useMutation } from '@vue/apollo-composable'
-
+import { useUserStore } from '@/stores/user'
 const props = defineProps({
   commentId: {
     type: Number,
@@ -77,6 +78,7 @@ const props = defineProps({
   }
 })
 const commentStore = useCommentsStore()
+const userStore = useUserStore()
 const { data } = storeToRefs(commentStore)
 const comment = computed(() => data.value.find((comment) => comment.id === props.commentId))
 
@@ -85,7 +87,8 @@ const showReply = ref(false)
 const createComment = (payload: string) => {
   if (!comment.value) return
   commentStore.createComment({
-    authorId: 3,
+    authorHash: userStore.sessionHash,
+    authorNickname: userStore.nickname,
     postId: comment.value.post.id,
     parentId: props.commentId,
     content: payload
@@ -95,17 +98,25 @@ const createComment = (payload: string) => {
 
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
 const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
-  if (!comment.value) return
-  await createVoteForComemnt({
-    data: {
-      commentId: props.commentId,
-      postId: comment.value.post.id,
-      // TODO: get userId from auth
-      userId: 1,
-      voteType: voteType
-    }
-  })
-  // await syncVote()
+  if (!comment.value) {
+    console.log('no comment')
+    return
+  }
+  try {
+    await createVoteForComemnt({
+      data: {
+        commentId: props.commentId,
+        postId: comment.value.post.id,
+        authorHash: userStore.sessionHash,
+        authorNickname: userStore.nickname,
+        voteType: voteType
+      }
+    })
+
+    // await syncVote()
+  } catch (error) {
+    console.log(error)
+  }
 }
 // const syncVote = async () => {
 //   await commentStore.updateComment(props.commentId)
