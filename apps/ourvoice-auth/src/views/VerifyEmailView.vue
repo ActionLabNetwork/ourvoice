@@ -63,7 +63,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://demo${domain}`
+        window.location.href = adminURL
       }
     }
   }

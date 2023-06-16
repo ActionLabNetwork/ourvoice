@@ -61,7 +61,7 @@ async function main() {
     const parentComment = comments.find(
       (comment) => comment.id === data.parentId,
     );
-    const { postId, parentId, ...rest } = data;
+    const { ...rest } = data;
     const comment = await prisma.comment.create({
       data: {
         ...rest,
@@ -78,7 +78,7 @@ async function main() {
   const voteData = seedData.votes;
   for (const data of voteData) {
     const post = posts.find((post) => post.id === data.postId);
-    const { postId, ...rest } = data;
+    const { ...rest } = data;
     await prisma.vote.create({
       data: {
         ...rest,

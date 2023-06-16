@@ -1,5 +1,4 @@
 import {
-  CommentCreateInput,
   CommentUpdateInput,
   CommentsFilterInput,
   CommentPaginationInput,

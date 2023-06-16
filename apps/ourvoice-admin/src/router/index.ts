@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import Session, { validateClaims } from 'supertokens-web-js/recipe/session'
+import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import { UserRoleClaim /*PermissionClaim*/ } from 'supertokens-web-js/recipe/userroles'
 

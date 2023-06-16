@@ -10,7 +10,6 @@ import { numberToCursor } from '../../utils/cursor-pagination';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { CommentsFilterDto } from './dto/comment-filter.dto';
-import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 
 @Injectable()

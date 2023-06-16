@@ -141,7 +141,7 @@ import { defineComponent } from 'vue'
 // import YamlContent from '../../../../config/config.yml'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+// const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
 
 const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 

@@ -1,5 +1,5 @@
 import { PostModifyDto } from './dto/post-modify.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   Post,
   Prisma,

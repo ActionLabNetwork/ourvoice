@@ -15,8 +15,6 @@ import type { ApolloError } from '@apollo/client/errors'
 import { GET_MODERATION_POST_BY_ID_QUERY } from '@/graphql/queries/getModerationPost'
 import { MODIFY_MODERATION_POST_MUTATION } from '@/graphql/mutations/modifyModerationPost'
 import { RENEW_POST_MODERATION_MUTATION } from '@/graphql/mutations/renewPostModeration'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
-import { version } from 'graphql'
 
 type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 

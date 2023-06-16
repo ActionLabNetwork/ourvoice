@@ -1,6 +1,6 @@
 import { Logger, Injectable } from '@nestjs/common';
 import UserRoles from 'supertokens-node/recipe/userroles';
-import Session, { SessionContainer } from 'supertokens-node/recipe/session';
+import Session from 'supertokens-node/recipe/session';
 import { UserRole } from './roles.interface';
 
 @Injectable()
