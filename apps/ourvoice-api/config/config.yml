@@ -35,5 +35,7 @@ auth:
 logo: /ourvoice_logo.svg
 slogan: 'This is the deployment slogan text from config.yml file'
 moderatorCount: 3
-postFrequency: hourly
+postFrequency:
+  unit: minutes
+  value: 2
 persistNickNames: true

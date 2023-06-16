@@ -1,5 +1,5 @@
 import { PostModifyDto } from './dto/post-modify.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   Post,
   Prisma,
@@ -42,6 +42,8 @@ function countPostVersionModerationDecisions(
 
 @Injectable()
 export class PostModerationRepository {
+  private readonly logger = new Logger(PostModerationRepository.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly postService: PostService,
@@ -333,7 +335,7 @@ export class PostModerationRepository {
           data: { status: 'APPROVED' },
         });
 
-        console.log('Finished approving post with post id', postId);
+        this.logger.log('Finished approving post with post id', postId);
 
         // TODO: Add as a new post entry in the main db
         const newPostInMainDb = await this.postService.createPost({
@@ -344,20 +346,22 @@ export class PostModerationRepository {
           authorHash: post.versions[0].authorHash,
           authorNickname: post.versions[0].authorNickname,
         });
-        console.log('Created new post in main db with id', newPostInMainDb.id);
+        this.logger.log(
+          'Created new post in main db with id',
+          newPostInMainDb.id,
+        );
 
         await tx.post.update({
           where: { id: post.id },
           data: { postIdInMainDb: newPostInMainDb.id },
         });
-        console.log(
+        this.logger.log(
           'Updated post with id',
           post.id,
           ' to have main db id',
           newPostInMainDb.id,
         );
       }
-      console.log('DecisionsCount for ', postId, decisionsCount);
     });
   }
 
@@ -373,7 +377,7 @@ export class PostModerationRepository {
       try {
         await this.approvePost(post.id);
       } catch (error) {
-        console.log(
+        this.logger.error(
           `Error approving post with post id ${post.id}. ${error.message}`,
         );
       }

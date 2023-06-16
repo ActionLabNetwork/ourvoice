@@ -1,5 +1,5 @@
 import { CommentModifyDto } from './dto/comment-modify.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   Comment,
   Prisma,
@@ -13,6 +13,7 @@ import {
 } from 'src/graphql';
 import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
+import { CommentService } from 'src/modules/comment/comment.service';
 
 function countCommentVersionModerationDecisions(
   version: CommentVersion & {
@@ -41,7 +42,12 @@ function countCommentVersionModerationDecisions(
 
 @Injectable()
 export class CommentModerationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(CommentModerationRepository.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly commentService: CommentService,
+  ) {}
 
   async getModerationCommentById(id: number): Promise<Comment> {
     return await this.prisma.comment.findUnique({
@@ -396,7 +402,7 @@ export class CommentModerationRepository {
     });
   }
 
-  async publishComment(commentId: number) {
+  async approveComment(commentId: number) {
     await this.prisma.$transaction(async (tx) => {
       // Check if the comment has enough number of moderations
       const comment = await tx.comment.findUnique({
@@ -427,9 +433,56 @@ export class CommentModerationRepository {
           where: { id: commentId },
           data: { status: 'APPROVED' },
         });
-        // TODO: Add as a new comment entry in the main db
+
+        this.logger.log(
+          'Finished approving comment with comment id',
+          commentId,
+        );
+
+        // TODO: Add as a new post entry in the main db
+        const newCommentInMainDb = await this.commentService.createComment({
+          content: comment.versions[0].content,
+          authorHash: comment.versions[0].authorHash,
+          authorNickname: comment.versions[0].authorNickname,
+        });
+
+        this.logger.log(
+          'Created new comment in main db with id',
+          newCommentInMainDb.id,
+        );
+
+        await tx.post.update({
+          where: { id: comment.id },
+          data: { postIdInMainDb: newCommentInMainDb.id },
+        });
+        this.logger.log(
+          'Updated post with id',
+          comment.id,
+          ' to have main db id',
+          newCommentInMainDb.id,
+        );
       }
-      console.log(decisionsCount);
     });
+  }
+
+  async approveOrRejectComments() {
+    const pendingComments = await this.prisma.comment.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        versions: { orderBy: { version: 'desc' }, take: 1 },
+      },
+    });
+
+    for (const comment of pendingComments) {
+      try {
+        await this.approveComment(comment.id);
+      } catch (error) {
+        this.logger.error(
+          `Error approving comment with comment id ${comment.id}. ${error.message}`,
+        );
+      }
+    }
+
+    // TODO: Reject comments (awaiting conditions/business logic)
   }
 }
