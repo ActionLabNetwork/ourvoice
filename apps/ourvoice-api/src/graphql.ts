@@ -421,7 +421,6 @@ export class ModerationCommentVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
-    status: ModerationCommentStatus;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -475,7 +474,6 @@ export class ModerationPostVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
-    status: ModerationPostStatus;
     latest: boolean;
     timestamp: string;
     post: ModerationPost;

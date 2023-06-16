@@ -38,7 +38,6 @@ describe('PostModerationService', () => {
     .withAuthorHash('user1hash')
     .withAuthorNickname('correct_teal_duck')
     .withReason('')
-    .withStatus('PENDING')
     .withLatest(true)
     .withTimestamp(new Date('2023-04-13T10:00:00.000Z'))
     .withPostId(1)

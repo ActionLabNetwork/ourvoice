@@ -55,7 +55,6 @@ type ModerationPostVersion {
   authorHash: String!
   authorNickname: String!
   reason: String
-  status: ModerationPostStatus!
   latest: Boolean!
   timestamp: String!
   post: ModerationPost!

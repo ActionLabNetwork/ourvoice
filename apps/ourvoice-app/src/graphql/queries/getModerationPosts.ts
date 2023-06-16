@@ -21,7 +21,6 @@ export const GET_MODERATION_POSTS_QUERY = gql`
             authorNickname
             timestamp
             version
-            status
             latest
           }
         }

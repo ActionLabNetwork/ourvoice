@@ -18,7 +18,6 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             authorNickname
             timestamp
             version
-            status
             latest
           }
         }

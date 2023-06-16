@@ -53,7 +53,6 @@ async function main() {
                 versionIndex + 1
               }`,
               categoryIds: [1, 2],
-              status: postStatuses[(i + versionIndex) % postStatuses.length],
               version: versionIndex + 1,
               authorHash,
               authorNickname: authorHash,
@@ -87,7 +86,6 @@ async function main() {
                 content: `This is a comment on post ${i + 1}. This is version ${
                   versionIndex + 1
                 }`,
-                status: postStatuses[(j + versionIndex) % postStatuses.length],
                 version: versionIndex + 1,
                 authorHash: commentAuthorHash,
                 authorNickname: commentAuthorHash,
@@ -117,7 +115,6 @@ async function main() {
               content: `This is a child comment of comment ${j + 1} on post ${
                 i + 1
               }`,
-              status: postStatuses[j % postStatuses.length],
               version: 1,
               authorHash: childCommentAuthorHash,
               authorNickname: childCommentAuthorHash,

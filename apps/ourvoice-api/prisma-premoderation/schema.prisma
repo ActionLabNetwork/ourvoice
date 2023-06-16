@@ -36,7 +36,6 @@ model PostVersion {
   authorHash     String
   authorNickname String
   reason         String?
-  status         PostStatus
   latest         Boolean          @default(false)
   timestamp      DateTime         @default(now())
   postId         Int
@@ -72,7 +71,6 @@ model CommentVersion {
   authorHash     String
   authorNickname String
   reason         String?
-  status         PostStatus
   latest         Boolean             @default(false)
   timestamp      DateTime            @default(now())
   commentId      Int

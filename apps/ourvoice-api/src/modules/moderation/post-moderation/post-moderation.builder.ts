@@ -111,11 +111,6 @@ class PostVersionBuilder {
     return this;
   }
 
-  withStatus(status: PostStatus): PostVersionBuilder {
-    this.version.status = status;
-    return this;
-  }
-
   withLatest(latest: boolean): PostVersionBuilder {
     this.version.latest = latest;
     return this;

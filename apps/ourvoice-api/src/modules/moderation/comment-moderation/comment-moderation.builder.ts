@@ -100,11 +100,6 @@ class CommentVersionBuilder {
     return this;
   }
 
-  withStatus(status: PostStatus): CommentVersionBuilder {
-    this.version.status = status;
-    return this;
-  }
-
   withLatest(latest: boolean): CommentVersionBuilder {
     this.version.latest = latest;
     return this;
