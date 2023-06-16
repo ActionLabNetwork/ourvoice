@@ -30,6 +30,7 @@ import { useModerationCommentsStore } from '@/stores/moderation-comments'
 
 import type { ModerationComment } from '@/stores/moderation-comments'
 import type { ModerationVersionStatus } from '@/types/moderation'
+import type { Tab } from '@/types'
 
 const commentsStore = useModerationCommentsStore()
 onMounted(async () => {
@@ -53,7 +54,7 @@ const moderationComments = computed(() => {
   )
 })
 
-// const handleTabSwitched = (selectedTab: Tab) => {
-//   // If we need to know when the tab is switched, we can do it here
-// };
+const handleTabSwitched = (selectedTab: Tab) => {
+  // If we need to know when the tab is switched, we can do it here
+}
 </script>
