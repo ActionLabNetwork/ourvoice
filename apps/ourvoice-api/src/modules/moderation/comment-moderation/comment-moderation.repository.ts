@@ -81,11 +81,7 @@ export class CommentModerationRepository {
     const { status } = filter ?? {};
 
     const where: Prisma.CommentWhereInput = {
-      versions: {
-        some: {
-          status: status ?? undefined,
-        },
-      },
+      status: status ?? undefined,
     };
 
     const totalCount = await this.prisma.comment.count({ where });
@@ -114,7 +110,7 @@ export class CommentModerationRepository {
     const { content, postId, parentId, authorHash, authorNickname } = data;
 
     return await this.prisma.$transaction(async (tx) => {
-      const connectData = { post: null, parent: null };
+      const connectData = { post: undefined, parent: undefined };
       let errorMessage;
 
       // 1. Fetch post to be connected with the comment

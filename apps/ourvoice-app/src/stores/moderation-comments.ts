@@ -151,12 +151,13 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
         const newComments = data.moderationComments.edges.map(
           (edge: Edge<ModerationComment>) => edge.node
         )
+
         this.comments = loadMore ? [...this.comments, ...newComments] : newComments
 
         this.totalCount = data.moderationComments.totalCount
         this.pageInfo = data.moderationComments.pageInfo
 
-        if (this.pageInfo?.hasNextPage && this.comments.length <= COMMENTS_LIMIT) {
+        if (this.pageInfo?.hasNextPage) {
           await this.loadMoreComments()
         }
       } catch (error) {
@@ -195,7 +196,6 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
       parentId: number | undefined
     }) {
       // Check for valid deployment and user session
-      const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
       // Check if we can access the session and generate a user hash for storing in the db
@@ -208,14 +208,16 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
       const authorNickname = userStore.nickname
       const requiredModerations = 1
 
+      console.log({ postId, parentId })
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
             data: {
               content,
-              postId,
-              parentId,
+              postId: postId,
+              parentId: parentId,
               authorHash,
               authorNickname,
               requiredModerations

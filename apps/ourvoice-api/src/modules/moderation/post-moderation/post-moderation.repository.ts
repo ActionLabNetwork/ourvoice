@@ -66,11 +66,7 @@ export class PostModerationRepository {
     const { status } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {
-      versions: {
-        some: {
-          status: status ?? undefined,
-        },
-      },
+      status: status ?? undefined,
     };
 
     const totalCount = await this.prisma.post.count({ where });
