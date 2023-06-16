@@ -2,7 +2,8 @@ import { useUserStore } from './../stores/user'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
-import PostsView from '../views/PostsView.vue'
+import PollViewVue from '@/views/PollView.vue'
+// import PostsView from '../views/PostsView.vue'
 import TestView from '@/views/TestView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import CreatePostView from '../views/CreatePostView.vue'
@@ -73,6 +74,11 @@ const router = createRouter({
       name: 'create-comment',
       component: CreateCommentView
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/polls',
+      name: 'polls',
+      component: PollViewVue
     },
     {
       path: '/moderation/posts',
