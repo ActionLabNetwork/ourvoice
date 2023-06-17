@@ -7,7 +7,7 @@ import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
-
+import { type sortOptions, type sortOrder } from '@/constants/post'
 export interface Post {
   id: number
   title: string
@@ -46,8 +46,8 @@ export interface PostsState {
   error: Error | undefined
   errorMessage: string | undefined
   selectedCategoryIds: number[]
-  sortBy: string
-  sortOrder: 'asc' | 'desc'
+  sortBy: sortOptions
+  sortOrder: sortOrder
 }
 
 provideApolloClient(apolloClient)
@@ -61,7 +61,7 @@ export const usePostsStore = defineStore('posts', {
     error: undefined,
     errorMessage: undefined,
     selectedCategoryIds: [],
-    sortBy: '',
+    sortBy: 'sortByCreatedAt',
     sortOrder: 'desc'
   }),
   getters: {
@@ -73,7 +73,17 @@ export const usePostsStore = defineStore('posts', {
     async fetchPosts() {
       try {
         const { data } = await apolloClient.query({
-          query: GET_POSTS_QUERY
+          query: GET_POSTS_QUERY,
+          variables: {
+            sort: {
+              [this.sortBy]: this.sortOrder
+            },
+            pagination: {
+              cursor: null,
+              limit: 20
+            },
+            filter: null
+          }
         })
 
         this.data = data.posts.edges.map((edge: any) => ({
@@ -212,7 +222,7 @@ export const usePostsStore = defineStore('posts', {
       this.selectedCategoryIds = categoryIds
     },
 
-    async setSortBy(sortBy: string) {
+    async setSortBy(sortBy: sortOptions) {
       this.sortBy = sortBy
     },
 

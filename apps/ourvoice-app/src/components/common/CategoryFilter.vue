@@ -1,8 +1,8 @@
 <template>
   <div class="w-full px-4 py-5">
     <h1 class="mb-3">postStore.selectedCategoryIds</h1>
-    <!-- {{ selectedCategories }} -->
-    {{ selectedCategoryIds }}
+    {{ selectedCategoryIds }} <br />
+    <!-- {{ categories }} <br /> -->
     <div class="mx-auto w-full max-w-md">
       <RadioGroup v-model="selectedCategory">
         <div class="space-y-2">
@@ -30,7 +30,7 @@
                       :class="checked ? 'text-white' : 'text-gray-900'"
                       class="font-medium"
                     >
-                      {{ el.name }}()
+                      {{ el.name }}({{ el.count }})
                     </RadioGroupLabel>
                     <RadioGroupDescription
                       as="span"
@@ -72,15 +72,50 @@ import {
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
+import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
+import { apolloClient } from '@/graphql/client'
 const postStore = usePostsStore()
 const { selectedCategoryIds } = storeToRefs(postStore)
 
 const categoriesStore = useCategoriesStore()
 await categoriesStore.fetchCategories()
 const { data } = storeToRefs(categoriesStore)
-const categories = computed(() => [{ id: 0, name: 'All' }, ...data.value])
 
-const selectedCategory = ref(categories.value[0])
+let categoriesWithCount = [] as any[]
+
+const getCategoriesWithCount = async () => {
+  categoriesWithCount.push({
+    id: 0,
+    name: 'All',
+    count: (
+      await apolloClient.query({
+        query: GET_POST_COUNT_BY_CATEGORY_QUERY
+      })
+    ).data.posts.totalCount
+  })
+  for (let cat of data.value) {
+    const res = await apolloClient.query({
+      query: GET_POST_COUNT_BY_CATEGORY_QUERY,
+      variables: {
+        filter: {
+          categoryIds: [cat.id]
+        }
+      }
+    })
+    categoriesWithCount.push({
+      id: cat.id,
+      name: cat.name,
+      count: res.data.posts.totalCount
+    })
+  }
+}
+
+await getCategoriesWithCount()
+const categories = computed(() => {
+  return categoriesWithCount
+})
+
+const selectedCategory = ref(categories.value[0]) // default to 'All'
 
 const selectedCategories = computed(() => {
   if (selectedCategory.value.id === 0) {

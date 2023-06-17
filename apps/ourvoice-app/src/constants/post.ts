@@ -17,3 +17,9 @@ export const inputPlaceholders = {
   content: 'I have an idea for improving...',
   categories: 'Select categories'
 }
+export type sortOptions =
+  | 'sortByCreatedAt'
+  | 'sortByCommentsCount'
+  | 'sortByVotesDown'
+  | 'sortByVotesUp'
+export type sortOrder = 'asc' | 'desc'

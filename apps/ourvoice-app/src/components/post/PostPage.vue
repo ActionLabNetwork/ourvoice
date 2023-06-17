@@ -1,6 +1,6 @@
 <template>
   <Suspense>
-    <div>
+    <div class="overflow-y-scroll">
       <PostCard :postId="postId">
         <div></div>
       </PostCard>

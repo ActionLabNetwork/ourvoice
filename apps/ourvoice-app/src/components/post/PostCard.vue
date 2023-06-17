@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:drop-shadow-lg transition duration-300 ease-in-out"
+    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:shadow-lg transition duration-500 ease-in-out"
   >
     <!-- {{ post }} -->
     <!-- <pre>{{ votes }}</pre> -->
@@ -44,7 +44,6 @@
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          <!-- {{ votes?.filter((vote) => vote.voteType === 'UPVOTE').length }} -->
           <span :class="{ 'text-ourvoice-purple': hasUpvote }">
             {{ post?.votesUp }} <font-awesome-icon icon="fa-solid fa-thumbs-up"
           /></span>
@@ -55,7 +54,6 @@
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          <!-- {{ votes?.filter((vote) => vote.voteType === 'DOWNVOTE').length }} -->
           <span :class="{ 'text-ourvoice-purple': hasDownvote }"
             >{{ post?.votesDown }} <font-awesome-icon icon="fa-solid fa-thumbs-down"
           /></span>
@@ -88,6 +86,7 @@ import { useRouter } from 'vue-router'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const router = useRouter()
+
 const props = defineProps({
   postId: {
     type: Number,
@@ -114,6 +113,8 @@ const getPresignedUrls = (keys: string[]) => {
 const presignedUrls = ref<string[]>([])
 const res = await getPresignedUrls(post.value?.files ?? [])
 presignedUrls.value = res.map((item: any) => item.url) ?? []
+
+const votes = ref<Vote[]>([])
 const hasUpvote = computed(() => {
   return votes.value.some(
     (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
@@ -124,7 +125,6 @@ const hasDownvote = computed(() => {
     (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
   )
 })
-const votes = ref<Vote[]>([])
 
 const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
 const { onResult, refetch } = useQuery(
@@ -145,6 +145,7 @@ const { onResult, refetch } = useQuery(
 onResult(({ data, loading }) => {
   if (loading) return
   votes.value = data.votes.filter((vote: any) => !vote.comment)
+  // console.log(`votes for post:${props.postId}`, votes.value)
 })
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {

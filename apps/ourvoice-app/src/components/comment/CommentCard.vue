@@ -16,7 +16,7 @@
       </b>
       <span class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</span>
       <div
-        class="bg-white dark:bg-ourvoice-blue rounded-lg border hover:drop-shadow-md transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
+        class="bg-white dark:bg-ourvoice-blue rounded-lg border hover:shadow-md transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
       >
         <div class="text-sm md:text-md py-2">
           <p class="break-all">

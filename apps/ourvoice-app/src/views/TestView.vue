@@ -1,7 +1,14 @@
 <template>
   <Suspense>
     <div class="w-full overflow-y-auto grid grid-cols-3">
-      <div class="col-span-3 lg:col-span-2 overflow-y-auto">
+      <div class="col-span-3 lg:col-span-2 overflow-y-auto relative border-r">
+        <div
+          id="active-threads-header"
+          class="flex py-3 bg-white sticky top-0 shadow-md justify-between items-center px-6"
+        >
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">Active Thread</h1>
+          <h1>xxx</h1>
+        </div>
         <div v-for="post in data" :key="post.id">
           <PostCard :postId="post.id" @click="showCommentList(post.id)" />
         </div>
