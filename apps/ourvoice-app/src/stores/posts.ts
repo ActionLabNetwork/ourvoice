@@ -86,13 +86,14 @@ export const usePostsStore = defineStore('posts', {
             },
             pagination: {
               cursor: null,
-              limit: 200
+              limit: null
             },
             filter: {
               categoryIds: this.sortFilter.selectedCategoryIds,
               createdAfter: this.sortFilter.createdAfter
             }
-          }
+          },
+          fetchPolicy: 'no-cache'
         })
 
         this.data = data.posts.edges.map((edge: any) => ({
@@ -210,7 +211,7 @@ export const usePostsStore = defineStore('posts', {
       })
     },
 
-    async syncPostVotesById(postId: number) {
+    async syncVotesForPostById(postId: number) {
       try {
         const { data } = await apolloClient.query({
           query: GET_POST_BY_ID_QUERY,
@@ -242,6 +243,8 @@ export const usePostsStore = defineStore('posts', {
 
     async fetchPostById(postId: number) {
       try {
+        if (this.getPostById(postId)) return
+
         const { data } = await apolloClient.query({
           query: GET_POST_BY_ID_QUERY,
           variables: { postId },

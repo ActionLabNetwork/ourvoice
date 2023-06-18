@@ -1,5 +1,5 @@
 <template>
-  <div class="text-gray-500 my-1">
+  <div class="my-1">
     <CommentTextarea
       @submit="
         (comment) => {
@@ -43,7 +43,7 @@ const props = defineProps({
   }
 })
 
-commentsStore.fetchComments()
+commentsStore.fetchComments(props.postId ?? null)
 const { data, totalCount } = storeToRefs(commentsStore)
 const comments = computed(() => data.value.filter((comment) => comment.post.id === props.postId))
 </script>

@@ -1,5 +1,8 @@
 <template>
   <!-- {{ comment }} -->
+  <!-- {{ votes }} -->
+  <!-- {{ hasUpvote }} -->
+  <!-- {{ hasDownvote }} -->
   <div class="flex">
     <div class="flex-shrink-0 mr-1 md:mr-3">
       <img
@@ -17,7 +20,7 @@
       <span class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</span>
       <div
         @click="commentCardClick(comment?.id)"
-        class="bg-white dark:bg-ourvoice-blue rounded-lg border hover:shadow-md transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
+        class="bg-white dark:bg-ourvoice-blue rounded-lg border-2 hover:shadow-md transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
       >
         <div class="text-sm md:text-md py-2">
           <p class="break-all">
@@ -29,21 +32,25 @@
         <div class="flex justify-between">
           <div class="flex">
             <button
-              @click="voteForComment('UPVOTE')"
+              @click.stop="voteForComment('UPVOTE')"
               type="button"
               class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
             >
-              {{ comment?.votesUp }}
-              <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+              <span :class="{ 'text-ourvoice-purple': hasUpvote }">
+                {{ comment?.votesUp }}
+                <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+              </span>
             </button>
 
             <button
-              @click="voteForComment('DOWNVOTE')"
+              @click.stop="voteForComment('DOWNVOTE')"
               type="button"
               class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
             >
-              {{ comment?.votesDown }}
-              <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+              <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+                {{ comment?.votesDown }}
+                <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+              </span>
             </button>
           </div>
           <div>
@@ -60,7 +67,6 @@
       <CommentTextarea v-if="showReply" @submit="(payload) => createComment(payload)" />
     </div>
   </div>
-  <!-- <pre>{{ comment }}</pre> -->
 </template>
 
 <script lang="ts" setup>
@@ -70,7 +76,8 @@ import { useCommentsStore } from '@/stores/comments'
 import CommentTextarea from './CommentTextarea.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { useMutation } from '@vue/apollo-composable'
+import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
+import { useMutation, useQuery } from '@vue/apollo-composable'
 import { useUserStore } from '@/stores/user'
 const props = defineProps({
   commentId: {
@@ -78,6 +85,45 @@ const props = defineProps({
     required: true
   }
 })
+const votes = ref<Vote[]>([])
+const hasUpvote = computed(() => {
+  return votes.value.some(
+    (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
+  )
+})
+const hasDownvote = computed(() => {
+  return votes.value.some(
+    (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
+  )
+})
+const { onResult, refetch } = useQuery(
+  GET_VOTES_QUERY,
+  {
+    filter: {
+      commentId: props.commentId
+    }
+  },
+  {
+    fetchPolicy: 'network-only'
+  }
+)
+onResult(({ data, loading }) => {
+  if (loading) return
+
+  votes.value = data.votes.map((vote: Vote) => ({
+    id: vote.id,
+    authorHash: vote.authorHash,
+    authorNickname: vote.authorNickname,
+    voteType: vote.voteType,
+    post: {
+      id: vote.post.id
+    },
+    comment: {
+      id: vote.comment.id
+    }
+  }))
+})
+
 const commentStore = useCommentsStore()
 const userStore = useUserStore()
 const { data } = storeToRefs(commentStore)
@@ -113,15 +159,15 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-
-    // await syncVote()
+    await refetch()
+    await syncVote()
   } catch (error) {
     console.log(error)
   }
 }
-// const syncVote = async () => {
-//   await commentStore.updateComment(props.commentId)
-// }
+const syncVote = async () => {
+  await commentStore.syncVotesForCommentById(props.commentId)
+}
 
 const commentCardClick = (commentId: number | undefined) => {
   // might add certain click logic here

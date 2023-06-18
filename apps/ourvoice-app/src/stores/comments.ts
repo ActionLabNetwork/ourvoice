@@ -5,8 +5,9 @@ import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createMo
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
-import { provideApolloClient } from '@vue/apollo-composable'
 
+import { GET_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getCommentById'
+import { provideApolloClient } from '@vue/apollo-composable'
 export interface Comment {
   id: number
   content: string
@@ -53,12 +54,27 @@ export const useCommentsStore = defineStore('comments', {
     pageInfo: undefined,
     totalCount: undefined
   }),
-
+  getters: {
+    getCommentById: (state) => (id: number) => {
+      return state.data.find((comment) => comment.id === id)
+    }
+  },
   actions: {
-    async fetchComments() {
+    async fetchComments(postId: number | null) {
       try {
         this.loading = true
-        const { data } = await apolloClient.query({ query: GET_COMMENTS_QUERY })
+        const { data } = await apolloClient.query({
+          query: GET_COMMENTS_QUERY,
+          variables: {
+            filter: {
+              postId: postId
+            },
+            pagination: {
+              limit: null,
+              cursor: null
+            }
+          }
+        })
 
         this.data = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
@@ -179,6 +195,31 @@ export const useCommentsStore = defineStore('comments', {
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
+        }
+      }
+    },
+
+    async syncVotesForCommentById(commentId: number) {
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_COMMENT_BY_ID_QUERY,
+          variables: {
+            commentId
+          },
+          fetchPolicy: 'no-cache'
+        })
+        const comment = this.data.find((comment) => comment.id === commentId)
+        if (comment) {
+          comment.votesDown = data.comment.votesDown
+          comment.votesUp = data.comment.votesUp
+        }
+        console.log(`refetching commentId: ${commentId}`, data)
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+        if (error) {
+          this.errorMessage = `Failed to load vote for comments: ${commentId}. Please try again.`
         }
       }
     }

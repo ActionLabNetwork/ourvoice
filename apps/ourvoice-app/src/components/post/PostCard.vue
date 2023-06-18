@@ -45,8 +45,9 @@
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
           <span :class="{ 'text-ourvoice-purple': hasUpvote }">
-            {{ post?.votesUp }} <font-awesome-icon icon="fa-solid fa-thumbs-up"
-          /></span>
+            {{ post?.votesUp }}
+            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+          </span>
         </button>
 
         <button
@@ -54,9 +55,10 @@
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          <span :class="{ 'text-ourvoice-purple': hasDownvote }"
-            >{{ post?.votesDown }} <font-awesome-icon icon="fa-solid fa-thumbs-down"
-          /></span>
+          <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+            {{ post?.votesDown }}
+            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+          </span>
         </button>
       </div>
       <div>
@@ -144,7 +146,18 @@ const { onResult, refetch } = useQuery(
 )
 onResult(({ data, loading }) => {
   if (loading) return
-  votes.value = data.votes.filter((vote: any) => !vote.comment)
+  votes.value = data.votes
+    .filter((vote: any) => !vote.comment)
+    .map((vote: any) => ({
+      id: vote.id,
+      voteType: vote.voteType,
+      authorHash: vote.authorHash,
+      authorNickname: vote.authorNickname,
+      post: {
+        id: vote.post.id
+      },
+      comment: null
+    }))
   // console.log(`votes for post:${props.postId}`, votes.value)
 })
 
@@ -161,7 +174,7 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
     })
     await refetch()
     console.log('refetched votes for post:', props.postId)
-    postsStore.syncPostVotesById(props.postId)
+    postsStore.syncVotesForPostById(props.postId)
   } catch (error) {
     console.log(error)
   }
