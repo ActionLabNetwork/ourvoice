@@ -31,7 +31,12 @@ export interface Post {
   votesDown: number
   files: string[]
 }
-
+export interface SortFilter {
+  sortBy: sortOptions
+  sortOrder: sortOrder
+  selectedCategoryIds: number[] | null
+  createdAfter: Date | null
+}
 export interface pageInfo {
   endCursor: string
   hasNextPage: boolean
@@ -45,9 +50,7 @@ export interface PostsState {
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
-  selectedCategoryIds: number[]
-  sortBy: sortOptions
-  sortOrder: sortOrder
+  sortFilter: SortFilter
 }
 
 provideApolloClient(apolloClient)
@@ -60,9 +63,12 @@ export const usePostsStore = defineStore('posts', {
     loading: false,
     error: undefined,
     errorMessage: undefined,
-    selectedCategoryIds: [],
-    sortBy: 'sortByCreatedAt',
-    sortOrder: 'desc'
+    sortFilter: {
+      sortBy: 'sortByCreatedAt',
+      sortOrder: 'desc',
+      selectedCategoryIds: null,
+      createdAfter: null
+    }
   }),
   getters: {
     getPostById: (state) => (id: number) => {
@@ -76,13 +82,16 @@ export const usePostsStore = defineStore('posts', {
           query: GET_POSTS_QUERY,
           variables: {
             sort: {
-              [this.sortBy]: this.sortOrder
+              [this.sortFilter.sortBy]: this.sortFilter.sortOrder
             },
             pagination: {
               cursor: null,
-              limit: 20
+              limit: 200
             },
-            filter: null
+            filter: {
+              categoryIds: this.sortFilter.selectedCategoryIds,
+              createdAfter: this.sortFilter.createdAfter
+            }
           }
         })
 
@@ -219,11 +228,16 @@ export const usePostsStore = defineStore('posts', {
     },
 
     async setSelectedCategoryIds(categoryIds: number[]) {
-      this.selectedCategoryIds = categoryIds
+      this.sortFilter.selectedCategoryIds = categoryIds
     },
 
-    async setSortBy(sortBy: sortOptions) {
-      this.sortBy = sortBy
+    async setSortOption(sortBy: string, sortOrder: sortOrder) {
+      this.sortFilter.sortBy = sortBy as sortOptions
+      this.sortFilter.sortOrder = sortOrder
+    },
+
+    async setCreatedAfter(createdAfter: Date | null) {
+      this.sortFilter.createdAfter = createdAfter
     },
 
     async fetchPostById(postId: number) {

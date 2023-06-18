@@ -66,7 +66,7 @@
             @click.stop="handleCommentBtnClicked"
             class="underline hover:bg-gray-200 px-1 rounded-md transition duration-300 ease-in-out"
           >
-            comment({{ post?.comments?.length ?? 0 }})
+            COMMENTS({{ post?.comments?.length ?? 0 }})
           </button>
         </slot>
       </div>

@@ -20,12 +20,7 @@
     </div>
 
     <div class="space-y-10">
-      <CommentCard
-        v-for="comment in comments"
-        :key="comment.id"
-        :comment-id="comment.id"
-        @click="commentCardClick(comment.id)"
-      />
+      <CommentCard v-for="comment in comments" :key="comment.id" :comment-id="comment.id" />
     </div>
   </div>
 </template>
@@ -51,8 +46,4 @@ const props = defineProps({
 commentsStore.fetchComments()
 const { data, totalCount } = storeToRefs(commentsStore)
 const comments = computed(() => data.value.filter((comment) => comment.post.id === props.postId))
-const commentCardClick = (commentId: number) => {
-  // might add certain click logic here
-  console.log('commentId:', commentId, 'clicked')
-}
 </script>
