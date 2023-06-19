@@ -145,7 +145,8 @@ export class ModerationCommentsFilterInput {
 }
 
 export class ModerationCommentPaginationInput {
-    cursor?: Nullable<string>;
+    before?: Nullable<string>;
+    after?: Nullable<string>;
     limit?: Nullable<number>;
 }
 
@@ -168,7 +169,8 @@ export class ModerationPostsFilterInput {
 }
 
 export class ModerationPostPaginationInput {
-    cursor?: Nullable<string>;
+    after?: Nullable<string>;
+    before?: Nullable<string>;
     limit?: Nullable<number>;
 }
 
@@ -450,6 +452,7 @@ export class ModerationCommentPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+    hasPreviousPage?: Nullable<boolean>;
 }
 
 export class ModerationPost {
@@ -503,6 +506,7 @@ export class ModerationPostPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+    hasPreviousPage?: Nullable<boolean>;
 }
 
 export class Post {

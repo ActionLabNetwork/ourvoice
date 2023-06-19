@@ -307,7 +307,7 @@ describe('CommentRepository', () => {
     );
     const nextComments =
       await commentModerationRepository.getModerationComments(null, {
-        cursor: numberToCursor(comments.moderationComments[4].id),
+        after: numberToCursor(comments.moderationComments[4].id),
         limit: 5,
       });
 
@@ -328,7 +328,7 @@ describe('CommentRepository', () => {
     );
     const nextComments =
       await commentModerationRepository.getModerationComments(null, {
-        cursor: numberToCursor(999),
+        after: numberToCursor(999),
         limit: 5,
       });
 
@@ -352,13 +352,43 @@ describe('CommentRepository', () => {
 
     await expect(
       commentModerationRepository.getModerationComments(null, {
-        cursor: 'asdadasdas',
+        after: 'asdadasdas',
         limit: 5,
       }),
     ).rejects.toThrowError();
   });
 
-  // // TODO: IMPLEMENT BACKWARD PAGINATION
+  it('should succeed backward pagination', async () => {
+    // Act
+    const posts = await commentModerationRepository.getModerationComments(
+      null,
+      {
+        limit: 2,
+      },
+    );
+    const nextPosts = await commentModerationRepository.getModerationComments(
+      null,
+      {
+        after: numberToCursor(posts.moderationComments.at(-1).id),
+        limit: 2,
+      },
+    );
+    const prevPosts = await commentModerationRepository.getModerationComments(
+      null,
+      {
+        before: numberToCursor(nextPosts.moderationComments[0].id),
+        limit: 2,
+      },
+    );
+
+    // Assert
+    expect(posts.totalCount).toEqual(TOTAL_COMMENTS);
+    expect(posts.moderationComments.length).toEqual(2);
+    expect(nextPosts.moderationComments.length).toEqual(2);
+    expect(nextPosts.moderationComments[0].id).toEqual(3);
+    expect(prevPosts.moderationComments.length).toEqual(2);
+    expect(prevPosts.moderationComments[0].id).toEqual(1);
+  });
 
   it('should create a new comment for a published post', async () => {
     // Arrange

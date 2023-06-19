@@ -8,7 +8,7 @@ import { plainToClass } from 'class-transformer';
 import {
   ModerationPostPaginationInput,
   ModerationPostsFilterInput,
-} from 'src/graphql';
+} from '../../../graphql';
 import { Post } from '@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
@@ -58,12 +58,36 @@ export class PostModerationService {
       }
     }
 
-    // Handle pagination
-    const { totalCount, moderationPosts } =
-      await this.moderationPostRepository.getModerationPosts(
-        filter,
-        pagination,
+    // Validate pagination
+    if (pagination?.before && pagination?.after) {
+      throw new BadRequestException(
+        "You cannot provide both 'before' and 'after' cursors. Please provide only one.",
       );
+    }
+
+    // Handle pagination
+    const limit = pagination?.limit ?? 10;
+
+    // We leave as undefined if we don't have a cursor to avoid doing a double fetch (backwards and forwards)
+    let hasNextPage = undefined;
+    let hasPreviousPage = undefined;
+
+    const { totalCount, moderationPosts } =
+      await this.moderationPostRepository.getModerationPosts(filter, {
+        ...pagination,
+        limit: limit + 1,
+      });
+
+    if (pagination?.before) {
+      hasPreviousPage = moderationPosts.length > limit;
+      if (hasPreviousPage) moderationPosts.pop();
+    }
+
+    // Forward pagination is the default if no cursor is provided
+    if (!pagination?.before || pagination?.after) {
+      hasNextPage = moderationPosts.length > limit;
+      if (hasNextPage) moderationPosts.pop();
+    }
 
     const edges = moderationPosts.map((post) => ({
       node: post,
@@ -73,7 +97,8 @@ export class PostModerationService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: moderationPosts.length === (pagination?.limit ?? 10),
+      hasNextPage,
+      hasPreviousPage,
     };
 
     return { totalCount, edges, pageInfo };

@@ -6,7 +6,16 @@ import {
   uniqueNamesGenerator,
 } from 'unique-names-generator';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    premoderation: {
+      url:
+        process.env.NODE_ENV === 'test'
+          ? process.env.DATABASE_PREMODERATION_TEST_URL
+          : process.env.DATABASE_PREMODERATION_URL,
+    },
+  },
+});
 
 async function clearDatabase() {
   await prisma.commentModeration.deleteMany();
@@ -166,4 +175,4 @@ export async function seedDb() {
   await main();
 }
 
-// run();
+// seedDb();

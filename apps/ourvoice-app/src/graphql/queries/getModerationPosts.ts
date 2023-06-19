@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const GET_MODERATION_POSTS_QUERY = gql`
-  query GetModerationPosts($cursor: String, $limit: Int = 10) {
-    moderationPosts(filter: null, pagination: { cursor: $cursor, limit: $limit }) {
+  query GetModerationPosts($after: String, $limit: Int = 10) {
+    moderationPosts(filter: null, pagination: { after: $after, limit: $limit }) {
       edges {
         cursor
         node {
@@ -30,6 +30,7 @@ export const GET_MODERATION_POSTS_QUERY = gql`
         startCursor
         endCursor
         hasNextPage
+        hasPreviousPage
       }
     }
   }

@@ -99,7 +99,8 @@ input ModerationCommentsFilterInput {
 }
 
 input ModerationCommentPaginationInput {
-  cursor: String
+  before: String
+  after: String
   limit: Int
 }
 
@@ -118,6 +119,7 @@ type ModerationCommentPageInfo {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean
+  hasPreviousPage: Boolean
 }
 
 input ModerationCommentModifyInput {

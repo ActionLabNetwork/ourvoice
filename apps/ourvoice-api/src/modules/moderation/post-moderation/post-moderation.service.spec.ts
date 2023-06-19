@@ -13,6 +13,7 @@ import {
   PostVersionBuilder,
   PostModerationBuilder,
 } from './post-moderation.builder';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 
 describe('PostModerationService', () => {
   let postModerationService: PostModerationService;
@@ -50,7 +51,9 @@ describe('PostModerationService', () => {
     .withAuthorHash('user1hash')
     .withAuthorNickname('correct_teal_duck')
     .withPostIdInMainDb(null)
-    .build() as Post;
+    .build() as Post & {
+    versions: (PostVersion & { moderations: PostModeration[] })[];
+  };
 
   const dummyPosts = [
     dummyPost,
@@ -93,7 +96,7 @@ describe('PostModerationService', () => {
     };
 
     postModerationRepositoryMock.createModerationPost.mockResolvedValue(
-      dummyPost as Post,
+      dummyPost,
     );
 
     // Act
@@ -185,9 +188,7 @@ describe('PostModerationService', () => {
     // Arrange
     const postId = 1;
     postModerationRepositoryMock.getModerationPostById.mockResolvedValue(
-      dummyPost as Post & {
-        versions: (PostVersion & { moderations: PostModeration[] })[];
-      },
+      dummyPost,
     );
 
     // Act
@@ -214,7 +215,6 @@ describe('PostModerationService', () => {
     ).toHaveBeenCalledWith(postId);
   });
 
-  // Tests that getPosts method successfully retrieves posts with valid filter and pagination input.
   it('should get posts with filters and pagination', async () => {
     // Arrange
     postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
@@ -253,9 +253,183 @@ describe('PostModerationService', () => {
 
     // Assert
     expect(result).toEqual(expectedResult);
-    expect(
-      postModerationRepositoryMock.getModerationPosts,
-    ).toHaveBeenCalledWith(filterData, paginationData);
+  });
+
+  it('should throw an error if both after and before fields are included', async () => {
+    // Arrange
+    const filterData = { status: ModerationPostStatus.PENDING };
+    const paginationData = { after: 'MQ==', before: 'MQ==' };
+
+    // Act & Assert
+    await expect(
+      postModerationService.getModerationPosts(filterData, paginationData),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('should return next page when after field is included', async () => {
+    // Arrange
+    postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
+      totalCount: 6,
+      moderationPosts: [
+        dummyPost,
+        new PostBuilder(dummyPost).withId(2).build(),
+        new PostBuilder(dummyPost).withId(3).build(),
+      ] as Post[],
+    });
+
+    const paginationData = { after: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [
+        {
+          cursor: numberToCursor(1),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 1,
+            postIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+        {
+          cursor: numberToCursor(2),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 2,
+            postIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+      ],
+      pageInfo: {
+        endCursor: numberToCursor(2),
+        hasNextPage: true,
+        hasPreviousPage: undefined,
+        startCursor: numberToCursor(1),
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await postModerationService.getModerationPosts(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should not return next page when after field is included but there is no next page', async () => {
+    // Arrange
+    postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
+      totalCount: 6,
+      moderationPosts: [] as Post[],
+    });
+
+    const paginationData = { after: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [],
+      pageInfo: {
+        endCursor: null,
+        hasNextPage: false,
+        hasPreviousPage: undefined,
+        startCursor: null,
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await postModerationService.getModerationPosts(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should return previous page when before field is included', async () => {
+    // Arrange
+    postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
+      totalCount: 6,
+      moderationPosts: [
+        dummyPost,
+        new PostBuilder(dummyPost).withId(2).build(),
+        new PostBuilder(dummyPost).withId(3).build(),
+      ] as Post[],
+    });
+
+    const paginationData = { before: numberToCursor(3), limit: 2 };
+    const expectedResult = {
+      edges: [
+        {
+          cursor: numberToCursor(1),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 1,
+            postIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+        {
+          cursor: numberToCursor(2),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 2,
+            postIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+      ],
+      pageInfo: {
+        endCursor: numberToCursor(2),
+        hasNextPage: undefined,
+        hasPreviousPage: true,
+        startCursor: numberToCursor(1),
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await postModerationService.getModerationPosts(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should not return previous page when before field is included but there is no previous page', async () => {
+    // Arrange
+    postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
+      totalCount: 6,
+      moderationPosts: [] as Post[],
+    });
+
+    const paginationData = { before: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [],
+      pageInfo: {
+        endCursor: null,
+        hasNextPage: undefined,
+        hasPreviousPage: false,
+        startCursor: null,
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await postModerationService.getModerationPosts(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
   });
 
   it('should approve a post version', async () => {
@@ -266,15 +440,11 @@ describe('PostModerationService', () => {
     const reason = 'Test Reason';
 
     postModerationRepositoryMock.getModerationPostById.mockResolvedValue(
-      dummyPost as Post & {
-        versions: (PostVersion & { moderations: PostModeration[] })[];
-      },
+      dummyPost,
     );
 
     postModerationRepositoryMock.approvePostVersion.mockResolvedValue(
-      dummyPost as Post & {
-        versions: (PostVersion & { moderations: PostModeration[] })[];
-      },
+      dummyPost,
     );
 
     // Act
@@ -344,16 +514,10 @@ describe('PostModerationService', () => {
     const reason = 'Test Reason';
 
     postModerationRepositoryMock.getModerationPostById.mockResolvedValue(
-      dummyPost as Post & {
-        versions: (PostVersion & { moderations: PostModeration[] })[];
-      },
+      dummyPost,
     );
 
-    postModerationRepositoryMock.rejectPostVersion.mockResolvedValue(
-      dummyPost as Post & {
-        versions: (PostVersion & { moderations: PostModeration[] })[];
-      },
-    );
+    postModerationRepositoryMock.rejectPostVersion.mockResolvedValue(dummyPost);
 
     // Act
     const result = await postModerationService.rejectPostVersion(

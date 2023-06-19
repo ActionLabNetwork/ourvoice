@@ -144,7 +144,7 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
 
         const { data } = await apolloClient.query({
           query: GET_MODERATION_COMMENTS_QUERY,
-          variables: this.pageInfo && loadMore ? { cursor: this.pageInfo.endCursor } : {}
+          variables: this.pageInfo && loadMore ? { after: this.pageInfo.endCursor } : {}
         })
 
         // If we're loading more comments, append them. Otherwise, replace the comments.

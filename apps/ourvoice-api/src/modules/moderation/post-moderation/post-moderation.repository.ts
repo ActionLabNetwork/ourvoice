@@ -73,14 +73,24 @@ export class PostModerationRepository {
 
     const totalCount = await this.prisma.post.count({ where });
 
+    // Determine if going forwards or backwards
+    let cursorDirection = 1;
+    let cursor: Prisma.PostWhereUniqueInput | undefined = undefined;
+    if (pagination?.before) {
+      cursorDirection = -1;
+      cursor = { id: cursorToNumber(pagination.before) };
+    } else if (pagination?.after) {
+      cursorDirection = 1;
+      cursor = { id: cursorToNumber(pagination.after) };
+    }
+
     const moderationPosts = await this.prisma.post.findMany({
       where,
       include: { versions: { orderBy: { version: 'desc' } } },
-      skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor) }
-        : undefined,
-      take: pagination?.limit ?? 10,
+      skip: cursor ? 1 : undefined,
+      cursor: cursor,
+      take: (pagination?.limit ?? 10) * cursorDirection,
+      orderBy: { id: 'asc' },
     });
 
     return { totalCount, moderationPosts };

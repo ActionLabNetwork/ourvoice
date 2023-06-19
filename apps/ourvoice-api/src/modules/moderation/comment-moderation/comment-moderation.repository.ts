@@ -92,14 +92,24 @@ export class CommentModerationRepository {
 
     const totalCount = await this.prisma.comment.count({ where });
 
+    // Determine if going forwards or backwards
+    let cursorDirection = 1;
+    let cursor: Prisma.CommentWhereUniqueInput | undefined = undefined;
+    if (pagination?.before) {
+      cursorDirection = -1;
+      cursor = { id: cursorToNumber(pagination.before) };
+    } else if (pagination?.after) {
+      cursorDirection = 1;
+      cursor = { id: cursorToNumber(pagination.after) };
+    }
+
     const moderationComments = await this.prisma.comment.findMany({
       where,
       include: { versions: { orderBy: { version: 'desc' } } },
-      skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor) }
-        : undefined,
-      take: pagination?.limit ?? 10,
+      skip: cursor ? 1 : undefined,
+      cursor: cursor,
+      take: (pagination?.limit ?? 10) * cursorDirection,
+      orderBy: { id: 'asc' },
     });
 
     return { totalCount, moderationComments };

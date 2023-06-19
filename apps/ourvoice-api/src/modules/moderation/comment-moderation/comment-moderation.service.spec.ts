@@ -17,6 +17,7 @@ import {
   CommentVersionBuilder,
   CommentModerationBuilder,
 } from './comment-moderation.builder';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 
 describe('CommentModerationService', () => {
   let commentModerationService: CommentModerationService;
@@ -178,7 +179,6 @@ describe('CommentModerationService', () => {
     ).toHaveBeenCalledWith(commentId);
   });
 
-  // Tests that getComments method successfully retrieves comments with valid filter and pagination input.
   it('should get comments with filters and pagination', async () => {
     // Arrange
     commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
@@ -220,6 +220,186 @@ describe('CommentModerationService', () => {
     expect(
       commentModerationRepositoryMock.getModerationComments,
     ).toHaveBeenCalledWith(filterData, paginationData);
+  });
+
+  it('should throw an error if both after and before fields are included', async () => {
+    // Arrange
+    const filterData = { status: ModerationCommentStatus.PENDING };
+    const paginationData = { after: 'MQ==', before: 'MQ==' };
+
+    // Act & Assert
+    await expect(
+      commentModerationService.getModerationComments(
+        filterData,
+        paginationData,
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('should return next page when after field is included', async () => {
+    // Arrange
+    commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
+      totalCount: 6,
+      moderationComments: [
+        dummyComment,
+        new CommentBuilder(dummyComment).withId(2).build(),
+        new CommentBuilder(dummyComment).withId(3).build(),
+      ] as Comment[],
+    });
+
+    const paginationData = { after: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [
+        {
+          cursor: numberToCursor(1),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 1,
+            commentIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+        {
+          cursor: numberToCursor(2),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 2,
+            commentIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+      ],
+      pageInfo: {
+        endCursor: numberToCursor(2),
+        hasNextPage: true,
+        hasPreviousPage: undefined,
+        startCursor: numberToCursor(1),
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await commentModerationService.getModerationComments(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should not return next page when after field is included but there is no next page', async () => {
+    // Arrange
+    commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
+      totalCount: 6,
+      moderationComments: [] as Comment[],
+    });
+
+    const paginationData = { after: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [],
+      pageInfo: {
+        endCursor: null,
+        hasNextPage: false,
+        hasPreviousPage: undefined,
+        startCursor: null,
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await commentModerationService.getModerationComments(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should return previous page when before field is included', async () => {
+    // Arrange
+    commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
+      totalCount: 6,
+      moderationComments: [
+        dummyComment,
+        new CommentBuilder(dummyComment).withId(2).build(),
+        new CommentBuilder(dummyComment).withId(3).build(),
+      ] as Comment[],
+    });
+
+    const paginationData = { before: numberToCursor(3), limit: 2 };
+    const expectedResult = {
+      edges: [
+        {
+          cursor: numberToCursor(1),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 1,
+            commentIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+        {
+          cursor: numberToCursor(2),
+          node: {
+            authorHash: 'user1hash',
+            authorNickname: 'correct_teal_duck',
+            id: 2,
+            commentIdInMainDb: null,
+            requiredModerations: 1,
+            status: 'PENDING',
+          },
+        },
+      ],
+      pageInfo: {
+        endCursor: numberToCursor(2),
+        hasNextPage: undefined,
+        hasPreviousPage: true,
+        startCursor: numberToCursor(1),
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await commentModerationService.getModerationComments(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
+  });
+
+  it('should not return previous page when before field is included but there is no previous page', async () => {
+    // Arrange
+    commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
+      totalCount: 6,
+      moderationComments: [] as Comment[],
+    });
+
+    const paginationData = { before: numberToCursor(1), limit: 2 };
+    const expectedResult = {
+      edges: [],
+      pageInfo: {
+        endCursor: null,
+        hasNextPage: undefined,
+        hasPreviousPage: false,
+        startCursor: null,
+      },
+      totalCount: 6,
+    };
+    // Act
+    const result = await commentModerationService.getModerationComments(
+      null,
+      paginationData,
+    );
+
+    // Assert
+    expect(result).toEqual(expectedResult);
   });
 
   it('should approve a comment version', async () => {

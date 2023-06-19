@@ -227,7 +227,7 @@ describe('PostRepository', () => {
       limit: 5,
     });
     const nextPosts = await postModerationRepository.getModerationPosts(null, {
-      cursor: numberToCursor(posts.moderationPosts[4].id),
+      after: numberToCursor(posts.moderationPosts.at(-1).id),
       limit: 5,
     });
 
@@ -244,7 +244,7 @@ describe('PostRepository', () => {
       limit: 5,
     });
     const nextPosts = await postModerationRepository.getModerationPosts(null, {
-      cursor: numberToCursor(999),
+      after: numberToCursor(999),
       limit: 5,
     });
 
@@ -265,13 +265,34 @@ describe('PostRepository', () => {
 
     await expect(
       postModerationRepository.getModerationPosts(null, {
-        cursor: 'asdadasdas',
+        after: 'asdadasdas',
         limit: 5,
       }),
     ).rejects.toThrowError();
   });
 
-  // TODO: IMPLEMENT BACKWARD PAGINATION
+  it('should succeed backward pagination', async () => {
+    // Act
+    const posts = await postModerationRepository.getModerationPosts(null, {
+      limit: 2,
+    });
+    const nextPosts = await postModerationRepository.getModerationPosts(null, {
+      after: numberToCursor(posts.moderationPosts.at(-1).id),
+      limit: 2,
+    });
+    const prevPosts = await postModerationRepository.getModerationPosts(null, {
+      before: numberToCursor(nextPosts.moderationPosts[0].id),
+      limit: 2,
+    });
+
+    // Assert
+    expect(posts.totalCount).toEqual(TOTAL_POSTS);
+    expect(posts.moderationPosts.length).toEqual(2);
+    expect(nextPosts.moderationPosts.length).toEqual(2);
+    expect(nextPosts.moderationPosts[0].id).toEqual(3);
+    expect(prevPosts.moderationPosts.length).toEqual(2);
+    expect(prevPosts.moderationPosts[0].id).toEqual(1);
+  });
 
   it('should create a new post', async () => {
     // Arrange

@@ -2,7 +2,16 @@ import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url:
+        process.env.NODE_ENV === 'test'
+          ? process.env.DATABASE_MAIN_TEST_URL
+          : process.env.DATABASE_MAIN_URL,
+    },
+  },
+});
 
 async function clearDatabase() {
   await prisma.vote.deleteMany();

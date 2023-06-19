@@ -58,12 +58,36 @@ export class CommentModerationService {
       }
     }
 
-    // Handle pagination
-    const { totalCount, moderationComments } =
-      await this.moderationCommentRepository.getModerationComments(
-        filter,
-        pagination,
+    // Validate pagination
+    if (pagination?.before && pagination?.after) {
+      throw new BadRequestException(
+        "You cannot provide both 'before' and 'after' cursors. Please provide only one.",
       );
+    }
+
+    // Handle pagination
+    const limit = pagination?.limit ?? 10;
+
+    // We leave as undefined if we don't have a cursor to avoid doing a double fetch (backwards and forwards)
+    let hasNextPage = undefined;
+    let hasPreviousPage = undefined;
+
+    const { totalCount, moderationComments } =
+      await this.moderationCommentRepository.getModerationComments(filter, {
+        ...pagination,
+        limit: limit + 1,
+      });
+
+    if (pagination?.before) {
+      hasPreviousPage = moderationComments.length > limit;
+      if (hasPreviousPage) moderationComments.pop();
+    }
+
+    // Forward pagination is the default if no cursor is provided
+    if (!pagination?.before || pagination?.after) {
+      hasNextPage = moderationComments.length > limit;
+      if (hasNextPage) moderationComments.pop();
+    }
 
     const edges = moderationComments.map((comment) => ({
       node: comment,
@@ -73,7 +97,8 @@ export class CommentModerationService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: moderationComments.length === (pagination?.limit ?? 10),
+      hasNextPage,
+      hasPreviousPage,
     };
 
     return { totalCount, edges, pageInfo };
