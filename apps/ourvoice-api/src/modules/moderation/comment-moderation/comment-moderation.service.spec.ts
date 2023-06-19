@@ -94,7 +94,9 @@ describe('CommentModerationService', () => {
     };
 
     commentModerationRepositoryMock.createModerationComment.mockResolvedValue(
-      dummyComment as Comment,
+      dummyComment as Comment & {
+        versions: (CommentVersion & { moderations: CommentModeration[] })[];
+      },
     );
 
     // Act

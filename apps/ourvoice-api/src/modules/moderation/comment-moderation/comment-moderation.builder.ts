@@ -4,14 +4,23 @@ import {
   CommentModeration,
   PostStatus,
   Decision,
+  Post,
+  PostVersion,
+  PostModeration,
 } from '@internal/prisma/client';
 
 class CommentBuilder {
   private comment: Partial<
     Comment & {
-      versions: CommentVersion[] & { moderations: CommentModeration[] };
+      post: Partial<
+        Post & { versions: (PostVersion & { moderations: PostModeration[] })[] }
+      >;
+      parent: Partial<Comment>;
+      versions: (CommentVersion & { moderations: CommentModeration[] })[];
     }
-  > = {};
+  > = {
+    parentId: null,
+  };
 
   constructor(comment?: Partial<Comment>) {
     this.comment = structuredClone(comment) ?? {};
@@ -27,7 +36,7 @@ class CommentBuilder {
   }
 
   withVersions(
-    versions: CommentVersion[] & { moderations: CommentModeration[] },
+    versions: (CommentVersion & { moderations: CommentModeration[] })[],
   ) {
     this.comment.versions = versions;
     return this;
@@ -50,6 +59,30 @@ class CommentBuilder {
 
   withCommentIdInMainDb(commentIdInMainDb: number | null): CommentBuilder {
     this.comment.commentIdInMainDb = commentIdInMainDb;
+    return this;
+  }
+
+  withPost(
+    post: Partial<
+      Post & { versions: (PostVersion & { moderations: PostModeration[] })[] }
+    >,
+  ): CommentBuilder {
+    this.comment.post = post;
+    return this;
+  }
+
+  withPostId(postId: number): CommentBuilder {
+    this.comment.postId = postId;
+    return this;
+  }
+
+  withParent(parent: Comment): CommentBuilder {
+    this.comment.parent = parent;
+    return this;
+  }
+
+  withParentId(parentId: number | null): CommentBuilder {
+    this.comment.parentId = parentId;
     return this;
   }
 
@@ -136,6 +169,10 @@ class CommentModerationBuilder {
   private moderation: Partial<
     CommentModeration & { commentVersion: Partial<CommentVersion> }
   > = {};
+
+  constructor(moderation?: CommentModeration) {
+    this.moderation = structuredClone(moderation) ?? {};
+  }
 
   withId(id: number): CommentModerationBuilder {
     this.moderation.id = id;

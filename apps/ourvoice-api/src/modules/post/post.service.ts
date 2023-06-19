@@ -97,21 +97,21 @@ export class PostService {
     return newPost;
   }
 
-  async updatePost(id: number, data: PostUpdateDto): Promise<Post> {
-    const postsUpdateDto = plainToClass(PostUpdateDto, data);
-    const errors = await validate(postsUpdateDto);
+  // async updatePost(id: number, data: PostUpdateDto): Promise<Post> {
+  //   const postsUpdateDto = plainToClass(PostUpdateDto, data);
+  //   const errors = await validate(postsUpdateDto);
 
-    if (errors.length > 0) {
-      throw new BadRequestException(errors);
-    }
+  //   if (errors.length > 0) {
+  //     throw new BadRequestException(errors);
+  //   }
 
-    const existingPost = await this.postRepository.getPostById(id);
-    if (!existingPost) {
-      throw new NotFoundException(`Post with id ${id} not found`);
-    }
+  //   const existingPost = await this.postRepository.getPostById(id);
+  //   if (!existingPost) {
+  //     throw new NotFoundException(`Post with id ${id} not found`);
+  //   }
 
-    return this.postRepository.updatePost(id, data);
-  }
+  //   return this.postRepository.updatePost(id, data);
+  // }
 
   async deletePost(id: number): Promise<Post> {
     const existingPost = await this.postRepository.getPostById(id);

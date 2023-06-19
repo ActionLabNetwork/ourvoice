@@ -50,7 +50,9 @@ export class ScheduledModerationService {
     ];
 
     await Promise.all(promises);
-    this.logger.debug('Ran scheduled moderation post approval/rejection');
+    this.logger.debug(
+      'Ran scheduled moderation post and comment approval/rejection',
+    );
   }
 
   onModuleInit() {
@@ -58,7 +60,7 @@ export class ScheduledModerationService {
     const cronTime = convertFrequencyToCron(postFrequency);
     const job = new CronJob(cronTime, () => this.handleCron());
 
-    this.schedulerRegistry.addCronJob('publishPost', job);
+    this.schedulerRegistry.addCronJob('publishPostAndComment', job);
     job.start();
   }
 }

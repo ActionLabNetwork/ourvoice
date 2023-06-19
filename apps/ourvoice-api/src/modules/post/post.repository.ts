@@ -120,19 +120,19 @@ export class PostRepository {
     return this.prisma.post.create({ data });
   }
 
-  async updatePost(id: number, data: Prisma.PostUpdateInput) {
-    const postExists = await this.prisma.post.findUnique({ where: { id } });
+  // async updatePost(id: number, data: Prisma.PostUpdateInput) {
+  //   const postExists = await this.prisma.post.findUnique({ where: { id } });
 
-    if (!postExists) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
-    }
+  //   if (!postExists) {
+  //     throw new NotFoundException(`Post with ID ${id} not found`);
+  //   }
 
-    return this.prisma.post.update({
-      where: { id },
-      data,
-      include: { categories: true },
-    });
-  }
+  //   return this.prisma.post.update({
+  //     where: { id },
+  //     data,
+  //     include: { categories: true },
+  //   });
+  // }
 
   async deletePost(id: number) {
     const postExists = await this.prisma.post.findUnique({ where: { id } });

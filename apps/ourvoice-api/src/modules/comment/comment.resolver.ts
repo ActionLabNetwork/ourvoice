@@ -4,7 +4,7 @@ import {
   CommentPaginationInput,
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CommentService } from 'src/modules/comment/comment.service';
+import { CommentService } from '../../modules/comment/comment.service';
 
 @Resolver('Comment')
 export class CommentResolver {

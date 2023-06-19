@@ -13,7 +13,7 @@ import {
 } from 'src/graphql';
 import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
-import { CommentService } from 'src/modules/comment/comment.service';
+import { CommentService } from '../../../modules/comment/comment.service';
 
 function countCommentVersionModerationDecisions(
   version: CommentVersion & {
@@ -114,63 +114,50 @@ export class CommentModerationRepository {
 
   async createModerationComment(data: CommentCreateDto) {
     const { content, postId, parentId, authorHash, authorNickname } = data;
+    const connectData = { post: undefined, parent: undefined };
 
-    return await this.prisma.$transaction(async (tx) => {
-      const connectData = { post: undefined, parent: undefined };
-      let errorMessage;
-
-      // 1. Fetch post to be connected with the comment
-      if (postId) {
-        console.log('Creating comment for post');
-        const post = await tx.post.findFirst({
-          where: { postIdInMainDb: postId },
-        });
-        console.log({ post });
-        if (!post) {
-          errorMessage = 'Post for comment not found in the moderation DB';
-        } else {
-          connectData.post = { connect: { id: post.id } };
-        }
-      }
-
-      // 1a. If there is a parent comment, fetch it to be connected with the comment
-      if (parentId) {
-        console.log('Creating comment for comment');
-        const parentComment = await tx.comment.findFirst({
-          where: { commentIdInMainDb: parentId },
-        });
-        if (!parentComment) {
-          errorMessage =
-            'Parent comment for comment not found in the moderation DB';
-        } else {
-          connectData.parent = { connect: { id: parentComment.id } };
-        }
-      }
-
-      if (errorMessage) {
-        throw new Error(errorMessage);
-      }
-
-      const newComment = await tx.comment.create({
-        data: {
-          authorHash,
-          authorNickname,
-          ...connectData,
-        },
+    if (postId) {
+      console.log('Creating comment for post');
+      const post = await this.prisma.post.findFirst({
+        where: { postIdInMainDb: postId },
       });
+      if (!post) {
+        throw new Error('Post for comment not found in the moderation DB');
+      } else {
+        connectData.post = { connect: { id: post.id } };
+      }
+    }
 
-      await tx.commentVersion.create({
-        data: {
-          content,
-          authorHash,
-          authorNickname,
-          comment: { connect: { id: newComment.id } },
-          latest: true,
-          version: 1,
-        },
+    if (parentId) {
+      console.log('Creating comment for comment');
+      const parentComment = await this.prisma.comment.findFirst({
+        where: { commentIdInMainDb: parentId },
       });
+      if (!parentComment) {
+        throw new Error(
+          'Parent comment for comment not found in the moderation DB',
+        );
+      } else {
+        connectData.parent = { connect: { id: parentComment.id } };
+      }
+    }
 
-      return newComment;
+    return await this.prisma.comment.create({
+      data: {
+        authorHash,
+        authorNickname,
+        ...connectData,
+        versions: {
+          create: {
+            content,
+            authorHash,
+            authorNickname,
+            latest: true,
+            version: 1,
+          },
+        },
+      },
+      include: { versions: { orderBy: { version: 'desc' } } },
     });
   }
 
@@ -188,6 +175,33 @@ export class CommentModerationRepository {
     reason: string,
   ) {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this comment version
+      const existingCommentModeration = await tx.commentModeration.findFirst({
+        where: {
+          moderatorHash,
+          commentVersionId: id,
+        },
+      });
+
+      if (existingCommentModeration) {
+        throw new Error('Moderator has already moderated this comment version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the comment
+      const commentVersion = await tx.commentVersion.findUnique({
+        where: { id },
+        include: { comment: true },
+      });
+
+      if (!commentVersion.latest) {
+        throw new Error('Comment version is not the latest');
+      }
+
+      // Check that comment has pending status
+      if (commentVersion.comment.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new comment moderation entry
       const newCommentModeration = await tx.commentModeration.create({
         data: {
@@ -199,15 +213,6 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the comment, or else we'll rollback
-      const commentVersion = await tx.commentVersion.findUnique({
-        where: { id },
-      });
-
-      if (!commentVersion.latest) {
-        throw new Error('Comment version is not the latest');
-      }
 
       return newCommentModeration;
     });
@@ -232,6 +237,33 @@ export class CommentModerationRepository {
     reason: string,
   ) {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this comment version
+      const existingCommentModeration = await tx.commentModeration.findFirst({
+        where: {
+          moderatorHash,
+          commentVersionId: id,
+        },
+      });
+
+      if (existingCommentModeration) {
+        throw new Error('Moderator has already moderated this comment version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the comment
+      const commentVersion = await tx.commentVersion.findUnique({
+        where: { id },
+        include: { comment: true },
+      });
+
+      if (!commentVersion.latest) {
+        throw new Error('Comment version is not the latest');
+      }
+
+      // Check that comment has pending status
+      if (commentVersion.comment.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new comment moderation entry
       const newCommentModeration = await tx.commentModeration.create({
         data: {
@@ -243,15 +275,6 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the comment, or else we'll rollback
-      const commentVersion = await tx.commentVersion.findUnique({
-        where: { id },
-      });
-
-      if (!commentVersion.latest) {
-        throw new Error('Comment version is not the latest');
-      }
 
       return newCommentModeration;
     });

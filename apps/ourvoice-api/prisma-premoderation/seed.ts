@@ -9,7 +9,6 @@ import {
 const prisma = new PrismaClient();
 
 async function clearDatabase() {
-  console.log('Clearing database...');
   await prisma.commentModeration.deleteMany();
   await prisma.commentVersion.deleteMany();
   await prisma.postModeration.deleteMany();
@@ -44,6 +43,7 @@ async function main() {
           seed: authorHash,
         }),
         status: postStatuses[i % postStatuses.length],
+        postIdInMainDb: i === 0 ? 1 : undefined,
         versions: {
           create: Array(3)
             .fill({})
@@ -58,7 +58,7 @@ async function main() {
               authorNickname: authorHash,
               reason: versionIndex > 0 ? 'Modified by moderator' : '',
               latest: versionIndex === 2,
-              timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
+              timestamp: new Date(`2023-04-${13 + i + versionIndex}T10:00:00Z`),
             })),
         },
       },
@@ -78,6 +78,7 @@ async function main() {
             seed: authorHash,
           }),
           post: { connect: { id: post.id } },
+          commentIdInMainDb: i === 0 ? 1 : undefined,
           status: postStatuses[j % postStatuses.length],
           versions: {
             create: Array(3)
@@ -91,7 +92,9 @@ async function main() {
                 authorNickname: commentAuthorHash,
                 reason: versionIndex > 0 ? 'Modified by moderator' : '',
                 latest: versionIndex === 2,
-                timestamp: new Date(`2023-04-${13 + i + j}T10:30:00Z`),
+                timestamp: new Date(
+                  `2023-04-${13 + i + j + versionIndex}T10:30:00Z`,
+                ),
               })),
           },
         },
@@ -134,6 +137,7 @@ async function main() {
             seed: moderatorHash,
           }),
           decision: decisions[i % decisions.length],
+          timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for post ${i + 1}`,
         },
       });
@@ -147,6 +151,7 @@ async function main() {
             seed: moderatorHash,
           }),
           decision: decisions[i % decisions.length],
+          timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for comment on post ${i + 1}`,
         },
       });
@@ -154,12 +159,11 @@ async function main() {
   }
 
   await prisma.$disconnect();
-  console.log('Seeding completed.');
 }
 
-async function run() {
+export async function seedDb() {
   await clearDatabase();
   await main();
 }
 
-run();
+// run();

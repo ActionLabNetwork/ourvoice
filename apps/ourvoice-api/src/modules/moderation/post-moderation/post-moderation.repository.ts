@@ -100,22 +100,35 @@ export class PostModerationRepository {
       data: {
         authorHash,
         authorNickname,
+        versions: {
+          create: {
+            title,
+            content,
+            categoryIds,
+            files,
+            authorHash,
+            authorNickname,
+            latest: true,
+            version: 1,
+          },
+        },
       },
+      include: { versions: true },
     });
 
-    await this.prisma.postVersion.create({
-      data: {
-        title,
-        content,
-        categoryIds,
-        files,
-        authorHash,
-        authorNickname,
-        post: { connect: { id: newPost.id } },
-        latest: true,
-        version: 1,
-      },
-    });
+    // await this.prisma.postVersion.create({
+    //   data: {
+    //     title,
+    //     content,
+    //     categoryIds,
+    //     files,
+    //     authorHash,
+    //     authorNickname,
+    //     post: { connect: { id: newPost.id } },
+    //     latest: true,
+    //     version: 1,
+    //   },
+    // });
 
     return newPost;
   }
@@ -134,6 +147,33 @@ export class PostModerationRepository {
     reason: string,
   ) {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this post version
+      const existingPostModeration = await tx.postModeration.findFirst({
+        where: {
+          moderatorHash,
+          postVersionId: id,
+        },
+      });
+
+      if (existingPostModeration) {
+        throw new Error('Moderator has already moderated this post version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
+      const postVersion = await tx.postVersion.findUnique({
+        where: { id },
+        include: { post: true },
+      });
+
+      if (!postVersion.latest) {
+        throw new Error('Post version is not the latest');
+      }
+
+      // Check that post has pending status
+      if (postVersion.post.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new post moderation entry
       const newPostModeration = await tx.postModeration.create({
         data: {
@@ -145,15 +185,6 @@ export class PostModerationRepository {
         },
         select: { postVersion: { select: { postId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
-      const postVersion = await tx.postVersion.findUnique({
-        where: { id },
-      });
-
-      if (!postVersion.latest) {
-        throw new Error('Post version is not the latest');
-      }
 
       return newPostModeration;
     });
@@ -170,6 +201,27 @@ export class PostModerationRepository {
     reason: string,
   ) {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this post version
+      const existingPostModeration = await tx.postModeration.findFirst({
+        where: {
+          moderatorHash,
+          postVersionId: id,
+        },
+      });
+
+      if (existingPostModeration) {
+        throw new Error('Moderator has already moderated this post version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
+      const postVersion = await tx.postVersion.findUnique({
+        where: { id },
+      });
+
+      if (!postVersion.latest) {
+        throw new Error('Post version is not the latest');
+      }
+
       // Create a new post moderation entry
       const newPostModeration = await tx.postModeration.create({
         data: {
@@ -181,15 +233,6 @@ export class PostModerationRepository {
         },
         select: { postVersion: { select: { postId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
-      const postVersion = await tx.postVersion.findUnique({
-        where: { id },
-      });
-
-      if (!postVersion.latest) {
-        throw new Error('Post version is not the latest');
-      }
 
       return newPostModeration;
     });
@@ -222,7 +265,7 @@ export class PostModerationRepository {
       });
 
       // Create a new PostVersion
-      const newPostVersion = await tx.postVersion.create({
+      return await tx.postVersion.create({
         data: {
           title: data.title ?? latestVersion.title,
           content: data.content ?? latestVersion.content,
@@ -236,17 +279,6 @@ export class PostModerationRepository {
           latest: true,
         },
       });
-
-      // Fetch the latest version to validate
-      const latestPostVersion = await tx.postVersion.findFirst({
-        where: { postId: postId },
-        orderBy: { version: 'desc' },
-      });
-
-      // Ensure that the latest post version is ours
-      if (latestPostVersion.id !== newPostVersion.id) {
-        throw new Error('Post version is not the latest');
-      }
     });
 
     return await this.findPostWithVersionsAndModerations(postId);
@@ -386,9 +418,7 @@ export class PostModerationRepository {
     // TODO: Reject posts (awaiting conditions/business logic)
   }
 
-  async findPostWithVersionsAndModerations(
-    postId: number,
-  ): Promise<Post | null> {
+  async findPostWithVersionsAndModerations(postId: number) {
     return await this.prisma.post.findUnique({
       where: { id: postId },
       include: {

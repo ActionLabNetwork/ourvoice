@@ -304,8 +304,6 @@ export abstract class IMutation {
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
-
     abstract deletePost(id: number): Post | Promise<Post>;
 }
 

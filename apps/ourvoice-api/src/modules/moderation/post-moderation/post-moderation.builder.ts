@@ -8,7 +8,7 @@ import {
 
 class PostBuilder {
   private post: Partial<
-    Post & { versions: PostVersion[] & { moderations: PostModeration[] } }
+    Post & { versions: (PostVersion & { moderations: PostModeration[] })[] }
   > = {};
 
   constructor(post?: Partial<Post>) {
@@ -24,7 +24,7 @@ class PostBuilder {
     return this;
   }
 
-  withVersions(versions: PostVersion[] & { moderations: PostModeration[] }) {
+  withVersions(versions: (PostVersion & { moderations: PostModeration[] })[]) {
     this.post.versions = versions;
     return this;
   }
@@ -62,7 +62,14 @@ class PostVersionBuilder {
     }
   > = {};
 
-  constructor(version?: PostVersion) {
+  constructor(
+    version?: Partial<
+      PostVersion & {
+        post: Partial<Post>;
+        moderations: Partial<PostModeration[]>;
+      }
+    >,
+  ) {
     this.version = structuredClone(version) ?? {};
   }
 
@@ -147,6 +154,10 @@ class PostModerationBuilder {
   private moderation: Partial<
     PostModeration & { postVersion: Partial<PostVersion> }
   > = {};
+
+  constructor(moderation?: PostModeration) {
+    this.moderation = structuredClone(moderation) ?? {};
+  }
 
   withId(id: number): PostModerationBuilder {
     this.moderation.id = id;

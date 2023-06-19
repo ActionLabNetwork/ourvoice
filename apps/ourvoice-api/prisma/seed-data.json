@@ -29,16 +29,16 @@
   "posts": [
     {
       "title": "Post 1",
-      "content": "This is the content of post 1",
+      "content": "This is the content of post 1. This is version 3",
       "files": ["https://example.com/file1.jpg"],
       "moderated": true,
       "published": true,
       "votesUp": 5,
       "votesDown": 1,
       "authorHash": "user1hash",
-      "authorNickname": "user1",
+      "authorNickname": "user1hash",
       "createdAt": "2023-04-13T10:00:00Z",
-      "categories": [1]
+      "categories": [1, 2]
     },
     {
       "title": "Post 2",
