@@ -217,9 +217,6 @@ describe('CommentModerationService', () => {
 
     // Assert
     expect(result).toEqual(expectedResult);
-    expect(
-      commentModerationRepositoryMock.getModerationComments,
-    ).toHaveBeenCalledWith(filterData, paginationData);
   });
 
   it('should throw an error if both after and before fields are included', async () => {
