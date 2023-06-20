@@ -127,7 +127,6 @@ export class CommentModerationRepository {
     const connectData = { post: undefined, parent: undefined };
 
     if (postId) {
-      console.log('Creating comment for post');
       const post = await this.prisma.post.findFirst({
         where: { postIdInMainDb: postId },
       });
@@ -139,7 +138,6 @@ export class CommentModerationRepository {
     }
 
     if (parentId) {
-      console.log('Creating comment for comment');
       const parentComment = await this.prisma.comment.findFirst({
         where: { commentIdInMainDb: parentId },
       });

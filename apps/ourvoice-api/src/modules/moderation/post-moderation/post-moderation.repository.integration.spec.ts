@@ -3,7 +3,7 @@ import {
   PostStatus,
   PostVersion,
   Decision,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { seedDb } from '../../../../prisma-premoderation/seed';
 import { PrismaService } from '../../../database/premoderation/prisma.service';
@@ -143,10 +143,10 @@ describe('PostRepository', () => {
     postModerationRepository = moduleRef.get(PostModerationRepository);
   });
 
-  afterAll(async () => {
-    // Disconnect from the test database after all tests are done
-    await prismaService.$disconnect();
-  });
+  // afterAll(async () => {
+  //   // Disconnect from the test database after all tests are done
+  //   await prismaService.$disconnect();
+  // });
 
   it('should get a post by id', async () => {
     // Act
