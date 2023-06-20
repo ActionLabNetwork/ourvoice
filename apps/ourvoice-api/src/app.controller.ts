@@ -33,7 +33,7 @@ export class AppController {
   }
   @Get('refreshtoken')
   @UseGuards(new AuthGuard({ checkDatabase: true }))
-  async refreshToken() {
-    return { message: 'success' };
+  async refreshToken(@Session() session: SessionContainer) {
+    return { userId: session?.getUserId() };
   }
 }

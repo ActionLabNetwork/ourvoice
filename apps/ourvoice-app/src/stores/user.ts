@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { useDeploymentStore } from '@/stores/deployment'
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 import Session from 'supertokens-web-js/recipe/session'
+import { getSessionPayload, getUserId } from '../services/session.service'
 
 export interface UserState {
   userId: string
@@ -47,15 +48,15 @@ export const useUserStore = defineStore('user', {
       const deploymentStore = useDeploymentStore()
       const deployment = deploymentStore.deployment
 
-      const userId = await Session.getUserId()
+      const userId = await getUserId()
       this.userId = userId
 
       const sessionHash = await authService.hashInput(userId, deployment)
       this.sessionHash = sessionHash
 
-      const payload = await Session.getAccessTokenPayloadSecurely()
-      const userRoles = payload['st-role'].v || []
-      const userDeployment = payload.deployment || ''
+      const payload = await getSessionPayload()
+      const userRoles = payload['st-role']?.v || []
+      const userDeployment = payload?.deployment || ''
       this.userRoles = userRoles
       this.userDeployment = userDeployment
 
