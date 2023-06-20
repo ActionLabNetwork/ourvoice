@@ -6,13 +6,18 @@ import {
   ModerationCommentsFilterInput,
 } from 'src/graphql';
 import { CommentModerationService } from './comment-moderation.service';
+import {
+  Comment,
+  CommentVersion,
+  CommentModeration,
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client/index';
 
 @Resolver('ModerationComment')
 export class CommentModerationResolver {
   constructor(private commentModerationService: CommentModerationService) {}
 
   @Query()
-  async moderationComment(@Args('id') id: number) {
+  async moderationComment(@Args('id') id: number): Promise<Comment> {
     return await this.commentModerationService.getModerationCommentById(id);
   }
 
@@ -32,7 +37,11 @@ export class CommentModerationResolver {
   }
 
   @Query()
-  async commentVersion(@Args('id') id: number) {
+  async commentVersion(@Args('id') id: number): Promise<
+    CommentVersion & {
+      moderations: CommentModeration[];
+    }
+  > {
     return await this.commentModerationService.getCommentVersionById(id);
   }
 
