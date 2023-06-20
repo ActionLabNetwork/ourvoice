@@ -10,7 +10,7 @@ import {
   Comment,
   CommentVersion,
   CommentModeration,
-} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client/index';
+} from '../../../../node_modules/@internal/prisma/client/index';
 
 @Resolver('ModerationComment')
 export class CommentModerationResolver {

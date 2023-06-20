@@ -4,7 +4,7 @@ import {
   Comment,
   CommentVersion,
   CommentModeration,
-} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
+} from '../../../../node_modules/@internal/prisma/client';
 import { PrismaService } from '../../../database/premoderation/prisma.service';
 import { CommentModerationService } from './comment-moderation.service';
 import { Test, TestingModule } from '@nestjs/testing';

@@ -7,7 +7,7 @@ import {
   Post,
   PostVersion,
   PostModeration,
-} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
+} from '../../../../node_modules/@internal/prisma/client';
 
 class CommentBuilder {
   private comment: Partial<

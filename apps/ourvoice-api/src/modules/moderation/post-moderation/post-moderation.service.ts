@@ -13,7 +13,7 @@ import {
   Post,
   PostVersion,
   PostModeration,
-} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
+} from '../../../../node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
