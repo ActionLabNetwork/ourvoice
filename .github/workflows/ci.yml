@@ -125,6 +125,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: API - unit tests
+        working-directory: apps/ourvoice-api
+        run: pnpm test
+
       - name: API - integration tests
         working-directory: apps/ourvoice-api
         run: pnpm test:integration

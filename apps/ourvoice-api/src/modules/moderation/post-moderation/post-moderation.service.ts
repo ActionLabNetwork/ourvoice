@@ -9,7 +9,11 @@ import {
   ModerationPostPaginationInput,
   ModerationPostsFilterInput,
 } from '../../../graphql';
-import { Post } from '@internal/prisma/client';
+import {
+  Post,
+  PostVersion,
+  PostModeration,
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
@@ -22,7 +26,13 @@ export class PostModerationService {
     private readonly moderationPostRepository: PostModerationRepository,
   ) {}
 
-  async getModerationPostById(id: number) {
+  async getModerationPostById(id: number): Promise<
+    Post & {
+      versions: (PostVersion & {
+        moderations: PostModeration[];
+      })[];
+    }
+  > {
     const moderationPost =
       await this.moderationPostRepository.getModerationPostById(id);
 

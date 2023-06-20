@@ -5,7 +5,11 @@ import {
 } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { Comment } from '@internal/prisma/client';
+import {
+  Comment,
+  CommentVersion,
+  CommentModeration,
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationCommentsFilterDto } from './dto/comments-filter.dto';
 import { CommentModerationRepository } from './comment-moderation.repository';
@@ -104,7 +108,11 @@ export class CommentModerationService {
     return { totalCount, edges, pageInfo };
   }
 
-  async createComment(data: CommentCreateDto) {
+  async createComment(data: CommentCreateDto): Promise<
+    Comment & {
+      versions: CommentVersion[];
+    }
+  > {
     const commentCreateDto = plainToClass(CommentCreateDto, data);
     const errors = await validate(commentCreateDto);
 
@@ -115,7 +123,11 @@ export class CommentModerationService {
     return await this.moderationCommentRepository.createModerationComment(data);
   }
 
-  async getCommentVersionById(id: number) {
+  async getCommentVersionById(id: number): Promise<
+    CommentVersion & {
+      moderations: CommentModeration[];
+    }
+  > {
     const commentVersion =
       await this.moderationCommentRepository.getCommentVersionById(id);
 

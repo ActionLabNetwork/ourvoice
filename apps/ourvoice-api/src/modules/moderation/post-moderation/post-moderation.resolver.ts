@@ -4,15 +4,26 @@ import {
   ModerationPostPaginationInput,
   ModerationPostCreateInput,
   ModerationPostModifyInput,
-} from 'src/graphql';
+} from '../../../graphql';
 import { PostModerationService } from './post-moderation.service';
+import {
+  Post,
+  PostVersion,
+  PostModeration,
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
 
 @Resolver('ModerationPost')
 export class PostModerationResolver {
   constructor(private postModerationService: PostModerationService) {}
 
   @Query()
-  async moderationPost(@Args('id') id: number) {
+  async moderationPost(@Args('id') id: number): Promise<
+    Post & {
+      versions: (PostVersion & {
+        moderations: PostModeration[];
+      })[];
+    }
+  > {
     return await this.postModerationService.getModerationPostById(id);
   }
 

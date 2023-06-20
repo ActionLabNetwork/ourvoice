@@ -1,4 +1,8 @@
-import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
+import {
+  PrismaClient,
+  Decision,
+  PostStatus,
+} from './node_modules/@internal/prisma/client';
 import {
   adjectives,
   animals,

@@ -5,7 +5,7 @@ import {
   Prisma,
   CommentVersion,
   CommentModeration,
-} from '@internal/prisma/client';
+} from '../../../../prisma-premoderation/node_modules/@internal/prisma/client';
 import { PrismaService } from '../../../database/premoderation/prisma.service';
 import {
   ModerationCommentPaginationInput,
