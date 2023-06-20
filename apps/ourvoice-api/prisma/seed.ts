@@ -95,7 +95,7 @@ async function main() {
       data: {
         ...data,
         post: { connect: { id: post.id } },
-        comment: commentId ? { connect: { id: comment.id } } : undefined,
+        // comment: commentId ? { connect: { id: comment.id } } : undefined,
       },
     });
   }

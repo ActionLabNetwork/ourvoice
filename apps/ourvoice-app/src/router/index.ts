@@ -6,6 +6,7 @@ import PollViewVue from '@/views/PollView.vue'
 // import PostsView from '../views/PostsView.vue'
 import TestView from '@/views/TestView.vue'
 import NoticeView from '../views/NoticeView.vue'
+import PostPage from '../views/PostPage.vue'
 import CreatePostView from '../views/CreatePostView.vue'
 // import CreateCommentView from '../views/CreateCommentView.vue'
 import PostModerationListView from '../views/PostModerationListView.vue'
@@ -113,13 +114,14 @@ const router = createRouter({
     {
       path: '/posts/:id(\\d+)',
       name: 'postpage',
-      component: () => import('@/components/post/PostPage.vue'),
+      component: PostPage,
       meta: { requiresAuth: false }
     },
     {
       path: '/test',
       name: 'test',
-      component: TestView
+      component: TestView,
+      meta: { requiresAuth: false }
     }
   ]
 })

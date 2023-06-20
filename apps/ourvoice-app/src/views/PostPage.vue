@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import PostCard from './PostCard.vue'
-import CommentList from '../comment/CommentList.vue'
+import PostCard from '@/components/post/PostCard.vue'
+import CommentList from '@/components/comment/CommentList.vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePostsStore } from '@/stores/posts'
