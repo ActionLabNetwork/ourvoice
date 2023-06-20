@@ -8,6 +8,7 @@ import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 import { type sortOptions, type sortOrder } from '@/constants/post'
+import type { ApolloError } from '@apollo/client/errors'
 export interface Post {
   id: number
   title: string
@@ -42,7 +43,6 @@ export interface pageInfo {
   hasNextPage: boolean
   startCursor: string
 }
-
 export interface PostsState {
   data: Post[]
   totalCount: number
@@ -76,7 +76,7 @@ export const usePostsStore = defineStore('posts', {
     }
   },
   actions: {
-    async fetchPosts() {
+    async fetchPosts(loadMore = false) {
       try {
         const { data } = await apolloClient.query({
           query: GET_POSTS_QUERY,
@@ -85,8 +85,7 @@ export const usePostsStore = defineStore('posts', {
               [this.sortFilter.sortBy]: this.sortFilter.sortOrder
             },
             pagination: {
-              cursor: null,
-              limit: null
+              cursor: loadMore && this.pageInfo ? this.pageInfo.endCursor : null
             },
             filter: {
               categoryIds: this.sortFilter.selectedCategoryIds,
@@ -96,7 +95,7 @@ export const usePostsStore = defineStore('posts', {
           fetchPolicy: 'no-cache'
         })
 
-        this.data = data.posts.edges.map((edge: any) => ({
+        const newPosts = data.posts.edges.map((edge: any) => ({
           id: edge.node.id,
           title: edge.node.title,
           content: edge.node.content,
@@ -120,16 +119,29 @@ export const usePostsStore = defineStore('posts', {
           files: edge.node.files
         }))
 
+        this.data = loadMore ? [...this.data, ...newPosts] : newPosts
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
-        console.log({ data })
+      } catch (error) {
+        this.error = error as ApolloError
+        this.errorMessage = 'Failed to load posts. Please try again.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async loadMorePosts() {
+      try {
+        if (this.pageInfo?.hasNextPage) {
+          this.fetchPosts(true)
+          console.log('fetching more posts')
+        }
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
         }
-
         if (error) {
-          this.errorMessage = 'Failed to load posts. Please try again.'
+          this.errorMessage = 'Failed to load more posts. Please try again.'
         }
       }
     },
