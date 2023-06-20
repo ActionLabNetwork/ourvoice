@@ -4,7 +4,6 @@ import {
   IsBoolean,
   IsDateString,
   IsInt,
-  IsNumber,
   IsArray,
 } from 'class-validator';
 import { DateTime } from 'src/graphql';

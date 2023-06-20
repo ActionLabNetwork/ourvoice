@@ -17,8 +17,11 @@ export async function createRole(name: string, permissions: string[] = []) {
   }
 }
 
-export async function addRoleToUser(userId: string) {
-  const response = await UserRoles.addRoleToUser(userId, 'user');
+export async function addRoleToUser(
+  userId: string,
+  role: 'user' | 'moderator' | 'admin' | 'super',
+) {
+  const response = await UserRoles.addRoleToUser(userId, role);
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
     // No such role exists
@@ -28,6 +31,9 @@ export async function addRoleToUser(userId: string) {
   if (response.didUserAlreadyHaveRole === true) {
     // The user already had the role
   }
+  if (response.status === 'OK') {
+    console.log('Role added to user ', userId);
+  }
 }
 
 export async function getRolesForUser(userId: string): Promise<string[]> {
@@ -35,7 +41,9 @@ export async function getRolesForUser(userId: string): Promise<string[]> {
   return response.roles;
 }
 
-export async function getUsersThatHaveRole(role: string): Promise<string[]> {
+export async function getUsersThatHaveRole(
+  role: 'user' | 'moderator' | 'admin' | 'super',
+): Promise<string[]> {
   const response = await UserRoles.getUsersThatHaveRole(role);
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
@@ -48,8 +56,9 @@ export async function getUsersThatHaveRole(role: string): Promise<string[]> {
 
 export async function removeRoleFromUserAndTheirSession(
   session: SessionContainer,
+  role: 'user' | 'moderator' | 'admin' | 'super',
 ) {
-  const response = await UserRoles.removeUserRole(session.getUserId(), 'user');
+  const response = await UserRoles.removeUserRole(session.getUserId(), role);
 
   if (response.status === 'UNKNOWN_ROLE_ERROR') {
     // No such role exists
@@ -62,5 +71,21 @@ export async function removeRoleFromUserAndTheirSession(
     // We also want to update the session of this user to reflect this change.
     await session.fetchAndSetClaim(UserRoles.UserRoleClaim);
     await session.fetchAndSetClaim(UserRoles.PermissionClaim);
+  }
+}
+
+export async function removeRoleFromUser(
+  userId: string,
+  role: 'user' | 'moderator' | 'admin' | 'super',
+) {
+  const response = await UserRoles.removeUserRole(userId, role);
+
+  if (response.status === 'UNKNOWN_ROLE_ERROR') {
+    // No such role exists
+    return;
+  }
+
+  if (response.didUserHaveRole === false) {
+    // The user was never assigned the role
   }
 }

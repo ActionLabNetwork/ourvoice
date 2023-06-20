@@ -3,9 +3,6 @@ import {
   IsOptional,
   Length,
   IsNumber,
-  MinLength,
-  MaxLength,
-  IsArray,
   ArrayMaxSize,
   ArrayMinSize,
 } from 'class-validator';

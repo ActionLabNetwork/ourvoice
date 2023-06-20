@@ -6,7 +6,9 @@
 import { verifyEmail } from 'supertokens-web-js/recipe/emailverification'
 import Session from 'supertokens-web-js/recipe/session'
 import { defineComponent } from 'vue'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 
+const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 
 export default defineComponent({
@@ -34,7 +36,16 @@ export default defineComponent({
           window.location.assign('/auth/verify-email') // back to the email sending screen.
         } else {
           // email was verified successfully.
-          window.location.href = adminURL
+          // attempt refreshing token to get deployment data into payload
+          Session.attemptRefreshingSession().then((success) => {
+            if (success) {
+              this.handleRedirect()
+            } else {
+              // we redirect to the login page since the user
+              // is now logged out
+              return window.location.assign('/signinWithEmailPassword')
+            }
+          })
         }
       } catch (err: any) {
         if (err.isSuperTokensGeneralError === true) {
@@ -43,6 +54,16 @@ export default defineComponent({
         } else {
           window.alert('Oops! Something went wrong.')
         }
+      }
+    },
+    handleRedirect: function () {
+      if (redirect.exists()) {
+        const redirectTo = redirect.get()
+        redirect.purge()
+        window.location.href = redirectTo
+      } else {
+        // fallback redirect
+        window.location.href = adminURL
       }
     }
   }

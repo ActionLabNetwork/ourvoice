@@ -15,6 +15,45 @@
         A safe space for employees and community members to anonymously discuss issues and concerns
         about their work environments.
       </p>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Deployment</th>
+            <th>User</th>
+            <th>Moderator</th>
+            <th>Administrator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, index) in users" :key="index">
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.deployment }}</td>
+            <td v-for="(role, index) in roles" :key="index">
+              <input
+                @change="changeRole($event, user.id, role.name)"
+                type="checkbox"
+                :checked="user.roles.includes(role.name)"
+                :fieldId="role.id"
+              />
+              <!-- <check-box :checked="user.roles.includes(role.name)" :fieldId="role.id" /> -->
+              <!-- <select class="form-control" @change="changeRole($event, user.id, user.role)">
+                <option value="" selected disabled>Choose</option>
+                <option
+                  v-for="role in roles"
+                  :value="role.id"
+                  :key="role.id"
+                  :selected="user.role === role.name"
+                >
+                  {{ role.name }}
+                </option>
+              </select> -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <div class="flex justify-center flex-wrap gap-6">
         <button type="button" class="btn btn-red btn-hover">Deploy</button>
       </div>
@@ -39,13 +78,26 @@ const apiURL = import.meta.env.VITE_APP_API_URL
 
 const authURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithEmailPassword'
 
+export type User = {
+  id: string
+  email: string
+  deployment: string
+  roles: string[]
+}
+
 export default defineComponent({
   data() {
     return {
       // if session is false, we show a blank screen
       // else we render the UI
       session: false,
-      userId: ''
+      userId: '',
+      users: [] as User[],
+      roles: [
+        { name: 'user', id: 1 },
+        { name: 'moderator', id: 2 },
+        { name: 'admin', id: 2 }
+      ]
     }
   },
   methods: {
@@ -90,6 +142,51 @@ export default defineComponent({
       const json = await response.json()
 
       window.alert('Session Information:\n' + JSON.stringify(json, null, 2))
+    },
+    getUsers: async function () {
+      await fetch(`${apiURL}/users`)
+        .then(async (response) => {
+          const data = await response.json()
+
+          // check for error response
+          if (response.status === 401) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status
+            window.location.href = authURL
+            return Promise.reject(error)
+          }
+          this.users = data.users
+        })
+        .catch((error) => {
+          console.error('There was an error!', error)
+        })
+    },
+    async changeRole(event: any, userId: string, role: string) {
+      await fetch(`${apiURL}/users/role/${userId}`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          role,
+          assign: event.target.checked
+        })
+      })
+        .then(async (response) => {
+          const data = await response.json()
+
+          // check for error response
+          if (response.status === 401) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status
+            window.location.href = authURL
+            return Promise.reject(error)
+          }
+        })
+        .catch((error) => {
+          console.error('There was an error!', error)
+        })
     }
   },
 
@@ -97,6 +194,7 @@ export default defineComponent({
     // this function checks if a session exists, and if not,
     // it will redirect to the login screen.
     this.checkForSession()
+    this.getUsers()
   }
 })
 </script>

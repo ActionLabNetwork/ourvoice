@@ -6,7 +6,13 @@ import { middleware, errorHandler } from 'supertokens-node/framework/express';
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { createRole } from './auth/roles.service';
+import {
+  addEmailsToAllowlist,
+  // clearEmailAllowList,
+} from './auth/metadata.service';
+import { addSuperAdmin } from './seed';
 import { ConfigService } from '@nestjs/config';
+import { Role } from './auth/roles.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,6 +37,7 @@ async function bootstrap() {
       // const match = origin
       //   .toLowerCase()
       //   .match(/^https?:\/\/([\w\d]+\.)?ourvoice\.test$/);
+      // const domainWhiteList = /^(https?:\/\/([a-z0-9]+[.])ourvoice[.]test(?::\d{1,5})?)$/;
       const parts = origin ? origin.split('.') : origin;
       if (
         !origin ||
@@ -46,17 +53,33 @@ async function bootstrap() {
         );
       }
     },
-    allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
+    allowedHeaders: [
+      'content-type',
+      'deployment',
+      ...supertokens.getAllCORSHeaders(),
+    ],
     credentials: true,
   });
 
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-  // create user roles
+  // create roles
   configService
-    .get<string[]>('roles')
-    .map(async (role) => await createRole(role));
+    .get<Role[]>('roles')
+    .map(async (role) => await createRole(role.name, role.permissions));
+  // if you need to clear the allowedEmails list
+  // await clearEmailAllowList();
+  //add allowed moderator emails
+  await addEmailsToAllowlist(configService.get<string[]>('allowedEmails'));
+  // add super admin user
+  await addSuperAdmin(
+    configService.get<string>('SUPERTOKENS_ADMIN_EMAIL') ||
+      'admin@ourvoice.app',
+    configService.get<string>(
+      'SUPERTOKENS_ADMIN_PASSWORD' || 'super-admin-pass',
+    ),
+  );
   await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
 }
 

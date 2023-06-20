@@ -43,11 +43,18 @@ import deployment from './config/deployment';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         return {
-          connectionURI: configService.get<string>('SUPERTOKENS_URI'),
-          apiKey: configService.get<string>('SUPERTOKENS_API_KEY'),
+          // TODO: add default values if config in not specified
+          connectionURI:
+            configService.get<string>('SUPERTOKENS_URI') ||
+            'http://localhost:3567',
+          apiKey:
+            configService.get<string>('SUPERTOKENS_API_KEY') ||
+            'super-secret-api-key',
           // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
           appInfo: {
-            appName: configService.get<string>('SUPERTOKENS_APP_NAME'),
+            appName:
+              configService.get<string>('SUPERTOKENS_APP_NAME') ||
+              'OurVoice Auth API',
             apiDomain: configService.get<string>('SUPERTOKENS_API_DOMAIN'),
             apiBasePath: configService.get<string>('SUPERTOKENS_API_BASE_PATH'),
             websiteDomain: configService.get<string>(
@@ -65,6 +72,7 @@ import deployment from './config/deployment';
           },
           authModules: configService.get<AuthOptions[]>('auth'),
           cookieDomain: configService.get<string>('SUPERTOKENS_COOKIE_DOMAIN'),
+          adminEmail: configService.get<string>('SUPERTOKENS_ADMIN_EMAIL'),
           authBypassTest: {
             isTestMode: configService.get<boolean>('TEST_MODE'),
             createCode: {

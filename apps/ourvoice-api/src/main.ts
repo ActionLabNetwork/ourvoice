@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 import { middleware, errorHandler } from 'supertokens-node/framework/express';
@@ -10,6 +11,18 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  if (configService.get<string>('NODE_ENV') === 'development') {
+    // generate openAPI docs
+    const config = new DocumentBuilder()
+      .setTitle('OurVoice API')
+      .setDescription('OurVoice API description')
+      .setVersion('1.0')
+      .addTag('ourvoice')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+  }
 
   // TODO: add website domains
   const whitelist: string[] = [

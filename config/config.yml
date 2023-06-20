@@ -1,9 +1,32 @@
 deployment: demo
 organisation: ourvoice.app
 roles:
-  - user
-  - moderator
-  - admin
+  - name: user
+    permissions:
+     - read:all
+     - edit:self
+     - delete:self
+  - name: moderator
+    permissions:
+     - read:all
+     - edit:all
+     - delete:all
+  - name: admin
+    permissions:
+      - manage:self
+      - read:all
+      - edit:all
+      - delete:all
+  - name: super
+    permissions:
+      - manage:all
+      - read:all
+      - edit:all
+      - delete:all
+allowedEmails:
+  - deployment_admin@ourvoice.app
+  - moderator1@ourvoice.app
+  - moderator2@ourvoice.app
 auth:
   - EmailPassword
   - Passwordless

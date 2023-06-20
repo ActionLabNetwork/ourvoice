@@ -20,6 +20,25 @@ export class SupertokensService {
       recipeList: [
         Session.init({
           cookieDomain: `${process.env.SUPERTOKENS_COOKIE_DOMAIN}`,
+          override: {
+            functions: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                createNewSession: async function (input) {
+                  const userId = input.userId;
+                  const { metadata } = await UserMetadata.getUserMetadata(
+                    userId,
+                  );
+                  // This goes in the access token, and is available to read on the frontend.
+                  input.accessTokenPayload = {
+                    ...input.accessTokenPayload,
+                    deployment: metadata.deployment || '',
+                  };
+                  return originalImplementation.createNewSession(input);
+                },
+              };
+            },
+          },
         }),
         UserMetadata.init(),
         UserRoles.init(),

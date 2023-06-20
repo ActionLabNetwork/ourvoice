@@ -3,6 +3,7 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
+    "plugins": ["@nestjs/swagger"],
     "assets": [{ "include": "../config/*.yml", "outDir": "./dist/src/config" }],
     "watchAssets": true
   }

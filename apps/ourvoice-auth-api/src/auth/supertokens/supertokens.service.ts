@@ -17,6 +17,7 @@ import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 import { addRoleToUser } from '../roles.service';
+import { isEmailAllowed } from '../metadata.service';
 
 @Injectable()
 export class SupertokensService {
@@ -32,12 +33,32 @@ export class SupertokensService {
         apiKey: config.apiKey,
       },
       recipeList: [
-        Session.init({
-          cookieDomain: config.cookieDomain,
-        }),
+        ...recipes,
         UserMetadata.init(),
         UserRoles.init(),
-        ...recipes,
+        Session.init({
+          cookieDomain: config.cookieDomain,
+          override: {
+            functions: (originalImplementation) => {
+              return {
+                ...originalImplementation,
+                createNewSession: async function (input) {
+                  const userId = input.userId;
+                  const { metadata } = await UserMetadata.getUserMetadata(
+                    userId,
+                  );
+                  // This goes in the access token, and is available to read on the frontend.
+                  input.accessTokenPayload = {
+                    ...input.accessTokenPayload,
+                    deployment: metadata.deployment || '',
+                  };
+
+                  return originalImplementation.createNewSession(input);
+                },
+              };
+            },
+          },
+        }),
       ],
     });
   }
@@ -52,6 +73,28 @@ export class SupertokensService {
 
     const recipeList = {
       EmailPassword: EmailPassword.init({
+        signUpFeature: {
+          formFields: [
+            {
+              id: 'deployment',
+            },
+            {
+              id: 'email',
+              validate: async (email: string) => {
+                // TODO: this should eventually come from admin database
+                if (
+                  !(await isEmailAllowed(email)) &&
+                  // check if this is app super admin who is login in
+                  config.adminEmail !== email
+                ) {
+                  return 'Sign up disabled. Please contact the admin.';
+                } else {
+                  return undefined;
+                }
+              },
+            },
+          ],
+        },
         override: {
           apis: (originalImplementation) => {
             return {
@@ -68,7 +111,14 @@ export class SupertokensService {
                 if (response.status === 'OK') {
                   const id = response.user.id;
                   // add `user` role to all registered users
-                  addRoleToUser(id);
+                  addRoleToUser(id, 'user');
+                  // add deployment
+                  const deployment = input.formFields.filter((obj) => {
+                    return obj.id === 'deployment';
+                  });
+                  await UserMetadata.updateUserMetadata(id, {
+                    deployment: deployment[0].value || '',
+                  });
                 }
                 return response;
               },
@@ -92,6 +142,44 @@ export class SupertokensService {
               // secure: true,
             },
           }),
+        },
+        override: {
+          apis: (originalImplementation) => {
+            return {
+              ...originalImplementation,
+              verifyEmailPOST: async function (input) {
+                if (originalImplementation.verifyEmailPOST === undefined) {
+                  throw Error('Should never come here');
+                }
+                // First we call the original implementation
+                const response = await originalImplementation.verifyEmailPOST(
+                  input,
+                );
+
+                // Then we check if it was successfully completed
+                if (response.status === 'OK') {
+                  const { id } = response.user;
+                  const { metadata } = await UserMetadata.getUserMetadata(id);
+                  // add
+                  const sessionHandles =
+                    await Session.getAllSessionHandlesForUser(id);
+                  sessionHandles.forEach(async (handle) => {
+                    const currSessionInfo = await Session.getSessionInformation(
+                      handle,
+                    );
+                    if (currSessionInfo === undefined) {
+                      return;
+                    }
+
+                    await Session.mergeIntoAccessTokenPayload(handle, {
+                      deployment: metadata.deployment || '',
+                    });
+                  });
+                }
+                return response;
+              },
+            };
+          },
         },
       }),
       Passwordless: Passwordless.init({
@@ -117,6 +205,7 @@ export class SupertokensService {
                   port: config.smtpSettings.port || 2525,
                   from: {
                     name: 'OurVoice',
+                    // TODO: make configurable
                     email: 'no-reply@ourvoice.app',
                   },
                   // secure: true,
@@ -200,8 +289,46 @@ export class SupertokensService {
                 if (response.status === 'OK') {
                   // const { id, email, phoneNumber } = response.user;
                   if (response.createdNewUser) {
+                    let deployment = '';
+                    const request = supertokens.getRequestFromUserContext(
+                      input.userContext,
+                    );
+
+                    if (request !== undefined) {
+                      deployment = request.getHeaderValue('deployment');
+                    } else {
+                      /**
+                       * This is possible if the function is triggered from the user management dashboard
+                       *
+                       * In this case set a reasonable default value to use
+                       */
+                      deployment = '';
+                    }
+
                     // add `user` role to all registered users
-                    addRoleToUser(response.user.id);
+                    addRoleToUser(response.user.id, 'user');
+
+                    // add deployment to user metadata
+                    await UserMetadata.updateUserMetadata(response.user.id, {
+                      deployment,
+                    });
+                    const sessionHandles =
+                      await Session.getAllSessionHandlesForUser(
+                        response.user.id,
+                      );
+
+                    // we update all the session's Access Token payloads for this user
+                    sessionHandles.forEach(async (handle) => {
+                      const currSessionInfo =
+                        await Session.getSessionInformation(handle);
+                      if (currSessionInfo === undefined) {
+                        return;
+                      }
+
+                      await Session.mergeIntoAccessTokenPayload(handle, {
+                        deployment,
+                      });
+                    });
                   }
                 }
                 return response;

@@ -128,6 +128,7 @@ export default defineComponent({
   components: {
     Login
   },
+  props: ['deployment'],
   data() {
     return {
       // used for setting magic link already sent status
@@ -184,7 +185,7 @@ export default defineComponent({
 
   methods: {
     // TODO: this list might be coming from the database later
-    getConfig(option) {
+    getConfig(option: string) {
       return YamlContent[option]
     },
     hasInitialMagicLinkBeenSent: async function () {

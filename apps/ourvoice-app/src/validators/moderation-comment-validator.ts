@@ -1,10 +1,4 @@
-import {
-  createPostTitleCharacterLimit,
-  createPostContentCharacterLimit,
-  maxCategories,
-  allowedFileTypes,
-  maxAttachmentFilesSize
-} from '@/constants/post'
+import { createPostContentCharacterLimit } from '@/constants/post'
 
 export const validateModerationReason = (value: string) => {
   if (value && value.trim()) {

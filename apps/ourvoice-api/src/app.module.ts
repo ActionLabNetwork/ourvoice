@@ -16,6 +16,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
+import { UsersModule } from './modules/users/users.module';
 
 import deployment from './config/deployment';
 
@@ -26,15 +27,21 @@ import deployment from './config/deployment';
       isGlobal: true,
     }),
     AuthModule.forRoot({
-      connectionURI: `${process.env.SUPERTOKENS_URI}`,
-      apiKey: `${process.env.SUPERTOKENS_API_KEY}`,
+      connectionURI: `${
+        process.env.SUPERTOKENS_URI || 'http://localhost:3567'
+      }`,
+      apiKey: `${process.env.SUPERTOKENS_API_KEY || 'super-secret-api-key'}`,
       appInfo: {
         // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
-        appName: `${process.env.SUPERTOKENS_APP_NAME}` || 'Ourvoice API',
-        apiDomain: `${process.env.SUPERTOKENS_API_DOMAIN}`,
-        apiBasePath: `${process.env.SUPERTOKENS_API_BASE_PATH}` || '/auth',
-        websiteDomain: `${process.env.SUPERTOKENS_WEBSITE_DOMAIN}`,
-        websiteBasePath: `${process.env.SUPERTOKENS_WEBSITE_BASE_PATH}` || '/',
+        appName: `${process.env.SUPERTOKENS_APP_NAME || 'Ourvoice API'}`,
+        apiDomain: `${
+          process.env.SUPERTOKENS_API_DOMAIN || 'http://authapi.ourvoice.test'
+        }`,
+        apiBasePath: `${process.env.SUPERTOKENS_API_BASE_PATH || '/auth'}`,
+        websiteDomain: `${
+          process.env.SUPERTOKENS_WEBSITE_DOMAIN || 'http://auth.ourvoice.test'
+        }`,
+        websiteBasePath: `${process.env.SUPERTOKENS_WEBSITE_BASE_PATH || '/'}`,
       },
       smtpSettings: {
         host: `${process.env.SMTP_HOST}`,
@@ -67,6 +74,8 @@ import deployment from './config/deployment';
     }),
     ModerationModule,
     ScheduleModule.forRoot(),
+    // TODO: perhaps move to other modules
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

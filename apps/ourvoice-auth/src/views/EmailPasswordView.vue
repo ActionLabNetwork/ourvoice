@@ -141,12 +141,15 @@ import { defineComponent } from 'vue'
 // import YamlContent from '../../../../config/config.yml'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+// const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+
+const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 
 // TODO: this list might be coming from the database later
 // const organisation = YamlContent.organisation
 
 export default defineComponent({
+  props: ['deployment'],
   data() {
     return {
       // we allow the user to switch between sign in and sign up view
@@ -271,10 +274,15 @@ export default defineComponent({
           {
             id: 'password',
             value: this.password
+          },
+          {
+            id: 'deployment',
+            value: this.deployment
           }
         ]
       })
       if (response.status === 'FIELD_ERROR') {
+        this.processing = false
         response.formFields.forEach((item) => {
           if (item.id === 'email') {
             // this means that something was wrong with the entered email.
@@ -361,7 +369,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://demo${domain}`
+        window.location.href = adminURL
       }
     }
   }

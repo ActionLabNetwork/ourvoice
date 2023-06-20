@@ -24,34 +24,37 @@ import Header from '@/components/common/Header.vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 
-import { computed, onMounted, ref } from 'vue';
-import { useModerationPostsStore } from '@/stores/moderation-posts';
-import { LIST_TABS } from '@/constants/moderation';
-import { getGroupsByProperty } from '@/utils/groupByProperty';
-import type { ModerationPost } from '@/stores/moderation-posts';
+import { computed, onMounted, ref } from 'vue'
+import { useModerationPostsStore } from '@/stores/moderation-posts'
+import { LIST_TABS } from '@/constants/moderation'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import type { ModerationPost } from '@/stores/moderation-posts'
 import type { ModerationVersionStatus } from '@/types/moderation'
+import type { Tab } from '@/types'
 
-const postsStore = useModerationPostsStore();
+const postsStore = useModerationPostsStore()
 onMounted(async () => {
   await postsStore.fetchPosts()
 })
 
 const tabs = ref(LIST_TABS)
-const allPosts = computed(() => postsStore.posts);
+const allPosts = computed(() => postsStore.posts)
 
 // Group the posts by their moderation status
 const moderationPosts = computed(() => {
   const initialGroups: Record<ModerationVersionStatus, ModerationPost[]> = {
     PENDING: [],
     APPROVED: [],
-    REJECTED: [],
-  };
+    REJECTED: []
+  }
 
-  return allPosts.value.reduce((groups, post) =>
-    getGroupsByProperty('status', groups, post), initialGroups);
-});
+  return allPosts.value.reduce(
+    (groups, post) => getGroupsByProperty('status', groups, post),
+    initialGroups
+  )
+})
 
 const handleTabSwitched = (selectedTab: Tab) => {
   // If we need to know when the tab is switched, we can do it here
-};
+}
 </script>
