@@ -1,4 +1,3 @@
-import { CommentModeration } from '@internal/prisma/client';
 import { PrismaModule } from 'src/database/premoderation/prisma.module';
 import { Module } from '@nestjs/common';
 import { CommentModerationResolver } from './ comment-moderation.resolver';

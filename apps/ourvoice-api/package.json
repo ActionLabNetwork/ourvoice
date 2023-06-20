@@ -28,7 +28,7 @@
     "prisma:generate:main": "prisma generate --schema ./prisma/schema.prisma",
     "prisma:generate:premoderation": "prisma generate --schema ./prisma-premoderation/schema.prisma",
     "prisma:generate:main:test": "NODE_ENV=test prisma generate --schema ./prisma/test/schema.prisma",
-    "prisma:generate:premoderation:test": "NOVE_ENV=test prisma generate --schema ./prisma-premoderation/test/schema.prisma",
+    "prisma:generate:premoderation:test": "NODE_ENV=test prisma generate --schema ./prisma-premoderation/test/schema.prisma",
     "graphql:generate": "pnpm exec tsx ./src/graphql/generate-typings.ts",
     "prisma:generate:contactform": "prisma generate --schema ./prisma-contactform/schema.prisma",
     "prisma:seed:main": "pnpm exec tsx ./prisma/exec-seed.ts",

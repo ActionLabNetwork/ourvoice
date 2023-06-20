@@ -1,4 +1,3 @@
-import { ConfigInjectionToken } from './../../modules/contactform/config.interface';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupertokensService } from './supertokens.service';
 

@@ -1,8 +1,4 @@
-import {
-  PostPaginationInput,
-  PostsFilterInput,
-  PostUpdateInput,
-} from './../../graphql';
+import { PostPaginationInput, PostsFilterInput } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from '../../modules/post/post.service';
 import { s3 } from '../../config/s3-config';

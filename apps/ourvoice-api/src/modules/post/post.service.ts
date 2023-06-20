@@ -9,7 +9,6 @@ import { PostRepository } from './post.repository';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { PostsFilterDto } from './dto/posts-filter.dto';
-import { PostUpdateDto } from './dto/post-update.dto';
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { PostCreateDto } from './dto/post-create.dto';
 

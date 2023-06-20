@@ -5,9 +5,8 @@ import {
   PostVersion,
   CommentVersion,
   Decision,
-} from '@internal/prisma/client';
+} from '../../../../node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
-import { NotFoundException } from '@nestjs/common';
 import { seedDb } from '../../../../prisma-premoderation/seed';
 import { PrismaService } from '../../../database/premoderation/prisma.service';
 import { Test } from '@nestjs/testing';
