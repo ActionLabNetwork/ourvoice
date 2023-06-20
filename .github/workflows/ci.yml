@@ -65,9 +65,9 @@ jobs:
       DB_TEST_APP_API_DB_MAIN_DRIVER: postgres
       DB_TEST_APP_API_DB_MAIN_HOST: localhost
       DB_TEST_APP_API_DB_MAIN_PORT: 5436
-      # DB_TEST_APP_API_DB_PREMOD_DRIVER: postgres
-      # DB_TEST_APP_API_DB_PREMOD_HOST: localhost
-      # DB_TEST_APP_API_DB_PREMOD_PORT: 5436
+      DB_TEST_APP_API_DB_PREMOD_DRIVER: postgres
+      DB_TEST_APP_API_DB_PREMOD_HOST: localhost
+      DB_TEST_APP_API_DB_PREMOD_PORT: 5437
 
     strategy:
       matrix:
@@ -87,9 +87,22 @@ jobs:
             --health-interval 10s
             --health-timeout 5s
             --health-retries 5
-
         ports:
           - 5436:5432
+      postgres-app-db-premoderation:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db_test
+          POSTGRES_DB_PREMODERATION: ourvoice_db_test_pre
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+        ports:
+          - 5437:5432
     steps:
       - name: Repository checkout
         uses: actions/checkout@v3.5.3
