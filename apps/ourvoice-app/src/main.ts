@@ -9,8 +9,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { DefaultApolloClient } from '@vue/apollo-composable'
-import VueVirtualScroller from 'vue-virtual-scroller'
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+// import VueVirtualScroller from 'vue-virtual-scroller'
+// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AppNavBar from './components/common/AppNavBar.vue'
 import AppFooter from './components/common/AppFooter.vue'
 import App from './App.vue'
@@ -49,5 +49,5 @@ app.use(router)
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.component('AppFooter', AppFooter)
 app.component('AppNavBar', AppNavBar)
-app.use(VueVirtualScroller)
+// app.use(VueVirtualScroller)
 app.mount('#app')
