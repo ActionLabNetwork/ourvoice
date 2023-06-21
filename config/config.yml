@@ -3,14 +3,14 @@ organisation: ourvoice.app
 roles:
   - name: user
     permissions:
-     - read:all
-     - edit:self
-     - delete:self
+      - read:all
+      - edit:self
+      - delete:self
   - name: moderator
     permissions:
-     - read:all
-     - edit:all
-     - delete:all
+      - read:all
+      - edit:all
+      - delete:all
   - name: admin
     permissions:
       - manage:self
@@ -35,5 +35,7 @@ auth:
 logo: /ourvoice_logo.svg
 slogan: 'This is the deployment slogan text from config.yml file'
 moderatorCount: 3
-postFrequency: hourly
+postFrequency:
+  unit: 'hours'
+  value: 1
 persistNickNames: true
