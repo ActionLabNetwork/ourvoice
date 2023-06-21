@@ -125,6 +125,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Prisma Migration API main DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:main
+
+      - name: Prisma Migration API premod DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:premoderation
+
+      - name: Prisma Generate API main DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:generate:main
+
+      - name: Prisma Generate API premod DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:generate:premoderation
+
+      - name: Seed Databases
+        run: pnpm seed:api:all
+
       - name: API - unit tests
         working-directory: apps/ourvoice-api
         run: pnpm test
@@ -132,6 +151,12 @@ jobs:
       - name: API - integration tests
         working-directory: apps/ourvoice-api
         run: pnpm test:integration
+
+      - name: API - e2e tests
+        uses: cypress-io/github-action@v4
+        with:
+          command: pnpx cypress run
+          browser: chrome
 
   # APPS Build
   build-apps:
