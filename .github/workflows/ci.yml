@@ -137,7 +137,8 @@ jobs:
       - name: APP - e2e tests
         uses: cypress-io/github-action@v5
         with:
-          command: pnpx cypress run
+          command: pnpm test:e2e:dev
+          project: apps/ourvoice-app
           browser: chrome
 
   # APPS Build
