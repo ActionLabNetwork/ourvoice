@@ -2,7 +2,7 @@
 // pnpm seed:api:all
 describe('Moderate Comment', () => {
   beforeEach(() => {
-    cy.session('login', cy.login)
+    cy.session('login', cy.loginAsModerator)
   })
 
   describe('Moderation Comment List', () => {

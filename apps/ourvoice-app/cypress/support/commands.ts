@@ -39,7 +39,6 @@
 import 'cypress-file-upload'
 
 Cypress.Commands.add('login', () => {
-  // Your login logic here
   cy.intercept({ method: 'POST', url: 'http://authapi.ourvoice.test/auth/signinup/code' }).as(
     'postLogin'
   )
@@ -60,6 +59,20 @@ Cypress.Commands.add('login', () => {
     'http://auth.ourvoice.test/verify?rid=passwordless&preAuthSessionId=4a3L55ZNKye5p6Rmk4tBEdUMBY79OoTAqtIHEyo_HL4=#OMz5kaYzzyFh_RF5UeIl6u81W2gwb2T-rp1lj9Hh5W8='
   )
   cy.wait('@postLoginConsume')
+})
+
+Cypress.Commands.add('loginAsModerator', () => {
+  cy.intercept({ method: 'POST', url: 'http://authapi.ourvoice.test/auth/signin' }).as(
+    'postEmailPasswordLogin'
+  )
+
+  cy.visit('http://auth.ourvoice.test')
+  cy.get(':nth-child(1) > .input-container > .input-wrapper > .input').type(
+    'moderator1@ourvoice.app'
+  )
+  cy.get(':nth-child(2) > .input-container > .input-wrapper > .input').type('password123')
+  cy.get('.button').click()
+  cy.wait('@postEmailPasswordLogin')
 })
 
 export {}

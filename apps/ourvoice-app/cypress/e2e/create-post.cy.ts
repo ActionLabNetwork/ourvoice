@@ -14,7 +14,7 @@ describe('Create Post', () => {
 
   beforeEach(() => {
     // Create/Restore auth session
-    cy.session('login', cy.login)
+    cy.session('login', cy.loginAsModerator)
 
     // Intercept and stub API calls
     cy.intercept({ method: 'POST', url: `${Cypress.env('apiUrl')}/graphql` }, (req) => {
