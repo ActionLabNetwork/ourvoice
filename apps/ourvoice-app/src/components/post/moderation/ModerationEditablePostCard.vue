@@ -1,7 +1,11 @@
 <template>
-  <div v-if="post && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
+  <div
+    v-if="post && version"
+    class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
+  >
     <!-- Author -->
-    <AuthorBadge v-if="nickname.author.nickname"
+    <AuthorBadge
+      v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
       :modificationDate="formattedDate(version)"
@@ -11,9 +15,19 @@
     <!-- Title -->
     <div>
       <div class="text-2xl font-extrabold text-black-700 mb-3">
-        <input type="text" name="title" v-model="titleField.value.value" class="border rounded p-2 w-full" data-cy="modify-title-input" />
+        <input
+          type="text"
+          name="title"
+          v-model="titleField.value.value"
+          class="border rounded p-2 w-full"
+          data-cy="modify-title-input"
+        />
       </div>
-      <p v-if="titleField.errorMessage.value" class="text-red-500 mb-5 text-sm" data-cy="title-input-error">
+      <p
+        v-if="titleField.errorMessage.value"
+        class="text-red-500 mb-5 text-sm"
+        data-cy="title-input-error"
+      >
         {{ titleField.errorMessage.value }}
       </p>
     </div>
@@ -21,17 +35,32 @@
     <!-- Content -->
     <div>
       <div class="text-gray-700 text-lg leading-relaxed mb-3">
-        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full" data-cy="modify-content-input"></textarea>
+        <textarea
+          v-model="contentField.value.value"
+          name="content"
+          class="border rounded p-2 w-full"
+          data-cy="modify-content-input"
+        ></textarea>
       </div>
-      <p v-if="contentField.errorMessage.value"
-      class="text-red-700 mb-5 text-sm"
-      data-cy="content-input-error">
+      <p
+        v-if="contentField.errorMessage.value"
+        class="text-red-700 mb-5 text-sm"
+        data-cy="content-input-error"
+      >
         {{ contentField.errorMessage.value }}
       </p>
     </div>
 
     <!-- Categories -->
-    <FormInput v-if="!categoriesStore.loading" id="categoriesWrapper" name="categories" labelText="Categories" labelSpan="select 1 to 2" :error-message="categoriesField.errorMessage.value" :meta="categoriesField.meta">
+    <FormInput
+      v-if="!categoriesStore.loading"
+      id="categoriesWrapper"
+      name="categories"
+      labelText="Categories"
+      labelSpan="select 1 to 2"
+      :error-message="categoriesField.errorMessage.value"
+      :meta="categoriesField.meta"
+    >
       <div class="flex flex-col w-full">
         <Multiselect
           id="categories"
@@ -43,51 +72,70 @@
           :caret="true"
           class="px-8 multiselect-blue"
           data-cy="modify-categories-multiselect"
-          />
+        />
         <!-- Show error message if there's an error fetching categories -->
-        <div v-if="categoriesStore.errorMessage" class="text-red-500 text-sm" data-cy="categories-input-error">
+        <div
+          v-if="categoriesStore.errorMessage"
+          class="text-red-500 text-sm"
+          data-cy="categories-input-error"
+        >
           {{ categoriesStore.errorMessage }}
         </div>
       </div>
     </FormInput>
 
     <!-- Attachments -->
-    <p v-if="version.files && version.attachmentsDownloadUrls" class="mt-2 text-gray-400 text-md mb-2">
+    <p
+      v-if="version.files && version.attachmentsDownloadUrls"
+      class="mt-2 text-gray-400 text-md mb-2"
+    >
       {{ `${version.attachmentsDownloadUrls.length}` }} attachments
     </p>
-    <AttachmentBadge v-if="version.attachmentsDownloadUrls"  :files="version.attachmentsDownloadUrls" :modifyMode ="true" @remove-file="handleRemoveFile" />
+    <AttachmentBadge
+      v-if="version.attachmentsDownloadUrls"
+      :files="version.attachmentsDownloadUrls"
+      :modifyMode="true"
+      @remove-file="handleRemoveFile"
+    />
 
     <!-- Moderator decisions count -->
     <div class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
-        <p class="text-xs text-gray-600">
-          {{ decision }}: {{ count }}
-        </p>
+        <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue';
-import { useModerationPostsStore, type Moderation, type PostVersion } from '@/stores/moderation-posts';
-import { formatTimestampToReadableDate } from '@/utils';
-import { storeToRefs } from 'pinia';
-import { useCategoriesStore } from '@/stores/categories';
-import { useField, useForm } from 'vee-validate';
-import Multiselect from '@vueform/multiselect';
+import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue'
+import {
+  useModerationPostsStore,
+  type Moderation,
+  type PostVersion
+} from '@/stores/moderation-posts'
+import { formatTimestampToReadableDate } from '@/utils'
+import { storeToRefs } from 'pinia'
+import { useCategoriesStore } from '@/stores/categories'
+import { useField, useForm } from 'vee-validate'
+import Multiselect from '@vueform/multiselect'
 import FormInput from '@/components/inputs/FormInput.vue'
-import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
-import { validateCategories, validateContent, validateTitle } from '@/validators/moderation-post-validator';
-import AuthorBadge from '@/components/common/AuthorBadge.vue';
-import { getGroupsByProperty } from '@/utils/groupByProperty';
-import type { ModerationVersionDecision } from '@/types/moderation';
+import AttachmentBadge from '@/components/common/AttachmentBadge.vue'
+import {
+  validateCategories,
+  validateContent,
+  validateTitle
+} from '@/validators/moderation-post-validator'
+import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import type { ModerationVersionDecision } from '@/types/moderation'
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update'])
 
 const nickname = computed(() => {
   const authorNickname = post.value?.versions?.at(-1)?.authorNickname
-  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
+  const moderatorNickname =
+    version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
 
   const nicknameSeparator = '_'
   const [aFirst, aMiddle, aLast] = authorNickname?.split(nicknameSeparator) || []
@@ -113,8 +161,8 @@ const nickname = computed(() => {
 })
 
 // Pinia Stores
-const moderationPostsStore = useModerationPostsStore();
-const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore);
+const moderationPostsStore = useModerationPostsStore()
+const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
 
 const categoriesStore = useCategoriesStore()
 onMounted(async () => {
@@ -131,34 +179,27 @@ const modifyModerationPostValidationSchema = {
   },
   categories(value: string[]) {
     return validateCategories(value)
-  },
+  }
 }
 
-const { errors } = useForm(
-  { validationSchema: modifyModerationPostValidationSchema }
-)
+const { errors } = useForm({ validationSchema: modifyModerationPostValidationSchema })
 
 // VeeValidate Form Fields
-const useVeeValidateField = <T,>(fieldName: string, initialValue?: T) => {
-  const { errorMessage, value, meta } = useField<T>(
-    fieldName, undefined, { initialValue }
-  )
+function useVeeValidateField<T>(fieldName: string, initialValue?: T) {
+  const { errorMessage, value, meta } = useField<T>(fieldName, undefined, { initialValue })
 
   return { errorMessage, value, meta }
 }
 
 const titleField = useVeeValidateField<string>('title', version.value?.title)
-const contentField = useVeeValidateField<string>(
-  'content', version.value?.content
-)
+const contentField = useVeeValidateField<string>('content', version.value?.content)
 const categoriesField = useVeeValidateField<number[]>('categories', version.value?.categoryIds)
 
 // Form field refs
 const selectedCategories = ref<number[]>([])
 
 const categoriesOptions = computed(() => {
-  return categoriesStore.data
-    .map(({ id, name }) => ({ label: name, value: id }))
+  return categoriesStore.data.map(({ id, name }) => ({ label: name, value: id }))
 })
 
 if (version.value) {
@@ -182,32 +223,37 @@ const formWasUpdated = computed(() => {
   const sortedCategoryIds = JSON.parse(JSON.stringify(version.value?.categoryIds))?.sort()
   const sortedCategoryFieldIds = JSON.parse(JSON.stringify(categoriesField.value?.value))?.sort()
 
-  const categoriesFieldUpdated = JSON.stringify(sortedCategoryIds) !== JSON.stringify(sortedCategoryFieldIds)
+  const categoriesFieldUpdated =
+    JSON.stringify(sortedCategoryIds) !== JSON.stringify(sortedCategoryFieldIds)
 
   return titleFieldUpdated || contentFieldUpdated || categoriesFieldUpdated
 })
 
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
-  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined = version.value?.moderations.reduce((acc, moderation) => {
-    return getGroupsByProperty('decision', acc, moderation)
-  }, { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] });
+  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
+    version.value?.moderations.reduce(
+      (acc, moderation) => {
+        return getGroupsByProperty('decision', acc, moderation)
+      },
+      { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] }
+    )
 
   const groupsCount: Record<ModerationVersionDecision, number> = {
-    ACCEPTED: 0, REJECTED: 0
+    ACCEPTED: 0,
+    REJECTED: 0
   }
 
   if (groups) {
-    (Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
-      groupsCount[key] = groups[key].length;
-    });
+    ;(Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
+      groupsCount[key] = groups[key].length
+    })
   }
 
   return groupsCount
 })
 
-const formattedDate = (version: PostVersion) =>
-  formatTimestampToReadableDate(+version.timestamp);
+const formattedDate = (version: PostVersion) => formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 const localVersion = reactive({
@@ -216,12 +262,15 @@ const localVersion = reactive({
   content: contentField.value.value,
   categoryIds: categoriesField.value.value,
   files: version.value?.files ?? undefined
-});
+})
 
-const handleRemoveFile = (file: { key: string; url: string; }) => {
+const handleRemoveFile = (file: { key: string; url: string }) => {
   if (!moderationPostsStore.versionInModeration) return
 
-  const modifiedAttachments = moderationPostsStore.versionInModeration.attachmentsDownloadUrls?.filter((f) => f.key !== file.key)
+  const modifiedAttachments =
+    moderationPostsStore.versionInModeration.attachmentsDownloadUrls?.filter(
+      (f) => f.key !== file.key
+    )
 
   moderationPostsStore.versionInModeration = {
     ...moderationPostsStore.versionInModeration,
@@ -242,13 +291,13 @@ watchEffect(() => {
       version: localVersion,
       isValid: true
     }
-    emit('update', { version: localVersion, isValid: true });
+    emit('update', { version: localVersion, isValid: true })
   } else {
     moderationPostsStore.versionInModification = {
       ...moderationPostsStore.versionInModification,
       isValid: false
     }
-    emit('update', { version: localVersion, isValid: false });
+    emit('update', { version: localVersion, isValid: false })
   }
 })
 </script>

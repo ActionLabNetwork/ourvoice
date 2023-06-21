@@ -99,8 +99,6 @@ const findSelfModeration = async (version: CommentVersion, userId: string, deplo
 
 provideApolloClient(apolloClient)
 
-const COMMENTS_LIMIT = 50
-
 export const useModerationCommentsStore = defineStore('moderation-comments', {
   state: (): ModerationCommentsState => ({
     comments: [],

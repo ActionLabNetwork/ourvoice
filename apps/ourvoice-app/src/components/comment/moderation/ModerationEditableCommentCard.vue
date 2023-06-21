@@ -1,7 +1,11 @@
 <template>
-  <div v-if="comment && version" class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3">
+  <div
+    v-if="comment && version"
+    class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
+  >
     <!-- Author -->
-    <AuthorBadge v-if="nickname.author.nickname"
+    <AuthorBadge
+      v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
       :modificationDate="formattedDate(version)"
@@ -11,11 +15,18 @@
     <!-- Content -->
     <div>
       <div class="text-gray-700 text-lg leading-relaxed mb-3">
-        <textarea v-model="contentField.value.value" name="content" class="border rounded p-2 w-full" data-cy="modify-content-input"></textarea>
+        <textarea
+          v-model="contentField.value.value"
+          name="content"
+          class="border rounded p-2 w-full"
+          data-cy="modify-content-input"
+        ></textarea>
       </div>
-      <p v-if="contentField.errorMessage.value"
-      class="text-red-700 mb-5 text-sm"
-      data-cy="content-input-error">
+      <p
+        v-if="contentField.errorMessage.value"
+        class="text-red-700 mb-5 text-sm"
+        data-cy="content-input-error"
+      >
         {{ contentField.errorMessage.value }}
       </p>
     </div>
@@ -23,31 +34,34 @@
     <!-- Moderator decisions count -->
     <div class="flex gap-3 justify-around">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
-        <p class="text-xs text-gray-600">
-          {{ decision }}: {{ count }}
-        </p>
+        <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watchEffect, onMounted, watch } from 'vue';
-import { useModerationCommentsStore, type Moderation, type CommentVersion } from '@/stores/moderation-comments';
-import { formatTimestampToReadableDate } from '@/utils';
-import { storeToRefs } from 'pinia';
-import { useCategoriesStore } from '@/stores/categories';
-import { useField, useForm } from 'vee-validate';
-import { validateContent } from '@/validators/moderation-comment-validator';
-import AuthorBadge from '@/components/common/AuthorBadge.vue';
-import { getGroupsByProperty } from '@/utils/groupByProperty';
-import type { ModerationVersionDecision } from '@/types/moderation';
+import { computed, reactive, watchEffect, onMounted } from 'vue'
+import {
+  useModerationCommentsStore,
+  type Moderation,
+  type CommentVersion
+} from '@/stores/moderation-comments'
+import { formatTimestampToReadableDate } from '@/utils'
+import { storeToRefs } from 'pinia'
+import { useCategoriesStore } from '@/stores/categories'
+import { useField, useForm } from 'vee-validate'
+import { validateContent } from '@/validators/moderation-comment-validator'
+import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import type { ModerationVersionDecision } from '@/types/moderation'
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update'])
 
 const nickname = computed(() => {
   const authorNickname = comment.value?.versions?.at(-1)?.authorNickname
-  const moderatorNickname = version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
+  const moderatorNickname =
+    version.value?.authorNickname !== authorNickname ? version.value?.authorNickname : undefined
 
   const nicknameSeparator = '_'
   const [aFirst, aMiddle, aLast] = authorNickname?.split(nicknameSeparator) || []
@@ -73,8 +87,9 @@ const nickname = computed(() => {
 })
 
 // Pinia Stores
-const moderationCommentsStore = useModerationCommentsStore();
-const { commentInModeration: comment, versionInModeration: version } = storeToRefs(moderationCommentsStore);
+const moderationCommentsStore = useModerationCommentsStore()
+const { commentInModeration: comment, versionInModeration: version } =
+  storeToRefs(moderationCommentsStore)
 
 const categoriesStore = useCategoriesStore()
 
@@ -88,22 +103,16 @@ const modifyModerationCommentValidationSchema = {
   }
 }
 
-const { errors } = useForm(
-  { validationSchema: modifyModerationCommentValidationSchema }
-)
+const { errors } = useForm({ validationSchema: modifyModerationCommentValidationSchema })
 
 // VeeValidate Form Fields
-const useVeeValidateField = <T,>(fieldName: string, initialValue?: T) => {
-  const { errorMessage, value, meta } = useField<T>(
-    fieldName, undefined, { initialValue }
-  )
+function useVeeValidateField<T>(fieldName: string, initialValue?: T) {
+  const { errorMessage, value, meta } = useField<T>(fieldName, undefined, { initialValue })
 
   return { errorMessage, value, meta }
 }
 
-const contentField = useVeeValidateField<string>(
-  'content', version.value?.content
-)
+const contentField = useVeeValidateField<string>('content', version.value?.content)
 
 const formHasNoErrors = computed(() => {
   return Object.keys(errors.value).length === 0
@@ -117,29 +126,32 @@ const formWasUpdated = computed(() => {
 
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
-  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined = version.value?.moderations.reduce((acc, moderation) => {
-    return getGroupsByProperty('decision', acc, moderation)
-  }, { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] });
+  const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
+    version.value?.moderations.reduce(
+      (acc, moderation) => {
+        return getGroupsByProperty('decision', acc, moderation)
+      },
+      { ACCEPTED: [] as Moderation[], REJECTED: [] as Moderation[] }
+    )
 
   const groupsCount: Record<ModerationVersionDecision, number> = { ACCEPTED: 0, REJECTED: 0 }
 
   if (groups) {
-    (Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
-      groupsCount[key] = groups[key].length;
-    });
+    ;(Object.keys(groups) as Array<keyof typeof groups>).forEach((key) => {
+      groupsCount[key] = groups[key].length
+    })
   }
 
   return groupsCount
 })
 
-const formattedDate = (version: CommentVersion) =>
-  formatTimestampToReadableDate(+version.timestamp);
+const formattedDate = (version: CommentVersion) => formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 let localVersion = reactive({
   ...version.value,
-  content: contentField.value.value,
-});
+  content: contentField.value.value
+})
 
 watchEffect(() => {
   // Keep local version in sync with VeeValidate fields
@@ -150,13 +162,13 @@ watchEffect(() => {
       version: localVersion,
       isValid: true
     }
-    emit('update', { version: localVersion, isValid: true });
+    emit('update', { version: localVersion, isValid: true })
   } else {
     moderationCommentsStore.versionInModification = {
       ...moderationCommentsStore.versionInModification,
       isValid: false
     }
-    emit('update', { version: localVersion, isValid: false });
+    emit('update', { version: localVersion, isValid: false })
   }
 })
 </script>

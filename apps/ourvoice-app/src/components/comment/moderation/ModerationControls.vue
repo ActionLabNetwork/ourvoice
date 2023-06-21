@@ -1,12 +1,23 @@
 <template>
   <form @submit.prevent="onSubmit" class="relative">
     <div
-    class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm"
-    :class="{
-      'focus-within:border-red-500  focus-within:ring-red-500': moderationReasonField.errorMessage.value,
-      'focus-within:border-indigo-500 focus-within:ring-indigo-500': !moderationReasonField.errorMessage.value
-    }">
-      <textarea id="moderationReason" name="moderationReason" v-model="moderationReasonField.value.value" rows="6" class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" :placeholder="fieldPlaceholder" data-cy="moderation-reason-textarea" />
+      class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm"
+      :class="{
+        'focus-within:border-red-500  focus-within:ring-red-500':
+          moderationReasonField.errorMessage.value,
+        'focus-within:border-indigo-500 focus-within:ring-indigo-500':
+          !moderationReasonField.errorMessage.value
+      }"
+    >
+      <textarea
+        id="moderationReason"
+        name="moderationReason"
+        v-model="moderationReasonField.value.value"
+        rows="6"
+        class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+        :placeholder="fieldPlaceholder"
+        data-cy="moderation-reason-textarea"
+      />
     </div>
 
     <!-- Moderation actions -->
@@ -15,18 +26,44 @@
         <div>
           <Listbox as="div" v-model="action" class="flex-shrink-0">
             <div class="relative">
-              <ListboxButton class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300" data-cy="moderation-action-listbox-button">
+              <ListboxButton
+                class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300"
+                data-cy="moderation-action-listbox-button"
+              >
                 <font-awesome-icon :icon="['fas', action.icon]" />
-                <span :class="[action.name === null ? '' : 'text-gray-900', 'hidden truncate sm:ml-2 sm:block']">
+                <span
+                  :class="[
+                    action.name === null ? '' : 'text-gray-900',
+                    'hidden truncate sm:ml-2 sm:block'
+                  ]"
+                >
                   {{ action.name }}
                 </span>
               </ListboxButton>
 
-              <TransitionRoot leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <ListboxOptions class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  <ListboxOption as="template" v-for="action in actions" :key="action.name" :value="action" v-slot="{ active }" data-cy="moderation-action-listbox">
+              <TransitionRoot
+                leave-active-class="transition ease-in duration-100"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+              >
+                <ListboxOptions
+                  class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                >
+                  <ListboxOption
+                    as="template"
+                    v-for="action in actions"
+                    :key="action.name"
+                    :value="action"
+                    v-slot="{ active }"
+                    data-cy="moderation-action-listbox"
+                  >
                     <ul>
-                      <li :class="[active ? 'bg-gray-100' : 'bg-white', 'relative cursor-default select-none px-3 py-2']">
+                      <li
+                        :class="[
+                          active ? 'bg-gray-100' : 'bg-white',
+                          'relative cursor-default select-none px-3 py-2'
+                        ]"
+                      >
                         <div class="flex items-center gap-2">
                           <font-awesome-icon :icon="['fas', action.icon]" />
                           <span class="block truncate font-medium">
@@ -44,7 +81,11 @@
 
         <!-- Submit button -->
         <div class="flex-shrink-0">
-          <CustomButton data-cy="moderate-button" :disabled-predicate="() => !isValidForm" label="Submit Moderation" />
+          <CustomButton
+            data-cy="moderate-button"
+            :disabled-predicate="() => !isValidForm"
+            label="Submit Moderation"
+          />
         </div>
       </div>
     </div>
@@ -54,11 +95,11 @@
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
-import { useField, useForm } from 'vee-validate';
+import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-comment-validator'
-import { useModerationCommentsStore } from '@/stores/moderation-comments';
-import { MODERATION_ACTIONS } from '@/constants/moderation';
-import CustomButton from '@/components/common/CustomButton.vue';
+import { useModerationCommentsStore } from '@/stores/moderation-comments'
+import { MODERATION_ACTIONS } from '@/constants/moderation'
+import CustomButton from '@/components/common/CustomButton.vue'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
@@ -71,34 +112,36 @@ const fieldPlaceholder = ref('')
 const { resetForm } = useForm()
 
 // VeeValidate Form Fields
-const useVeeValidateField = <T,>(fieldName: string, validationNeeded = true) => {
-  const { errorMessage, value, meta } = useField<T>(fieldName, value => validationNeeded ? validateModerationReason(value as string) : true)
+function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
+  const { errorMessage, value, meta } = useField<T>(fieldName, (value) =>
+    validationNeeded ? validateModerationReason(value as string) : true
+  )
   return { errorMessage, value, meta }
 }
-let moderationReasonField = useVeeValidateField<string>(
-  'moderationReason', action.value.validate
-)
+
+let moderationReasonField = useVeeValidateField<string>('moderationReason', action.value.validate)
 
 const isValidForm = computed(() => {
-  const modifyFormHasNoErrors = moderationCommentsStore.versionInModification.isValid;
-  const reasonFieldHasNoErrors = moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null;
+  const modifyFormHasNoErrors = moderationCommentsStore.versionInModification.isValid
+  const reasonFieldHasNoErrors =
+    moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null
 
   switch (action.value.name) {
     case 'Accept':
       // No validations for accepting the comment
-      return true;
+      return true
 
     case 'Modify':
-      return modifyFormHasNoErrors && reasonFieldHasNoErrors;
+      return modifyFormHasNoErrors && reasonFieldHasNoErrors
 
     case 'Reject':
-      return reasonFieldHasNoErrors;
+      return reasonFieldHasNoErrors
 
     default:
       // If the action name does not match any case
-      return false;  // Should never happen
+      return false // Should never happen
   }
-});
+})
 
 async function onSubmit() {
   // This should never happen since we disable the button, but just in case
@@ -106,22 +149,23 @@ async function onSubmit() {
     return
   }
 
-  emit(
-    'moderation-submit',
-    { action: action.value.name, reason: moderationReasonField.value.value }
-  )
-};
+  emit('moderation-submit', {
+    action: action.value.name,
+    reason: moderationReasonField.value.value
+  })
+}
 
-watch(action, (newAction) => {
-  moderationReasonField = useVeeValidateField<string>(
-    'moderationReason', newAction.validate
-  )
-  resetForm()
-}, { immediate: true })
+watch(
+  action,
+  (newAction) => {
+    moderationReasonField = useVeeValidateField<string>('moderationReason', newAction.validate)
+    resetForm()
+  },
+  { immediate: true }
+)
 
 watchEffect(() => {
   emit('moderation-action-change', action.value.name)
   fieldPlaceholder.value = action.value.placeholder
 })
-
 </script>

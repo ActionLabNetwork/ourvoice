@@ -5,13 +5,13 @@
       <div class="px-10 py-10 bg-gray-100">
         <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
           <template #pending>
-            <PostModerationList :posts="moderationPosts.PENDING"  />
+            <PostModerationList :posts="moderationPosts.PENDING" />
           </template>
           <template #accepted>
-            <PostModerationList :posts="moderationPosts.APPROVED"  />
+            <PostModerationList :posts="moderationPosts.APPROVED" />
           </template>
           <template #rejected>
-            <PostModerationList :posts="moderationPosts.REJECTED"  />
+            <PostModerationList :posts="moderationPosts.REJECTED" />
           </template>
         </BaseTab>
       </div>
@@ -30,7 +30,7 @@ import { LIST_TABS } from '@/constants/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationPost } from '@/stores/moderation-posts'
 import type { ModerationVersionStatus } from '@/types/moderation'
-import type { Tab } from '@/types'
+// import type { Tab } from '@/types'
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
@@ -54,7 +54,7 @@ const moderationPosts = computed(() => {
   )
 })
 
-const handleTabSwitched = (selectedTab: Tab) => {
+const handleTabSwitched = () => {
   // If we need to know when the tab is switched, we can do it here
 }
 </script>
