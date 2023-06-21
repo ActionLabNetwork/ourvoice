@@ -2,6 +2,7 @@ import {
   CommentUpdateInput,
   CommentsFilterInput,
   CommentPaginationInput,
+  CommentCreateInput,
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommentService } from '../../modules/comment/comment.service';

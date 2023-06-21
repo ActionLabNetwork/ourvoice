@@ -70,10 +70,12 @@ async function main() {
     const parentComment = comments.find(
       (comment) => comment.id === data.parentId,
     );
-    const { ...rest } = data;
+
+    delete data.postId;
+    delete data.parentId;
     const comment = await prisma.comment.create({
       data: {
-        ...rest,
+        ...data,
         post: post ? { connect: { id: post.id } } : undefined,
         parent: parentComment
           ? { connect: { id: parentComment.id } }
@@ -87,10 +89,11 @@ async function main() {
   const voteData = seedData.votes;
   for (const data of voteData) {
     const post = posts.find((post) => post.id === data.postId);
-    const { ...rest } = data;
+
+    delete data.postId;
     await prisma.vote.create({
       data: {
-        ...rest,
+        ...data,
         post: { connect: { id: post.id } },
       },
     });

@@ -11,6 +11,7 @@ import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { CommentsFilterDto } from './dto/comment-filter.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
+import { CommentCreateDto } from './dto/comment-create.dto';
 
 @Injectable()
 export class CommentService {

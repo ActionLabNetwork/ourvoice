@@ -180,7 +180,7 @@ describe('CommentRepository', () => {
     .build() as CommentVersion & { moderations: CommentModeration[] };
 
   let commentModerationRepository: CommentModerationRepository;
-  // let prismaService: PrismaService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     await seedDb();
@@ -193,14 +193,14 @@ describe('CommentRepository', () => {
       providers: [PrismaService, CommentModerationRepository],
     }).compile();
 
-    // prismaService = moduleRef.get(PrismaService);
+    prismaService = moduleRef.get(PrismaService);
     commentModerationRepository = moduleRef.get(CommentModerationRepository);
   });
 
-  // afterAll(async () => {
-  //   // Disconnect from the test database after all tests are done
-  //   await prismaService.$disconnect();
-  // });
+  afterAll(async () => {
+    // Disconnect from the test database after all tests are done
+    await prismaService.$disconnect();
+  });
 
   it('should get a comment by id', async () => {
     // Arrange

@@ -126,7 +126,7 @@ describe('PostRepository', () => {
     .build();
 
   let postModerationRepository: PostModerationRepository;
-  // let prismaService: PrismaService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     await seedDb();
@@ -139,14 +139,14 @@ describe('PostRepository', () => {
       providers: [PrismaService, PostModerationRepository],
     }).compile();
 
-    // prismaService = moduleRef.get(PrismaService);
+    prismaService = moduleRef.get(PrismaService);
     postModerationRepository = moduleRef.get(PostModerationRepository);
   });
 
-  // afterAll(async () => {
-  //   // Disconnect from the test database after all tests are done
-  //   await prismaService.$disconnect();
-  // });
+  afterAll(async () => {
+    // Disconnect from the test database after all tests are done
+    await prismaService.$disconnect();
+  });
 
   it('should get a post by id', async () => {
     // Act
