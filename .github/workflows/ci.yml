@@ -138,7 +138,7 @@ jobs:
         run: pnpx cypress install
 
       - name: APP - e2e tests
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           command: pnpx cypress run
           browser: chrome
