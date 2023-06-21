@@ -138,10 +138,9 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           install: false
-          working-directory: apps/ourvoice-api
+          working-directory: apps/ourvoice-app
           spec: |
             cypress/e2e/moderate-post.cy.ts
-          command: pnpm test:e2e:dev
           browser: chrome
 
   # APPS Build
