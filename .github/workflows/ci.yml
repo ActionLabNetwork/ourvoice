@@ -152,7 +152,7 @@ jobs:
 
       - name: APP - e2e tests
         working-directory: apps/ourvoice-app
-        run: pnpm cypress run
+        run: node_modules/.bin/cypress run
 
   # APPS Build
   build-apps:
