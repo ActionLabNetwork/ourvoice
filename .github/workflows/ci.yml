@@ -134,6 +134,22 @@ jobs:
         working-directory: apps/ourvoice-api
         run: pnpm test:integration
 
+      - name: Cypress Cache path
+        working-directory: apps/ourvoice-app
+        run: pnpx cypress cache path
+
+      - name: Cypress Cache list
+        working-directory: apps/ourvoice-app
+        run: pnpx cypress cache list
+
+      - name: Install Cypress
+        working-directory: apps/ourvoice-app
+        run: pnpx cypress install
+
+      - name: Verify Cypress
+        working-directory: apps/ourvoice-app
+        run: pnpx cypress verify
+
       - name: APP - e2e tests
         working-directory: apps/ourvoice-app
         run: pnpm cypress run
