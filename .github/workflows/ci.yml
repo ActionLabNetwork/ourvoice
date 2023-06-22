@@ -135,13 +135,8 @@ jobs:
         run: pnpm test:integration
 
       - name: APP - e2e tests
-        uses: cypress-io/github-action@v5
-        with:
-          install: false
-          working-directory: apps/ourvoice-app
-          spec: |
-            cypress/e2e/moderate-post.cy.ts
-          browser: chrome
+        working-directory: apps/ourvoice-app
+        run: pnpm cypress run
 
   # APPS Build
   build-apps:
