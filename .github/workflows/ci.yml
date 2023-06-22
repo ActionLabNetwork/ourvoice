@@ -57,7 +57,7 @@ jobs:
 
   # API & APP Tests
   app-api-db-test:
-    name: API (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
+    name: APP & API (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
     runs-on: ubuntu-latest
     needs: lint
 
@@ -149,6 +149,9 @@ jobs:
       - name: Verify Cypress
         working-directory: apps/ourvoice-app
         run: pnpx cypress verify
+
+      - name: Start up servers
+        run: pnpm dev:apps
 
       - name: APP - e2e tests
         working-directory: apps/ourvoice-app
