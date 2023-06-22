@@ -228,12 +228,14 @@ export default defineComponent({
     },
 
     sendMagicLink: async function () {
-      if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
+      // check for organisation restrictions
+      if (organisation && this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         this.processing = false
         this.errorMessage = 'Organisation does not match'
         this.error = true
         return
       }
+
       try {
         await Passwordless.createCode({
           email: this.email

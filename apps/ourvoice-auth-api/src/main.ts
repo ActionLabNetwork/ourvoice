@@ -8,6 +8,7 @@ import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { createRole } from './auth/roles.service';
 import {
   addEmailsToAllowlist,
+  addModeratorsToAllowlist,
   // clearEmailAllowList,
 } from './auth/metadata.service';
 import { addSuperAdmin } from './seed';
@@ -65,13 +66,20 @@ async function bootstrap() {
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
   // create roles
+  console.log('Creating roles...');
   configService
     .get<Role[]>('roles')
     .map(async (role) => await createRole(role.name, role.permissions));
   // if you need to clear the allowedEmails list
   // await clearEmailAllowList();
-  //add allowed moderator emails
+  // add allowed emails who can sign up
+  console.log('Updating email allow list...');
   await addEmailsToAllowlist(configService.get<string[]>('allowedEmails'));
+  // if you need to clear the allowedEmails list
+  // await clearModeratorAllowList();
+  // add moderators who can sign up using email
+  console.log('Updating moderators list...');
+  await addModeratorsToAllowlist(configService.get<string[]>('moderators'));
   // add super admin user
   await addSuperAdmin(
     configService.get<string>('SUPERTOKENS_ADMIN_EMAIL') ||

@@ -1,6 +1,7 @@
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
+// TODO: add error handling
 export const checkForSession = async () => {
   if (!(await Session.doesSessionExist())) return false
   const validationErrors = await Session.validateClaims()
@@ -19,17 +20,23 @@ export const checkForSession = async () => {
 }
 
 export const getDeployment = async () => {
+  if (!(await Session.doesSessionExist())) return ''
   const payload = await Session.getAccessTokenPayloadSecurely()
   return payload.deployment || ''
 }
 
+export const getSessionPayload = async () => {
+  if (!(await Session.doesSessionExist())) return undefined
+  return await Session.getAccessTokenPayloadSecurely()
+}
 export const getUserId = async () => {
+  if (!(await Session.doesSessionExist())) return ''
   return await Session.getUserId()
 }
 
 export const checkDeployment = async (deployment: string): Promise<boolean> => {
   const payload = await Session.getAccessTokenPayloadSecurely()
-  const userDeployment = payload.deployment || ''
+  const userDeployment = payload?.deployment || ''
   return userDeployment === deployment || userDeployment === '*'
 }
 
