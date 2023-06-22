@@ -50,7 +50,8 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 
 #### Test Setup:
 
--
+- Run from the root `pnpm test:api` to run unit tests for the api
+- Run from the root `pnpm test:api:integration` to run integration tests for the api
 
 #### Regular use:
 
@@ -66,8 +67,6 @@ Navigate to `http://demo.ourvoice.test/` to access the OurVoice App or `http://a
 - Run `pnpm dev` in corresponding `app` directory (`app`, `api` or `admin`) to start that app in development mode
 - Run from the root `pnpm run clean` to clean all apps directories (delete `dist` and `node_modules`) folders. Assume this is needed after pulling an updated version of the code from the remote repository.
 - Run from the root `pnpm lint` to show all lint errors and `pnpm lint:fix` to auto fix if possible
-- Run from the root `pnpm test:api` to run unit tests for the api
-- Run from the root `pnpm test:api:integration` to run integration tests for the api
 
 Local ports and URL reference:
 | Service | Port | Dev URL |
