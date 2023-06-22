@@ -150,9 +150,6 @@ jobs:
         working-directory: apps/ourvoice-app
         run: pnpx cypress verify
 
-      - name: Start up servers
-        run: pnpm dev:apps
-
       - name: APP - e2e tests
         working-directory: apps/ourvoice-app
         run: node_modules/.bin/cypress run
