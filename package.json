@@ -32,6 +32,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:api": "pnpm --filter ./apps/ourvoice-api test",
     "test:api:integration": "pnpm --filter ./apps/ourvoice-api test:integration",
+    "test:app:e2e": "pnpm --filter ./apps/ourvoice-api pnpm cypress run",
+    "test:e2e": "start-server-and-test dev:apps http://demo.ourvoice.test test:app:e2e",
     "lint:ts": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore && pretty-quick --check",
     "lint": "run-s lint:ts",
     "lint:fix": "eslint --fix --ext .vue,.js,.ts,.jsx,.tsx . --ignore-path .gitignore && pretty-quick",
@@ -92,5 +94,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "wait-on": "^7.0.1"
   }
 }

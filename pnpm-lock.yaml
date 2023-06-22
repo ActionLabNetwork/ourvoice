@@ -3,6 +3,10 @@ lockfileVersion: '6.0'
 importers:
 
   .:
+    dependencies:
+      wait-on:
+        specifier: ^7.0.1
+        version: 7.0.1(debug@4.3.4)
     devDependencies:
       '@types/node':
         specifier: ^18.16.17
@@ -2733,13 +2737,11 @@ packages:
 
   /@hapi/hoek@9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
-    dev: true
 
   /@hapi/topo@5.1.0:
     resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
     dependencies:
       '@hapi/hoek': 9.3.0
-    dev: true
 
   /@headlessui/vue@1.7.14(vue@3.3.4):
     resolution: {integrity: sha512-aL9U9Sa7wdOzlrfjx6EjMIYNRCma5mngWcWzQBcHFwznpRZ8g/QZ/AYFtRDrZZUw22Ttttja4D7ZRXFwhONewA==}
@@ -3889,15 +3891,12 @@ packages:
     resolution: {integrity: sha512-7vwq+rOHVWjyXxVlR76Agnvhy8I9rpzjosTESvmhNeXOXdZZB15Fl+TI9x1SiHZH5Jv2wTGduSxFDIaq0m3DUw==}
     dependencies:
       '@hapi/hoek': 9.3.0
-    dev: true
 
   /@sideway/formula@3.0.1:
     resolution: {integrity: sha512-/poHZJJVjx3L+zVD6g9KgHfYnb443oi7wLu/XKojDviHy6HOEOA6z1Trk5aR1dGcmPenJEgb2sK2I80LeS3MIg==}
-    dev: true
 
   /@sideway/pinpoint@2.0.0:
     resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
-    dev: true
 
   /@sinclair/typebox@0.25.24:
     resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
@@ -5415,7 +5414,6 @@ packages:
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
-    dev: true
 
   /babel-jest@29.5.0(@babel/core@7.22.1):
     resolution: {integrity: sha512-mA4eCDh5mSo2EcA9xQjVTpmbbNk32Zb3Q3QFQsNhaK56Q+yoXowzFodLux30HRgyOho5rsQ6B0P9QpMkvvnJ0Q==}
@@ -7651,7 +7649,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: true
 
   /formdata-polyfill@4.0.10:
     resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
@@ -9057,7 +9054,6 @@ packages:
       '@sideway/address': 4.1.4
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
-    dev: true
 
   /jose@2.0.6:
     resolution: {integrity: sha512-FVoPY7SflDodE4lknJmbAHSUjLCzE2H1F6MS0RYKMQ8SR+lNccpMf8R4eqkNYyyUjR5qZReOzZo5C5YiHOCjjg==}
@@ -13207,7 +13203,6 @@ packages:
       rxjs: 7.8.1
     transitivePeerDependencies:
       - debug
-    dev: true
 
   /walker@1.0.8:
     resolution: {integrity: sha512-ts/8E8l5b7kY0vlWLewOkDXMmPdLcVV4GmOQLyxuSswIJsweeFZtAsMF7k1Nszz+TYBQrlYRmzOnr398y1JemQ==}
