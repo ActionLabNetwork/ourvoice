@@ -1,7 +1,7 @@
 <template>
   <div class="bg-ourvoice-portal-yellow py-20">
     <div
-      class="flex flex-row flex-nowrap bg-red relative w-full items-stretch"
+      class="flex flex-row flex-nowrap bg-red relative w-full items-stretch transition-all duration-200 ease-linear"
       ref="containerRef"
       :style="containerStyle"
     >
@@ -63,9 +63,26 @@ export default defineComponent({
     const containerRef = ref(null)
     const containerBBox = useElementBounding(containerRef)
 
-    const changeToIndex = (index) => {
+    let timer: NodeJS.Timer
+    const resetTimer = () => {
+      if (timer) {
+        clearInterval(timer)
+      }
+      timer = setInterval(() => {
+        activeIndex.value = (activeIndex.value + 1) % testimonials.length
+      }, 10_000)
+    }
+    onMounted(() => {
+      resetTimer()
+    })
+    onUnmounted(() => {
+      clearInterval(timer)
+    })
+    const changeToIndex = (index: number) => {
+      resetTimer()
       activeIndex.value = index
     }
+
     const containerStyle = computed(() => ({
       left: -containerBBox.width.value * activeIndex.value + 'px',
     }))
