@@ -33,7 +33,7 @@
       </button>
     </div>
     <div class="block sm:hidden justify-self-end ml-auto">
-      <Menu>
+      <Menu v-slot="{ close }">
         <MenuButton>
           <ClientOnly>
             <font-awesome-icon
@@ -51,6 +51,7 @@
             v-show="navIndex"
             :key="idx"
             :to="hash"
+            @click="close"
             class="transform cursor-pointer text-lg font-medium text-ourvoice-portal-navbar-gray hover:text-ourvoice-portal-yellow"
           >
             {{ name }}

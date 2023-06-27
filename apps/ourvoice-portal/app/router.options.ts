@@ -8,4 +8,12 @@ export default <RouterConfig>{
       component: () => import('~/pages/index.vue').then((r) => r.default || r),
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+  },
 }
