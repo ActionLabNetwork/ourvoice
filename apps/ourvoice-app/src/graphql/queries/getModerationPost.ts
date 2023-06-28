@@ -19,7 +19,6 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
         authorNickname
         reason
         latest
-        status
         moderations {
           id
           decision

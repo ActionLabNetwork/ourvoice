@@ -3,14 +3,15 @@ import { Module } from '@nestjs/common';
 import { CommentModerationResolver } from './ comment-moderation.resolver';
 import { CommentModerationRepository } from './comment-moderation.repository';
 import { CommentModerationService } from './comment-moderation.service';
+import { CommentModule } from 'src/modules/comment/comment.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, CommentModule],
   providers: [
     CommentModerationRepository,
     CommentModerationService,
     CommentModerationResolver,
   ],
-  exports: [CommentModerationService],
+  exports: [CommentModerationService, CommentModerationRepository],
 })
 export class CommentModerationModule {}

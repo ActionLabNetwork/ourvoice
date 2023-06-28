@@ -25,7 +25,6 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
           authorNickname
           reason
           latest
-          status
           moderations {
             id
             decision
@@ -50,7 +49,6 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
           authorNickname
           reason
           latest
-          status
         }
       }
       versions {
@@ -62,7 +60,6 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
         authorNickname
         reason
         latest
-        status
         moderations {
           id
           decision

@@ -112,8 +112,6 @@ const findSelfModeration = async (
 
 provideApolloClient(apolloClient)
 
-const POSTS_LIMIT = 50
-
 export const useModerationPostsStore = defineStore('moderation-posts', {
   state: (): ModerationPostsState => ({
     posts: [],
@@ -158,7 +156,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
 
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POSTS_QUERY,
-          variables: this.pageInfo && loadMore ? { cursor: this.pageInfo.endCursor } : {}
+          variables: this.pageInfo && loadMore ? { after: this.pageInfo.endCursor } : {}
         })
 
         // If we're loading more posts, append them. Otherwise, replace the posts.
@@ -215,7 +213,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           return { ...post, versions: versionsWithCategoriesIncluded }
         })
 
-        if (this.pageInfo?.hasNextPage && this.posts.length <= POSTS_LIMIT) {
+        if (this.pageInfo?.hasNextPage) {
           await this.loadMorePosts()
         }
       } catch (error) {

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const GET_MODERATION_COMMENTS_QUERY = gql`
-  query GetModerationComments($cursor: String, $limit: Int = 10) {
-    moderationComments(filter: null, pagination: { cursor: $cursor, limit: $limit }) {
+  query GetModerationComments($after: String, $limit: Int = 10) {
+    moderationComments(filter: null, pagination: { after: $after, limit: $limit }) {
       edges {
         cursor
         node {
@@ -18,7 +18,6 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             authorNickname
             timestamp
             version
-            status
             latest
           }
         }
@@ -28,6 +27,7 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
         startCursor
         endCursor
         hasNextPage
+        hasPreviousPage
       }
     }
   }

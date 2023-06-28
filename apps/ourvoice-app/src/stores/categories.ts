@@ -1,6 +1,5 @@
 import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { defineStore } from 'pinia'
-import { useQuery } from '@vue/apollo-composable'
 import { apolloClient } from './../graphql/client/index'
 
 interface Category {
@@ -12,16 +11,16 @@ interface Edge {
   node: Category
 }
 
-interface Data {
-  categories: {
-    edges: Edge[]
-  }
-}
+// interface Data {
+//   categories: {
+//     edges: Edge[]
+//   }
+// }
 
-interface Result {
-  data: Data
-  loading: boolean
-}
+// interface Result {
+//   data: Data
+//   loading: boolean
+// }
 
 export interface CategoriesState {
   data: { id: number; name: string }[]

@@ -28,6 +28,7 @@ type Mutation {
     reason: String!
     data: ModerationPostModifyInput!
   ): ModerationPost
+  rollbackModifiedModerationPost(postId: Int!): ModerationPost
   renewPostModeration(
     postModerationId: Int!
     moderatorHash: String!
@@ -54,7 +55,6 @@ type ModerationPostVersion {
   authorHash: String!
   authorNickname: String!
   reason: String
-  status: ModerationPostStatus!
   latest: Boolean!
   timestamp: String!
   post: ModerationPost!
@@ -97,7 +97,8 @@ input ModerationPostsFilterInput {
 }
 
 input ModerationPostPaginationInput {
-  cursor: String
+  after: String
+  before: String
   limit: Int
 }
 
@@ -116,6 +117,7 @@ type ModerationPostPageInfo {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean
+  hasPreviousPage: Boolean
 }
 
 input ModerationPostModifyInput {

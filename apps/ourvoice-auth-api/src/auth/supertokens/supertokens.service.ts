@@ -65,10 +65,6 @@ export class SupertokensService {
 
   private getAuthModules(config: AuthModuleConfig) {
     const isTestMode = String(config.authBypassTest.isTestMode) == 'true';
-    console.log(
-      typeof isTestMode,
-      String(config.authBypassTest.isTestMode) == 'true',
-    );
     const smtpSettings = config.smtpSettings;
 
     const recipeList = {

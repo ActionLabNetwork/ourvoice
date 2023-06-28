@@ -2,7 +2,16 @@ import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url:
+        process.env.NODE_ENV === 'test'
+          ? process.env.DATABASE_MAIN_TEST_URL
+          : process.env.DATABASE_MAIN_URL,
+    },
+  },
+});
 
 async function clearDatabase() {
   await prisma.vote.deleteMany();
@@ -61,10 +70,12 @@ async function main() {
     const parentComment = comments.find(
       (comment) => comment.id === data.parentId,
     );
-    const { ...rest } = data;
+
+    delete data.postId;
+    delete data.parentId;
     const comment = await prisma.comment.create({
       data: {
-        ...rest,
+        ...data,
         post: post ? { connect: { id: post.id } } : undefined,
         parent: parentComment
           ? { connect: { id: parentComment.id } }
@@ -78,10 +89,11 @@ async function main() {
   const voteData = seedData.votes;
   for (const data of voteData) {
     const post = posts.find((post) => post.id === data.postId);
-    const { ...rest } = data;
+
+    delete data.postId;
     await prisma.vote.create({
       data: {
-        ...rest,
+        ...data,
         post: { connect: { id: post.id } },
       },
     });
@@ -89,12 +101,11 @@ async function main() {
 }
 
 export const seedMainDb = async () => {
-  console.log('Clearing main database...');
   await clearDatabase();
-  console.log('Seeding main database...');
   await main()
     .catch((e) => {
       console.error(e);
+      console.log(e);
       process.exit(1);
     })
     .finally(async () => {
@@ -102,4 +113,5 @@ export const seedMainDb = async () => {
     });
 };
 
-seedMainDb();
+// Uncomment to run this manually. Remember to comment it out again as it is being used by the integration test
+// seedMainDb();

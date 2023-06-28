@@ -2,9 +2,10 @@ import {
   CommentUpdateInput,
   CommentsFilterInput,
   CommentPaginationInput,
+  CommentCreateInput,
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CommentService } from 'src/modules/comment/comment.service';
+import { CommentService } from '../../modules/comment/comment.service';
 
 @Resolver('Comment')
 export class CommentResolver {
@@ -25,10 +26,10 @@ export class CommentResolver {
     return { totalCount, edges, pageInfo };
   }
 
-  // @Mutation()
-  // async createComment(@Args('data') data: CommentCreateInput) {
-  //   return this.commentService.createComment(data);
-  // }
+  @Mutation()
+  async createComment(@Args('data') data: CommentCreateInput) {
+    return this.commentService.createComment(data);
+  }
 
   @Mutation()
   async updateComment(

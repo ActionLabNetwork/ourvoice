@@ -22,8 +22,12 @@ export class CommentsFilterDto {
   published?: boolean;
 
   @IsOptional()
-  @IsInt()
-  authorId?: number;
+  @IsString()
+  authorHash?: string;
+
+  @IsOptional()
+  @IsString()
+  authorNickname?: string;
 
   @IsOptional()
   @IsInt()

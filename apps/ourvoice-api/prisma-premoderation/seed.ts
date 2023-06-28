@@ -1,4 +1,8 @@
-import { PrismaClient, Decision, PostStatus } from '@internal/prisma/client';
+import {
+  PrismaClient,
+  Decision,
+  PostStatus,
+} from '../node_modules/@internal/prisma/client';
 import {
   adjectives,
   animals,
@@ -6,10 +10,18 @@ import {
   uniqueNamesGenerator,
 } from 'unique-names-generator';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    premoderation: {
+      url:
+        process.env.NODE_ENV === 'test'
+          ? process.env.DATABASE_PREMODERATION_TEST_URL
+          : process.env.DATABASE_PREMODERATION_URL,
+    },
+  },
+});
 
 async function clearDatabase() {
-  console.log('Clearing database...');
   await prisma.commentModeration.deleteMany();
   await prisma.commentVersion.deleteMany();
   await prisma.postModeration.deleteMany();
@@ -44,6 +56,7 @@ async function main() {
           seed: authorHash,
         }),
         status: postStatuses[i % postStatuses.length],
+        postIdInMainDb: i === 0 ? 1 : undefined,
         versions: {
           create: Array(3)
             .fill({})
@@ -53,13 +66,12 @@ async function main() {
                 versionIndex + 1
               }`,
               categoryIds: [1, 2],
-              status: postStatuses[(i + versionIndex) % postStatuses.length],
               version: versionIndex + 1,
               authorHash,
               authorNickname: authorHash,
               reason: versionIndex > 0 ? 'Modified by moderator' : '',
               latest: versionIndex === 2,
-              timestamp: new Date(`2023-04-${13 + i}T10:00:00Z`),
+              timestamp: new Date(`2023-04-${13 + i + versionIndex}T10:00:00Z`),
             })),
         },
       },
@@ -79,6 +91,8 @@ async function main() {
             seed: authorHash,
           }),
           post: { connect: { id: post.id } },
+          commentIdInMainDb: i === 0 ? 1 : undefined,
+          status: postStatuses[j % postStatuses.length],
           versions: {
             create: Array(3)
               .fill({})
@@ -86,13 +100,14 @@ async function main() {
                 content: `This is a comment on post ${i + 1}. This is version ${
                   versionIndex + 1
                 }`,
-                status: postStatuses[(j + versionIndex) % postStatuses.length],
                 version: versionIndex + 1,
                 authorHash: commentAuthorHash,
                 authorNickname: commentAuthorHash,
                 reason: versionIndex > 0 ? 'Modified by moderator' : '',
                 latest: versionIndex === 2,
-                timestamp: new Date(`2023-04-${13 + i + j}T10:30:00Z`),
+                timestamp: new Date(
+                  `2023-04-${13 + i + j + versionIndex}T10:30:00Z`,
+                ),
               })),
           },
         },
@@ -110,12 +125,12 @@ async function main() {
           }),
           parent: { connect: { id: comment.id } },
           post: { connect: { id: post.id } },
+          status: postStatuses[j % postStatuses.length],
           versions: {
             create: {
               content: `This is a child comment of comment ${j + 1} on post ${
                 i + 1
               }`,
-              status: postStatuses[j % postStatuses.length],
               version: 1,
               authorHash: childCommentAuthorHash,
               authorNickname: childCommentAuthorHash,
@@ -135,6 +150,7 @@ async function main() {
             seed: moderatorHash,
           }),
           decision: decisions[i % decisions.length],
+          timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for post ${i + 1}`,
         },
       });
@@ -148,6 +164,7 @@ async function main() {
             seed: moderatorHash,
           }),
           decision: decisions[i % decisions.length],
+          timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for comment on post ${i + 1}`,
         },
       });
@@ -155,12 +172,11 @@ async function main() {
   }
 
   await prisma.$disconnect();
-  console.log('Seeding completed.');
 }
 
-async function run() {
+export async function seedDb() {
   await clearDatabase();
   await main();
 }
 
-run();
+// seedDb();

@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from 'class-validator';
-import { ModerationPostStatus } from 'src/graphql';
+import { ModerationPostStatus } from '../../../../graphql';
 
 export class ModerationPostsFilterDto {
   @IsOptional()

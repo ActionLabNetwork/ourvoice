@@ -1,3 +1,4 @@
+import { ModerationCommentsResponse } from '../../../types/moderation/comment-moderation';
 import {
   Injectable,
   BadRequestException,
@@ -5,8 +6,12 @@ import {
 } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { Comment } from '@internal/prisma/client';
-import { numberToCursor } from 'src/utils/cursor-pagination';
+import {
+  Comment,
+  CommentVersion,
+  CommentModeration,
+} from '../../../../node_modules/@internal/prisma/client';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationCommentsFilterDto } from './dto/comments-filter.dto';
 import { CommentModerationRepository } from './comment-moderation.repository';
 import { CommentCreateDto } from './dto/comment-create.dto';
@@ -36,15 +41,7 @@ export class CommentModerationService {
   async getModerationComments(
     filter?: ModerationCommentsFilterInput,
     pagination?: ModerationCommentPaginationInput,
-  ): Promise<{
-    totalCount: number;
-    edges: { node: Comment; cursor: string }[];
-    pageInfo: {
-      startCursor: string;
-      endCursor: string;
-      hasNextPage: boolean;
-    };
-  }> {
+  ): Promise<ModerationCommentsResponse> {
     // Validate filters
     if (filter) {
       const moderationCommentsFilterDto = plainToClass(
@@ -58,12 +55,36 @@ export class CommentModerationService {
       }
     }
 
-    // Handle pagination
-    const { totalCount, moderationComments } =
-      await this.moderationCommentRepository.getModerationComments(
-        filter,
-        pagination,
+    // Validate pagination
+    if (pagination?.before && pagination?.after) {
+      throw new BadRequestException(
+        "You cannot provide both 'before' and 'after' cursors. Please provide only one.",
       );
+    }
+
+    // Handle pagination
+    const limit = pagination?.limit ?? 10;
+
+    // We leave as undefined if we don't have a cursor to avoid doing a double fetch (backwards and forwards)
+    let hasNextPage = undefined;
+    let hasPreviousPage = undefined;
+
+    const { totalCount, moderationComments } =
+      await this.moderationCommentRepository.getModerationComments(filter, {
+        ...pagination,
+        limit: limit + 1,
+      });
+
+    if (pagination?.before) {
+      hasPreviousPage = moderationComments.length > limit;
+      if (hasPreviousPage) moderationComments.pop();
+    }
+
+    // Forward pagination is the default if no cursor is provided
+    if (!pagination?.before || pagination?.after) {
+      hasNextPage = moderationComments.length > limit;
+      if (hasNextPage) moderationComments.pop();
+    }
 
     const edges = moderationComments.map((comment) => ({
       node: comment,
@@ -73,13 +94,14 @@ export class CommentModerationService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: moderationComments.length === (pagination?.limit ?? 10),
+      hasNextPage,
+      hasPreviousPage,
     };
 
     return { totalCount, edges, pageInfo };
   }
 
-  async createComment(data: CommentCreateDto) {
+  async createComment(data: CommentCreateDto): Promise<Comment> {
     const commentCreateDto = plainToClass(CommentCreateDto, data);
     const errors = await validate(commentCreateDto);
 
@@ -90,7 +112,7 @@ export class CommentModerationService {
     return await this.moderationCommentRepository.createModerationComment(data);
   }
 
-  async getCommentVersionById(id: number) {
+  async getCommentVersionById(id: number): Promise<CommentVersion> {
     const commentVersion =
       await this.moderationCommentRepository.getCommentVersionById(id);
 
@@ -106,7 +128,7 @@ export class CommentModerationService {
     moderatorHash: string,
     moderatorNickname,
     reason: string,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -134,7 +156,7 @@ export class CommentModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -164,7 +186,7 @@ export class CommentModerationService {
     moderatorNickname: string,
     reason: string,
     data: CommentModifyDto,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate data
@@ -173,6 +195,11 @@ export class CommentModerationService {
 
     if (errors.length > 0) {
       throw new BadRequestException(errors);
+    }
+
+    // Validate reason
+    if (!reason) {
+      throw new BadRequestException('Reason is required');
     }
 
     // Validate comment id
@@ -192,9 +219,23 @@ export class CommentModerationService {
     );
   }
 
-  async renewCommentModeration(id: number, moderatorHash: string) {
+  // Meant to be used in testing to quickly rollback to the previous db state
+  async rollbackModifiedModerationComment(commentId: number): Promise<Comment> {
+    return await this.moderationCommentRepository.rollbackModifiedModerationComment(
+      commentId,
+    );
+  }
+
+  async renewCommentModeration(
+    id: number,
+    moderatorHash: string,
+  ): Promise<Comment> {
     const moderationToBeRenewed =
       await this.moderationCommentRepository.getCommentModerationById(id);
+
+    if (!moderationToBeRenewed) {
+      throw new NotFoundException('Moderation does not exist');
+    }
 
     if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
       throw new BadRequestException('Invalid moderator hash');

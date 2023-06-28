@@ -1,5 +1,5 @@
 <template>
-  <div class="flow-root">
+  <div class="flow-root" data-cy="moderation-history">
     <ul v-if="moderations && moderations.length" class="divide-y divide-white/5">
       <li v-for="moderation in moderations" :key="moderation.id" class="relative flex items-center space-x-4 py-4">
         <div class="min-w-0 flex-auto">

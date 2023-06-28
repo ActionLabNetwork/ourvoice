@@ -16,7 +16,8 @@ describe('CommentService', () => {
   const dummyComment: any = {
     id: 1,
     content: 'Test Content',
-    authorId: 1,
+    authorHash: 'Test Hash',
+    authorNickname: 'Test Nickname',
     createdAt: new Date('2023-05-09T04:42:03.447Z'),
     disabledAt: null,
     moderatedAt: null,
@@ -51,7 +52,8 @@ describe('CommentService', () => {
     // Arrange
     const commentCreateInput = {
       content: 'Test content',
-      authorId: 1,
+      authorHash: 'Test hash',
+      authorNickname: 'Test nickname',
       postId: 1,
     };
 
@@ -63,20 +65,20 @@ describe('CommentService', () => {
     // Assert
     expect(result).toEqual(dummyComment);
 
-    const { authorId, postId, ...restData } = commentCreateInput;
+    const { postId, ...restData } = commentCreateInput;
     expect(commentRepositoryMock.createComment).toHaveBeenCalledWith({
       ...restData,
-      author: { connect: { id: authorId } },
       post: postId ? { connect: { id: postId } } : undefined,
     });
   });
 
-  it('should faill to create a comment without authorId', async () => {
+  it('should fail to create a comment without authorHash and authorNickname', async () => {
     // Arrange
     const commentData: CommentCreateDto = {
       content: 'Test content',
       postId: 1,
-      authorId: null,
+      authorHash: null,
+      authorNickname: null,
     };
 
     //Act & Assert
@@ -85,12 +87,13 @@ describe('CommentService', () => {
     );
   });
 
-  it('should faill to create a comment without content', async () => {
+  it('should fail to create a comment without content', async () => {
     // Arrange
     const commentData: CommentCreateDto = {
       content: null,
       postId: 1,
-      authorId: 1,
+      authorHash: 'Test hash',
+      authorNickname: 'Test nickname',
     };
 
     //Act & Assert
@@ -139,7 +142,8 @@ describe('CommentService', () => {
     });
     const filters: CommentsFilterDto = {
       postId: 1,
-      authorId: 1,
+      authorHash: 'Test Hash',
+      authorNickname: 'Test Nickname',
     };
     const pagination: CommentPaginationInput = {
       cursor: '1',
@@ -150,7 +154,8 @@ describe('CommentService', () => {
       edges: [
         {
           node: {
-            authorId: 1,
+            authorHash: 'Test Hash',
+            authorNickname: 'Test Nickname',
             content: 'Test Content',
             createdAt: new Date('2023-05-09T04:42:03.447Z'),
             disabledAt: null,

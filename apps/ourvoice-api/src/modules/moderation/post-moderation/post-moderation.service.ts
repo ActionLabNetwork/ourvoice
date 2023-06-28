@@ -8,9 +8,12 @@ import { plainToClass } from 'class-transformer';
 import {
   ModerationPostPaginationInput,
   ModerationPostsFilterInput,
-} from 'src/graphql';
-import { Post } from '@internal/prisma/client';
-import { numberToCursor } from 'src/utils/cursor-pagination';
+} from '../../../graphql';
+import {
+  Post,
+  PostVersion,
+} from '../../../../node_modules/@internal/prisma/client';
+import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
 import { PostCreateDto } from './dto/post-create.dto';
@@ -58,12 +61,36 @@ export class PostModerationService {
       }
     }
 
-    // Handle pagination
-    const { totalCount, moderationPosts } =
-      await this.moderationPostRepository.getModerationPosts(
-        filter,
-        pagination,
+    // Validate pagination
+    if (pagination?.before && pagination?.after) {
+      throw new BadRequestException(
+        "You cannot provide both 'before' and 'after' cursors. Please provide only one.",
       );
+    }
+
+    // Handle pagination
+    const limit = pagination?.limit ?? 10;
+
+    // We leave as undefined if we don't have a cursor to avoid doing a double fetch (backwards and forwards)
+    let hasNextPage = undefined;
+    let hasPreviousPage = undefined;
+
+    const { totalCount, moderationPosts } =
+      await this.moderationPostRepository.getModerationPosts(filter, {
+        ...pagination,
+        limit: limit + 1,
+      });
+
+    if (pagination?.before) {
+      hasPreviousPage = moderationPosts.length > limit;
+      if (hasPreviousPage) moderationPosts.pop();
+    }
+
+    // Forward pagination is the default if no cursor is provided
+    if (!pagination?.before || pagination?.after) {
+      hasNextPage = moderationPosts.length > limit;
+      if (hasNextPage) moderationPosts.pop();
+    }
 
     const edges = moderationPosts.map((post) => ({
       node: post,
@@ -73,13 +100,14 @@ export class PostModerationService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: moderationPosts.length === (pagination?.limit ?? 10),
+      hasNextPage,
+      hasPreviousPage,
     };
 
     return { totalCount, edges, pageInfo };
   }
 
-  async createPost(data: PostCreateDto) {
+  async createPost(data: PostCreateDto): Promise<Post> {
     const postCreateDto = plainToClass(PostCreateDto, data);
     const errors = await validate(postCreateDto);
 
@@ -90,7 +118,7 @@ export class PostModerationService {
     return await this.moderationPostRepository.createModerationPost(data);
   }
 
-  async getPostVersionById(id: number) {
+  async getPostVersionById(id: number): Promise<PostVersion> {
     const postVersion = await this.moderationPostRepository.getPostVersionById(
       id,
     );
@@ -107,7 +135,7 @@ export class PostModerationService {
     moderatorHash: string,
     moderatorNickname,
     reason: string,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -135,7 +163,7 @@ export class PostModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -165,7 +193,7 @@ export class PostModerationService {
     moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate data
@@ -174,6 +202,11 @@ export class PostModerationService {
 
     if (errors.length > 0) {
       throw new BadRequestException(errors);
+    }
+
+    // Validate reason
+    if (!reason) {
+      throw new BadRequestException('Reason is required');
     }
 
     // Validate post id
@@ -193,9 +226,20 @@ export class PostModerationService {
     );
   }
 
-  async renewPostModeration(id: number, moderatorHash: string) {
+  // Meant to be used in testing to quickly rollback to the previous db state
+  async rollbackModifiedModerationPost(postId: number): Promise<Post> {
+    return await this.moderationPostRepository.rollbackModifiedModerationPost(
+      postId,
+    );
+  }
+
+  async renewPostModeration(id: number, moderatorHash: string): Promise<Post> {
     const moderationToBeRenewed =
       await this.moderationPostRepository.getPostModerationById(id);
+
+    if (!moderationToBeRenewed) {
+      throw new NotFoundException('Moderation does not exist');
+    }
 
     if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
       throw new BadRequestException('Invalid moderator hash');

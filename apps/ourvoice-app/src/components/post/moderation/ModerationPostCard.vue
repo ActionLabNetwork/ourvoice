@@ -4,13 +4,8 @@
     class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
   >
     <!-- Self moderation indicator -->
-    <div class="absolute right-10" v-if="props.decisionIcon">
-      <div
-        :class="[
-          props.decisionIcon?.indicatorClass,
-          'flex gap-2 items-center rounded-full p-1 px-2'
-        ]"
-      >
+    <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
+      <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
@@ -58,10 +53,7 @@
     </div>
 
     <!-- Moderation decisions count -->
-    <div
-      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
-      class="flex gap-3 justify-around"
-    >
+    <div v-if="props.version?.moderations?.length && props.version.moderations.length > 0" class="flex gap-3 justify-around" data-cy="moderation-decisions-count">
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
@@ -69,26 +61,22 @@
 
     <!-- Moderate button -->
     <div class="mt-4" v-if="!preview && post.status === 'PENDING'">
-      <router-link
-        v-if="post && post.id"
-        :to="{ name: 'moderate-post', params: { id: post.id } }"
-        class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-      >
-        Moderate
-      </router-link>
+      <CustomButton :visibilityPredicate="() => !!(post && post.id)"
+        :to="{ name: 'moderate-post', params: { id: post.id } }" data-cy="moderate-button" label="Moderate" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { formatTimestampToReadableDate } from '@/utils'
-import AttachmentBadge from '@/components/common/AttachmentBadge.vue'
-import type { ModerationVersionDecision } from '@/types/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
-import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import { computed } from 'vue';
+import { formatTimestampToReadableDate } from '@/utils';
+import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
+import type { ModerationVersionDecision } from '@/types/moderation';
+import { getGroupsByProperty } from '@/utils/groupByProperty';
+import AuthorBadge from '@/components/common/AuthorBadge.vue';
+import CustomButton from '@/components/common/CustomButton.vue';
 
-import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts'
+import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
 import type { ModerationPost as CModerationPost } from '@/stores/moderation-comments'
 import type { PropType } from 'vue'
 
@@ -163,7 +151,7 @@ const moderationResultGroups = computed(() => {
   }
 
   if (groups) {
-    ;(Object.keys(groups) as Array<keyof typeof groups>).forEach(
+    ; (Object.keys(groups) as Array<keyof typeof groups>).forEach(
       (key: ModerationVersionDecision) => {
         groupsCount[key] = groups[key].length
       }

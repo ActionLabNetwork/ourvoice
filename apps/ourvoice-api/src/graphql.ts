@@ -145,7 +145,8 @@ export class ModerationCommentsFilterInput {
 }
 
 export class ModerationCommentPaginationInput {
-    cursor?: Nullable<string>;
+    before?: Nullable<string>;
+    after?: Nullable<string>;
     limit?: Nullable<number>;
 }
 
@@ -168,7 +169,8 @@ export class ModerationPostsFilterInput {
 }
 
 export class ModerationPostPaginationInput {
-    cursor?: Nullable<string>;
+    after?: Nullable<string>;
+    before?: Nullable<string>;
     limit?: Nullable<number>;
 }
 
@@ -272,6 +274,8 @@ export abstract class IMutation {
 
     abstract deleteCategory(id: number): Category | Promise<Category>;
 
+    abstract createComment(data: CommentCreateInput): Comment | Promise<Comment>;
+
     abstract updateComment(id: number, data: CommentUpdateInput): Comment | Promise<Comment>;
 
     abstract deleteComment(id: number): Comment | Promise<Comment>;
@@ -286,6 +290,8 @@ export abstract class IMutation {
 
     abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
+    abstract rollbackModifiedModerationComment(commentId: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+
     abstract renewCommentModeration(commentModerationId: number, moderatorHash: string): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
     abstract createModerationPost(data: ModerationPostCreateInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
@@ -296,9 +302,9 @@ export abstract class IMutation {
 
     abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+    abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract updatePost(id: number, data: PostUpdateInput): Post | Promise<Post>;
+    abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
 }
@@ -415,7 +421,6 @@ export class ModerationCommentVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
-    status: ModerationCommentStatus;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -447,6 +452,7 @@ export class ModerationCommentPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+    hasPreviousPage?: Nullable<boolean>;
 }
 
 export class ModerationPost {
@@ -469,7 +475,6 @@ export class ModerationPostVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
-    status: ModerationPostStatus;
     latest: boolean;
     timestamp: string;
     post: ModerationPost;
@@ -501,6 +506,7 @@ export class ModerationPostPageInfo {
     startCursor?: Nullable<string>;
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
+    hasPreviousPage?: Nullable<boolean>;
 }
 
 export class Post {

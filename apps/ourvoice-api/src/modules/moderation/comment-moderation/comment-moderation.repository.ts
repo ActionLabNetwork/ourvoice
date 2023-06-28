@@ -1,24 +1,31 @@
+import {
+  CommentIncludesVersion,
+  CommentIncludesVersionIncludesModerations,
+  ModerationIncludesVersion,
+} from './../../../types/moderation/comment-moderation';
+import { GetManyRepositoryResponse } from './../../../types/general';
 import { CommentModifyDto } from './dto/comment-modify.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   Comment,
   Prisma,
   CommentVersion,
   CommentModeration,
-} from '@internal/prisma/client';
-import { PrismaService } from 'src/database/premoderation/prisma.service';
+} from '../../../../node_modules/@internal/prisma/client';
+import { PrismaService } from '../../../database/premoderation/prisma.service';
 import {
   ModerationCommentPaginationInput,
   ModerationCommentsFilterInput,
 } from 'src/graphql';
-import { cursorToNumber } from 'src/utils/cursor-pagination';
+import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
+import { CommentService } from '../../../modules/comment/comment.service';
 
 function countCommentVersionModerationDecisions(
   version: CommentVersion & {
     moderations: CommentModeration[];
   },
-) {
+): Record<'ACCEPTED' | 'REJECTED', number> {
   const groups = version.moderations.reduce((acc, moderation) => {
     const group = moderation.decision;
     if (!acc[group]) {
@@ -41,9 +48,16 @@ function countCommentVersionModerationDecisions(
 
 @Injectable()
 export class CommentModerationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(CommentModerationRepository.name);
 
-  async getModerationCommentById(id: number): Promise<Comment> {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly commentService: CommentService,
+  ) {}
+
+  async getModerationCommentById(
+    id: number,
+  ): Promise<CommentIncludesVersionIncludesModerations> {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
@@ -77,103 +91,101 @@ export class CommentModerationRepository {
   async getModerationComments(
     filter?: ModerationCommentsFilterInput,
     pagination?: ModerationCommentPaginationInput,
-  ): Promise<{ totalCount: number; moderationComments: Comment[] }> {
+  ): Promise<
+    GetManyRepositoryResponse<'moderationComments', CommentIncludesVersion>
+  > {
     const { status } = filter ?? {};
 
     const where: Prisma.CommentWhereInput = {
-      versions: {
-        some: {
-          status: status ?? undefined,
-        },
-      },
+      status: status ?? undefined,
     };
 
     const totalCount = await this.prisma.comment.count({ where });
 
+    // Determine if going forwards or backwards
+    let cursorDirection = 1;
+    let cursor: Prisma.CommentWhereUniqueInput | undefined = undefined;
+    if (pagination?.before) {
+      cursorDirection = -1;
+      cursor = { id: cursorToNumber(pagination.before) };
+    } else if (pagination?.after) {
+      cursorDirection = 1;
+      cursor = { id: cursorToNumber(pagination.after) };
+    }
+
     const moderationComments = await this.prisma.comment.findMany({
       where,
       include: { versions: { orderBy: { version: 'desc' } } },
-      skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor) }
-        : undefined,
-      take: pagination?.limit ?? 10,
+      skip: cursor ? 1 : undefined,
+      cursor: cursor,
+      take: (pagination?.limit ?? 10) * cursorDirection,
+      orderBy: { id: 'asc' },
     });
 
     return { totalCount, moderationComments };
   }
 
-  async getCommentModerationById(id: number) {
+  async getCommentModerationById(
+    id: number,
+  ): Promise<ModerationIncludesVersion> {
     return await this.prisma.commentModeration.findUnique({
       where: { id },
       include: { commentVersion: true },
     });
   }
 
-  async createModerationComment(data: CommentCreateDto) {
+  async createModerationComment(
+    data: CommentCreateDto,
+  ): Promise<CommentIncludesVersion> {
     const { content, postId, parentId, authorHash, authorNickname } = data;
+    const connectData = { post: undefined, parent: undefined };
 
-    return await this.prisma.$transaction(async (tx) => {
-      const connectData = { post: null, parent: null };
-      let errorMessage;
-
-      // 1. Fetch post to be connected with the comment
-      if (postId) {
-        console.log('Creating comment for post');
-        const post = await tx.post.findFirst({
-          where: { postIdInMainDb: postId },
-        });
-        console.log({ post });
-        if (!post) {
-          errorMessage = 'Post for comment not found in the moderation DB';
-        } else {
-          connectData.post = { connect: { id: post.id } };
-        }
-      }
-
-      // 1a. If there is a parent comment, fetch it to be connected with the comment
-      if (parentId) {
-        console.log('Creating comment for comment');
-        const parentComment = await tx.comment.findFirst({
-          where: { commentIdInMainDb: parentId },
-        });
-        if (!parentComment) {
-          errorMessage =
-            'Parent comment for comment not found in the moderation DB';
-        } else {
-          connectData.parent = { connect: { id: parentComment.id } };
-        }
-      }
-
-      if (errorMessage) {
-        throw new Error(errorMessage);
-      }
-
-      const newComment = await tx.comment.create({
-        data: {
-          authorHash,
-          authorNickname,
-          ...connectData,
-        },
+    if (postId) {
+      const post = await this.prisma.post.findFirst({
+        where: { postIdInMainDb: postId },
       });
+      if (!post) {
+        throw new Error('Post for comment not found in the moderation DB');
+      } else {
+        connectData.post = { connect: { id: post.id } };
+      }
+    }
 
-      await tx.commentVersion.create({
-        data: {
-          content,
-          authorHash,
-          authorNickname,
-          status: 'PENDING',
-          comment: { connect: { id: newComment.id } },
-          latest: true,
-          version: 1,
-        },
+    if (parentId) {
+      const parentComment = await this.prisma.comment.findFirst({
+        where: { commentIdInMainDb: parentId },
       });
+      if (!parentComment) {
+        throw new Error(
+          'Parent comment for comment not found in the moderation DB',
+        );
+      } else {
+        connectData.parent = { connect: { id: parentComment.id } };
+      }
+    }
 
-      return newComment;
+    return await this.prisma.comment.create({
+      data: {
+        authorHash,
+        authorNickname,
+        ...connectData,
+        versions: {
+          create: {
+            content,
+            authorHash,
+            authorNickname,
+            latest: true,
+            version: 1,
+          },
+        },
+      },
+      include: { versions: { orderBy: { version: 'desc' } } },
     });
   }
 
-  async getCommentVersionById(id: number) {
+  async getCommentVersionById(
+    id: number,
+  ): Promise<CommentVersion & { moderations: CommentModeration[] }> {
     return await this.prisma.commentVersion.findUnique({
       where: { id },
       include: { moderations: { orderBy: { timestamp: 'desc' } } },
@@ -185,8 +197,35 @@ export class CommentModerationRepository {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<CommentIncludesVersionIncludesModerations> {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this comment version
+      const existingCommentModeration = await tx.commentModeration.findFirst({
+        where: {
+          moderatorHash,
+          commentVersionId: id,
+        },
+      });
+
+      if (existingCommentModeration) {
+        throw new Error('Moderator has already moderated this comment version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the comment
+      const commentVersion = await tx.commentVersion.findUnique({
+        where: { id },
+        include: { comment: true },
+      });
+
+      if (!commentVersion.latest) {
+        throw new Error('Comment version is not the latest');
+      }
+
+      // Check that comment has pending status
+      if (commentVersion.comment.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new comment moderation entry
       const newCommentModeration = await tx.commentModeration.create({
         data: {
@@ -198,15 +237,6 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the comment, or else we'll rollback
-      const commentVersion = await tx.commentVersion.findUnique({
-        where: { id },
-      });
-
-      if (!commentVersion.latest) {
-        throw new Error('Comment version is not the latest');
-      }
 
       return newCommentModeration;
     });
@@ -229,8 +259,35 @@ export class CommentModerationRepository {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<CommentIncludesVersionIncludesModerations> {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
+      // Check if moderator has already moderated this comment version
+      const existingCommentModeration = await tx.commentModeration.findFirst({
+        where: {
+          moderatorHash,
+          commentVersionId: id,
+        },
+      });
+
+      if (existingCommentModeration) {
+        throw new Error('Moderator has already moderated this comment version');
+      }
+
+      // Ensure that another moderator hasn't created a new version (modified) for the comment
+      const commentVersion = await tx.commentVersion.findUnique({
+        where: { id },
+        include: { comment: true },
+      });
+
+      if (!commentVersion.latest) {
+        throw new Error('Comment version is not the latest');
+      }
+
+      // Check that comment has pending status
+      if (commentVersion.comment.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new comment moderation entry
       const newCommentModeration = await tx.commentModeration.create({
         data: {
@@ -242,15 +299,6 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
-
-      // Ensure that another moderator hasn't created a new version (modified) for the comment, or else we'll rollback
-      const commentVersion = await tx.commentVersion.findUnique({
-        where: { id },
-      });
-
-      if (!commentVersion.latest) {
-        throw new Error('Comment version is not the latest');
-      }
 
       return newCommentModeration;
     });
@@ -274,7 +322,7 @@ export class CommentModerationRepository {
     moderatorNickname: string,
     reason: string,
     data: CommentModifyDto,
-  ) {
+  ): Promise<CommentIncludesVersionIncludesModerations> {
     const modifiedModerationComment = await this.prisma.$transaction(
       async (tx) => {
         // Fetch the current comment with the latest version
@@ -297,7 +345,6 @@ export class CommentModerationRepository {
             content: data.content ?? latestVersion.content,
             authorHash: moderatorHash,
             authorNickname: moderatorNickname,
-            status: 'PENDING',
             comment: { connect: { id: commentId } },
             reason,
             version: latestVersion.version + 1,
@@ -332,7 +379,46 @@ export class CommentModerationRepository {
     return modifiedModerationComment;
   }
 
-  async renewCommentModeration(id: number, moderatorHash: string) {
+  async rollbackModifiedModerationComment(
+    commentId: number,
+  ): Promise<CommentIncludesVersionIncludesModerations> {
+    return await this.prisma.$transaction(async (tx) => {
+      // Fetch the modified comment
+      const comment = await tx.comment.findUnique({
+        where: { id: commentId },
+        include: { versions: { orderBy: { version: 'desc' } } },
+      });
+
+      // Set 2nd latest version to latest version
+      await tx.commentVersion.update({
+        where: { id: comment.versions[1].id },
+        data: { latest: true },
+      });
+
+      // Delete the latest version
+      await tx.commentVersion.delete({
+        where: { id: comment.versions[0].id },
+      });
+
+      // Fetch the updated comment
+      const updatedComment = await tx.comment.findUnique({
+        where: { id: commentId },
+        include: {
+          versions: {
+            orderBy: { version: 'desc' },
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          },
+        },
+      });
+
+      return updatedComment;
+    });
+  }
+
+  async renewCommentModeration(
+    id: number,
+    moderatorHash: string,
+  ): Promise<CommentIncludesVersionIncludesModerations> {
     const renewedCommentId = await this.prisma.$transaction(async (tx) => {
       // Fetch the commentModeration and related comment
       const commentModeration = await tx.commentModeration.findUnique({
@@ -368,7 +454,7 @@ export class CommentModerationRepository {
     });
   }
 
-  async publishComment(commentId: number) {
+  async approveComment(commentId: number): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       // Check if the comment has enough number of moderations
       const comment = await tx.comment.findUnique({
@@ -399,9 +485,55 @@ export class CommentModerationRepository {
           where: { id: commentId },
           data: { status: 'APPROVED' },
         });
-        // TODO: Add as a new comment entry in the main db
+
+        this.logger.log(
+          'Finished approving comment with comment id',
+          commentId,
+        );
+
+        const newCommentInMainDb = await this.commentService.createComment({
+          content: comment.versions[0].content,
+          authorHash: comment.versions[0].authorHash,
+          authorNickname: comment.versions[0].authorNickname,
+        });
+
+        this.logger.log(
+          'Created new comment in main db with id',
+          newCommentInMainDb.id,
+        );
+
+        await tx.post.update({
+          where: { id: comment.id },
+          data: { postIdInMainDb: newCommentInMainDb.id },
+        });
+        this.logger.log(
+          'Updated post with id',
+          comment.id,
+          ' to have main db id',
+          newCommentInMainDb.id,
+        );
       }
-      console.log(decisionsCount);
     });
+  }
+
+  async approveOrRejectComments(): Promise<void> {
+    const pendingComments = await this.prisma.comment.findMany({
+      where: { status: 'PENDING' },
+      include: {
+        versions: { orderBy: { version: 'desc' }, take: 1 },
+      },
+    });
+
+    for (const comment of pendingComments) {
+      try {
+        await this.approveComment(comment.id);
+      } catch (error) {
+        this.logger.error(
+          `Error approving comment with comment id ${comment.id}. ${error.message}`,
+        );
+      }
+    }
+
+    // TODO: Reject comments (awaiting conditions/business logic)
   }
 }

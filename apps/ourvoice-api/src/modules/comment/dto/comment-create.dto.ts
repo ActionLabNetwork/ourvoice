@@ -19,8 +19,11 @@ export class CommentCreateDto {
   @IsOptional()
   published?: boolean;
 
-  @IsInt()
-  authorId: number;
+  @IsString()
+  authorHash: string;
+
+  @IsString()
+  authorNickname: string;
 
   @IsInt()
   @IsOptional()

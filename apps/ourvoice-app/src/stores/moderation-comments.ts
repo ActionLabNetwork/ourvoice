@@ -99,8 +99,6 @@ const findSelfModeration = async (version: CommentVersion, userId: string, deplo
 
 provideApolloClient(apolloClient)
 
-const COMMENTS_LIMIT = 50
-
 export const useModerationCommentsStore = defineStore('moderation-comments', {
   state: (): ModerationCommentsState => ({
     comments: [],
@@ -144,19 +142,20 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
 
         const { data } = await apolloClient.query({
           query: GET_MODERATION_COMMENTS_QUERY,
-          variables: this.pageInfo && loadMore ? { cursor: this.pageInfo.endCursor } : {}
+          variables: this.pageInfo && loadMore ? { after: this.pageInfo.endCursor } : {}
         })
 
         // If we're loading more comments, append them. Otherwise, replace the comments.
         const newComments = data.moderationComments.edges.map(
           (edge: Edge<ModerationComment>) => edge.node
         )
+
         this.comments = loadMore ? [...this.comments, ...newComments] : newComments
 
         this.totalCount = data.moderationComments.totalCount
         this.pageInfo = data.moderationComments.pageInfo
 
-        if (this.pageInfo?.hasNextPage && this.comments.length <= COMMENTS_LIMIT) {
+        if (this.pageInfo?.hasNextPage) {
           await this.loadMoreComments()
         }
       } catch (error) {
@@ -195,7 +194,6 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
       parentId: number | undefined
     }) {
       // Check for valid deployment and user session
-      const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
 
       // Check if we can access the session and generate a user hash for storing in the db
@@ -208,14 +206,16 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
       const authorNickname = userStore.nickname
       const requiredModerations = 1
 
+      console.log({ postId, parentId })
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
             data: {
               content,
-              postId,
-              parentId,
+              postId: postId,
+              parentId: parentId,
               authorHash,
               authorNickname,
               requiredModerations

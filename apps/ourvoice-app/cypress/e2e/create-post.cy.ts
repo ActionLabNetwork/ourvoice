@@ -14,10 +14,10 @@ describe('Create Post', () => {
 
   beforeEach(() => {
     // Create/Restore auth session
-    cy.session('login', cy.login)
+    cy.session('login', cy.loginAsModerator)
 
     // Intercept and stub API calls
-    cy.intercept({ method: 'POST', url: 'http://api.ourvoice.test/graphql' }, (req) => {
+    cy.intercept({ method: 'POST', url: `${Cypress.env('apiUrl')}/graphql` }, (req) => {
       // Query Aliases
       aliasQuery(req, 'GetPresignedUrls')
       aliasQuery(req, 'GetCategories')
@@ -43,13 +43,20 @@ describe('Create Post', () => {
     cy.intercept(
       {
         method: 'PUT',
-        url: 'http://localhost:4566/test-bucket/user123/1683163606594_0_dummy.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=test%2F20230504%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230504T012646Z&X-Amz-Expires=300&X-Amz-Signature=063eba130bfd93d1814ab194960d178dc0fbf8754c5a7c2266c09887c9ff3034&X-Amz-SignedHeaders=host&x-id=PutObject'
+        url: `${Cypress.env(
+          'localstackUrl'
+        )}/test-bucket/user123/1683163606594_0_dummy.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=test%2F20230504%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230504T012646Z&X-Amz-Expires=300&X-Amz-Signature=063eba130bfd93d1814ab194960d178dc0fbf8754c5a7c2266c09887c9ff3034&X-Amz-SignedHeaders=host&x-id=PutObject`
       },
       []
     ).as('putPresignedUrl')
 
     // Should be authenticated, now visit the create post page
     cy.visit('/post')
+  })
+
+  it('should contain navbar', () => {
+    // Assert
+    cy.get('[data-cy="ourvoice-navbar"]').should('exist')
   })
 
   describe('Form rendering', () => {
@@ -186,7 +193,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Categories (API Reliant)', () => {
+  describe('Categories (API reliant & stubbed)', () => {
     it('should display categories received from the API', () => {
       // Arrange
       const expectedCategories = [
@@ -211,7 +218,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Attachments (API reliant)', () => {
+  describe('Attachments (API reliant & stubbed)', () => {
     it('should display uploaded attachments', () => {
       // Arrange
       const pdfFile = `${fixtureRoot}/dummy.pdf`
@@ -246,7 +253,7 @@ describe('Create Post', () => {
     })
   })
 
-  describe('Form submission (API reliant)', () => {
+  describe('Form submission (API reliant & stubbed)', () => {
     it('should do mutation calls to upload attachments to s3 bucket and create post details on form submit', () => {
       // Arrange
       const pdfFile = `${fixtureRoot}/dummy.pdf`

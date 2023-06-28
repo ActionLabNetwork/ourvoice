@@ -1,15 +1,11 @@
-import {
-  PostPaginationInput,
-  PostsFilterInput,
-  PostUpdateInput,
-} from './../../graphql';
+import { PostPaginationInput, PostsFilterInput } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { PostService } from 'src/modules/post/post.service';
-import { s3 } from 'src/config/s3-config';
+import { PostService } from '../../modules/post/post.service';
+import { s3 } from '../../config/s3-config';
 import {
   generatePresignedDownloadUrl,
   generatePresignedUploadUrl,
-} from 'src/services/s3-service';
+} from '../../services/s3-service';
 
 @Resolver('Post')
 export class PostResolver {
@@ -86,13 +82,13 @@ export class PostResolver {
     return urls;
   }
 
-  @Mutation()
-  async updatePost(
-    @Args('id') id: number,
-    @Args('data') data: PostUpdateInput,
-  ) {
-    return this.postService.updatePost(id, data);
-  }
+  // @Mutation()
+  // async updatePost(
+  //   @Args('id') id: number,
+  //   @Args('data') data: PostUpdateInput,
+  // ) {
+  //   return this.postService.updatePost(id, data);
+  // }
 
   @Mutation()
   async deletePost(@Args('id') id: number) {
