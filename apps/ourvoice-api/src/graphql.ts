@@ -187,6 +187,24 @@ export class ModerationPostModifyInput {
     files?: Nullable<Nullable<string>[]>;
 }
 
+export class PollFilterInput {
+    question?: Nullable<string>;
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresBefore?: Nullable<DateTime>;
+    expiresAfter?: Nullable<DateTime>;
+    expiresExcludeNull?: Nullable<boolean>;
+    createdBefore?: Nullable<DateTime>;
+    createdAfter?: Nullable<DateTime>;
+}
+
+export class PollPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
 export class PollCreateInput {
     published: boolean;
     active: boolean;
@@ -307,7 +325,7 @@ export abstract class IQuery {
 
     abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
 
-    abstract pollsWithResult(moderatorHash: string): PollWithResult[] | Promise<PollWithResult[]>;
+    abstract pollsWithResult(moderatorHash: string, filter?: Nullable<PollFilterInput>, pagination?: Nullable<PollPaginationInput>): Nullable<PollWithResultConnection> | Promise<Nullable<PollWithResultConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
@@ -591,6 +609,12 @@ export class Poll {
     options: PollOption[];
 }
 
+export class PollPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
+}
+
 export class PollOption {
     id: number;
     option: string;
@@ -606,6 +630,17 @@ export class PollWithResult {
     createdAt: DateTime;
     expiresAt?: Nullable<DateTime>;
     options: PollOptionWithResult[];
+}
+
+export class PollWithResultEdge {
+    node: PollWithResult;
+    cursor: string;
+}
+
+export class PollWithResultConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: PollPageInfo;
+    edges: PollWithResultEdge[];
 }
 
 export class PollOptionWithResult {

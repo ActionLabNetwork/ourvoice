@@ -194,15 +194,32 @@ describe('PollService', () => {
     }
 
     const results = await pollService.getPollsWithResult('');
-    expect(results.length).toBe(1);
-    const result = results[0];
-    expect(result.options.sort()).toEqual([
+    expect(results.edges.length).toBe(1);
+    const result = results.edges[0];
+    expect(result.node.options.sort()).toEqual([
       // values depend on testVotes
       { ...createdPoll.options[0], numVotes: 2 },
       { ...createdPoll.options[1], numVotes: 2 },
       { ...createdPoll.options[2], numVotes: 1 },
     ]);
   });
+
+  it.each`
+    poll                                          | filter                                                              | shouldFind | description
+    ${{ ...testPoll, expiresAt: testDateExpiry }} | ${undefined}                                                        | ${true}    | ${'no filter on post with expiry'}
+    ${{ ...testPoll, expiresAt: null }}           | ${undefined}                                                        | ${true}    | ${'no filter on post with no expiry'}
+    ${{ ...testPoll, expiresAt: testDateExpiry }} | ${{ expiresExcludeNull: true }}                                     | ${true}    | ${'disallow null with expiry'}
+    ${{ ...testPoll, expiresAt: null }}           | ${{ expiresExcludeNull: true }}                                     | ${false}   | ${'disallow null with no expiry'}
+    ${{ ...testPoll, expiresAt: testDateExpiry }} | ${{ expiresAfter: testDateBeforeExpiry }}                           | ${true}    | ${'disallow null with range with expiry'}
+    ${{ ...testPoll, expiresAt: testDateExpiry }} | ${{ expiresAfter: testDateBeforeExpiry, expiresExcludeNull: true }} | ${true}    | ${'disallow null with range with no expiry'}
+  `(
+    'should find = ($shouldFind) with $description',
+    async ({ poll, filter, shouldFind }) => {
+      const createdPoll = await pollService.createPoll(poll);
+      const pollConnection = await pollService.getPollsWithResult('', filter);
+      expect(pollConnection.totalCount).toEqual(shouldFind ? 1 : 0);
+    },
+  );
 
   it('should not let the user to vote twice', async () => {
     const createdPoll = await pollService.createPoll(testPoll);

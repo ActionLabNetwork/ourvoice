@@ -1,6 +1,10 @@
 type Query {
   availablePolls(userHash: String!): [Poll!]!
-  pollsWithResult(moderatorHash: String!): [PollWithResult!]!
+  pollsWithResult(
+    moderatorHash: String!
+    filter: PollFilterInput
+    pagination: PollPaginationInput
+  ): PollWithResultConnection
 }
 
 type Mutation {
@@ -21,6 +25,30 @@ type Poll {
   options: [PollOption!]!
 }
 
+input PollFilterInput {
+  question: String
+  published: Boolean
+  active: Boolean
+  postLink: String
+  weight: Int
+  expiresBefore: DateTime
+  expiresAfter: DateTime
+  expiresExcludeNull: Boolean
+  createdBefore: DateTime
+  createdAfter: DateTime
+}
+
+type PollPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}
+
+input PollPaginationInput {
+  cursor: String
+  limit: Int
+}
+
 type PollOption {
   id: Int!
   option: String!
@@ -36,6 +64,17 @@ type PollWithResult {
   createdAt: DateTime!
   expiresAt: DateTime
   options: [PollOptionWithResult!]!
+}
+
+type PollWithResultEdge {
+  node: PollWithResult!
+  cursor: String!
+}
+
+type PollWithResultConnection {
+  totalCount: Int
+  pageInfo: PollPageInfo!
+  edges: [PollWithResultEdge!]!
 }
 
 type PollOptionWithResult {
