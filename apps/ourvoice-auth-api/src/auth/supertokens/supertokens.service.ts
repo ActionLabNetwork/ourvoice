@@ -17,7 +17,7 @@ import UserMetadata from 'supertokens-node/recipe/usermetadata';
 import UserRoles from 'supertokens-node/recipe/userroles';
 
 import { addRoleToUser } from '../roles.service';
-import { isEmailAllowed } from '../metadata.service';
+import { isEmailAllowed, isModeratorAllowed } from '../metadata.service';
 
 @Injectable()
 export class SupertokensService {
@@ -79,7 +79,7 @@ export class SupertokensService {
               validate: async (email: string) => {
                 // TODO: this should eventually come from admin database
                 if (
-                  !(await isEmailAllowed(email)) &&
+                  !(await isModeratorAllowed(email)) &&
                   // check if this is app super admin who is login in
                   config.adminEmail !== email
                 ) {
@@ -273,6 +273,23 @@ export class SupertokensService {
           apis: (originalImplementation) => {
             return {
               ...originalImplementation,
+              createCodePOST: async function (input) {
+                if ('email' in input) {
+                  const existingUser = await Passwordless.getUserByEmail({
+                    email: input.email,
+                  });
+                  if (existingUser === undefined) {
+                    // this is sign up attempt
+                    if (!(await isEmailAllowed(input.email))) {
+                      return {
+                        status: 'GENERAL_ERROR',
+                        message: 'Sign up disabled. Please contact the admin.',
+                      };
+                    }
+                  }
+                }
+                return await originalImplementation.createCodePOST!(input);
+              },
               consumeCodePOST: async (input) => {
                 if (originalImplementation.consumeCodePOST === undefined) {
                   throw Error('Should never come here');

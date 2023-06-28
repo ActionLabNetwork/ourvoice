@@ -16,25 +16,25 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
-    "consola": "3.1.0",
-    "nuxt": "^3.5.3",
+    "consola": "3.2.1",
+    "nuxt": "^3.6.1",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
     "vue": "^3.3.4"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.15",
+    "@apollo/client": "^3.7.16",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@headlessui/vue": "^1.7.14",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
-    "@vue/apollo-composable": "4.0.0-beta.5",
+    "@vue/apollo-composable": "4.0.0-beta.7",
     "@vuelidate/core": "^2.0.2",
     "@vuelidate/validators": "^2.0.2",
-    "@vueuse/nuxt": "^10.1.2",
-    "@vueuse/core": "^10.1.2",
-    "graphql": "^16.6.0",
+    "@vueuse/nuxt": "^10.2.0",
+    "@vueuse/core": "^10.2.0",
+    "graphql": "^16.7.1",
     "graphql-tag": "^2.12.6",
     "vue-recaptcha-v3": "^2.0.1"
   }

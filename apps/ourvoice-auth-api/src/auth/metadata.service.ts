@@ -24,24 +24,42 @@ export async function clearEmailAllowList() {
 export async function isEmailAllowed(email: string) {
   const existingData = await UserMetadata.getUserMetadata('emailAllowList');
   const allowList: string[] = existingData.metadata.allowList || [];
-  return allowList.includes(email);
+  // NOTE: if allowlist is empty then this feature is disabled
+  return allowList.includes(email) || allowList.length === 0;
 }
-
-export async function addPhoneNumberToAllowlist(phoneNumber: string) {
+// NOTE: using phoneNumberAllowList as a storage for storing moderators list in supertokens
+// in the future this could be moved to admin/deployment database or if supertokens extends
+// functionality to allow custom storages of metadata not linked to user
+export async function addModeratorsToAllowlist(moderators: string[]) {
   const existingData = await UserMetadata.getUserMetadata(
     'phoneNumberAllowList',
   );
   let allowList: string[] = existingData.metadata.allowList || [];
-  allowList = [...allowList, phoneNumber];
+  allowList = [...allowList, ...moderators];
   await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
     allowList,
   });
 }
 
-export async function isPhoneNumberAllowed(phoneNumber: string) {
+export async function addModeratorToAllowlist(moderator: string) {
+  const existingData = await UserMetadata.getUserMetadata(
+    'phoneNumberAllowList',
+  );
+  let allowList: string[] = existingData.metadata.allowList || [];
+  allowList = [...allowList, moderator];
+  await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
+    allowList,
+  });
+}
+
+export async function isModeratorAllowed(moderator: string) {
   const existingData = await UserMetadata.getUserMetadata(
     'phoneNumberAllowList',
   );
   const allowList: string[] = existingData.metadata.allowList || [];
-  return allowList.includes(phoneNumber);
+  return allowList.includes(moderator);
+}
+
+export async function clearModeratorAllowList() {
+  await UserMetadata.clearUserMetadata('phoneNumberAllowList');
 }

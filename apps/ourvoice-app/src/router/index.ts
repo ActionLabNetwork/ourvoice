@@ -14,7 +14,8 @@ import {
   getCurrentDeploymentDomain,
   checkForSession,
   checkDeployment,
-  redirectTo
+  redirectTo,
+  getSessionPayload
 } from '../services/session.service'
 
 // import YamlContent from '../../../../config/config.yml'
@@ -119,7 +120,6 @@ router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   // check for user session
   const isSession = await checkForSession()
-  await userStore.isLoggedIn
 
   if (isSession) {
     // if current deployment matches with user then init user store

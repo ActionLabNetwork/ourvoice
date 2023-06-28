@@ -115,11 +115,13 @@ Content such as deployment specific texts are loaded from `config/content` folde
 
 User and role management (email and password sign up only):
 
-To add deployment administrator and moderator users you need to add them to the `allowedEmails` in `config/config.yml` (run `pnpm postinstall` after modification to propagate to application configurations). This will restrict email/password sign up to those specified emails, all other emails will raise an error in the backend when signing up.
+To add deployment administrator and moderator users you need to add them to the `moderators` in the root `config/config.yml` file (run `pnpm postinstall` after modification to propagate to application configurations). This will restrict email/password sign up to those specified emails, all other emails will raise an error in the backend when signing up.
 
-Once a user with an email (`allowedEmails`) has signed up you can use the super admin user (created on startup with credentials in `.env`) to allocate them admin role via the OurVoice Admin application. Once a user has a role `admin` they can log into the OurVoice Admin application to modify rights for their deployment only. See list roles and right below (can be modified based on need).
+Once a user with an email (in `moderators`) has signed up you can use the super admin user (created on startup with credentials in `.env`) to allocate them admin role via the OurVoice Admin application. Once a user has a role `admin` they can log into the OurVoice Admin application to modify rights for their deployment only. See list roles and right below (can be modified based on need).
 
-> NOTE: currently session is not revoked/refreshed/claims updated on frontend token when role is assigned/removed from user. This functionality needs to be implemented see more in docs - https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload and https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload#with-session-verification-online-mode
+To add email that can use the passwordless sign in/up you need to add them to `allowedEmails` in the root `config/config.yml` file (run `pnpm postinstall` after modification to propagate to application configurations). If no emails are added this feature is disabled. To restrict the domain for emails that can sign up specify the `organisation` in the root `config/config.yml` file (run `pnpm postinstall` after modification to propagate to application configurations).
+
+> NOTE: Session token is updated using refresh call to API endpoint that checks supertoken database for updates using [Token blacklisting](https://supertokens.com/docs/passwordless/common-customizations/sessions/access-token-blacklisting). This is not a most elegant solution and other options (e.g. keeping a cache of tokens that need to be refreshed) should be used in the future. See more in docs - https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload and https://supertokens.com/docs/session/common-customizations/sessions/claims/access-token-payload#with-session-verification-online-mode
 
 - name: `user`
 - permissions:
