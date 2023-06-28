@@ -49,7 +49,7 @@ class PostBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<Post> {
     return this.post;
   }
 }
@@ -145,7 +145,7 @@ class PostVersionBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<PostVersion> {
     return this.version;
   }
 }
@@ -199,7 +199,7 @@ class PostModerationBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<PostModeration> {
     return this.moderation;
   }
 }

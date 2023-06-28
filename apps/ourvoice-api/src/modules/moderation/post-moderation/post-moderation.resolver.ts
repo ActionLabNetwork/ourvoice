@@ -1,3 +1,4 @@
+import { ModerationPostsResponse } from './../../../types/moderation/post-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   ModerationPostsFilterInput,
@@ -9,7 +10,6 @@ import { PostModerationService } from './post-moderation.service';
 import {
   Post,
   PostVersion,
-  PostModeration,
 } from '../../../../node_modules/@internal/prisma/client';
 
 @Resolver('ModerationPost')
@@ -17,13 +17,7 @@ export class PostModerationResolver {
   constructor(private postModerationService: PostModerationService) {}
 
   @Query()
-  async moderationPost(@Args('id') id: number): Promise<
-    Post & {
-      versions: (PostVersion & {
-        moderations: PostModeration[];
-      })[];
-    }
-  > {
+  async moderationPost(@Args('id') id: number): Promise<Post> {
     return await this.postModerationService.getModerationPostById(id);
   }
 
@@ -32,7 +26,7 @@ export class PostModerationResolver {
     @Args('filter', { nullable: true }) filter?: ModerationPostsFilterInput,
     @Args('pagination', { nullable: true })
     pagination?: ModerationPostPaginationInput,
-  ) {
+  ): Promise<ModerationPostsResponse> {
     const { totalCount, edges, pageInfo } =
       await this.postModerationService.getModerationPosts(filter, pagination);
 
@@ -40,12 +34,14 @@ export class PostModerationResolver {
   }
 
   @Query()
-  async postVersion(@Args('id') id: number) {
+  async postVersion(@Args('id') id: number): Promise<PostVersion> {
     return await this.postModerationService.getPostVersionById(id);
   }
 
   @Mutation()
-  async createModerationPost(@Args('data') data: ModerationPostCreateInput) {
+  async createModerationPost(
+    @Args('data') data: ModerationPostCreateInput,
+  ): Promise<Post> {
     return await this.postModerationService.createPost(data);
   }
 
@@ -55,7 +51,7 @@ export class PostModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
-  ) {
+  ): Promise<Post> {
     return await this.postModerationService.approvePostVersion(
       id,
       moderatorHash,
@@ -70,7 +66,7 @@ export class PostModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
-  ) {
+  ): Promise<Post> {
     return await this.postModerationService.rejectPostVersion(
       id,
       moderatorHash,
@@ -86,7 +82,7 @@ export class PostModerationResolver {
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationPostModifyInput,
-  ) {
+  ): Promise<Post> {
     return await this.postModerationService.modifyModerationPost(
       id,
       moderatorHash,
@@ -97,7 +93,9 @@ export class PostModerationResolver {
   }
 
   @Mutation()
-  async rollbackModifiedModerationPost(@Args('postId') postId: number) {
+  async rollbackModifiedModerationPost(
+    @Args('postId') postId: number,
+  ): Promise<Post> {
     return await this.postModerationService.rollbackModifiedModerationPost(
       postId,
     );
@@ -107,7 +105,7 @@ export class PostModerationResolver {
   async renewPostModeration(
     @Args('postModerationId') id: number,
     @Args('moderatorHash') moderatorHash: string,
-  ) {
+  ): Promise<Post> {
     return await this.postModerationService.renewPostModeration(
       id,
       moderatorHash,

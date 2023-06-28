@@ -1,7 +1,7 @@
+import { GetManyRepositoryResponse } from './../../../types/general';
 import { PostModifyDto } from './dto/post-modify.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  Post,
   Prisma,
   PostVersion,
   PostModeration,
@@ -14,6 +14,11 @@ import {
 import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostService } from '../../../modules/post/post.service';
+import {
+  PostIncludesVersionIncludesModerations,
+  PostIncludesVersion,
+  ModerationIncludesVersion,
+} from '../../../types/moderation/post-moderation';
 
 function countPostVersionModerationDecisions(
   version: PostVersion & {
@@ -49,7 +54,9 @@ export class PostModerationRepository {
     private readonly postService: PostService,
   ) {}
 
-  async getModerationPostById(id: number) {
+  async getModerationPostById(
+    id: number,
+  ): Promise<PostIncludesVersionIncludesModerations> {
     return await this.prisma.post.findUnique({
       where: { id },
       include: {
@@ -64,7 +71,9 @@ export class PostModerationRepository {
   async getModerationPosts(
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
-  ): Promise<{ totalCount: number; moderationPosts: Post[] }> {
+  ): Promise<
+    GetManyRepositoryResponse<'moderationPosts', PostIncludesVersion>
+  > {
     const { status } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {
@@ -96,14 +105,16 @@ export class PostModerationRepository {
     return { totalCount, moderationPosts };
   }
 
-  async getPostModerationById(id: number) {
+  async getPostModerationById(id: number): Promise<ModerationIncludesVersion> {
     return await this.prisma.postModeration.findUnique({
       where: { id },
       include: { postVersion: true },
     });
   }
 
-  async createModerationPost(data: PostCreateDto) {
+  async createModerationPost(
+    data: PostCreateDto,
+  ): Promise<PostIncludesVersion> {
     const { title, content, categoryIds, files, authorHash, authorNickname } =
       data;
     const newPost = await this.prisma.post.create({
@@ -126,24 +137,12 @@ export class PostModerationRepository {
       include: { versions: true },
     });
 
-    // await this.prisma.postVersion.create({
-    //   data: {
-    //     title,
-    //     content,
-    //     categoryIds,
-    //     files,
-    //     authorHash,
-    //     authorNickname,
-    //     post: { connect: { id: newPost.id } },
-    //     latest: true,
-    //     version: 1,
-    //   },
-    // });
-
     return newPost;
   }
 
-  async getPostVersionById(id: number) {
+  async getPostVersionById(
+    id: number,
+  ): Promise<PostVersion & { moderations: PostModeration[] }> {
     return await this.prisma.postVersion.findUnique({
       where: { id },
       include: { moderations: { orderBy: { timestamp: 'desc' } } },
@@ -155,7 +154,7 @@ export class PostModerationRepository {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<PostIncludesVersionIncludesModerations> {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
       // Check if moderator has already moderated this post version
       const existingPostModeration = await tx.postModeration.findFirst({
@@ -209,7 +208,7 @@ export class PostModerationRepository {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<PostIncludesVersionIncludesModerations> {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
       // Check if moderator has already moderated this post version
       const existingPostModeration = await tx.postModeration.findFirst({
@@ -258,7 +257,7 @@ export class PostModerationRepository {
     moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
-  ) {
+  ): Promise<PostIncludesVersionIncludesModerations> {
     await this.prisma.$transaction(async (tx) => {
       // Fetch the current post with the latest version
       const {
@@ -294,7 +293,9 @@ export class PostModerationRepository {
     return await this.findPostWithVersionsAndModerations(postId);
   }
 
-  async rollbackModifiedModerationPost(postId: number) {
+  async rollbackModifiedModerationPost(
+    postId: number,
+  ): Promise<PostIncludesVersionIncludesModerations> {
     await this.prisma.$transaction(async (tx) => {
       // Fetch the modified post
       const post = await tx.post.findUnique({
@@ -318,7 +319,10 @@ export class PostModerationRepository {
     return this.findPostWithVersionsAndModerations(postId);
   }
 
-  async renewPostModeration(id: number, moderatorHash: string) {
+  async renewPostModeration(
+    id: number,
+    moderatorHash: string,
+  ): Promise<PostIncludesVersionIncludesModerations> {
     const renewedPostId = await this.prisma.$transaction(async (tx) => {
       // Fetch the postModeration and related post
       const postModeration = await tx.postModeration.findUnique({
@@ -346,7 +350,7 @@ export class PostModerationRepository {
     return await this.findPostWithVersionsAndModerations(renewedPostId);
   }
 
-  async approvePost(postId: number) {
+  async approvePost(postId: number): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       // Check if the post has enough number of moderations
       const post = await tx.post.findUnique({
@@ -407,7 +411,7 @@ export class PostModerationRepository {
     });
   }
 
-  async approveOrRejectPosts() {
+  async approveOrRejectPosts(): Promise<void> {
     const pendingPosts = await this.prisma.post.findMany({
       where: { status: 'PENDING' },
       include: {
@@ -428,7 +432,9 @@ export class PostModerationRepository {
     // TODO: Reject posts (awaiting conditions/business logic)
   }
 
-  async findPostWithVersionsAndModerations(postId: number) {
+  async findPostWithVersionsAndModerations(
+    postId: number,
+  ): Promise<PostIncludesVersionIncludesModerations> {
     return await this.prisma.post.findUnique({
       where: { id: postId },
       include: {

@@ -1,3 +1,4 @@
+import { ModerationCommentsResponse } from '../../../types/moderation/comment-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   ModerationCommentCreateInput,
@@ -26,7 +27,7 @@ export class CommentModerationResolver {
     @Args('filter', { nullable: true }) filter?: ModerationCommentsFilterInput,
     @Args('pagination', { nullable: true })
     pagination?: ModerationCommentPaginationInput,
-  ) {
+  ): Promise<ModerationCommentsResponse> {
     const { totalCount, edges, pageInfo } =
       await this.commentModerationService.getModerationComments(
         filter,
@@ -37,18 +38,14 @@ export class CommentModerationResolver {
   }
 
   @Query()
-  async commentVersion(@Args('id') id: number): Promise<
-    CommentVersion & {
-      moderations: CommentModeration[];
-    }
-  > {
+  async commentVersion(@Args('id') id: number): Promise<CommentVersion> {
     return await this.commentModerationService.getCommentVersionById(id);
   }
 
   @Mutation()
   async createModerationComment(
     @Args('data') data: ModerationCommentCreateInput,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.createComment(data);
   }
 
@@ -58,7 +55,7 @@ export class CommentModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.approveCommentVersion(
       id,
       moderatorHash,
@@ -73,7 +70,7 @@ export class CommentModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.rejectCommentVersion(
       id,
       moderatorHash,
@@ -89,7 +86,7 @@ export class CommentModerationResolver {
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationCommentModifyInput,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.modifyModerationComment(
       id,
       moderatorHash,
@@ -102,7 +99,7 @@ export class CommentModerationResolver {
   @Mutation()
   async rollbackModifiedModerationComment(
     @Args('commentId') commentId: number,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.rollbackModifiedModerationComment(
       commentId,
     );
@@ -112,7 +109,7 @@ export class CommentModerationResolver {
   async renewCommentModeration(
     @Args('commentModerationId') id: number,
     @Args('moderatorHash') moderatorHash: string,
-  ) {
+  ): Promise<Comment> {
     return await this.commentModerationService.renewCommentModeration(
       id,
       moderatorHash,

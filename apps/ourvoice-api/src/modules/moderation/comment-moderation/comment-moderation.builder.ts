@@ -86,7 +86,7 @@ class CommentBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<Comment> {
     return this.comment;
   }
 }
@@ -160,7 +160,7 @@ class CommentVersionBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<CommentVersion> {
     return this.version;
   }
 }
@@ -214,7 +214,7 @@ class CommentModerationBuilder {
     return this;
   }
 
-  build() {
+  build(): Partial<CommentModeration> {
     return this.moderation;
   }
 }

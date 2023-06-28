@@ -1,3 +1,4 @@
+import { ModerationCommentsResponse } from '../../../types/moderation/comment-moderation';
 import {
   Injectable,
   BadRequestException,
@@ -40,15 +41,7 @@ export class CommentModerationService {
   async getModerationComments(
     filter?: ModerationCommentsFilterInput,
     pagination?: ModerationCommentPaginationInput,
-  ): Promise<{
-    totalCount: number;
-    edges: { node: Comment; cursor: string }[];
-    pageInfo: {
-      startCursor: string;
-      endCursor: string;
-      hasNextPage: boolean;
-    };
-  }> {
+  ): Promise<ModerationCommentsResponse> {
     // Validate filters
     if (filter) {
       const moderationCommentsFilterDto = plainToClass(
@@ -108,11 +101,7 @@ export class CommentModerationService {
     return { totalCount, edges, pageInfo };
   }
 
-  async createComment(data: CommentCreateDto): Promise<
-    Comment & {
-      versions: CommentVersion[];
-    }
-  > {
+  async createComment(data: CommentCreateDto): Promise<Comment> {
     const commentCreateDto = plainToClass(CommentCreateDto, data);
     const errors = await validate(commentCreateDto);
 
@@ -123,11 +112,7 @@ export class CommentModerationService {
     return await this.moderationCommentRepository.createModerationComment(data);
   }
 
-  async getCommentVersionById(id: number): Promise<
-    CommentVersion & {
-      moderations: CommentModeration[];
-    }
-  > {
+  async getCommentVersionById(id: number): Promise<CommentVersion> {
     const commentVersion =
       await this.moderationCommentRepository.getCommentVersionById(id);
 
@@ -143,7 +128,7 @@ export class CommentModerationService {
     moderatorHash: string,
     moderatorNickname,
     reason: string,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -171,7 +156,7 @@ export class CommentModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -201,7 +186,7 @@ export class CommentModerationService {
     moderatorNickname: string,
     reason: string,
     data: CommentModifyDto,
-  ) {
+  ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate data
@@ -235,13 +220,16 @@ export class CommentModerationService {
   }
 
   // Meant to be used in testing to quickly rollback to the previous db state
-  async rollbackModifiedModerationComment(commentId: number) {
+  async rollbackModifiedModerationComment(commentId: number): Promise<Comment> {
     return await this.moderationCommentRepository.rollbackModifiedModerationComment(
       commentId,
     );
   }
 
-  async renewCommentModeration(id: number, moderatorHash: string) {
+  async renewCommentModeration(
+    id: number,
+    moderatorHash: string,
+  ): Promise<Comment> {
     const moderationToBeRenewed =
       await this.moderationCommentRepository.getCommentModerationById(id);
 

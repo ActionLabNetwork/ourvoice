@@ -1,3 +1,4 @@
+import { CommentIncludesVersion } from './../../../types/moderation/comment-moderation';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { ModerationCommentStatus } from '../../../graphql';
 import {
@@ -183,7 +184,7 @@ describe('CommentModerationService', () => {
     // Arrange
     commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
       totalCount: 1,
-      moderationComments: [dummyComments[0]] as Comment[],
+      moderationComments: [dummyComments[0]] as CommentIncludesVersion[],
     });
 
     const filterData = { status: ModerationCommentStatus.PENDING };
@@ -241,7 +242,7 @@ describe('CommentModerationService', () => {
         dummyComment,
         new CommentBuilder(dummyComment).withId(2).build(),
         new CommentBuilder(dummyComment).withId(3).build(),
-      ] as Comment[],
+      ] as CommentIncludesVersion[],
     });
 
     const paginationData = { after: numberToCursor(1), limit: 2 };
@@ -292,7 +293,7 @@ describe('CommentModerationService', () => {
     // Arrange
     commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
       totalCount: 6,
-      moderationComments: [] as Comment[],
+      moderationComments: [] as CommentIncludesVersion[],
     });
 
     const paginationData = { after: numberToCursor(1), limit: 2 };
@@ -324,7 +325,7 @@ describe('CommentModerationService', () => {
         dummyComment,
         new CommentBuilder(dummyComment).withId(2).build(),
         new CommentBuilder(dummyComment).withId(3).build(),
-      ] as Comment[],
+      ] as CommentIncludesVersion[],
     });
 
     const paginationData = { before: numberToCursor(3), limit: 2 };
@@ -375,7 +376,7 @@ describe('CommentModerationService', () => {
     // Arrange
     commentModerationRepositoryMock.getModerationComments.mockResolvedValue({
       totalCount: 6,
-      moderationComments: [] as Comment[],
+      moderationComments: [] as CommentIncludesVersion[],
     });
 
     const paginationData = { before: numberToCursor(1), limit: 2 };

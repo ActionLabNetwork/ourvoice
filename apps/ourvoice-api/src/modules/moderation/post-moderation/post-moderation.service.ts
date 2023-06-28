@@ -12,7 +12,6 @@ import {
 import {
   Post,
   PostVersion,
-  PostModeration,
 } from '../../../../node_modules/@internal/prisma/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
@@ -26,13 +25,7 @@ export class PostModerationService {
     private readonly moderationPostRepository: PostModerationRepository,
   ) {}
 
-  async getModerationPostById(id: number): Promise<
-    Post & {
-      versions: (PostVersion & {
-        moderations: PostModeration[];
-      })[];
-    }
-  > {
+  async getModerationPostById(id: number): Promise<Post> {
     const moderationPost =
       await this.moderationPostRepository.getModerationPostById(id);
 
@@ -114,7 +107,7 @@ export class PostModerationService {
     return { totalCount, edges, pageInfo };
   }
 
-  async createPost(data: PostCreateDto) {
+  async createPost(data: PostCreateDto): Promise<Post> {
     const postCreateDto = plainToClass(PostCreateDto, data);
     const errors = await validate(postCreateDto);
 
@@ -125,7 +118,7 @@ export class PostModerationService {
     return await this.moderationPostRepository.createModerationPost(data);
   }
 
-  async getPostVersionById(id: number) {
+  async getPostVersionById(id: number): Promise<PostVersion> {
     const postVersion = await this.moderationPostRepository.getPostVersionById(
       id,
     );
@@ -142,7 +135,7 @@ export class PostModerationService {
     moderatorHash: string,
     moderatorNickname,
     reason: string,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -170,7 +163,7 @@ export class PostModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate id exists
@@ -200,7 +193,7 @@ export class PostModerationService {
     moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
-  ) {
+  ): Promise<Post> {
     // TODO: Validate moderator hash to see if they have permission/role
 
     // Validate data
@@ -234,13 +227,13 @@ export class PostModerationService {
   }
 
   // Meant to be used in testing to quickly rollback to the previous db state
-  async rollbackModifiedModerationPost(postId: number) {
+  async rollbackModifiedModerationPost(postId: number): Promise<Post> {
     return await this.moderationPostRepository.rollbackModifiedModerationPost(
       postId,
     );
   }
 
-  async renewPostModeration(id: number, moderatorHash: string) {
+  async renewPostModeration(id: number, moderatorHash: string): Promise<Post> {
     const moderationToBeRenewed =
       await this.moderationPostRepository.getPostModerationById(id);
 
