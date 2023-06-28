@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { PollWithResult, VoteInput } from '../../graphql';
+import {
+  PollFilterInput,
+  PollPaginationInput,
+  PollWithResultConnection,
+  VoteInput,
+} from '../../graphql';
+import { numberToCursor } from '../../utils/cursor-pagination';
 import { PollCreateDto } from './dto/poll-create.dto';
 import { PollUpdateDto } from './dto/poll-update.dto';
 import { PollModerationRepository } from './poll-moderation.repository';
@@ -19,7 +25,7 @@ export class PollService {
   ) {}
 
   async getAvailablePolls(userHash: string) {
-    const allActivePolls = await this.pollRepository.getPolls({
+    const { polls: allActivePolls } = await this.pollRepository.getPolls({
       expiresAfter: new Date(),
       active: true,
     });
@@ -32,8 +38,15 @@ export class PollService {
     return allActivePolls.filter((poll) => !pollsUserVotedForIds.has(poll.id));
   }
 
-  async getPollsWithResult(moderatorHash: string): Promise<PollWithResult[]> {
-    const polls = await this.pollRepository.getPolls({});
+  async getPollsWithResult(
+    moderatorHash: string,
+    filter?: PollFilterInput,
+    pagination?: PollPaginationInput,
+  ): Promise<PollWithResultConnection> {
+    const { polls, totalCount } = await this.pollRepository.getPolls(
+      filter,
+      pagination,
+    );
     const pollsWithResult = polls.map(async (poll) => {
       const pollVotes = await this.pollModerationRepository.getPollVotes(
         poll.id,
@@ -52,7 +65,23 @@ export class PollService {
         })),
       };
     });
-    return await Promise.all(pollsWithResult);
+
+    const edges = (await Promise.all(pollsWithResult)).map(
+      (pollWithResult) => ({
+        node: pollWithResult,
+        cursor: numberToCursor(pollWithResult.id),
+      }),
+    );
+
+    return {
+      totalCount,
+      edges,
+      pageInfo: {
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+        hasNextPage: edges.length < totalCount,
+      },
+    };
   }
 
   async createPoll(data: PollCreateDto) {

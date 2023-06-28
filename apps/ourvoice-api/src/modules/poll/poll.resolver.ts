@@ -4,8 +4,11 @@ import { PollService } from './poll.service';
 import {
   Poll,
   PollCreateInput,
+  PollFilterInput,
+  PollPaginationInput,
   PollUpdateInput,
   PollWithResult,
+  PollWithResultConnection,
   VoteInput,
   VoteResponse,
 } from '../../graphql';
@@ -23,8 +26,14 @@ export class PollResolver {
   @Query()
   async pollsWithResult(
     @Args('moderatorHash') moderatorHash: string,
-  ): Promise<PollWithResult[]> {
-    return await this.pollService.getPollsWithResult(moderatorHash);
+    @Args('filter') filter?: PollFilterInput,
+    @Args('pagination') pagination?: PollPaginationInput,
+  ): Promise<PollWithResultConnection> {
+    return await this.pollService.getPollsWithResult(
+      moderatorHash,
+      filter,
+      pagination,
+    );
   }
 
   @Mutation()
