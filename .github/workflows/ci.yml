@@ -69,6 +69,7 @@ jobs:
       DB_TEST_APP_API_DB_PREMOD_HOST: localhost
       DB_TEST_APP_API_DB_PREMOD_PORT: 5437
       NODE_ENV: test
+      CONTACT_FORM_DB_PORT: 27017
 
     strategy:
       matrix:
@@ -104,9 +105,30 @@ jobs:
             --health-retries 5
         ports:
           - 5437:5432
+      
+      # ourvoice-contact-form-db:
+      #   # container_name: ourvoice-contact-form-db
+      #   image: mongo:6
+      #   # networks:
+      #     # - backend
+      #   # restart: unless-stopped
+      #   ports:
+      #     - '27017:27017'
+      #   # environment:
+      #   #   - 'MONGO_INITDB_ROOT_USERNAME:${CONTACT_FORM_DB_ROOT_USERNAME}'
+      #   #   - 'MONGO_INITDB_ROOT_PASSWORD:${CONTACT_FORM_DB_ROOT_PASSWORD}'
+      #   volumes:
+      #     - ./init/contactform/init.sh:/init.sh
+      #   # command: bash /init.sh
+
+
     steps:
       - name: Repository checkout
         uses: actions/checkout@v3.5.3
+
+      - name: Start contact form docker container
+        run: docker-compose create ourvoice-contact-form-db && docker-compose start ourvoice-contact-form-db
+        working-directory: deployment
 
       # - name: Create main databases if not exists
       #   run: |
