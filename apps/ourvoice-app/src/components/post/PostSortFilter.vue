@@ -25,9 +25,9 @@
             </ListboxButton>
 
             <transition
-              leave-active-class="transition duration-100 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
+              leaveActiveClass="transition duration-100 ease-in"
+              leaveFromClass="opacity-100"
+              leaveToClass="opacity-0"
             >
               <ListboxOptions
                 class="z-10 absolute mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
