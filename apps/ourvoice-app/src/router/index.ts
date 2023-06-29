@@ -4,11 +4,10 @@ import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import PollViewVue from '@/views/PollView.vue'
 import PostsView from '../views/PostsView.vue'
-import TestView from '@/views/TestView.vue'
 import NoticeView from '../views/NoticeView.vue'
 import PostPage from '../views/PostPage.vue'
 import CreatePostView from '../views/CreatePostView.vue'
-import CreateCommentView from '../views/CreateCommentView.vue'
+// import CreateCommentView from '../views/CreateCommentView.vue'
 import PostModerationListView from '../views/PostModerationListView.vue'
 import PostModerationView from '../views/PostModerationView.vue'
 import CommentModerationListView from '../views/CommentModerationListView.vue'
@@ -70,12 +69,13 @@ const router = createRouter({
       component: CreatePostView,
       meta: { requiresAuth: true }
     },
-    {
-      path: '/comment',
-      name: 'create-comment',
-      component: CreateCommentView,
-      meta: { requiresAuth: true }
-    },
+    // TODO: this route is not used
+    // {
+    //   path: '/comment',
+    //   name: 'create-comment',
+    //   component: CreateCommentView,
+    //   meta: { requiresAuth: true }
+    // },
     {
       path: '/polls',
       name: 'polls',
@@ -109,19 +109,13 @@ const router = createRouter({
       path: '/posts',
       name: 'posts',
       component: PostsView,
-      meta: { requiresAuth: false }
+      meta: { requiresAuth: true }
     },
     {
       path: '/posts/:id(\\d+)',
       name: 'postpage',
       component: PostPage,
-      meta: { requiresAuth: false }
-    },
-    {
-      path: '/test',
-      name: 'test',
-      component: TestView,
-      meta: { requiresAuth: false }
+      meta: { requiresAuth: true }
     }
   ]
 })
