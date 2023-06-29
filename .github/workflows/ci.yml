@@ -127,8 +127,9 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Start contact form docker container
-        run: docker-compose create ourvoice-contact-form-db && docker-compose start ourvoice-contact-form-db
-        working-directory: deployment
+        run: |
+          docker run -p 27017:27017 --name ourvoice-contact-form-db -d mongo:6 mongod --replSet rs0 &&
+          docker exec ourvoice-contact-form-db mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host:'localhost:27017'}]});"
 
       # - name: Create main databases if not exists
       #   run: |
