@@ -3,7 +3,6 @@ module.exports = {
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
   moduleFileExtensions: ['ts', 'js'],
   testPathIgnorePatterns: [
-    '<rootDir>/src/modules/contactform/.*',
     '<rootDir>/src/modules/users/.*',
     '.*\\.integration\\.spec\\.ts',
   ],
