@@ -3,7 +3,7 @@
     <Suspense>
       <TabsWrapper>
         <TabContent title="Create Comment">
-          <CreateComment />
+          <!-- <CreateComment /> -->
         </TabContent>
       </TabsWrapper>
     </Suspense>
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 // import CreatePost from '../components/post/CreatePost.vue'
-import CreateComment from '../components/comment/CreateComment.vue'
+// import CreateComment from '../components/comment/CreateComment.vue'
 import TabsWrapper from '../components/common/TabsWrapper.vue'
 import TabContent from '../components/common/TabContent.vue'
 </script>

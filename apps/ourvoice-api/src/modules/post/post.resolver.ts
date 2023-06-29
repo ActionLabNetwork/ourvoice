@@ -1,4 +1,7 @@
-import { PostPaginationInput, PostsFilterInput   PostSortingInput,
+import {
+  PostPaginationInput,
+  PostsFilterInput,
+  PostSortingInput,
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from '../../modules/post/post.service';
@@ -32,18 +35,18 @@ export class PostResolver {
     return { totalCount, edges, pageInfo };
   }
 
-  // @Query()
-  // async postsByCategories(
-  //   @Args('categories', { type: () => [String] }) categories: string[],
-  //   @Args('filter', { nullable: true }) filter?: PostsFilterInput,
-  //   @Args('pagination', { nullable: true }) pagination?: PostPaginationInput,
-  // ) {
-  //   return this.postService.getPostsByCategories(
-  //     categories,
-  //     filter,
-  //     pagination,
-  //   );
-  // }
+  @Query()
+  async postsByCategories(
+    @Args('categories', { type: () => [String] }) categories: string[],
+    @Args('filter', { nullable: true }) filter?: PostsFilterInput,
+    @Args('pagination', { nullable: true }) pagination?: PostPaginationInput,
+  ) {
+    return this.postService.getPostsByCategories(
+      categories,
+      filter,
+      pagination,
+    );
+  }
 
   @Query()
   async getPresignedUrls(

@@ -89,13 +89,12 @@ async function main() {
   const voteData = seedData.votes;
   for (const data of voteData) {
     const post = posts.find((post) => post.id === data.postId);
-    const comment = comments.find((comment) => comment.id === data.commentId);
-    const { postId, commentId, ...rest } = data;
+
+    delete data.postId;
     await prisma.vote.create({
       data: {
         ...data,
         post: { connect: { id: post.id } },
-        // comment: commentId ? { connect: { id: comment.id } } : undefined,
       },
     });
   }

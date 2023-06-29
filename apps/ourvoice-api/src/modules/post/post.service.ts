@@ -58,58 +58,24 @@ export class PostService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+      // FIXME: Fix hasNextPage logic
       hasNextPage: posts.length === (pagination?.limit ?? 10),
     };
 
     return { totalCount, edges, pageInfo };
   }
 
-  // async getPostsByCategories(
-  //   categoryNames: string[],
-  //   filter?: PostsFilterDto,
-  //   pagination?: PostPaginationInput,
-  // ): Promise<{
-  //   totalCount: number;
-  //   edges: { node: Post; cursor: string }[];
-  //   pageInfo: {
-  //     startCursor: string;
-  //     endCursor: string;
-  //     hasNextPage: boolean;
-  //   };
-  // }> {
-  //   // Validate filters
-  //   if (filter) {
-  //     const postsFilterDto = plainToClass(PostsFilterDto, filter);
-  //     const errors = await validate(postsFilterDto);
-
-  //     if (errors.length > 0) {
-  //       throw new BadRequestException(errors);
-  //     }
-  //   }
-
-  //   // // Handle pagination
-  //   const { totalCount, posts } =
-  //     await this.postRepository.getPostsByCategories(
-  //       categoryNames,
-  //       filter,
-  //       pagination,
-  //     );
-
-  //   const edges = posts.map((post) => ({
-  //     node: post,
-  //     cursor: numberToCursor(post.id),
-  //   }));
-
-  //   const pageInfo = {
-  //     startCursor: edges.length > 0 ? edges[0].cursor : null,
-  //     endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-  //     hasNextPage:
-  //       posts.length == pagination.limit &&
-  //       posts.length < totalCount &&
-  //       posts.length != 0,
-  //   };
-  //   return { totalCount, edges, pageInfo };
-  // }
+  async getPostsByCategories(
+    categoryNames: string[],
+    filter?: PostsFilterDto,
+    pagination?: PostPaginationInput,
+  ): Promise<Post[]> {
+    return this.postRepository.getPostsByCategories(
+      categoryNames,
+      filter,
+      pagination,
+    );
+  }
 
   async createPost(data: PostCreateDto): Promise<Post> {
     const postCreateDto = plainToClass(PostCreateDto, data);
