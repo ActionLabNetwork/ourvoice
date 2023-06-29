@@ -309,7 +309,7 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3(@fortawesome/fontawesome-svg-core@6.4.0)(vue@3.3.4)
       '@headlessui/vue':
-        specifier: ^1.7.13
+        specifier: ^1.7.14
         version: 1.7.14(vue@3.3.4)
       '@heroicons/vue':
         specifier: ^2.0.18
