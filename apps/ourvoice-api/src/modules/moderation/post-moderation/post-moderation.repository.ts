@@ -1,6 +1,6 @@
 import { GetManyRepositoryResponse } from './../../../types/general';
 import { PostModifyDto } from './dto/post-modify.dto';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import {
   Prisma,
   PostVersion,
@@ -50,6 +50,7 @@ export class PostModerationRepository {
   private readonly logger = new Logger(PostModerationRepository.name);
 
   constructor(
+    @Inject(forwardRef(() => PrismaService))
     private readonly prisma: PrismaService,
     private readonly postService: PostService,
   ) {}

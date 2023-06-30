@@ -50,11 +50,12 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
 import Information from '../../../../config/content/information.md'
+
 import { useDeploymentStore } from '@/stores/deployment'
+import config from '@/config'
 
-const apiURL = import.meta.env.VITE_APP_API_URL
-
-const authBaseURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithoutPassword'
+const apiURL = config.apiURL
+const authBaseURL = config.authURL + '/signinWithoutPassword'
 
 export default defineComponent({
   components: {

@@ -4,6 +4,7 @@ import { seedMainDb } from './../../../prisma/seed';
 import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CommentRepository } from './comment.repository';
+import { ConfigService } from '@nestjs/config';
 
 describe('CommentRepository', () => {
   let commentRepository: CommentRepository;
@@ -16,7 +17,29 @@ describe('CommentRepository', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [PrismaService, CommentRepository],
+      providers: [
+        PrismaService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'database.mainTestUrl') {
+                return (
+                  process.env.DATABASE_MAIN_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test'
+                );
+              } else if (key === 'database.mainUrl') {
+                return (
+                  process.env.DATABASE_MAIN_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer'
+                );
+              }
+              return null;
+            }),
+          },
+        },
+        CommentRepository,
+      ],
     }).compile();
 
     prismaService = moduleRef.get(PrismaService);

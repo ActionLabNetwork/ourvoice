@@ -1,8 +1,9 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
+import config from '@/config'
 
 // Set up GraphQL client
 const httpLink = createHttpLink({
-  uri: `${import.meta.env.VITE_APP_API_URL}/graphql` || 'http://localhost:3000/graphql'
+  uri: `${config.apiURL}/graphql` || 'http://localhost:3000/graphql'
 })
 
 // Create the apollo client

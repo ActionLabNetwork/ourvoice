@@ -4,7 +4,6 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -12,14 +11,18 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor(configService: ConfigService) {
+  // TODO: look into using configurationservice to get the connection strings
+  // test failed with it???
+  constructor() {
     super({
       datasources: {
         db: {
           url:
             process.env.NODE_ENV === 'test'
-              ? configService.get<string>('database.mainTestUrl')
-              : configService.get<string>('database.mainUrl'),
+              ? process.env.DATABASE_MAIN_TEST_URL ||
+                'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test'
+              : process.env.DATABASE_MAIN_URL ||
+                'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer',
         },
       },
     });

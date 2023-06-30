@@ -112,6 +112,8 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
+import config from '@/config'
+
 import YamlContent from '../../../../config/config.yml'
 import Login from '../../../../config/content/login.md'
 
@@ -119,7 +121,7 @@ import Login from '../../../../config/content/login.md'
 // const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+const domain = config.sessionTokenFrontendDomain
 
 // TODO: this list might be coming from the database later
 const organisation = YamlContent.organisation

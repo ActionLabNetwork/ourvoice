@@ -14,9 +14,10 @@ import {
   getCurrentDeploymentDomain,
   checkForSession,
   checkDeployment,
-  redirectTo,
-  getSessionPayload
+  redirectTo
 } from '../services/session.service'
+
+import config from '@/config'
 
 // import YamlContent from '../../../../config/config.yml'
 import { useDeploymentStore } from '@/stores/deployment'
@@ -24,7 +25,7 @@ import { useDeploymentStore } from '@/stores/deployment'
 // const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
 // const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 
-const authBaseURL = import.meta.env.VITE_APP_AUTH_URL
+const authBaseURL = config.authURL
 const authURL = `${authBaseURL}/signinWithoutPassword?d=${getCurrentDeploymentDomain().deployment}`
 const authModURL = `${authBaseURL}?d=${getCurrentDeploymentDomain().deployment}`
 

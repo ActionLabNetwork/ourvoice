@@ -29,7 +29,7 @@ moderators:
   - deployment_admin@ourvoice.app
   - moderator1@ourvoice.app
   - moderator2@ourvoice.app
-auth:
+authModules:
   - EmailPassword
   - Passwordless
   - Verify

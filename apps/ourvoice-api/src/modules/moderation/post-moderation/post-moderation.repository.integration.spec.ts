@@ -16,6 +16,7 @@ import {
   PostVersionBuilder,
 } from './post-moderation.builder';
 import { ModerationPostStatus } from '../../../graphql';
+import { ConfigService } from '@nestjs/config';
 
 describe('PostRepository', () => {
   const TOTAL_POSTS = 10;
@@ -136,7 +137,39 @@ describe('PostRepository', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [PostModule],
-      providers: [PrismaService, PostModerationRepository],
+      providers: [
+        PrismaService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'database.premoderationUrl') {
+                return (
+                  process.env.DATABASE_PREMODERATION_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer'
+                );
+              } else if (key === 'database.premoderationTestUrl') {
+                return (
+                  process.env.DATABASE_PREMODERATION_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
+                );
+              } else if (key === 'database.mainTestUrl') {
+                return (
+                  process.env.DATABASE_MAIN_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test'
+                );
+              } else if (key === 'database.mainUrl') {
+                return (
+                  process.env.DATABASE_MAIN_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer'
+                );
+              }
+              return null;
+            }),
+          },
+        },
+        PostModerationRepository,
+      ],
     }).compile();
 
     prismaService = moduleRef.get(PrismaService);

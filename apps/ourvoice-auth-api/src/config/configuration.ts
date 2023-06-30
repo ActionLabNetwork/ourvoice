@@ -85,20 +85,4 @@ export default () => ({
       process.env.DATABASE_PREMODERATION_TEST_URL ||
       'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test',
   },
-  // testing
-  testMode: process.env.TEST_MODE || false,
-  preAuthSessionId:
-    process.env.PRE_AUTH_SESSION_ID ||
-    '4a3L55ZNKye5p6Rmk4tBEdUMBY79OoTAqtIHEyo_HL4=',
-  codeId: process.env.CODE_ID || 'abb95508-bd9d-4aa4-925d-9fcfebec77db',
-  deviceId:
-    process.env.DEVICE_ID || 'R91K/g0XEMI9px2MobWytighoiR9nzcvMDxhOAnk3+0=',
-  userInputCode: parseInt(process.env.USER_INPUT_CODE, 10) || 344218,
-  linkCode:
-    process.env.LINK_CODE || 'OMz5kaYzzyFh_RF5UeIl6u81W2gwb2T-rp1lj9Hh5W8=',
-  // Consume Code (Copy fields from supertokens' passwordless_users table)
-  // TODO: use admin email
-  userEmail: process.env.USER_EMAIL || 'admin@ourvoice.app',
-  userId: process.env.USER_ID || '12345',
-  userTimeJoined: process.env.USER_TIME_JOINED || '',
 });

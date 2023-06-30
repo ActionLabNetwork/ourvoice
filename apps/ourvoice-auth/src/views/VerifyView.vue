@@ -57,11 +57,12 @@ import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 import { DeploymentService } from '../utils/deployment.service'
+import config from '@/config'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
 
-const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+const domain = config.sessionTokenFrontendDomain
 
 export default defineComponent({
   setup() {
