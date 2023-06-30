@@ -8,6 +8,7 @@ import { Error as STError } from 'supertokens-node/recipe/session';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger('UsersService');
+
   async getUsers(recipe: string) {
     // get for specific recipes
     return await getUsersNewestFirst({
@@ -18,6 +19,7 @@ export class UsersService {
     // / You can learn more about the `User` object over here https://github.com/supertokens/core-driver-interface/wiki
     return await EmailPassword.getUserById(userId);
   }
+
   async isAdmin(session: SessionContainer) {
     const roles = await session.getClaimValue(UserRoles.UserRoleClaim);
     if (

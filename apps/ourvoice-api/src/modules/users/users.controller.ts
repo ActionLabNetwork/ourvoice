@@ -108,7 +108,9 @@ export class UserController {
     const adminId = session.getUserId();
     // TODO: add user pagination
     const allUsers = await this.userService.getUsers('emailpassword');
+    console.log(allUsers);
     const deploymentUsers = allUsers.users.flatMap(async (object) => {
+      console.log(object);
       // check if self
       if (adminId === object.user.id) {
         return [];

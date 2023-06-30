@@ -18,6 +18,7 @@ export class MetadataService {
   async clear(userId: string) {
     return await UserMetadata.clearUserMetadata(userId);
   }
+
   async checkDeployment(
     adminId: string,
     userId: string,
@@ -32,6 +33,7 @@ export class MetadataService {
     }
     return false;
   }
+
   async addEmailToAllowlist(email: string) {
     const existingData = await UserMetadata.getUserMetadata('emailAllowList');
     let allowList: string[] = existingData.metadata.allowList || [];
