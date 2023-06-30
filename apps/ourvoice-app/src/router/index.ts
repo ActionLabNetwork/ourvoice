@@ -136,7 +136,9 @@ router.beforeEach(async (to, from, next) => {
       // if current deployment matches with user then init user store
       if (await checkDeployment(deployment)) {
         if (to.matched.some((record: any) => record.meta.requiresModerator)) {
-          userStore.isModerator ? next() : redirectTo('/')
+          userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
+            ? next()
+            : redirectTo('/')
         } else {
           next()
         }

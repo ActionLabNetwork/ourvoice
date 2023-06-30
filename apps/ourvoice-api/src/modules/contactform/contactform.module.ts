@@ -4,6 +4,7 @@ import { ContactFormRepository } from './contactform.repository';
 import { ContactFormService } from './contactform.service';
 import {
   ConfigInjectionToken,
+  ContactFormModuleAsyncConfig,
   ContactFormModuleConfig,
 } from './config.interface';
 import { ContactFormResolver } from './contactform.resolver';
@@ -20,6 +21,24 @@ export class ContactFormModule {
         ContactFormResolver,
       ],
       module: ContactFormModule,
+    };
+  }
+
+  static registerAsync(config: ContactFormModuleAsyncConfig): DynamicModule {
+    return {
+      imports: config.imports,
+      module: ContactFormModule,
+      providers: [
+        {
+          useFactory: config.useFactory,
+          inject: config.inject,
+          provide: ConfigInjectionToken,
+        },
+        ContactFormPrismaService,
+        ContactFormRepository,
+        ContactFormService,
+        ContactFormResolver,
+      ],
     };
   }
 }

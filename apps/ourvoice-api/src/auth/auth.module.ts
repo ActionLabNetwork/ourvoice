@@ -6,7 +6,11 @@ import {
 } from '@nestjs/common';
 
 import { AuthMiddleware } from './auth.middleware';
-import { ConfigInjectionToken, AuthModuleConfig } from './config.interface';
+import {
+  ConfigInjectionToken,
+  AuthModuleConfig,
+  AuthModuleAsyncConfig,
+} from './config.interface';
 import { SupertokensService } from './supertokens/supertokens.service';
 
 @Module({
@@ -41,6 +45,22 @@ export class AuthModule implements NestModule {
       exports: [],
       imports: [],
       module: AuthModule,
+    };
+  }
+
+  static forRootAsync(config: AuthModuleAsyncConfig): DynamicModule {
+    return {
+      module: AuthModule,
+      imports: config.imports,
+      providers: [
+        {
+          useFactory: config.useFactory,
+          inject: config.inject,
+          provide: ConfigInjectionToken,
+        },
+        SupertokensService,
+      ],
+      exports: [],
     };
   }
 }

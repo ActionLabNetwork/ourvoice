@@ -1,6 +1,9 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-    <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+    <nav
+      class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
+      aria-label="Global"
+    >
       <!-- Logo -->
       <div class="flex lg:flex-1">
         <a href="#" class="-m-1.5 p-1.5">
@@ -32,7 +35,12 @@
             {{ item.name }}
           </span>
         </router-link>
-        <Popover :class="{ hidden: !userStore.isModerator }" class="relative">
+        <Popover
+          :class="{
+            hidden: !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
+          }"
+          class="relative"
+        >
           <PopoverButton
             class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
             :class="{ 'border-b-2': isModerationPage }"

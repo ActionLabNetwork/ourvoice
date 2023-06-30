@@ -4,8 +4,10 @@ import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import { UserRoleClaim /*PermissionClaim*/ } from 'supertokens-web-js/recipe/userroles'
 
-const authURL = import.meta.env.VITE_APP_AUTH_URL + '/auth'
-const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
+import config from '@/config'
+
+const authURL = `${config.authURL}/auth`
+const portalURL = config.portalURL
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -74,9 +74,10 @@ import { defineComponent } from 'vue'
 import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 
-const apiURL = import.meta.env.VITE_APP_API_URL
+import config from '@/config'
 
-const authURL = import.meta.env.VITE_APP_AUTH_URL + '/signinWithEmailPassword'
+const apiURL = config.apiURL
+const authURL = `${config.authURL}/signinWithEmailPassword`
 
 export type User = {
   id: string
