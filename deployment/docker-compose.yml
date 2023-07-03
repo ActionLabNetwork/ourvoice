@@ -89,6 +89,7 @@ services:
       start_period: 80s
 
   # contact form database
+  # for development only
   ourvoice-contact-form-db:
     container_name: ourvoice-contact-form-db
     image: mongo:6
@@ -102,7 +103,8 @@ services:
       - 'MONGO_INITDB_ROOT_PASSWORD:${CONTACT_FORM_DB_ROOT_PASSWORD}'
     volumes:
       - ./contactformdb/db:/data/db
-    command: mongod --replSet rs0 # replica set is needed for prisma
+      - ./init/contactform/init.sh:/init.sh
+    command: bash /init.sh
 
   # auth manager
   supertokens:
