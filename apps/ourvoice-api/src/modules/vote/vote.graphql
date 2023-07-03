@@ -1,0 +1,34 @@
+type Mutation {
+  createVote(data: VoteCreateInput!): Vote!
+  deleteVote(id: Int!): Vote!
+}
+
+type Query {
+  vote(id: Int!): Vote
+  votes(filter: VotesFilterInput): [Vote!]!
+}
+
+type Vote {
+  id: Int!
+  voteType: String!
+  authorHash: String!
+  authorNickname: String!
+  post: Post!
+  comment: Comment
+}
+
+input VoteCreateInput {
+  voteType: String!
+  authorHash: String!
+  authorNickname: String!
+  postId: Int!
+  commentId: Int
+}
+
+input VotesFilterInput {
+  voteType: String
+  authorHash: String
+  authorNickname: String
+  postId: Int
+  commentId: Int
+}

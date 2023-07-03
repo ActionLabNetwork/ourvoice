@@ -1,5 +1,6 @@
 import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
+import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -72,6 +73,7 @@ import { GraphQLError } from 'graphql/error';
     PostModule,
     CategoryModule,
     CommentModule,
+    VoteModule,
     ContactFormModule.register({
       smtpSettings: {
         host: process.env.CONTACT_FORM_SMTP_HOST,

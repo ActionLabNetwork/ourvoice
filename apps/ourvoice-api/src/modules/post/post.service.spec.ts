@@ -191,6 +191,8 @@ describe('PostService', () => {
 
     const filterData = { title: 'Test Title', moderated: true };
     const paginationData = { cursor: '1', limit: 10 };
+    //TODO: Add test for sortData
+    const sortData = undefined;
     const expectedResult = {
       edges: [
         {
@@ -221,13 +223,18 @@ describe('PostService', () => {
       totalCount: 1,
     };
     // Act
-    const result = await postService.getPosts(filterData, paginationData);
+    const result = await postService.getPosts(
+      filterData,
+      paginationData,
+      sortData,
+    );
 
     // Assert
     expect(result).toEqual(expectedResult);
     expect(postRepositoryMock.getPosts).toHaveBeenCalledWith(
       filterData,
       paginationData,
+      sortData,
     );
   });
 

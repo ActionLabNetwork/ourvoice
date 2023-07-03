@@ -102,6 +102,7 @@ export class CommentRepository {
         ? { id: cursorToNumber(pagination.cursor.toString()) }
         : undefined,
       take: pagination?.limit ?? 10,
+      orderBy: { createdAt: 'desc' },
     });
 
     return { totalCount, comments };

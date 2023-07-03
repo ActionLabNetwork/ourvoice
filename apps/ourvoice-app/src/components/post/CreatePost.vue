@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen">
+  <div class="max-h-screen">
     <div class="container mx-auto p-4">
       <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto">
         <!-- Form for creating new post -->

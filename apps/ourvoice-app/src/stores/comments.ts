@@ -1,33 +1,46 @@
 import { defineStore } from 'pinia'
 import { apolloClient } from './../graphql/client/index'
-import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+// import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
+import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
-import { provideApolloClient } from '@vue/apollo-composable'
 
+import { GET_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getCommentById'
+import { provideApolloClient } from '@vue/apollo-composable'
 export interface Comment {
   id: number
   content: string
+  votesDown: number
+  votesUp: number
+  moderated: boolean
+  published: boolean
   createdAt: string
-  author: {
-    id: number
-    nickname: string
-  }
+  moderatedAt: string
+  publishedAt: string
+  disabledAt: string
+  authorHash: string
+  authorNickname: string
   post: {
     id: number
-    title: string
   }
   parent: {
     id: number
-    content: string
+    authorNickname: string
   }
+}
+export interface pageInfo {
+  endCursor: string
+  hasNextPage: boolean
+  startCursor: string
 }
 export interface CommentsState {
   data: Comment[]
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
+  pageInfo: pageInfo | undefined
+  totalCount: number | undefined
 }
 
 provideApolloClient(apolloClient)
@@ -37,55 +50,52 @@ export const useCommentsStore = defineStore('comments', {
     data: [],
     loading: false,
     error: undefined,
-    errorMessage: undefined
+    errorMessage: undefined,
+    pageInfo: undefined,
+    totalCount: undefined
   }),
-
   getters: {
-    getCommentslength(state) {
-      return state.data.length
-    },
-
-    getGroupedComments(state) {
-      const commentsForPosts: Comment[] = []
-      const commentsForComments: Comment[] = []
-      state.data.forEach((c) => {
-        if (c.parent) {
-          commentsForComments.push(c)
-        } else if (c.post) {
-          commentsForPosts.push(c)
-        }
-      })
-      return [
-        {
-          label: 'Comments for Posts',
-          options: commentsForPosts
-        },
-        {
-          label: 'Comments for Comments',
-          options: commentsForComments
-        }
-      ]
-    },
-
-    getCommentsByPostId: (state) => (postId: number) => {
-      return state.data.filter((c) => c.post?.id === postId)
+    getCommentById: (state) => (id: number) => {
+      return state.data.find((comment) => comment.id === id)
     }
   },
   actions: {
-    async fetchComments() {
+    async fetchComments(postId: number | null) {
       try {
         this.loading = true
-        const { data } = await apolloClient.query({ query: GET_COMMENTS_QUERY })
+        const { data } = await apolloClient.query({
+          query: GET_COMMENTS_QUERY,
+          variables: {
+            filter: {
+              postId: postId
+            },
+            pagination: {
+              limit: null,
+              cursor: null
+            }
+          }
+        })
 
         this.data = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
           content: comment.node.content,
+          votesDown: comment.node.votesDown,
+          votesUp: comment.node.votesUp,
           createdAt: comment.node.createdAt,
           authorHash: comment.node.authorHash ?? null,
           authorNickname: comment.node.authorNickname ?? null,
-          post: comment.node.post ?? null,
-          parent: comment.node.parent ?? null
+          post: {
+            id: comment.node.post.id
+          },
+          parent: comment.node.parent?.id
+            ? {
+                id: comment.node.parent.id,
+                authorNickname: comment.node.parent.authorNickname
+              }
+            : null
         }))
+        this.pageInfo = data.comments.pageInfo
+        this.totalCount = data.comments.totalCount
         this.loading = false
       } catch (error) {
         if (error instanceof Error) {
@@ -102,29 +112,37 @@ export const useCommentsStore = defineStore('comments', {
       content,
       parentId,
       postId,
-      authorId
+      authorHash,
+      authorNickname
     }: {
       content: string
       postId: number | undefined
       parentId: number | undefined
-      authorId: number
+      authorHash: string
+      authorNickname: string
     }) {
       try {
-        const response = await apolloClient.mutate({
-          mutation: CREATE_COMMENT_MUTATION,
+        console.log({
+          content,
+          parentId,
+          postId,
+          authorHash,
+          authorNickname
+        })
+        const { data } = await apolloClient.mutate({
+          mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
             data: {
+              authorHash,
+              authorNickname,
               content,
-              postId,
-              parentId,
-              authorId
+              parentId: parentId ?? null,
+              postId: postId ?? null,
+              requiredModerations: 3
             }
           }
         })
-        console.log('response: ', response)
-        this.$patch((state) => {
-          state.data.push(response?.data.createComment)
-        })
+        console.log(data)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
@@ -177,6 +195,31 @@ export const useCommentsStore = defineStore('comments', {
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
+        }
+      }
+    },
+
+    async syncVotesForCommentById(commentId: number) {
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_COMMENT_BY_ID_QUERY,
+          variables: {
+            commentId
+          },
+          fetchPolicy: 'no-cache'
+        })
+        const comment = this.data.find((comment) => comment.id === commentId)
+        if (comment) {
+          comment.votesDown = data.comment.votesDown
+          comment.votesUp = data.comment.votesUp
+        }
+        console.log(`refetching commentId: ${commentId}`, data)
+      } catch (error) {
+        if (error instanceof Error) {
+          this.error = error
+        }
+        if (error) {
+          this.errorMessage = `Failed to load vote for comments: ${commentId}. Please try again.`
         }
       }
     }

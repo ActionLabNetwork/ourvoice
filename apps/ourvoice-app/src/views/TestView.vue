@@ -1,6 +1,7 @@
 <template>
   <Suspense>
     <div class="w-full overflow-y-hidden grid grid-cols-3">
+      bottom:{{ arrivedState.bottom }}
       <div class="col-span-3 overflow-y-auto relative border-r" ref="scrollContainer">
         <PostSortFilter />
         <div v-for="post in data" :key="post.id">

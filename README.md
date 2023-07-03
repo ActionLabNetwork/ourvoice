@@ -41,8 +41,9 @@ This also links to the nginx `reverse-proxy` deployed via `docker-compose` file.
 
 #### Setup:
 
-- Run from deployment `docker compose up -d` to start services (`reverse-proxy`, `supertokens`, `databases`, `localstack`)
 - Run from the root `pnpm install` to install dependencies (also runs `pnpm postinstall` and copies all `.env` files)
+- Run from deployment `docker compose up -d` to start services (`reverse-proxy`, `supertokens`, `databases`, `localstack`)
+- Run from deployment `docker compose exec ourvoice-contact-form-db mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});"` for contact-form-db setup.
 - Run from the root `pnpm generate:api:all` and `pnpm migrate:api:all` for database setup.
 - Run `pnpm seed:api:all` for database seeding.
 - Run `pnpm dev:apps` to start all applications in development mode

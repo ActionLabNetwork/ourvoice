@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-content" v-show="title == activeTab">
+  <div class="tab-content" v-show="title === activeTab">
     <slot></slot>
   </div>
 </template>

@@ -5,9 +5,6 @@
         <TabContent title="Create Post">
           <CreatePost />
         </TabContent>
-        <!-- <TabContent title="Create Comment">
-          <CreateComment />
-        </TabContent> -->
       </TabsWrapper>
     </Suspense>
   </div>
@@ -15,7 +12,6 @@
 
 <script setup lang="ts">
 import CreatePost from '../components/post/CreatePost.vue'
-// import CreateComment from '../components/comment/CreateComment.vue'
 import TabsWrapper from '../components/common/TabsWrapper.vue'
 import TabContent from '../components/common/TabContent.vue'
 </script>
