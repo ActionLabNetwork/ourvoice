@@ -1,5 +1,9 @@
 type Query {
   availablePolls(userHash: String!): [Poll!]!
+  votedPolls(
+    userHash: String!
+    pagination: PollPaginationInput
+  ): PollWithStatsConnection
   pollsWithResult(
     moderatorHash: String!
     filter: PollFilterInput
@@ -13,7 +17,33 @@ type Mutation {
   votePoll(voteInput: VoteInput): VoteResponse
 }
 
-type Poll {
+input PollPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+interface BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+}
+
+interface BasePollOption {
+  id: Int!
+  option: String!
+}
+
+type PollOption implements BasePollOption {
+  id: Int!
+  option: String!
+}
+
+type Poll implements BasePoll {
   id: Int!
   question: String!
   published: Boolean!
@@ -44,17 +74,13 @@ type PollPageInfo {
   hasNextPage: Boolean
 }
 
-input PollPaginationInput {
-  cursor: String
-  limit: Int
-}
-
-type PollOption {
+type PollOptionWithResult implements BasePollOption {
   id: Int!
   option: String!
+  numVotes: Int!
 }
 
-type PollWithResult {
+type PollWithResult implements BasePoll {
   id: Int!
   question: String!
   published: Boolean!
@@ -75,12 +101,6 @@ type PollWithResultConnection {
   totalCount: Int
   pageInfo: PollPageInfo!
   edges: [PollWithResultEdge!]!
-}
-
-type PollOptionWithResult {
-  id: Int!
-  option: String!
-  numVotes: Int!
 }
 
 input PollCreateInput {
@@ -122,4 +142,28 @@ type VoteResponse {
 type PollOptionStat {
   optionId: Int!
   proportion: Float!
+}
+
+type PollWithStats implements BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  options: [PollOption!]!
+  stats: [PollOptionStat!]
+}
+
+type PollWithStatsEdge {
+  node: PollWithStats!,
+  cursor: String!
+}
+
+type PollWithStatsConnection {
+  totalCount: Int
+  pageInfo: PollPageInfo!
+  edges: [PollWithStatsEdge!]!
 }

@@ -126,11 +126,9 @@ enum PostStatus {
 }
 
 model PollVoterVoted {
-  id Int @default(autoincrement())
+  id Int @id @default(autoincrement())
   pollId Int
   voterHash String
-
-  @@id([pollId, voterHash])
 }
 
 model PollVote {

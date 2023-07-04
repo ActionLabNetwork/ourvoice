@@ -330,6 +330,21 @@ describe('PollService', () => {
     },
   );
 
+  it('should display a poll that a user has previously voted', async () => {
+    const createdPoll1 = await pollService.createPoll(testPoll);
+    const createdPoll2 = await pollService.createPoll(testPoll);
+
+    await pollService.vote({
+      pollId: createdPoll1.id,
+      optionId: createdPoll1.options[0].id,
+      voterHash: 'user',
+    });
+
+    const votedPolls = await pollService.getVotedPolls('user');
+    expect(votedPolls.edges.length).toEqual(1);
+    expect(votedPolls.edges[0].node).toEqual({ ...createdPoll1, stats: null });
+  });
+
   it('should not display to the user a voted poll', async () => {
     const createdPoll = await pollService.createPoll(testPoll);
 

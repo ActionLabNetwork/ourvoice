@@ -1,13 +1,32 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/moderation/prisma.service';
 import { PollVote, PollVoterVoted } from '@prisma-moderation-db/client';
+import { PollPaginationInput } from 'src/graphql';
+import { cursorTo } from 'readline';
+import { cursorToNumber } from '../../utils/cursor-pagination';
 
 @Injectable()
 export class PollModerationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getPollsVoterVoted(voterHash: string): Promise<PollVoterVoted[]> {
+  async getPollsVoterVoted(
+    voterHash: string,
+    pagination?: PollPaginationInput,
+  ): Promise<PollVoterVoted[]> {
     return this.prisma.pollVoterVoted.findMany({
+      where: {
+        voterHash: voterHash,
+      },
+      skip: pagination?.cursor ? 1 : undefined,
+      cursor: pagination?.cursor
+        ? { id: cursorToNumber(pagination.cursor) }
+        : undefined,
+      take: pagination?.limit,
+    });
+  }
+
+  async countPollsVoterVoted(voterHash: string) {
+    return this.prisma.pollVoterVoted.count({
       where: {
         voterHash: voterHash,
       },
@@ -18,12 +37,10 @@ export class PollModerationRepository {
     voterHash: string,
     pollId: number,
   ): Promise<boolean> {
-    const pollVoterVoted = this.prisma.pollVoterVoted.findUnique({
+    const pollVoterVoted = this.prisma.pollVoterVoted.findFirst({
       where: {
-        pollId_voterHash: {
-          voterHash,
-          pollId,
-        },
+        pollId: pollId,
+        voterHash: voterHash,
       },
     });
     return pollVoterVoted !== null;
@@ -35,12 +52,10 @@ export class PollModerationRepository {
     optionId: number,
   ): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
-      const pollVoterVoted = await this.prisma.pollVoterVoted.findUnique({
+      const pollVoterVoted = await this.prisma.pollVoterVoted.findFirst({
         where: {
-          pollId_voterHash: {
-            voterHash,
-            pollId,
-          },
+          pollId,
+          voterHash,
         },
       });
       if (pollVoterVoted) {

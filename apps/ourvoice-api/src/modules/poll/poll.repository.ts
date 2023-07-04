@@ -85,6 +85,19 @@ export class PollRepository {
     });
   }
 
+  async getPollsByIds(ids: number[]) {
+    return await this.prisma.poll.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      include: {
+        options: true,
+      },
+    });
+  }
+
   async getPolls(filter?: PollFilterInput, pagination?: PollPaginationInput) {
     const {
       expiresBefore,
