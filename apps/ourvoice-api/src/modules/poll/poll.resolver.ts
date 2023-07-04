@@ -9,6 +9,7 @@ import {
   PollUpdateInput,
   PollWithResult,
   PollWithResultConnection,
+  PollWithStatsConnection,
   VoteInput,
   VoteResponse,
 } from '../../graphql';
@@ -34,6 +35,14 @@ export class PollResolver {
       filter,
       pagination,
     );
+  }
+
+  @Query()
+  async votedPolls(
+    @Args('userHash') userHash: string,
+    @Args('pagination') pagination?: PollPaginationInput,
+  ): Promise<PollWithStatsConnection> {
+    return await this.pollService.getVotedPolls(userHash, pagination);
   }
 
   @Mutation()

@@ -8,11 +8,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export enum CacheControlScope {
-    PUBLIC = "PUBLIC",
-    PRIVATE = "PRIVATE"
-}
-
 export enum ModerationDecision {
     ACCEPTED = "ACCEPTED",
     REJECTED = "REJECTED"
@@ -35,26 +30,9 @@ export enum sortOrder {
     desc = "desc"
 }
 
-export class UserCreateInput {
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId: number;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-}
-
-export class UserUpdateInput {
-    orgId?: Nullable<number>;
-    hash?: Nullable<string>;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId?: Nullable<number>;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
+export enum CacheControlScope {
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE"
 }
 
 export class CategoryCreateInput {
@@ -187,6 +165,11 @@ export class ModerationPostModifyInput {
     files?: Nullable<Nullable<string>[]>;
 }
 
+export class PollPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
 export class PollFilterInput {
     question?: Nullable<string>;
     published?: Nullable<boolean>;
@@ -198,11 +181,6 @@ export class PollFilterInput {
     expiresExcludeNull?: Nullable<boolean>;
     createdBefore?: Nullable<DateTime>;
     createdAfter?: Nullable<DateTime>;
-}
-
-export class PollPaginationInput {
-    cursor?: Nullable<string>;
-    limit?: Nullable<number>;
 }
 
 export class PollCreateInput {
@@ -296,13 +274,45 @@ export class VotesFilterInput {
     commentId?: Nullable<number>;
 }
 
+export class UserCreateInput {
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId: number;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+}
+
+export class UserUpdateInput {
+    orgId?: Nullable<number>;
+    hash?: Nullable<string>;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId?: Nullable<number>;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+}
+
+export interface BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+}
+
+export interface BasePollOption {
+    id: number;
+    option: string;
+}
+
 export abstract class IQuery {
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract users(): User[] | Promise<User[]>;
-
     abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
 
     abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
@@ -325,6 +335,8 @@ export abstract class IQuery {
 
     abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
 
+    abstract votedPolls(userHash: string, pagination?: Nullable<PollPaginationInput>): Nullable<PollWithStatsConnection> | Promise<Nullable<PollWithStatsConnection>>;
+
     abstract pollsWithResult(moderatorHash: string, filter?: Nullable<PollFilterInput>, pagination?: Nullable<PollPaginationInput>): Nullable<PollWithResultConnection> | Promise<Nullable<PollWithResultConnection>>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
@@ -340,17 +352,15 @@ export abstract class IQuery {
     abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
 
     abstract votes(filter?: Nullable<VotesFilterInput>): Vote[] | Promise<Vote[]>;
+
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(): User[] | Promise<User[]>;
 }
 
 export abstract class IMutation {
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract createUser(data: UserCreateInput): User | Promise<User>;
-
-    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
-
-    abstract deleteUser(id: number): User | Promise<User>;
-
     abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
 
     abstract updateCategory(id: number, data: CategoryUpdateInput): Category | Promise<Category>;
@@ -400,28 +410,14 @@ export abstract class IMutation {
     abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
 
     abstract deleteVote(id: number): Vote | Promise<Vote>;
-}
 
-export class User {
-    id: number;
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    type: UserType;
-    active?: Nullable<boolean>;
-    createdAt?: Nullable<DateTime>;
-    disabledAt?: Nullable<DateTime>;
-    updatedAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-    comments: Comment[];
-    posts: Post[];
-}
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
-export class UserType {
-    id: number;
-    type: string;
-    users: User[];
+    abstract createUser(data: UserCreateInput): User | Promise<User>;
+
+    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
+
+    abstract deleteUser(id: number): User | Promise<User>;
 }
 
 export class Category {
@@ -599,7 +595,12 @@ export class ModerationPostPageInfo {
     hasPreviousPage?: Nullable<boolean>;
 }
 
-export class Poll {
+export class PollOption implements BasePollOption {
+    id: number;
+    option: string;
+}
+
+export class Poll implements BasePoll {
     id: number;
     question: string;
     published: boolean;
@@ -617,12 +618,13 @@ export class PollPageInfo {
     hasNextPage?: Nullable<boolean>;
 }
 
-export class PollOption {
+export class PollOptionWithResult implements BasePollOption {
     id: number;
     option: string;
+    numVotes: number;
 }
 
-export class PollWithResult {
+export class PollWithResult implements BasePoll {
     id: number;
     question: string;
     published: boolean;
@@ -645,12 +647,6 @@ export class PollWithResultConnection {
     edges: PollWithResultEdge[];
 }
 
-export class PollOptionWithResult {
-    id: number;
-    option: string;
-    numVotes: number;
-}
-
 export class VoteResponse {
     pollId: number;
     optionId: number;
@@ -660,6 +656,30 @@ export class VoteResponse {
 export class PollOptionStat {
     optionId: number;
     proportion: number;
+}
+
+export class PollWithStats implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+    stats?: Nullable<PollOptionStat[]>;
+}
+
+export class PollWithStatsEdge {
+    node: PollWithStats;
+    cursor: string;
+}
+
+export class PollWithStatsConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: PollPageInfo;
+    edges: PollWithStatsEdge[];
 }
 
 export class Post {
@@ -712,6 +732,28 @@ export class Vote {
     authorNickname: string;
     post: Post;
     comment?: Nullable<Comment>;
+}
+
+export class User {
+    id: number;
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    type: UserType;
+    active?: Nullable<boolean>;
+    createdAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+    comments: Comment[];
+    posts: Post[];
+}
+
+export class UserType {
+    id: number;
+    type: string;
+    users: User[];
 }
 
 export type DateTime = any;

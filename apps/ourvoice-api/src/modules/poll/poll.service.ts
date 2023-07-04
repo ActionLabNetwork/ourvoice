@@ -9,7 +9,9 @@ import {
   PollFilterInput,
   PollPaginationInput,
   PollWithResultConnection,
+  PollWithStatsConnection,
   VoteInput,
+  VoteResponse,
 } from '../../graphql';
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { PollCreateDto } from './dto/poll-create.dto';
@@ -36,6 +38,47 @@ export class PollService {
       pollsUserVotedFor.map((pollUserVotedFor) => pollUserVotedFor.pollId),
     );
     return allActivePolls.filter((poll) => !pollsUserVotedForIds.has(poll.id));
+  }
+
+  async getVotedPolls(
+    userHash: string,
+    pagination?: PollPaginationInput,
+  ): Promise<PollWithStatsConnection> {
+    const pollsVoterVoted =
+      await this.pollModerationRepository.getPollsVoterVoted(
+        userHash,
+        pagination,
+      );
+    const totalCount = await this.pollModerationRepository.countPollsVoterVoted(
+      userHash,
+    );
+    const polls = await this.pollRepository.getPollsByIds(
+      pollsVoterVoted.map((pollVoterVoted) => pollVoterVoted.pollId),
+    );
+    const idToPolls = new Map();
+    for (const poll of polls) {
+      idToPolls.set(poll.id, poll);
+    }
+    const pollsSorted = pollsVoterVoted.map((pollVoterVoted) =>
+      idToPolls.get(pollVoterVoted.pollId),
+    );
+    const pollsWithStats = pollsSorted.map(async (poll) => ({
+      ...poll,
+      stats: await this.getStatsOfPoll(poll.id),
+    }));
+    const edges = (await Promise.all(pollsWithStats)).map((poll) => ({
+      node: poll,
+      cursor: numberToCursor(poll.id),
+    }));
+    return {
+      totalCount,
+      edges,
+      pageInfo: {
+        startCursor: edges.length > 0 ? edges[0].cursor : null,
+        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+        hasNextPage: edges.length < totalCount,
+      },
+    };
   }
 
   async getPollsWithResult(
@@ -140,7 +183,7 @@ export class PollService {
     await this.pollRepository.removePollById(pollId);
   }
 
-  async vote(voteInput: VoteInput) {
+  async vote(voteInput: VoteInput): Promise<VoteResponse> {
     const { pollId, voterHash, optionId } = voteInput;
     const poll = await this.pollRepository.getPoll(pollId);
     if (poll === null) {
@@ -161,6 +204,14 @@ export class PollService {
     }
 
     await this.pollModerationRepository.vote(voterHash, pollId, optionId);
+    return {
+      pollId,
+      optionId,
+      stats: await this.getStatsOfPoll(pollId),
+    };
+  }
+
+  async getStatsOfPoll(pollId: number) {
     const pollVotes = await this.pollModerationRepository.getPollVotes(pollId);
     const numTotalVotes = pollVotes.reduce(
       (acc, pollVote) => acc + pollVote.numVotes,
@@ -173,10 +224,6 @@ export class PollService {
         proportion: pollVote.numVotes / numTotalVotes,
       }));
     }
-    return {
-      pollId,
-      optionId,
-      stats: stats,
-    };
+    return stats;
   }
 }
