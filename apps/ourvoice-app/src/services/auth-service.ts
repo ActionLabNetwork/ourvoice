@@ -3,9 +3,11 @@ import sha256 from 'crypto-js/sha256'
 import Base64 from 'crypto-js/enc-base64'
 import Session from 'supertokens-web-js/recipe/session'
 
-const API_URL = import.meta.env.VITE_APP_API_URL
-const SESSION_INFO_ENDPOINT = import.meta.env.VITE_SESSION_INFO_ENDPOINT
-const GLOBAL_PEPPER = import.meta.env.VITE_GLOBAL_PEPPER
+import config from '@/config'
+
+const API_URL = config.apiURL
+const SESSION_INFO_ENDPOINT = config.sessionEndpoint
+const GLOBAL_PEPPER = config.globalPepper
 
 export default {
   async getSessionInfo() {

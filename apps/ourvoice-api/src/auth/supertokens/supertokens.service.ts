@@ -19,7 +19,7 @@ export class SupertokensService {
       },
       recipeList: [
         Session.init({
-          cookieDomain: `${process.env.SUPERTOKENS_COOKIE_DOMAIN}`,
+          cookieDomain: config.cookieDomain,
           override: {
             functions: (originalImplementation) => {
               return {

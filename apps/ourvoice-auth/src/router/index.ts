@@ -7,11 +7,13 @@ import ForgotPasswordView from '../views/ForgotPasswordView.vue'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { DeploymentService } from '../utils/deployment.service'
 
+import config from '@/config'
+
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
 
 // const adminURL = import.meta.env.VITE_APP_ADMIN_URL
-const domain = import.meta.env.VITE_APP_FRONTEND_DOMAIN
+const domain = config.sessionTokenFrontendDomain
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

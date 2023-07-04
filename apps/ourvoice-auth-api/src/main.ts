@@ -23,10 +23,11 @@ async function bootstrap() {
 
   // TODO: add admin and app addresses to list
   const whitelist: string[] = [
-    configService.get('SUPERTOKENS_API_DOMAIN'), // app itself
-    configService.get('VITE_APP_AUTH_URL'),
-    configService.get('VITE_APP_ADMIN_URL'),
-    configService.get('VITE_APP_APP_DOMAIN'),
+    `http://localhost:${configService.get<number>('authApi.port')}`, // localhost
+    configService.get<string>('authApi.url'), // AUTHAPI
+    configService.get<string>('auth.url'), // AUTH
+    configService.get<string>('admin.url'), // ADMIN
+    configService.get<string>('app.domain'), // DOMAIN
   ];
   // TODO : use regex for all deployment names
   app.enableCors({
@@ -82,13 +83,10 @@ async function bootstrap() {
   await addModeratorsToAllowlist(configService.get<string[]>('moderators'));
   // add super admin user
   await addSuperAdmin(
-    configService.get<string>('SUPERTOKENS_ADMIN_EMAIL') ||
-      'admin@ourvoice.app',
-    configService.get<string>(
-      'SUPERTOKENS_ADMIN_PASSWORD' || 'super-admin-pass',
-    ),
+    configService.get<string>('supertokens.adminEmail'),
+    configService.get<string>('supertokens.adminPassword'),
   );
-  await app.listen(configService.get<number>('AUTH_API_PORT') || 3001);
+  await app.listen(configService.get<number>('authApi.port'));
 }
 
 bootstrap();

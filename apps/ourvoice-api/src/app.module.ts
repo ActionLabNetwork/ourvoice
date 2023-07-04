@@ -3,7 +3,7 @@ import { PostModule } from './modules/post/post.module';
 import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
@@ -20,36 +20,39 @@ import { ModerationModule } from './modules/moderation/moderation.module';
 import { UsersModule } from './modules/users/users.module';
 
 import deployment from './config/deployment';
+import configuration from './config/configuration';
+
 import { GraphQLError } from 'graphql/error';
+import { SMTPConfig } from './auth/config.interface';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [deployment],
+      load: [deployment, configuration],
       isGlobal: true,
     }),
-    AuthModule.forRoot({
-      connectionURI: `${
-        process.env.SUPERTOKENS_URI || 'http://localhost:3567'
-      }`,
-      apiKey: `${process.env.SUPERTOKENS_API_KEY || 'super-secret-api-key'}`,
-      appInfo: {
-        // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
-        appName: `${process.env.SUPERTOKENS_APP_NAME || 'Ourvoice API'}`,
-        apiDomain: `${
-          process.env.SUPERTOKENS_API_DOMAIN || 'http://authapi.ourvoice.test'
-        }`,
-        apiBasePath: `${process.env.SUPERTOKENS_API_BASE_PATH || '/auth'}`,
-        websiteDomain: `${
-          process.env.SUPERTOKENS_WEBSITE_DOMAIN || 'http://auth.ourvoice.test'
-        }`,
-        websiteBasePath: `${process.env.SUPERTOKENS_WEBSITE_BASE_PATH || '/'}`,
-      },
-      smtpSettings: {
-        host: `${process.env.SMTP_HOST}`,
-        port: Number(process.env.SMTP_PORT),
-        user: `${process.env.SMTP_USER}`,
-        password: `${process.env.SMTP_PASSWORD}`,
+    AuthModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          connectionURI: configService.get<string>('supertokens.connectionURI'),
+          apiKey: configService.get<string>('supertokens.apiKey'),
+          appInfo: {
+            // Learn more about this on https://supertokens.com/docs/emailpassword/appinfo
+            appName: configService.get<string>('supertokens.appName'),
+            apiDomain: configService.get<string>('supertokens.apiDomain'),
+            apiBasePath: configService.get<string>('supertokens.apiBasePath'),
+            websiteDomain: configService.get<string>(
+              'supertokens.websiteDomain',
+            ),
+            websiteBasePath: configService.get<string>(
+              'supertokens.websiteBasePath',
+            ),
+          },
+          smtpSettings: configService.get<SMTPConfig>('smtp'),
+          cookieDomain: configService.get<string>('supertokens.cookieDomain'),
+        };
       },
     }),
     GraphQLModule.forRoot({
@@ -73,19 +76,24 @@ import { GraphQLError } from 'graphql/error';
     PostModule,
     CategoryModule,
     CommentModule,
-    VoteModule,
-    ContactFormModule.register({
-      smtpSettings: {
-        host: process.env.CONTACT_FORM_SMTP_HOST,
-        port: Number(process.env.CONTACT_FORM_SMTP_PORT),
-        user: process.env.CONTACT_FORM_SMTP_USER,
-        pass: process.env.CONTACT_FORM_SMTP_PASS,
+    ContactFormModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        return {
+          smtpSettings: {
+            host: configService.get<string>('smtp.host'),
+            port: configService.get<number>('smtp.port'),
+            user: configService.get<string>('smtp.user'),
+            pass: configService.get<string>('smtp.password'),
+          },
+          recaptchaSecret: configService.get<string>('contact.recaptchaSecret'),
+        };
       },
-      recaptchaSecret: process.env.CONTACT_FORM_RECAPTCHA_SECRET,
     }),
+    VoteModule,
     ModerationModule,
     ScheduleModule.forRoot(),
-    // TODO: perhaps move to other modules
     UsersModule,
   ],
   controllers: [AppController],

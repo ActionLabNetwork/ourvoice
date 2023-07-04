@@ -4,19 +4,20 @@ import SuperTokens from 'supertokens-web-js'
 import Session from 'supertokens-web-js/recipe/session'
 import EmailVerification from 'supertokens-web-js/recipe/emailverification'
 
+import config from './config'
 import App from './App.vue'
 import router from './router'
 
 SuperTokens.init({
   appInfo: {
-    appName: `${import.meta.env.VITE_APP_NAME || 'OurVoice Admin'}`,
-    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL}`,
-    apiBasePath: `${import.meta.env.VITE_APP_AUTH_API_BASE_PATH || '/auth'}`
+    appName: config.appName,
+    apiDomain: config.apiDomain,
+    apiBasePath: config.apiBasePath
   },
   recipeList: [
     Session.init({
-      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN}`,
-      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN}`
+      sessionTokenBackendDomain: config.sessionTokenBackendDomain,
+      sessionTokenFrontendDomain: config.sessionTokenFrontendDomain
     }),
     EmailVerification.init()
   ]

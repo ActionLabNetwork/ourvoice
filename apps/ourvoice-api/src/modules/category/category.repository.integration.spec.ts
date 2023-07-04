@@ -4,6 +4,7 @@ import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CategoryRepository } from './category.repository';
 import { numberToCursor } from '../../utils/cursor-pagination';
+import { ConfigService } from '@nestjs/config';
 
 describe('CategoryRepository', () => {
   let categoryRepository: CategoryRepository;
@@ -16,7 +17,29 @@ describe('CategoryRepository', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [PrismaService, CategoryRepository],
+      providers: [
+        PrismaService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'database.mainTestUrl') {
+                return (
+                  process.env.DATABASE_MAIN_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test'
+                );
+              } else if (key === 'database.mainUrl') {
+                return (
+                  process.env.DATABASE_MAIN_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer'
+                );
+              }
+              return null;
+            }),
+          },
+        },
+        CategoryRepository,
+      ],
     }).compile();
 
     prismaService = moduleRef.get(PrismaService);

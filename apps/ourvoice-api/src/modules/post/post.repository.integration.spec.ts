@@ -4,6 +4,7 @@ import { seedMainDb } from './../../../prisma/seed';
 import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { PostRepository } from './post.repository';
+import { ConfigService } from '@nestjs/config';
 
 describe('PostRepository', () => {
   let postRepository: PostRepository;
@@ -16,7 +17,39 @@ describe('PostRepository', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [PrismaService, PostRepository],
+      providers: [
+        PrismaService,
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              if (key === 'database.premoderationUrl') {
+                return (
+                  process.env.DATABASE_PREMODERATION_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer'
+                );
+              } else if (key === 'database.premoderationTestUrl') {
+                return (
+                  process.env.DATABASE_PREMODERATION_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
+                );
+              } else if (key === 'database.mainTestUrl') {
+                return (
+                  process.env.DATABASE_MAIN_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test'
+                );
+              } else if (key === 'database.mainUrl') {
+                return (
+                  process.env.DATABASE_MAIN_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer'
+                );
+              }
+              return null;
+            }),
+          },
+        },
+        PostRepository,
+      ],
     }).compile();
 
     prismaService = moduleRef.get(PrismaService);

@@ -18,7 +18,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-const adminEmail = import.meta.env.VITE_APP_ADMIN_EMAIL
+import config from '@/config'
+
+const adminEmail = config.adminEmail
 
 export default defineComponent({
   props: ['deployment'],

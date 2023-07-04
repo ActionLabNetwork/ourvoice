@@ -24,13 +24,12 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
 
-  // TODO: add website domains
   const whitelist: string[] = [
     // 'http://localhost:4173', // cypress
-    configService.get('VITE_APP_LOCALHOST_ORIGIN'),
-    configService.get('VITE_APP_API_URL'), // APP itself
-    configService.get('VITE_APP_ADMIN_URL'), // ADMIN
-    configService.get('VITE_APP_APP_DOMAIN'), // DOMAIN
+    `http://localhost:${configService.get<number>('api.port')}`, // localhost
+    configService.get<string>('api.url'), // API
+    configService.get<string>('admin.url'), // ADMIN
+    configService.get<string>('app.domain'), // DOMAIN
   ];
   app.enableCors({
     origin: function (origin, callback) {
@@ -56,7 +55,7 @@ async function bootstrap() {
   app.use(middleware());
   app.use(errorHandler());
   app.useGlobalFilters(new SupertokensExceptionFilter());
-  await app.listen(configService.get<number>('API_PORT') || 3000);
+  await app.listen(configService.get<number>('api.port'));
 }
 
 bootstrap();

@@ -8,8 +8,10 @@ import Session from 'supertokens-web-js/recipe/session'
 import { defineComponent } from 'vue'
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 
+import config from '@/config'
+
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
-const adminURL = import.meta.env.VITE_APP_ADMIN_URL
+const adminURL = config.adminURL
 
 export default defineComponent({
   data() {

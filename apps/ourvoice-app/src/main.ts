@@ -9,6 +9,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { DefaultApolloClient } from '@vue/apollo-composable'
+import config from './config'
+
 // import VueVirtualScroller from 'vue-virtual-scroller'
 // import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AppNavBar from './components/common/AppNavBar.vue'
@@ -18,14 +20,14 @@ import router from './router'
 
 SuperTokens.init({
   appInfo: {
-    appName: `${import.meta.env.VITE_APP_NAME || 'OurVoice APP'}`,
-    apiDomain: `${import.meta.env.VITE_APP_AUTH_API_URL}`,
-    apiBasePath: `${import.meta.env.VITE_APP_AUTH_API_BASE || '/auth'}`
+    appName: config.appName,
+    apiDomain: config.apiDomain,
+    apiBasePath: config.apiBasePath
   },
   recipeList: [
     Session.init({
-      sessionTokenBackendDomain: `${import.meta.env.VITE_APP_BACKEND_DOMAIN}`,
-      sessionTokenFrontendDomain: `${import.meta.env.VITE_APP_FRONTEND_DOMAIN}`
+      sessionTokenBackendDomain: config.sessionTokenBackendDomain,
+      sessionTokenFrontendDomain: config.sessionTokenFrontendDomain
     }),
     EmailVerification.init()
   ]

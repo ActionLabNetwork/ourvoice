@@ -354,6 +354,8 @@ export class SupertokensService {
         apiKey: config.apiKey || 'super-secret-api-key',
       }),
     };
-    return config.authModules.map((auth) => recipeList[auth]);
+    return config.authModules
+      ? config.authModules.map((auth) => recipeList[auth])
+      : Object.values(recipeList);
   }
 }
