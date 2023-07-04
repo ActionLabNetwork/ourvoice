@@ -59,6 +59,11 @@ export class PollResolver {
   }
 
   @Mutation()
+  async removePoll(@Args('pollId') pollId: number): Promise<number> {
+    return await this.pollService.removePoll(pollId);
+  }
+
+  @Mutation()
   async votePoll(@Args('voteInput') vote: VoteInput): Promise<VoteResponse> {
     return await this.pollService.vote(vote);
   }
