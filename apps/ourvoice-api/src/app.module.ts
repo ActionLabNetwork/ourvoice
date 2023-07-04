@@ -1,5 +1,6 @@
 import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
+import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -90,6 +91,7 @@ import { SMTPConfig } from './auth/config.interface';
         };
       },
     }),
+    VoteModule,
     ModerationModule,
     ScheduleModule.forRoot(),
     UsersModule,

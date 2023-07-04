@@ -1,94 +1,182 @@
 <template>
-  <div class="flex-shrink-0 mr-0">
-    <img
-      class="mt-2 rounded-full w-8 h-8 sm:w-10 sm:h-10 hover:cursor-pointer"
-      :src="`https://api.multiavatar.com/${post.author.nickname}.png`"
-      :title="post.author.nickname"
-    />
-  </div>
-  <div class="flex-1 rounded-lg p-2 leading-relaxed">
-    <div class="bg-white px-4 py-2 rounded-lg">
-      <!-- <strong>{{ post.author.nickname }}</strong> -->
-
-      <h1 class="text-lg md:text-xl font-bold">Title: {{ post.title }}</h1>
-      <p class="text-sm md:text-md py-2">
-        {{ post.content }}
-      </p>
-
+  <div
+    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:shadow-lg transition duration-500 ease-in-out"
+  >
+    <!-- {{ post }} -->
+    <!-- <pre>{{ votes }}</pre> -->
+    <!-- {{ hasUpvote }} -->
+    <!-- {{ hasDownvote }} -->
+    <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
+      {{ post?.title }}
+      <div>
+        <span
+          v-for="(cat, index) in post?.categories"
+          :key="index"
+          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+          ># {{ cat?.name }}
+        </span>
+      </div>
+    </h1>
+    <h2 class="text-xs lg:text-sm text-gray-500">
+      <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
+      <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
+    </h2>
+    <p class="text-sm my-2">
+      <font-awesome-icon icon="fa-solid fa-quote-left" />
+      {{ post?.content }}
+      <font-awesome-icon icon="fa-solid fa-quote-right" />
+    </p>
+    <div id="fileUrlsWrapper" class="text-right">
+      <a
+        class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline"
+        v-for="url in presignedUrls"
+        :key="url"
+        :href="url"
+        target="_blank"
+      >
+        file
+      </a>
+    </div>
+    <div class="flex justify-between items-center">
       <div class="flex">
-        <div class="grid grid-cols-3 divide-x divide-none text-gray-500 text-xs md:text-sm">
-          <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
-            @click="showCommentTextarea = !showCommentTextarea"
-          >
-            <font-awesome-icon icon="fa-solid fa-comment" />
-            <span class="hidden sm:inline-block px-1"> Comment </span>
-          </div>
-          <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
-          >
+        <button
+          @click.stop="voteForPost('UPVOTE')"
+          type="button"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+        >
+          <span :class="{ 'text-ourvoice-purple': hasUpvote }">
+            {{ post?.votesUp }}
             <font-awesome-icon icon="fa-solid fa-thumbs-up" />
-            <span class="hidden sm:inline-block px-1"> Vote up </span>
-          </div>
-          <div
-            class="hover:text-indigo-400 hover:cursor-pointer bg-gray-100 text-center rounded-full px-2 py-1 m-auto w-fit"
-          >
-            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
-            <span class="hidden sm:inline-block px-1"> Vote down </span>
-          </div>
-        </div>
+          </span>
+        </button>
 
-        <div class="text-right ml-auto">
-          <span class="text-xs md:text-md text-gray-500">{{ timePassed(post.createdAt) }}</span>
-        </div>
+        <button
+          @click.stop="voteForPost('DOWNVOTE')"
+          type="button"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+        >
+          <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+            {{ post?.votesDown }}
+            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+          </span>
+        </button>
+      </div>
+      <div>
+        <slot>
+          <!-- default slot -->
+          <button
+            @click.stop="handleCommentBtnClicked"
+            class="underline hover:bg-gray-200 px-1 rounded-md transition duration-300 ease-in-out"
+          >
+            COMMENTS({{ post?.comments?.length ?? 0 }})
+          </button>
+        </slot>
       </div>
     </div>
-
-    <CommentTextarea v-if="showCommentTextarea" @submit="(payload) => createComment(payload)" />
-
-    <CommentTile :postId="post.id" />
   </div>
 </template>
+<script lang="ts" setup>
+import { computed, ref } from 'vue'
+import { timePassed } from '@/utils/index'
+import { usePostsStore } from '@/stores/posts'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+const postsStore = usePostsStore()
+const userStore = useUserStore()
+const router = useRouter()
 
-<script lang="ts">
-import { timePassed } from '@/utils'
-import { ref } from 'vue'
-import CommentTile from '../comment/CommentTile.vue'
-import CommentTextarea from '../comment/CommentTextarea.vue'
-import { useCommentsStore } from '@/stores/comments'
+const props = defineProps({
+  postId: {
+    type: Number,
+    required: true
+  }
+})
 
-export default {
-  name: 'PostCard',
-  props: {
-    post: {
-      type: Object,
-      required: true
+const post = computed(() => postsStore.getPostById(props.postId))
+
+const handleCommentBtnClicked = () => {
+  console.log('comment btn clicked')
+  router.push({
+    name: 'postpage',
+    params: {
+      id: props.postId
+    }
+  })
+}
+
+const getPresignedUrls = (keys: string[]) => {
+  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
+}
+
+const presignedUrls = ref<string[]>([])
+const res = await getPresignedUrls(post.value?.files ?? [])
+presignedUrls.value = res.map((item: any) => item.url) ?? []
+
+const votes = ref<Vote[]>([])
+const hasUpvote = computed(() => {
+  return votes.value.some(
+    (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
+  )
+})
+const hasDownvote = computed(() => {
+  return votes.value.some(
+    (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
+  )
+})
+
+const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
+const { onResult, refetch } = useQuery(
+  GET_VOTES_QUERY,
+  {
+    filter: {
+      postId: props.postId,
+      voteType: null,
+      authorHash: null,
+      authorNickname: null,
+      commentId: null
     }
   },
-  components: {
-    CommentTile,
-    CommentTextarea
-  },
-  setup(props) {
-    const commentsStore = useCommentsStore()
+  {
+    fetchPolicy: 'network-only'
+  }
+)
+onResult(({ data, loading }) => {
+  if (loading) return
+  votes.value = data.votes
+    .filter((vote: any) => !vote.comment)
+    .map((vote: any) => ({
+      id: vote.id,
+      voteType: vote.voteType,
+      authorHash: vote.authorHash,
+      authorNickname: vote.authorNickname,
+      post: {
+        id: vote.post.id
+      },
+      comment: null
+    }))
+  // console.log(`votes for post:${props.postId}`, votes.value)
+})
 
-    const showCommentTextarea = ref(false)
-    const createComment = (payload: string) => {
-      console.log('createPost')
-      commentsStore.createComment({
-        //TODO: get authorId from auth
-        authorId: 3,
-        content: payload,
-        postId: props.post.id,
-        parentId: undefined
-      })
-      showCommentTextarea.value = false
-    }
-    return {
-      showCommentTextarea,
-      createComment,
-      timePassed
-    }
+const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+  try {
+    await createVoteForPost({
+      data: {
+        commentId: null,
+        postId: props.postId,
+        authorHash: userStore.sessionHash,
+        authorNickname: userStore.nickname,
+        voteType: voteType
+      }
+    })
+    await refetch()
+    console.log('refetched votes for post:', props.postId)
+    postsStore.syncVotesForPostById(props.postId)
+  } catch (error) {
+    console.log(error)
   }
 }
 </script>

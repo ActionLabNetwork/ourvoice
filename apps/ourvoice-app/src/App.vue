@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-col w-full">
     <Navbar />
-    <RouterView />
+    <Suspense>
+      <RouterView />
+    </Suspense>
   </div>
 </template>
 

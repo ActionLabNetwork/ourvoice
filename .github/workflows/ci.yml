@@ -104,10 +104,18 @@ jobs:
             --health-retries 5
         ports:
           - 5437:5432
+
     steps:
       - name: Repository checkout
         uses: actions/checkout@v3.5.3
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: 6.0
+          mongodb-replica-set: rs0
+          mongodb-port: 27017
+        
       # - name: Create main databases if not exists
       #   run: |
       #     PGPASSWORD=${{ env.DB_TEST_MAIN_PASSWORD }} psql -U ${{ env.DB_TEST_MAIN_USERNAME }} -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${{ env.DB_TEST_MAIN_DATABASE }}'" | grep -q 1 || psql -h ${{ env.DB_TEST_APP_API_DB_MAIN_HOST }} -p ${{env.DB_TEST_APP_API_DB_MAIN_PORT}} -U ${{ env.DB_TEST_MAIN_USERNAME }} -d postgres -c 'CREATE DATABASE ${{ env.DB_TEST_MAIN_DATABASE }};'

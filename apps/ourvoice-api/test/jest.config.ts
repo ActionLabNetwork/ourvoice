@@ -1,3 +1,4 @@
+// '<rootDir>/src/modules/users/.*',
 module.exports = {
   rootDir: '../',
   testMatch: ['<rootDir>/src/**/*.spec.ts'],

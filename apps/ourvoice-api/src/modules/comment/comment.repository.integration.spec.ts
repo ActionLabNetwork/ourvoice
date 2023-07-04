@@ -137,7 +137,7 @@ describe('CommentRepository', () => {
     });
 
     // Assert
-    expect(comments.comments.map((comment) => comment.id)).toEqual([1, 2]);
+    expect(comments.comments.map((comment) => comment.id)).toEqual([3, 2]);
     expect(comments.totalCount).toEqual(3);
     expect(prismaService.comment.findMany).toHaveBeenCalledTimes(1);
   });
@@ -149,11 +149,11 @@ describe('CommentRepository', () => {
     // Act
     const comments = await commentRepository.getComments(undefined, {
       limit: 2,
-      cursor: numberToCursor(1),
+      cursor: numberToCursor(3),
     });
 
     // Assert
-    expect(comments.comments.map((comment) => comment.id)).toEqual([2, 3]);
+    expect(comments.comments.map((comment) => comment.id)).toEqual([2, 1]);
     expect(comments.totalCount).toEqual(3);
     expect(prismaService.comment.findMany).toHaveBeenCalledTimes(1);
   });
@@ -187,7 +187,7 @@ describe('CommentRepository', () => {
 
     // Assert
     expect(comments.comments.length).toEqual(2);
-    expect(comments.comments.map((comment) => comment.id)).toEqual([1, 3]);
+    expect(comments.comments.map((comment) => comment.id)).toEqual([3, 1]);
     expect(comments.totalCount).toEqual(2);
     expect(prismaService.comment.findMany).toHaveBeenCalledTimes(1);
   });

@@ -1,4 +1,8 @@
-import { PostPaginationInput, PostsFilterInput } from './../../graphql';
+import {
+  PostPaginationInput,
+  PostsFilterInput,
+  PostSortingInput,
+} from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from '../../modules/post/post.service';
 import { s3 } from '../../config/s3-config';
@@ -20,10 +24,12 @@ export class PostResolver {
   async posts(
     @Args('filter', { nullable: true }) filter?: PostsFilterInput,
     @Args('pagination', { nullable: true }) pagination?: PostPaginationInput,
+    @Args('sort', { nullable: true }) sort?: PostSortingInput,
   ) {
     const { totalCount, edges, pageInfo } = await this.postService.getPosts(
       filter,
       pagination,
+      sort,
     );
 
     return { totalCount, edges, pageInfo };

@@ -1,7 +1,15 @@
 type Query {
   post(id: Int!): Post
-  posts(filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
-  postsByCategories(categories: [String!]!, filter: PostsFilterInput, pagination: PostPaginationInput): PostConnection
+  posts(
+    filter: PostsFilterInput
+    pagination: PostPaginationInput
+    sort: PostSortingInput
+  ): PostConnection
+  postsByCategories(
+    categories: [String!]!
+    filter: PostsFilterInput
+    pagination: PostPaginationInput
+  ): PostConnection
   getPresignedUrls(
     bucket: String!
     keys: [String!]!
@@ -69,6 +77,20 @@ input PostsFilterInput {
   moderatedBefore: DateTime
   publishedAfter: DateTime
   publishedBefore: DateTime
+}
+
+enum sortOrder {
+  asc
+  desc
+}
+
+input PostSortingInput {
+  sortByCreatedAt: sortOrder
+  sortBypublishedAt: sortOrder
+  sortByModeratedAt: sortOrder
+  sortByVotesUp: sortOrder
+  sortByVotesDown: sortOrder
+  sortByCommentsCount: sortOrder
 }
 
 type PresignedUrl {

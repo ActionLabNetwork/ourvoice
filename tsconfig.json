@@ -25,7 +25,7 @@
     "noImplicitThis": true,
     "strict": true,
     // "preserveValueImports": true,
-    "verbatimModuleSyntax": true,
+    // "verbatimModuleSyntax": true,
     // "importHelpers": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
