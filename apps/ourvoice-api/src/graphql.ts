@@ -187,6 +187,36 @@ export class ModerationPostModifyInput {
     files?: Nullable<Nullable<string>[]>;
 }
 
+export class PollCreateInput {
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    expiresAt?: Nullable<DateTime>;
+    question: string;
+    options: PollOptionCreateInput[];
+}
+
+export class PollUpdateInput {
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresAt?: Nullable<DateTime>;
+    question?: Nullable<string>;
+    options?: Nullable<PollOptionCreateInput[]>;
+}
+
+export class PollOptionCreateInput {
+    option: string;
+}
+
+export class VoteInput {
+    voterHash: string;
+    pollId: number;
+    optionId: number;
+}
+
 export class PostUpdateInput {
     title?: Nullable<string>;
     content?: Nullable<string>;
@@ -275,6 +305,10 @@ export abstract class IQuery {
 
     abstract postVersion(id: number): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
 
+    abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
+
+    abstract pollsWithResult(moderatorHash: string): PollWithResult[] | Promise<PollWithResult[]>;
+
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
     abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): PostConnection | Promise<PostConnection>;
@@ -336,6 +370,12 @@ export abstract class IMutation {
     abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
+    abstract createPoll(data: PollCreateInput): Nullable<Poll> | Promise<Nullable<Poll>>;
+
+    abstract updatePoll(pollId: number, data: PollUpdateInput): Nullable<Poll> | Promise<Nullable<Poll>>;
+
+    abstract votePoll(voteInput?: Nullable<VoteInput>): Nullable<VoteResponse> | Promise<Nullable<VoteResponse>>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
 
@@ -537,6 +577,52 @@ export class ModerationPostPageInfo {
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
     hasPreviousPage?: Nullable<boolean>;
+}
+
+export class Poll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+}
+
+export class PollOption {
+    id: number;
+    option: string;
+}
+
+export class PollWithResult {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOptionWithResult[];
+}
+
+export class PollOptionWithResult {
+    id: number;
+    option: string;
+    numVotes: number;
+}
+
+export class VoteResponse {
+    pollId: number;
+    optionId: number;
+    stats?: Nullable<PollOptionStat[]>;
+}
+
+export class PollOptionStat {
+    optionId: number;
+    proportion: number;
 }
 
 export class Post {

@@ -19,6 +19,7 @@ import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheContr
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { UsersModule } from './modules/users/users.module';
+import { PollModule } from './modules/poll/poll.module';
 
 import deployment from './config/deployment';
 import configuration from './config/configuration';
@@ -96,6 +97,8 @@ import { SMTPConfig } from './auth/config.interface';
         };
       },
     }),
+    VoteModule,
+    PollModule,
     VoteModule,
     ModerationModule,
     ScheduleModule.forRoot(),
