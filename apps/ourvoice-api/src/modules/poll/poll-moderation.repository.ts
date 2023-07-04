@@ -82,6 +82,9 @@ export class PollModerationRepository {
       where: {
         pollId,
       },
+      orderBy: {
+        optionId: 'asc',
+      },
     });
   }
 
