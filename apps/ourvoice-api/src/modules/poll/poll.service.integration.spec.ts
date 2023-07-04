@@ -21,7 +21,7 @@ describe('PollService', () => {
     published: true,
     active: true,
     weight: 1,
-    expiresAt: testDateExpiry,
+    expiresAt: null,
     options: [
       { option: 'option 1' },
       { option: 'option 2' },
@@ -106,7 +106,10 @@ describe('PollService', () => {
   });
 
   it('should update expiring date to null', async () => {
-    const createdPoll = await pollService.createPoll(testPoll);
+    const createdPoll = await pollService.createPoll({
+      ...testPoll,
+      expiresAt: testDateExpiry,
+    });
 
     await pollService.updatePoll(createdPoll.id, { expiresAt: null });
     const poll = await expectOnlyOnePoll();
@@ -114,11 +117,14 @@ describe('PollService', () => {
   });
 
   it('should not update expiring date with undefined', async () => {
-    const createdPoll = await pollService.createPoll(testPoll);
+    const createdPoll = await pollService.createPoll({
+      ...testPoll,
+      expiresAt: testDateExpiry,
+    });
 
     await pollService.updatePoll(createdPoll.id, { expiresAt: undefined });
     const poll = await expectOnlyOnePoll();
-    expect(poll.expiresAt).toEqual(testPoll.expiresAt);
+    expect(poll.expiresAt).toEqual(testDateExpiry);
   });
 
   it('should update question', async () => {
@@ -278,7 +284,6 @@ describe('PollService', () => {
       active: false,
     });
 
-    // setDate(testDateAfterExpiry)
     await expect(async () => {
       await pollService.vote({
         pollId: createdPoll.id,
@@ -289,7 +294,10 @@ describe('PollService', () => {
   });
 
   it('should not let user to vote after expiry date', async () => {
-    const createdPoll = await pollService.createPoll(testPoll);
+    const createdPoll = await pollService.createPoll({
+      ...testPoll,
+      expiresAt: testDateExpiry,
+    });
     setDate(testDateAfterExpiry);
     await expect(async () => {
       await pollService.vote({
@@ -323,11 +331,7 @@ describe('PollService', () => {
   );
 
   it('should not display to the user a voted poll', async () => {
-    setDate(testDateBeforeExpiry);
-    const createdPoll = await pollService.createPoll({
-      ...testPoll,
-      expiresAt: testDateExpiry,
-    });
+    const createdPoll = await pollService.createPoll(testPoll);
 
     await pollService.vote({
       pollId: createdPoll.id,
