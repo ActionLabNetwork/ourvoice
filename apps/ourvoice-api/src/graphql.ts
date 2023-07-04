@@ -403,6 +403,8 @@ export abstract class IMutation {
 
     abstract updatePoll(pollId: number, data: PollUpdateInput): Nullable<Poll> | Promise<Nullable<Poll>>;
 
+    abstract removePoll(pollId: number): number | Promise<number>;
+
     abstract votePoll(voteInput?: Nullable<VoteInput>): Nullable<VoteResponse> | Promise<Nullable<VoteResponse>>;
 
     abstract deletePost(id: number): Post | Promise<Post>;

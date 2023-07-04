@@ -181,6 +181,7 @@ export class PollService {
       throw new BadRequestException('Unable to remove poll if there are votes');
     }
     await this.pollRepository.removePollById(pollId);
+    return pollId;
   }
 
   async vote(voteInput: VoteInput): Promise<VoteResponse> {
