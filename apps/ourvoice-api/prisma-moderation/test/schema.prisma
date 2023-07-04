@@ -124,3 +124,19 @@ enum PostStatus {
   APPROVED
   REJECTED
 }
+
+model PollVoterVoted {
+  id Int @default(autoincrement())
+  pollId Int
+  voterHash String
+
+  @@id([pollId, voterHash])
+}
+
+model PollVote {
+  pollId Int
+  optionId Int
+  numVotes Int
+
+  @@id([pollId, optionId])
+}

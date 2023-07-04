@@ -89,3 +89,22 @@ model Vote {
 
   @@unique([authorHash, postId, commentId])
 }
+
+model Poll {
+  id Int @id @default(autoincrement())
+  options PollOption[]
+  question String
+  published Boolean
+  active Boolean
+  postLink String?
+  weight Int
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+}
+
+model PollOption {
+  id Int @id @default(autoincrement())
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  pollId Int
+  option String
+}
