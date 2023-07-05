@@ -335,9 +335,9 @@ export abstract class IQuery {
 
     abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
 
-    abstract votedPolls(userHash: string, pagination?: Nullable<PollPaginationInput>): Nullable<PollWithStatsConnection> | Promise<Nullable<PollWithStatsConnection>>;
+    abstract votedPolls(userHash: string, pagination: PollPaginationInput): PollWithStatsConnection | Promise<PollWithStatsConnection>;
 
-    abstract pollsWithResult(moderatorHash: string, filter?: Nullable<PollFilterInput>, pagination?: Nullable<PollPaginationInput>): Nullable<PollWithResultConnection> | Promise<Nullable<PollWithResultConnection>>;
+    abstract pollsWithResult(moderatorHash: string, filter: PollFilterInput, pagination: PollPaginationInput): PollWithResultConnection | Promise<PollWithResultConnection>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
@@ -399,13 +399,13 @@ export abstract class IMutation {
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract createPoll(data: PollCreateInput): Nullable<Poll> | Promise<Nullable<Poll>>;
+    abstract createPoll(data: PollCreateInput): Poll | Promise<Poll>;
 
-    abstract updatePoll(pollId: number, data: PollUpdateInput): Nullable<Poll> | Promise<Nullable<Poll>>;
+    abstract updatePoll(pollId: number, data: PollUpdateInput): Poll | Promise<Poll>;
 
     abstract removePoll(pollId: number): number | Promise<number>;
 
-    abstract votePoll(voteInput?: Nullable<VoteInput>): Nullable<VoteResponse> | Promise<Nullable<VoteResponse>>;
+    abstract votePoll(voteInput?: Nullable<VoteInput>): VoteResponse | Promise<VoteResponse>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
 

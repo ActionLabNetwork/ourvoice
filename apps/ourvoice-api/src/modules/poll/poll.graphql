@@ -2,20 +2,20 @@ type Query {
   availablePolls(userHash: String!): [Poll!]!
   votedPolls(
     userHash: String!
-    pagination: PollPaginationInput
-  ): PollWithStatsConnection
+    pagination: PollPaginationInput!
+  ): PollWithStatsConnection!
   pollsWithResult(
     moderatorHash: String!
-    filter: PollFilterInput
-    pagination: PollPaginationInput
-  ): PollWithResultConnection
+    filter: PollFilterInput!
+    pagination: PollPaginationInput!
+  ): PollWithResultConnection!
 }
 
 type Mutation {
-  createPoll(data: PollCreateInput!): Poll
-  updatePoll(pollId: Int!, data: PollUpdateInput!): Poll
+  createPoll(data: PollCreateInput!): Poll!
+  updatePoll(pollId: Int!, data: PollUpdateInput!): Poll!
   removePoll(pollId: Int!): Int!
-  votePoll(voteInput: VoteInput): VoteResponse
+  votePoll(voteInput: VoteInput): VoteResponse!
 }
 
 input PollPaginationInput {
@@ -159,7 +159,7 @@ type PollWithStats implements BasePoll {
 }
 
 type PollWithStatsEdge {
-  node: PollWithStats!,
+  node: PollWithStats!
   cursor: String!
 }
 
