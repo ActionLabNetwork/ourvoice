@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0 text-sm sm:text-md">
+    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
       <!-- Side pane button -->
       <div
         @click="toggleSidePane"
-        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md"
+        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
         data-cy="moderation-history-button"
       >
         <p>
