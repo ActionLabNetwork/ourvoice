@@ -1,8 +1,7 @@
 <template>
   <div class="w-full h-full bg-gray-100">
-    <Header title="Moderation Posts List" />
     <main>
-      <div class="px-10 py-10 bg-gray-100">
+      <div class="px-10 py-10 bg-gray-100 border">
         <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
           <template #pending>
             <PostModerationList :posts="moderationPosts.PENDING" />
@@ -30,7 +29,6 @@ import { LIST_TABS } from '@/constants/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationPost } from '@/stores/moderation-posts'
 import type { ModerationVersionStatus } from '@/types/moderation'
-// import type { Tab } from '@/types'
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {

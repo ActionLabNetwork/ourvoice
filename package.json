@@ -54,7 +54,7 @@
     "seed:api:all": "pnpm seed:api:main && pnpm seed:api:premoderation",
     "seed:api:main": "pnpm --filter ./apps/ourvoice-api prisma:seed:main",
     "seed:api:premoderation": "pnpm --filter ./apps/ourvoice-api prisma:seed:premoderation",
-    "postinstall": "pnpm tsx scripts/copy-config.ts"
+    "postinstall": "pnpm tsx scrip ts/copy-config.ts"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
