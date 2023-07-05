@@ -73,6 +73,8 @@
   },
   "homepage": "https://github.com/Our-Voice-Inc/ourvoice#readme",
   "devDependencies": {
+    "@graphql-codegen/cli": "^4.0.1",
+    "@graphql-codegen/client-preset": "^4.0.1",
     "@types/node": "^18.16.18",
     "copyfiles": "^2.4.1",
     "cypress": "^12.15.0",

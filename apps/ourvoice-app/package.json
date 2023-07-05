@@ -15,7 +15,8 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "type-check:ci": "vue-ts --incremental false --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "graphql:generate": "graphql-codegen --watch"
   },
   "dependencies": {
     "@apollo/client": "^3.7.16",
