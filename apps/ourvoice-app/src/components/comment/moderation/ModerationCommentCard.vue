@@ -5,7 +5,12 @@
   >
     <!-- Self moderation indicator -->
     <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
-      <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
+      <div
+        :class="[
+          props.decisionIcon?.indicatorClass,
+          'flex gap-2 items-center rounded-full p-1 px-2'
+        ]"
+      >
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
@@ -21,32 +26,41 @@
     />
 
     <!-- Content -->
-    <p class="text-gray-700 text-lg leading-relaxed mb-3">{{ version.content }}</p>
+    <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">{{ version.content }}</p>
 
     <!-- Moderation decisions count -->
-    <div v-if="props.version?.moderations?.length && props.version.moderations.length > 0" class="flex gap-3 justify-around" data-cy="comment-moderation-decisions-count">
+    <div
+      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
+      class="flex flex-col sm:flex-row gap-3 justify-center sm:justify-around mx-auto sm:mx-0"
+      data-cy="comment-moderation-decisions-count"
+    >
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
     </div>
 
     <!-- Moderate button -->
-    <div class="mt-4" v-if="!preview && comment.status === 'PENDING'">
-      <CustomButton :visibility-predicate="() => !!(comment && comment.id)" :to="{ name: 'moderate-comment', params: { id: comment.id } }" data-cy="moderate-button" label="Moderate" />
+    <div class="mt-4 mx-auto sm:mx-0" v-if="!preview && comment.status === 'PENDING'">
+      <CustomButton
+        :visibility-predicate="() => !!(comment && comment.id)"
+        :to="{ name: 'moderate-comment', params: { id: comment.id } }"
+        data-cy="moderate-button"
+        label="Moderate"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { formatTimestampToReadableDate } from '@/utils';
-import AuthorBadge from '@/components/common/AuthorBadge.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
+import { computed } from 'vue'
+import { formatTimestampToReadableDate } from '@/utils'
+import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments';
-import type { PropType } from 'vue';
-import type { ModerationVersionDecision } from '@/types/moderation';
-import { getGroupsByProperty } from '@/utils/groupByProperty';
+import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments'
+import type { PropType } from 'vue'
+import type { ModerationVersionDecision } from '@/types/moderation'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
 
 interface DecisionIcon {
   text: string

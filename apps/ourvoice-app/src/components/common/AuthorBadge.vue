@@ -1,12 +1,15 @@
 <template>
   <div class="group block flex-shrink-0 mb-3">
-    <div class="flex items-center">
+    <div class="flex flex-col gap-3 sm:gap-0 sm:flex-row items-center">
       <div>
-        <img class="inline-block h-9 w-9 rounded-full"
-        :src="props.authorAvatar" alt="PseudoNickname" />
+        <img
+          class="inline-block h-9 w-9 rounded-full"
+          :src="props.authorAvatar"
+          alt="PseudoNickname"
+        />
       </div>
       <div class="ml-3">
-        <p class="text-sm font-medium text-gray-700">
+        <p class="text-sm text-center sm:text-left font-medium text-gray-700">
           {{ props.authorName }}
           <span v-if="props.modifierName" class="italic font-light text-orange-700">
             (Modified by {{ props.modifierName }})

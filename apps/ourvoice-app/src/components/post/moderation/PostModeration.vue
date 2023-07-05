@@ -1,10 +1,11 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end">
+    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0 text-sm sm:text-md">
       <!-- Side pane button -->
       <div
         @click="toggleSidePane"
-        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md" data-cy="moderation-history-button"
+        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md"
+        data-cy="moderation-history-button"
       >
         <p>
           Moderation History
@@ -19,21 +20,31 @@
     </div>
     <div class="grid grid-cols-4 gap-2">
       <!-- Versioning -->
-      <div class="col-span-1" v-if="post">
-        <ModerationVersionList @versionClicked="handleVersionChange" :versions="post?.versions ?? []" />
+      <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="post">
+        <ModerationVersionList
+          @versionClicked="handleVersionChange"
+          :versions="post?.versions ?? []"
+        />
       </div>
 
       <!-- Post Preview -->
-      <div v-if="post && version" class="col-span-3">
+      <div v-if="post && version" class="col-span-full sm:col-span-3 px-4 sm:px-0">
         <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
-        <ModerationPostCard v-else :post="post" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
+        <ModerationPostCard
+          v-else
+          :post="post"
+          :version="version"
+          :preview="true"
+          :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+        />
 
         <div class="grid grid-cols-4">
           <!-- Moderation Controls -->
-          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf"
-            class="col-span-4"
-          >
-            <ModerationControls @moderation-submit="handleModerationControlsSubmit" @moderation-action-change="handleModerationControlsActionChange" />
+          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
+            <ModerationControls
+              @moderation-submit="handleModerationControlsSubmit"
+              @moderation-action-change="handleModerationControlsActionChange"
+            />
           </div>
           <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
             <!-- Renew button -->
@@ -61,29 +72,32 @@
 </template>
 
 <script setup lang="ts">
-import { useModerationPostsStore, type Moderation, type PostVersion, } from '@/stores/moderation-posts';
-import { useUserStore } from '@/stores/user';
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
-import ModerationEditablePostCard from './ModerationEditablePostCard.vue';
-import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue';
+import {
+  useModerationPostsStore,
+  type Moderation,
+  type PostVersion
+} from '@/stores/moderation-posts'
+import { useUserStore } from '@/stores/user'
+import { ref, onMounted, computed, type ComputedRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
+import ModerationEditablePostCard from './ModerationEditablePostCard.vue'
+import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
-import { storeToRefs } from 'pinia';
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
-
-type ModerationActions = 'Accept' | 'Modify' | 'Reject'
+import { storeToRefs } from 'pinia'
+import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import type { ModerationActions } from '@/types/moderation'
 
 interface PostFields {
-  title?: string;
-  content?: string;
-  categoryIds?: number[];
-  files?: string[] | null;
+  title?: string
+  content?: string
+  categoryIds?: number[]
+  files?: string[] | null
 }
 
-const route = useRoute();
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const moderationPostsStore = useModerationPostsStore()
@@ -92,17 +106,15 @@ const moderationPostsStore = useModerationPostsStore()
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
-const showSidePane = ref(false)
+const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 
-const isLatestVersion = computed(() => moderationPostsStore.latestPostVersion)
+const isLatestVersion: ComputedRef<boolean> = computed(() => moderationPostsStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !moderationPostsStore.userHasModeratedPost)
 const hasModerationHistory = computed(() => {
-  const wasModified =
-    version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
-  const hasModerations =
-    (version.value?.moderations && version.value?.moderations.length > 0)
+  const wasModified = version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
+  const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
 
   return wasModified || hasModerations
 })
@@ -120,13 +132,13 @@ const decisionIcon = {
 
 onMounted(async () => {
   await initializeModerationPosts()
-});
+})
 
 async function initializeModerationPosts() {
   await userStore.verifyUserSession()
 
   moderationPostsStore.$reset()
-  await moderationPostsStore.fetchPostById(+route.params.id)
+  await moderationPostsStore.fetchPostById(Number(route.params.id))
 
   if (version.value) {
     await refreshVersion(version.value)
@@ -161,15 +173,19 @@ async function handleVersionChange(newVersion: PostVersion) {
   await refreshVersion(newVersion)
 }
 
-function handleModerationControlsSubmit(
-  { action, reason }: { action: ModerationActions, reason: string }
-) {
+function handleModerationControlsSubmit({
+  action,
+  reason
+}: {
+  action: ModerationActions
+  reason: string
+}) {
   const moderationHandlers = {
-    'Accept': acceptPost,
-    'Modify': modifyPost,
-    'Reject': rejectPost
+    Accept: acceptPost,
+    Modify: modifyPost,
+    Reject: rejectPost
   }
-  moderationHandlers[action](reason);
+  moderationHandlers[action](reason)
 }
 
 function handleModerationControlsActionChange(action: ModerationActions) {
@@ -181,10 +197,14 @@ function handleModerationControlsActionChange(action: ModerationActions) {
   }
 }
 
-function handleModifyFormUpdate(
-  { version: editedVersion, isValid }: { version: PostVersion, isValid: boolean }
-) {
-  if (!isValid) return;
+function handleModifyFormUpdate({
+  version: editedVersion,
+  isValid
+}: {
+  version: PostVersion
+  isValid: boolean
+}) {
+  if (!isValid) return
 
   modifyValues.value = {
     title: editedVersion.title,
@@ -199,7 +219,13 @@ async function handleRenewModeration() {
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 }
 
-async function performModeration({ actionHandler, reason }: { actionHandler: Function, reason: string }) {
+async function performModeration({
+  actionHandler,
+  reason
+}: {
+  actionHandler: Function
+  reason: string
+}) {
   const version = moderationPostsStore.versionInModeration
 
   if (!userStore.userId) {
@@ -254,7 +280,13 @@ const modifyPost = async (reason: string) => {
     return
   }
 
-  await moderationPostsStore.modifyModerationPost(post.id, userStore.sessionHash, userStore.nickname, reason, modifyValues.value)
+  await moderationPostsStore.modifyModerationPost(
+    post.id,
+    userStore.sessionHash,
+    userStore.nickname,
+    reason,
+    modifyValues.value
+  )
   selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
 
   // Reload the page

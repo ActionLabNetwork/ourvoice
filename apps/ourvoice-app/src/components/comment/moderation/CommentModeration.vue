@@ -1,8 +1,12 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end">
+    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0 text-sm sm:text-md">
       <!-- Side pane button -->
-      <div @click="toggleSidePane" class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md" data-cy="moderation-history-button">
+      <div
+        @click="toggleSidePane"
+        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md"
+        data-cy="moderation-history-button"
+      >
         <p>
           Moderation History
           <span>
@@ -16,31 +20,58 @@
     </div>
     <div class="grid grid-cols-4 gap-2">
       <!-- Versioning -->
-      <div class="col-span-1" v-if="comment">
-        <ModerationVersionList @versionClicked="handleVersionChange" :versions="comment?.versions ?? []" />
+      <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="comment">
+        <ModerationVersionList
+          @versionClicked="handleVersionChange"
+          :versions="comment?.versions ?? []"
+        />
       </div>
 
       <!-- Post Context Preview -->
-      <div v-if="comment && comment.post && comment.post.versions" class="col-span-3">
-        <ModerationPostCard :post="comment.post" :version="comment.post.versions[0]" :preview="true"  />
+      <div
+        v-if="comment && comment.post && comment.post.versions"
+        class="col-span-full sm:col-span-3 px-4 sm:px-0"
+      >
+        <ModerationPostCard
+          :post="comment.post"
+          :version="comment.post.versions[0]"
+          :preview="true"
+        />
       </div>
 
       <!-- Parent Comment Context Preview -->
-      <div v-if="comment && comment.parent && comment.parent.versions" class="col-span-3 col-start-2 pl-10">
-        <ModerationCommentCard :comment="comment.parent" :version="comment.parent.versions[0]" :preview="true" />
+      <div
+        v-if="comment && comment.parent && comment.parent.versions"
+        class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10"
+      >
+        <ModerationCommentCard
+          :comment="comment.parent"
+          :version="comment.parent.versions[0]"
+          :preview="true"
+        />
       </div>
 
       <!-- Comment Preview -->
-      <div v-if="comment && version" class="col-span-3 col-start-2 pl-10">
+      <div
+        v-if="comment && version"
+        class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
+      >
         <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
-        <ModerationCommentCard v-else :comment="comment" :version="version" :preview="true" :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined" />
+        <ModerationCommentCard
+          v-else
+          :comment="comment"
+          :version="version"
+          :preview="true"
+          :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+        />
 
         <div class="grid grid-cols-4">
           <!-- Moderation Controls -->
-          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf"
-            class="col-span-4"
-          >
-            <ModerationControls @moderation-submit="handleModerationControlsSubmit" @moderation-action-change="handleModerationControlsActionChange" />
+          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
+            <ModerationControls
+              @moderation-submit="handleModerationControlsSubmit"
+              @moderation-action-change="handleModerationControlsActionChange"
+            />
           </div>
           <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
             <!-- Renew button -->
@@ -68,35 +99,40 @@
 </template>
 
 <script setup lang="ts">
-import { useModerationCommentsStore, type Moderation, type CommentVersion, } from '@/stores/moderation-comments';
-import { useUserStore } from '@/stores/user';
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue';
-import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue';
-import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue';
-import ModerationHistory from '@/components/comment/moderation/ModerationHistory.vue';
+import {
+  useModerationCommentsStore,
+  type Moderation,
+  type CommentVersion
+} from '@/stores/moderation-comments'
+import { useUserStore } from '@/stores/user'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
+import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue'
+import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue'
+import ModerationHistory from '@/components/comment/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/comment/moderation/ModerationVersionList.vue'
 import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
 interface CommentFields {
-  title?: string;
-  content?: string;
-  categoryIds?: number[];
-  files?: string[] | null;
+  title?: string
+  content?: string
+  categoryIds?: number[]
+  files?: string[] | null
 }
 
-const route = useRoute();
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const moderationCommentsStore = useModerationCommentsStore()
 
 // Comment and Version refs
-const { commentInModeration: comment, versionInModeration: version } = storeToRefs(moderationCommentsStore)
+const { commentInModeration: comment, versionInModeration: version } =
+  storeToRefs(moderationCommentsStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
@@ -107,9 +143,9 @@ const isLatestVersion = computed(() => moderationCommentsStore.latestCommentVers
 const hasNotBeenModeratedBySelf = computed(() => !moderationCommentsStore.userHasModeratedComment)
 const hasModerationHistory = computed(() => {
   const wasModified =
-    (version.value?.authorHash !== comment.value?.versions?.at(-1)?.authorHash) || (version.value?.version && version.value?.version > 1)
-  const hasModerations =
-    (version.value?.moderations && version.value?.moderations.length > 0)
+    version.value?.authorHash !== comment.value?.versions?.at(-1)?.authorHash ||
+    (version.value?.version && version.value?.version > 1)
+  const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
 
   return wasModified || hasModerations
 })
@@ -128,7 +164,7 @@ const decisionIcon = {
 onMounted(async () => {
   console.log(comment.value)
   await initializeModerationComments()
-});
+})
 
 async function initializeModerationComments() {
   await userStore.verifyUserSession()
@@ -161,15 +197,19 @@ async function handleVersionChange(newVersion: CommentVersion) {
   await refreshVersion()
 }
 
-function handleModerationControlsSubmit(
-  { action, reason }: { action: ModerationActions, reason: string }
-) {
+function handleModerationControlsSubmit({
+  action,
+  reason
+}: {
+  action: ModerationActions
+  reason: string
+}) {
   const moderationHandlers = {
-    'Accept': acceptComment,
-    'Modify': modifyComment,
-    'Reject': rejectComment
+    Accept: acceptComment,
+    Modify: modifyComment,
+    Reject: rejectComment
   }
-  moderationHandlers[action](reason);
+  moderationHandlers[action](reason)
 }
 
 function handleModerationControlsActionChange(action: ModerationActions) {
@@ -181,10 +221,14 @@ function handleModerationControlsActionChange(action: ModerationActions) {
   }
 }
 
-function handleModifyFormUpdate(
-  { version: editedVersion, isValid }: { version: CommentVersion, isValid: boolean }
-) {
-  if (!isValid) return;
+function handleModifyFormUpdate({
+  version: editedVersion,
+  isValid
+}: {
+  version: CommentVersion
+  isValid: boolean
+}) {
+  if (!isValid) return
 
   modifyValues.value = { content: editedVersion.content }
 }
@@ -194,7 +238,13 @@ async function handleRenewModeration() {
   selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
 }
 
-async function performModeration({ actionHandler, reason }: { actionHandler: Function, reason: string }) {
+async function performModeration({
+  actionHandler,
+  reason
+}: {
+  actionHandler: Function
+  reason: string
+}) {
   const version = moderationCommentsStore.versionInModeration
 
   if (!userStore.userId) {
@@ -249,7 +299,13 @@ const modifyComment = async (reason: string) => {
     return
   }
 
-  await moderationCommentsStore.modifyModerationComment(comment.id, userStore.sessionHash, userStore.nickname, reason, modifyValues.value)
+  await moderationCommentsStore.modifyModerationComment(
+    comment.id,
+    userStore.sessionHash,
+    userStore.nickname,
+    reason,
+    modifyValues.value
+  )
   selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
 
   // Reload the page

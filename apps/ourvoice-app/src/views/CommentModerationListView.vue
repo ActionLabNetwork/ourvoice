@@ -1,6 +1,5 @@
 <template>
   <div class="w-full h-full bg-gray-100">
-    <Header title="Moderation Comments List" />
     <main>
       <div class="px-10 py-10 bg-gray-100">
         <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
@@ -20,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import Header from '@/components/common/Header.vue'
 import CommentModerationList from '@/components/comment/moderation/CommentModerationList.vue'
 import { LIST_TABS } from '@/constants/moderation'
 import BaseTab from '@/components/common/BaseTab.vue'

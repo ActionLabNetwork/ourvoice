@@ -47,7 +47,7 @@
                 leave-to-class="opacity-0"
               >
                 <ListboxOptions
-                  class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                  class="absolute -top-40 sm:-top-14 sm:right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
                 >
                   <ListboxOption
                     as="template"
