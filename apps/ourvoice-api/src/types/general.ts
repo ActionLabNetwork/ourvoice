@@ -13,3 +13,8 @@ export type GetManyResponse<T> = {
 export type GetManyRepositoryResponse<K extends string, T> = {
   totalCount: number;
 } & { [P in K]: T[] };
+
+export type ModerationPublishFrequency = {
+  unit: 'minutes' | 'hours' | 'days';
+  value: number;
+};

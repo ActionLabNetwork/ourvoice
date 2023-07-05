@@ -11,7 +11,10 @@ import {
   Post,
   PostVersion,
 } from '../../../../node_modules/@internal/prisma/client';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(new AuthGuard())
 @Resolver('ModerationPost')
 export class PostModerationResolver {
   constructor(private postModerationService: PostModerationService) {}

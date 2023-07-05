@@ -12,7 +12,10 @@ import {
   CommentVersion,
   CommentModeration,
 } from '../../../../node_modules/@internal/prisma/client/index';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(new AuthGuard())
 @Resolver('ModerationComment')
 export class CommentModerationResolver {
   constructor(private commentModerationService: CommentModerationService) {}
