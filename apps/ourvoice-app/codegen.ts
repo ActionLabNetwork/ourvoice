@@ -9,7 +9,7 @@ const config: CodegenConfig = {
     './src/graphql/generated/': {
       preset: 'client',
       config: {
-        useTypeImports: false,
+        useTypeImports: true,
         avoidOptionals: {
           defaultValue: true,
           field: true

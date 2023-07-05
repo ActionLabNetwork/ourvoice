@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -15,22 +15,6 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
-};
-
-export type BasePoll = {
-  active: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['Int']['output'];
-  postLink: Maybe<Scalars['String']['output']>;
-  published: Scalars['Boolean']['output'];
-  question: Scalars['String']['output'];
-  weight: Scalars['Int']['output'];
-};
-
-export type BasePollOption = {
-  id: Scalars['Int']['output'];
-  option: Scalars['String']['output'];
 };
 
 export type CategoriesFilterInput = {
@@ -371,7 +355,6 @@ export type Mutation = {
   createContactFormEntry: Scalars['String']['output'];
   createModerationComment: Maybe<ModerationComment>;
   createModerationPost: Maybe<ModerationPost>;
-  createPoll: Maybe<Poll>;
   createUser: User;
   createVote: Vote;
   deleteCategory: Category;
@@ -383,16 +366,13 @@ export type Mutation = {
   modifyModerationPost: Maybe<ModerationPost>;
   rejectModerationCommentVersion: Maybe<ModerationComment>;
   rejectModerationPostVersion: Maybe<ModerationPost>;
-  removePoll: Scalars['Int']['output'];
   renewCommentModeration: Maybe<ModerationComment>;
   renewPostModeration: Maybe<ModerationPost>;
   rollbackModifiedModerationComment: Maybe<ModerationComment>;
   rollbackModifiedModerationPost: Maybe<ModerationPost>;
   updateCategory: Category;
   updateComment: Comment;
-  updatePoll: Maybe<Poll>;
   updateUser: User;
-  votePoll: Maybe<VoteResponse>;
 };
 
 
@@ -434,11 +414,6 @@ export type MutationCreateModerationCommentArgs = {
 
 export type MutationCreateModerationPostArgs = {
   data: ModerationPostCreateInput;
-};
-
-
-export type MutationCreatePollArgs = {
-  data: PollCreateInput;
 };
 
 
@@ -511,11 +486,6 @@ export type MutationRejectModerationPostVersionArgs = {
 };
 
 
-export type MutationRemovePollArgs = {
-  pollId: Scalars['Int']['input'];
-};
-
-
 export type MutationRenewCommentModerationArgs = {
   commentModerationId: Scalars['Int']['input'];
   moderatorHash: Scalars['String']['input'];
@@ -550,154 +520,9 @@ export type MutationUpdateCommentArgs = {
 };
 
 
-export type MutationUpdatePollArgs = {
-  data: PollUpdateInput;
-  pollId: Scalars['Int']['input'];
-};
-
-
 export type MutationUpdateUserArgs = {
   data: UserUpdateInput;
   id: Scalars['Int']['input'];
-};
-
-
-export type MutationVotePollArgs = {
-  voteInput?: InputMaybe<VoteInput>;
-};
-
-export type Poll = BasePoll & {
-  __typename?: 'Poll';
-  active: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['Int']['output'];
-  options: Array<PollOption>;
-  postLink: Maybe<Scalars['String']['output']>;
-  published: Scalars['Boolean']['output'];
-  question: Scalars['String']['output'];
-  weight: Scalars['Int']['output'];
-};
-
-export type PollCreateInput = {
-  active: Scalars['Boolean']['input'];
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  options: Array<PollOptionCreateInput>;
-  postLink?: InputMaybe<Scalars['String']['input']>;
-  published: Scalars['Boolean']['input'];
-  question: Scalars['String']['input'];
-  weight: Scalars['Int']['input'];
-};
-
-export type PollFilterInput = {
-  active?: InputMaybe<Scalars['Boolean']['input']>;
-  createdAfter?: InputMaybe<Scalars['DateTime']['input']>;
-  createdBefore?: InputMaybe<Scalars['DateTime']['input']>;
-  expiresAfter?: InputMaybe<Scalars['DateTime']['input']>;
-  expiresBefore?: InputMaybe<Scalars['DateTime']['input']>;
-  expiresExcludeNull?: InputMaybe<Scalars['Boolean']['input']>;
-  postLink?: InputMaybe<Scalars['String']['input']>;
-  published?: InputMaybe<Scalars['Boolean']['input']>;
-  question?: InputMaybe<Scalars['String']['input']>;
-  weight?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type PollOption = BasePollOption & {
-  __typename?: 'PollOption';
-  id: Scalars['Int']['output'];
-  option: Scalars['String']['output'];
-};
-
-export type PollOptionCreateInput = {
-  option: Scalars['String']['input'];
-};
-
-export type PollOptionStat = {
-  __typename?: 'PollOptionStat';
-  optionId: Scalars['Int']['output'];
-  proportion: Scalars['Float']['output'];
-};
-
-export type PollOptionWithResult = BasePollOption & {
-  __typename?: 'PollOptionWithResult';
-  id: Scalars['Int']['output'];
-  numVotes: Scalars['Int']['output'];
-  option: Scalars['String']['output'];
-};
-
-export type PollPageInfo = {
-  __typename?: 'PollPageInfo';
-  endCursor: Maybe<Scalars['String']['output']>;
-  hasNextPage: Maybe<Scalars['Boolean']['output']>;
-  startCursor: Maybe<Scalars['String']['output']>;
-};
-
-export type PollPaginationInput = {
-  cursor?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type PollUpdateInput = {
-  active?: InputMaybe<Scalars['Boolean']['input']>;
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  options?: InputMaybe<Array<PollOptionCreateInput>>;
-  postLink?: InputMaybe<Scalars['String']['input']>;
-  published?: InputMaybe<Scalars['Boolean']['input']>;
-  question?: InputMaybe<Scalars['String']['input']>;
-  weight?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type PollWithResult = BasePoll & {
-  __typename?: 'PollWithResult';
-  active: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['Int']['output'];
-  options: Array<PollOptionWithResult>;
-  postLink: Maybe<Scalars['String']['output']>;
-  published: Scalars['Boolean']['output'];
-  question: Scalars['String']['output'];
-  weight: Scalars['Int']['output'];
-};
-
-export type PollWithResultConnection = {
-  __typename?: 'PollWithResultConnection';
-  edges: Array<PollWithResultEdge>;
-  pageInfo: PollPageInfo;
-  totalCount: Maybe<Scalars['Int']['output']>;
-};
-
-export type PollWithResultEdge = {
-  __typename?: 'PollWithResultEdge';
-  cursor: Scalars['String']['output'];
-  node: PollWithResult;
-};
-
-export type PollWithStats = BasePoll & {
-  __typename?: 'PollWithStats';
-  active: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['Int']['output'];
-  options: Array<PollOption>;
-  postLink: Maybe<Scalars['String']['output']>;
-  published: Scalars['Boolean']['output'];
-  question: Scalars['String']['output'];
-  stats: Maybe<Array<PollOptionStat>>;
-  weight: Scalars['Int']['output'];
-};
-
-export type PollWithStatsConnection = {
-  __typename?: 'PollWithStatsConnection';
-  edges: Array<PollWithStatsEdge>;
-  pageInfo: PollPageInfo;
-  totalCount: Maybe<Scalars['Int']['output']>;
-};
-
-export type PollWithStatsEdge = {
-  __typename?: 'PollWithStatsEdge';
-  cursor: Scalars['String']['output'];
-  node: PollWithStats;
 };
 
 export type Post = {
@@ -806,7 +631,6 @@ export type PresignedUrl = {
 export type Query = {
   __typename?: 'Query';
   _empty: Maybe<Scalars['String']['output']>;
-  availablePolls: Array<Poll>;
   categories: Maybe<CategoryConnection>;
   category: Maybe<Category>;
   comment: Maybe<Comment>;
@@ -818,7 +642,6 @@ export type Query = {
   moderationComments: Maybe<ModerationCommentConnection>;
   moderationPost: Maybe<ModerationPost>;
   moderationPosts: Maybe<ModerationPostConnection>;
-  pollsWithResult: Maybe<PollWithResultConnection>;
   post: Maybe<Post>;
   postVersion: Maybe<ModerationPostVersion>;
   posts: Maybe<PostConnection>;
@@ -826,13 +649,7 @@ export type Query = {
   user: Maybe<User>;
   users: Array<User>;
   vote: Maybe<Vote>;
-  votedPolls: Maybe<PollWithStatsConnection>;
   votes: Array<Vote>;
-};
-
-
-export type QueryAvailablePollsArgs = {
-  userHash: Scalars['String']['input'];
 };
 
 
@@ -899,13 +716,6 @@ export type QueryModerationPostsArgs = {
 };
 
 
-export type QueryPollsWithResultArgs = {
-  filter?: InputMaybe<PollFilterInput>;
-  moderatorHash: Scalars['String']['input'];
-  pagination?: InputMaybe<PollPaginationInput>;
-};
-
-
 export type QueryPostArgs = {
   id: Scalars['Int']['input'];
 };
@@ -937,12 +747,6 @@ export type QueryUserArgs = {
 
 export type QueryVoteArgs = {
   id: Scalars['Int']['input'];
-};
-
-
-export type QueryVotedPollsArgs = {
-  pagination?: InputMaybe<PollPaginationInput>;
-  userHash: Scalars['String']['input'];
 };
 
 
@@ -1012,19 +816,6 @@ export type VoteCreateInput = {
   commentId?: InputMaybe<Scalars['Int']['input']>;
   postId: Scalars['Int']['input'];
   voteType: Scalars['String']['input'];
-};
-
-export type VoteInput = {
-  optionId: Scalars['Int']['input'];
-  pollId: Scalars['Int']['input'];
-  voterHash: Scalars['String']['input'];
-};
-
-export type VoteResponse = {
-  __typename?: 'VoteResponse';
-  optionId: Scalars['Int']['output'];
-  pollId: Scalars['Int']['output'];
-  stats: Maybe<Array<PollOptionStat>>;
 };
 
 export type VotesFilterInput = {
