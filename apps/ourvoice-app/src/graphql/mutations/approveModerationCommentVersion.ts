@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const APPROVE_MODERATION_COMMENT_VERSION_MUTATION = gql`
-  mutation Mutation(
+  mutation ApproveModerationCommentVersion(
     $id: Int!
     $moderatorHash: String!
     $moderatorNickname: String!
