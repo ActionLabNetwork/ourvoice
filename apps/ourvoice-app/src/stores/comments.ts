@@ -142,7 +142,8 @@ export const useCommentsStore = defineStore('comments', {
             }
           }
         })
-        console.log(data)
+        // console.log(data)
+        return data
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
