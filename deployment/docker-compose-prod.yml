@@ -55,7 +55,11 @@ services:
   portal:
     container_name: ourvoice-portal
     platform: linux/amd64
-    build: ./apps/ourvoice-portal
+    build:
+      context: ../
+      args:
+        APP: portal
+        DIR: ourvoice-portal
     restart: always
     expose:
       - 80
@@ -80,7 +84,11 @@ services:
   app:
     container_name: ourvoice-app
     platform: linux/amd64
-    build: ./apps/ourvoice-app
+    build:
+      context: ../
+      args:
+        APP: app
+        DIR: ourvoice-app
     restart: always
     expose:
       - 80
@@ -123,19 +131,17 @@ services:
         APP: admin
         DIR: ourvoice-admin      
     restart: always
-    ports:
-      - '80:80'
     expose:
       - 80
     networks:
       - frontend
-    # labels:
-    #   - 'traefik.enable=true'
-    #   - 'traefik.docker.network=frontend'
-    #   - 'traefik.http.routers.ourvoice-admin.rule=Host(`admin.${DEPLOYMENT}`)'
-    #   - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
-    #   - 'traefik.http.routers.ourvoice-admin.tls=true'
-    #   - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`admin.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
     environment:
       - VITE_APP_NAME
       - VITE_APP_AUTH_API_URL
@@ -157,7 +163,11 @@ services:
   auth:
     container_name: ourvoice-auth
     platform: linux/amd64
-    build: ./apps/ourvoice-auth
+    build:
+      context: ../
+      args:
+        APP: auth
+        DIR: ourvoice-auth 
     restart: always
     expose:
       - 80
@@ -192,7 +202,11 @@ services:
   api:
     container_name: ourvoice-api
     platform: linux/amd64
-    build: ./apps/ourvoice-api
+    build:
+      context: ../
+      args:
+        APP: api
+        DIR: ourvoice-api 
     restart: always
     expose:
       - 80
@@ -206,49 +220,7 @@ services:
       - 'traefik.http.routers.ourvoice-admin.tls=true'
       - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
     environment:
-      - SUPERTOKENS_APP_NAME
-      - SUPERTOKENS_URI
-      - SUPERTOKENS_API_KEY
-      - SUPERTOKENS_API_DOMAIN
-      - SUPERTOKENS_API_BASE_PATH
-      - SUPERTOKENS_WEBSITE_DOMAIN
-      - SUPERTOKENS_WEBSITE_BASE_PATH
-      - SUPERTOKENS_COOKIE_DOMAIN
-      - SUPERTOKENS_ADMIN_EMAIL
-      - SUPERTOKENS_ADMIN_PASSWORD
-      - VITE_APP_API_URL
-      - VITE_APP_APP_DOMAIN
-      - VITE_APP_AUTH_API_URL
-      - VITE_APP_PORTAL_URL
-      - VITE_APP_ADMIN_URL
-      - VITE_APP_AUTH_URL
-      - SMTP_HOST
-      - SMTP_PORT
-      - SMTP_USER
-      - SMTP_PASSWORD
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '1024k'
-        max-file: '10'
-
-  authapi:
-    container_name: ourvoice-auth-api
-    platform: linux/amd64
-    build: ./apps/ourvoice-auth-api
-    restart: always
-    expose:
-      - 80
-    networks:
-      - frontend
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=frontend'
-      - 'traefik.http.routers.ourvoice-admin.rule=Host(`authapi.${DEPLOYMENT}`)'
-      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
-      - 'traefik.http.routers.ourvoice-admin.tls=true'
-      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
-    environment:
+      
       - S3_API_VERSION
       - AWS_ENDPOINT
       - AWS_REGION
@@ -305,6 +277,53 @@ services:
       - USER_EMAIL
       - USER_ID
       - USER_TIME_JOINED
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  authapi:
+    container_name: ourvoice-auth-api
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: admin
+        DIR: ourvoice-auth-api
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`authapi.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    environment:
+      - SUPERTOKENS_APP_NAME
+      - SUPERTOKENS_URI
+      - SUPERTOKENS_API_KEY
+      - SUPERTOKENS_API_DOMAIN
+      - SUPERTOKENS_API_BASE_PATH
+      - SUPERTOKENS_WEBSITE_DOMAIN
+      - SUPERTOKENS_WEBSITE_BASE_PATH
+      - SUPERTOKENS_COOKIE_DOMAIN
+      - SUPERTOKENS_ADMIN_EMAIL
+      - SUPERTOKENS_ADMIN_PASSWORD
+      - VITE_APP_API_URL
+      - VITE_APP_APP_DOMAIN
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_AUTH_URL
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASSWORD
     logging:
       driver: 'json-file'
       options:
