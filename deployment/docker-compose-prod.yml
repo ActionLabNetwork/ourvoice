@@ -117,19 +117,25 @@ services:
   admin:
     container_name: ourvoice-admin
     platform: linux/amd64
-    build: ./apps/ourvoice-admin
+    build:
+      context: ../
+      args:
+        APP: admin
+        DIR: ourvoice-admin      
     restart: always
+    ports:
+      - '80:80'
     expose:
       - 80
     networks:
       - frontend
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.docker.network=frontend'
-      - 'traefik.http.routers.ourvoice-admin.rule=Host(`admin.${DEPLOYMENT}`)'
-      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
-      - 'traefik.http.routers.ourvoice-admin.tls=true'
-      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    # labels:
+    #   - 'traefik.enable=true'
+    #   - 'traefik.docker.network=frontend'
+    #   - 'traefik.http.routers.ourvoice-admin.rule=Host(`admin.${DEPLOYMENT}`)'
+    #   - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+    #   - 'traefik.http.routers.ourvoice-admin.tls=true'
+    #   - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
     environment:
       - VITE_APP_NAME
       - VITE_APP_AUTH_API_URL

@@ -199,7 +199,7 @@ export default defineComponent({
     },
     startTimer() {
       this.period = 15
-      this.timer = setInterval(() => {
+      this.timer = window.setInterval(() => {
         if (!this.period) this.stopTimer()
         this.period -= 1
       }, 1000)
