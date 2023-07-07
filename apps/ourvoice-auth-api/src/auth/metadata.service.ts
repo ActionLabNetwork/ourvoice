@@ -57,7 +57,8 @@ export async function isModeratorAllowed(moderator: string) {
     'phoneNumberAllowList',
   );
   const allowList: string[] = existingData.metadata.allowList || [];
-  return allowList.includes(moderator);
+  // NOTE: if allowlist is empty then this feature is disabled
+  return allowList.includes(moderator) || allowList.length === 0;
 }
 
 export async function clearModeratorAllowList() {

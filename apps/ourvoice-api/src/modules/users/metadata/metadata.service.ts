@@ -43,24 +43,52 @@ export class MetadataService {
     });
   }
 
+  async addEmailsToAllowlist(emails: string[]) {
+    const existingData = await UserMetadata.getUserMetadata('emailAllowList');
+    let allowList: string[] = existingData.metadata.allowList || [];
+    allowList = [...allowList, ...emails];
+    return await UserMetadata.updateUserMetadata('emailAllowList', {
+      allowList,
+    });
+  }
+
+  async clearEmailAllowList() {
+    return await UserMetadata.clearUserMetadata('emailAllowList');
+  }
+
   async isEmailAllowed(email: string) {
     const existingData = await UserMetadata.getUserMetadata('emailAllowList');
     const allowList: string[] = existingData.metadata.allowList || [];
-    return allowList.includes(email);
+    // NOTE: if allowlist is empty then this feature is disabled
+    return allowList.includes(email) || allowList.length === 0;
   }
 
-  async addPhoneNumberToAllowlist(phoneNumber: string) {
+  // NOTE: using phoneNumberAllowList as a storage for storing moderators list in supertokens
+  // in the future this could be moved to admin/deployment database or if supertokens extends
+  // functionality to allow custom storages of metadata not linked to user
+  async addModeratorToAllowlist(phoneNumber: string) {
     const existingData = await UserMetadata.getUserMetadata(
       'phoneNumberAllowList',
     );
     let allowList: string[] = existingData.metadata.allowList || [];
     allowList = [...allowList, phoneNumber];
-    await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
+    return await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
       allowList,
     });
   }
 
-  async isPhoneNumberAllowed(phoneNumber: string) {
+  async addModeratorsToAllowlist(moderators: string[]) {
+    const existingData = await UserMetadata.getUserMetadata(
+      'phoneNumberAllowList',
+    );
+    let allowList: string[] = existingData.metadata.allowList || [];
+    allowList = [...allowList, ...moderators];
+    return await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
+      allowList,
+    });
+  }
+
+  async isModeratorAllowed(phoneNumber: string) {
     const existingData = await UserMetadata.getUserMetadata(
       'phoneNumberAllowList',
     );

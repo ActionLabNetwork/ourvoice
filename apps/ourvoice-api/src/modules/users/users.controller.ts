@@ -168,4 +168,36 @@ export class UserController {
       return { message: 'role changed successfully' };
     }
   }
+  // assign role to specific user
+  @Put('moderators')
+  @UseGuards(new AuthGuard())
+  async addModerators(
+    @Session() session: SessionContainer,
+    @Body() moderators: string[],
+  ): Promise<{ message: string }> {
+    // check of admin
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status } = await this.metadataService.addModeratorsToAllowlist(
+      moderators,
+    );
+    if (status === 'OK')
+      return { message: 'successfully added moderator emails' };
+  }
+
+  // assign allowed emails
+  @Put('allowed')
+  @UseGuards(new AuthGuard())
+  async addAllowedEmails(
+    @Session() session: SessionContainer,
+    @Body() emails: string[],
+  ): Promise<{ message: string }> {
+    // check of admin
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status } = await this.metadataService.addEmailsToAllowlist(emails);
+    if (status === 'OK') return { message: 'successfully updated user emails' };
+  }
 }
