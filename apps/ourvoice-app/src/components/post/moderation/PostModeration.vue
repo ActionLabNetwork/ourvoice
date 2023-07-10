@@ -72,11 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useModerationPostsStore,
-  type Moderation,
-  type PostVersion
-} from '@/stores/moderation-posts'
+import { usePostModerationStore, type Moderation, type PostVersion } from '@/stores/post-moderation'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -100,7 +96,7 @@ interface PostFields {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const moderationPostsStore = useModerationPostsStore()
+const moderationPostsStore = usePostModerationStore()
 
 // Post and Version refs
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)

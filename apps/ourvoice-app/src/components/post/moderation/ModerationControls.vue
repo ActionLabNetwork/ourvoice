@@ -103,12 +103,12 @@ import {
 } from '@headlessui/vue'
 import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-post-validator'
-import { useModerationPostsStore } from '@/stores/moderation-posts'
+import { usePostModerationStore } from '@/stores/post-moderation'
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
-const moderationPostsStore = useModerationPostsStore()
+const moderationPostsStore = usePostModerationStore()
 
 const actions = MODERATION_ACTIONS
 const action = ref(actions[0])

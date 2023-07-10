@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const GET_MODERATION_POSTS_QUERY = gql`
-  query GetModerationPosts($after: String, $limit: Int = 10) {
-    moderationPosts(filter: null, pagination: { after: $after, limit: $limit }) {
+  query GetModerationPosts($after: String, $limit: Int = 10, $status: ModerationPostStatus) {
+    moderationPosts(pagination: { after: $after, limit: $limit }, filter: { status: $status }) {
       edges {
         cursor
         node {
