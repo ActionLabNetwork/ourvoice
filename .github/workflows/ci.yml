@@ -115,7 +115,7 @@ jobs:
           mongodb-version: 6.0
           mongodb-replica-set: rs0
           mongodb-port: 27017
-        
+
       # - name: Create main databases if not exists
       #   run: |
       #     PGPASSWORD=${{ env.DB_TEST_MAIN_PASSWORD }} psql -U ${{ env.DB_TEST_MAIN_USERNAME }} -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${{ env.DB_TEST_MAIN_DATABASE }}'" | grep -q 1 || psql -h ${{ env.DB_TEST_APP_API_DB_MAIN_HOST }} -p ${{env.DB_TEST_APP_API_DB_MAIN_PORT}} -U ${{ env.DB_TEST_MAIN_USERNAME }} -d postgres -c 'CREATE DATABASE ${{ env.DB_TEST_MAIN_DATABASE }};'
@@ -271,6 +271,85 @@ jobs:
       - name: WEB PORTAL - build
         working-directory: apps/ourvoice-portal
         run: pnpm build
+
+  deploy-staging:
+    name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
+    runs-on: self-hosted
+    needs: build-apps
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        postgres-version: [15]
+
+    services:
+      postgres-app-db-main:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+        ports:
+          - 5433:5432
+
+      postgres-app-db-premod:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db_pre
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+        ports:
+          - 5435:5432
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v3.5.3
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Prisma Migration API main DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:main
+
+      - name: Prisma Migration API premod DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:premoderation
+
+      - name: Prisma Generate API main DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:generate:main
+
+      - name: Prisma Generate API premod DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:generate:premoderation
+
+      - name: Prisma Generate API contactform DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:generate:contactform
 
   # API auth
   # api-auth:
