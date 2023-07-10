@@ -274,7 +274,8 @@ jobs:
 
   deploy-staging:
     name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
-    runs-on: self-hosted
+    if: startsWith(github.ref, 'refs/heads/dev')
+    runs-on: [self-hosted, linux]
     needs: build-apps
 
     strategy:
