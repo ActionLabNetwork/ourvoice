@@ -3,4 +3,4 @@ name: Consent Form
 deployment: OURVOICE.APP
 ---
 
-# Consent Form
+This is the information text for {{frontmatter.deployment}} from _consent.md_ file
