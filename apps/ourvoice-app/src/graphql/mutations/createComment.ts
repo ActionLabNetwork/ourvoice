@@ -6,10 +6,10 @@ export const CREATE_COMMENT_MUTATION = gql`
       id
       content
       createdAt
-      author {
-        id
-        nickname
-      }
+      # author {
+      #   id
+      #   nickname
+      # }
       post {
         id
         title

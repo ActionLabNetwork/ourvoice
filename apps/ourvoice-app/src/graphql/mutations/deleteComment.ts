@@ -3,10 +3,10 @@ export const DELETE_COMMENT_MUTATION = gql`
   mutation DeleteComment($deleteCommentId: Int!) {
     deleteComment(id: $deleteCommentId) {
       id
-      author {
-        id
-        nickname
-      }
+      # author {
+      #   id
+      #   nickname
+      # }
       content
       parent {
         id
