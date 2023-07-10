@@ -37,7 +37,7 @@ export class MetadataService {
   async addEmailToAllowlist(email: string) {
     const existingData = await UserMetadata.getUserMetadata('emailAllowList');
     let allowList: string[] = existingData.metadata.allowList || [];
-    allowList = [...allowList, email];
+    allowList = [...new Set([...allowList, email])];
     await UserMetadata.updateUserMetadata('emailAllowList', {
       allowList,
     });
@@ -46,7 +46,7 @@ export class MetadataService {
   async addEmailsToAllowlist(emails: string[]) {
     const existingData = await UserMetadata.getUserMetadata('emailAllowList');
     let allowList: string[] = existingData.metadata.allowList || [];
-    allowList = [...allowList, ...emails];
+    allowList = [...new Set([...allowList, ...emails])];
     return await UserMetadata.updateUserMetadata('emailAllowList', {
       allowList,
     });
@@ -66,12 +66,12 @@ export class MetadataService {
   // NOTE: using phoneNumberAllowList as a storage for storing moderators list in supertokens
   // in the future this could be moved to admin/deployment database or if supertokens extends
   // functionality to allow custom storages of metadata not linked to user
-  async addModeratorToAllowlist(phoneNumber: string) {
+  async addModeratorToAllowlist(moderator: string) {
     const existingData = await UserMetadata.getUserMetadata(
       'phoneNumberAllowList',
     );
     let allowList: string[] = existingData.metadata.allowList || [];
-    allowList = [...allowList, phoneNumber];
+    allowList = [...new Set([...allowList, moderator])];
     return await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
       allowList,
     });
@@ -82,7 +82,7 @@ export class MetadataService {
       'phoneNumberAllowList',
     );
     let allowList: string[] = existingData.metadata.allowList || [];
-    allowList = [...allowList, ...moderators];
+    allowList = [...new Set([...allowList, ...moderators])];
     return await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
       allowList,
     });
