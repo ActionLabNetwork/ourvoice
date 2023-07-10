@@ -315,8 +315,11 @@ jobs:
     #       - 5435:5432
 
     steps:
-      - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+      - name: Echo test hello world
+        run: echo "Hello world"
+
+      # - name: Repository checkout
+      #   uses: actions/checkout@v3.5.3
 
       # - name: Install pnpm
       #   uses: pnpm/action-setup@v2.2.4
@@ -329,8 +332,8 @@ jobs:
       #     node-version: ${{ matrix.node-version }}
       #     cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install
+      # - name: Install dependencies
+      #   run: pnpm install
 
       # - name: Prisma Migration API main DB
       #   working-directory: apps/ourvoice-api
