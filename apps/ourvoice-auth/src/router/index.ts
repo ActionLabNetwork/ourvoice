@@ -57,7 +57,7 @@ const router = createRouter({
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
@@ -87,7 +87,7 @@ const router = createRouter({
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },

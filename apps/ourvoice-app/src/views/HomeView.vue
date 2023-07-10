@@ -20,7 +20,7 @@
         >
       </div>
       <div v-else class="flex justify-center flex-wrap gap-6">
-        <a href="/noauth/post"
+        <a href="/posts"
           ><button type="button" class="btn btn-purple btn-hover">Get Started</button></a
         >
       </div>
