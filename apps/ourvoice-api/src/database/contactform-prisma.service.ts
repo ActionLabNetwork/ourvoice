@@ -4,7 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { PrismaClient } from '@internal/prisma/contactform/index';
+import { PrismaClient } from '@prisma-contactform-db/client';
 
 @Injectable()
 export class ContactFormPrismaService

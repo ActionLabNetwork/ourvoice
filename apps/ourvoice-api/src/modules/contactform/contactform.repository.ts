@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  Prisma,
-  ContactFormEntry,
-} from '../../../node_modules/@internal/prisma/contactform/index';
+import { Prisma, ContactFormEntry } from '@prisma-contactform-db/client';
 import { ContactFormPrismaService } from '../../database/contactform-prisma.service';
 
 @Injectable()
