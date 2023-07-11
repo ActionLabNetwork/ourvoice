@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Comment } from '@prisma/client';
+import { Comment } from '@prisma-main-db/client';
 import { CommentRepository } from './comment.repository';
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { validate } from 'class-validator';
