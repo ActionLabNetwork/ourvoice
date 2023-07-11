@@ -10,7 +10,6 @@ import { CommentModerationService } from './comment-moderation.service';
 import {
   Comment,
   CommentVersion,
-  CommentModeration,
 } from '../../../../node_modules/@internal/prisma/client/index';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';

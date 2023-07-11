@@ -7,7 +7,10 @@ import {
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Category } from '@prisma/client';
 import { CategoryService } from './category.service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(new AuthGuard())
 @Resolver('Category')
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
