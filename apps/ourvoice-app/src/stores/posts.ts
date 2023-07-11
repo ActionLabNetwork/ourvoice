@@ -236,8 +236,8 @@ export const usePostsStore = defineStore('posts', {
       }
     },
 
-    async setSelectedCategoryIds(categoryIds: number[]) {
-      this.sortFilter.selectedCategoryIds = categoryIds
+    async setSelectedCategoryIds(categoryIds: number[] | null) {
+      this.sortFilter = { ...this.sortFilter, selectedCategoryIds: categoryIds }
     },
 
     async setSortOption(sortBy: string, sortOrder: sortOrder) {

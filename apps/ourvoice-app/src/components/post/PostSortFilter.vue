@@ -69,21 +69,20 @@
     </div>
     <div class="flex overflow-x-auto py-4 space-x-5 backdrop-blur-md items-center">
       <span class="hidden md:inline-block font-semibold md:text-xl md:pl-10">Categories</span>
-      <button
-        v-for="(option, index) in categoriesWithCount"
-        @click="handleCategorySelected(index)"
-        :key="option.id"
-        class="px-4 h-10 items-center rounded-full border-2 border-gray-300"
-        :class="{ 'bg-black text-white': option.active }"
-      >
-        <span
-          class="px-1 rounded-full items-center"
-          :class="option.active ? 'bg-white text-black' : 'bg-yellow-400 text-black'"
-        >
-          {{ option.count }}
-        </span>
-        <span class="px-1 whitespace-nowrap">{{ option.name }}</span>
-      </button>
+      <PostSortFilterCategoryButton
+        :active="!sortFilter.selectedCategoryIds"
+        :count="3"
+        text="All"
+        @select="selectCategory(null)"
+      />
+      <PostSortFilterCategoryButton
+        v-for="category in categories"
+        :key="category.id"
+        :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
+        :count="category.numPosts"
+        :text="category.name"
+        @select="selectCategory(category.id)"
+      />
     </div>
     <!-- {{ selectedTimeRangeOption }} -->
     <!-- <div class="border-2">{{ selectedSortOption }}</div>
@@ -108,6 +107,7 @@ import { usePostsStore } from '@/stores/posts'
 import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
+import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
 interface CategoryWithCount {
   id: number
   name: string
@@ -153,59 +153,11 @@ watchEffect(async () => {
 const handleTimeRangeSelected = (index: number) => {
   selectedTimeRangeOption.value = timeRangeOptions[index]
 }
-
-const categories = storeToRefs(useCategoriesStore()).data
-let categoriesWithCount = ref<CategoryWithCount[]>([])
-const getCategoriesWithCount = async () => {
-  categoriesWithCount.value.push({
-    id: 0,
-    name: 'All',
-    count: (
-      await apolloClient.query({
-        query: GET_POST_COUNT_BY_CATEGORY_QUERY
-      })
-    ).data.posts.totalCount,
-    active: true
-  })
-  for (let cat of categories.value) {
-    const res = await apolloClient.query({
-      query: GET_POST_COUNT_BY_CATEGORY_QUERY,
-      variables: {
-        filter: {
-          categoryIds: [cat.id]
-        }
-      }
-    })
-    categoriesWithCount.value.push({
-      id: cat.id,
-      name: cat.name,
-      count: res.data.posts.totalCount,
-      active: false
-    })
-  }
-}
-await getCategoriesWithCount()
-const selectedCategoryIds = ref<number[]>([])
-watchEffect(async () => {
-  await usePostsStore().setSelectedCategoryIds(selectedCategoryIds.value)
-  usePostsStore().fetchPosts()
-})
-// set initial selectedCategoryIds to all categories
-selectedCategoryIds.value = categories.value.map((cat: any) => cat.id)
-
-const handleCategorySelected = (index: number) => {
-  if (index < 0 || index >= categoriesWithCount.value.length) return
-  categoriesWithCount.value.forEach((option: any, i: number) => {
-    if (i === index) {
-      option.active = true
-      if (option.id === 0) {
-        selectedCategoryIds.value = categories.value.map((cat: any) => cat.id)
-      } else {
-        selectedCategoryIds.value = [option.id]
-      }
-    } else {
-      option.active = false
-    }
-  })
+const categoriesStore = useCategoriesStore()
+const postsStore = usePostsStore()
+const { data: categories } = storeToRefs(categoriesStore)
+const { sortFilter } = storeToRefs(postsStore)
+const selectCategory = (id: number | null) => {
+  postsStore.setSelectedCategoryIds(id ? [id] : null)
 }
 </script>

@@ -130,4 +130,8 @@ export class CategoryService {
 
     return this.categoryRepository.deleteCategory(id);
   }
+
+  async countNumPostsOfCategory(id: number): Promise<number> {
+    return this.categoryRepository.countNumPostsOfCategory(id);
+  }
 }
