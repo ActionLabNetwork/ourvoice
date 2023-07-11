@@ -18,16 +18,18 @@ function copyEnvFile(directory: string) {
   }
 }
 
-readdirSync(appDir, { withFileTypes: true }).forEach((dirent) => {
-  if (dirent.isDirectory()) copyEnvFile(`${appDir}${dirent.name}`)
-})
+if (process.env.RUN_POST !== 'false') {
+  readdirSync(appDir, { withFileTypes: true }).forEach((dirent) => {
+    if (dirent.isDirectory()) copyEnvFile(`${appDir}${dirent.name}`)
+  })
 
-// deployment env file
-copyEnvFile('./deployment')
+  // deployment env file
+  copyEnvFile('./deployment')
 
-// copy configuration files
-copyFileSync('./config/config.yml', './apps/ourvoice-api/config/config.yml')
-copyFileSync(
-  './config/config.yml',
-  './apps/ourvoice-auth-api/config/config.yml'
-)
+  // copy configuration files
+  copyFileSync('./config/config.yml', './apps/ourvoice-api/config/config.yml')
+  copyFileSync(
+    './config/config.yml',
+    './apps/ourvoice-auth-api/config/config.yml'
+  )
+}

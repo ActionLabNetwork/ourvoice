@@ -1,0 +1,452 @@
+version: '3.8'
+name: ourvoice
+# List of networks
+networks:
+  backend:
+  test:
+  frontend:
+    driver: bridge
+
+services:
+  # reverse proxy
+  reverse-proxy:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    restart: always
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=frontend"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DEPLOYMENT}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${DASHBOARD_USER}:${DASHBOARD_PASSWORD}"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+    networks:
+      - frontend
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The HTTPS port
+      - "443:443"
+      # The Web UI (enabled by --api.insecure=true)
+      # - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  # APPs
+  portal:
+    container_name: ourvoice-portal
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: portal
+        DIR: ourvoice-portal
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-app.rule=Host(`${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-app.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-app.tls=true'
+      - 'traefik.http.routers.ourvoice-app.tls.certresolver=myresolver'
+    environment:
+      NUXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NUXT_PUBLIC_RECAPTCHA_SITE_KEY}
+      NUXT_PUBLIC_API_URL: ${VITE_APP_API_URL}
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  app:
+    container_name: ourvoice-app
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: app
+        DIR: ourvoice-app
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-app.rule=Host(`app.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-app.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-app.tls=true'
+      - 'traefik.http.routers.ourvoice-app.tls.certresolver=myresolver'
+    environment:
+      - VITE_APP_NAME
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_AUTH_API_BASE_PATH
+      - VITE_APP_BACKEND_DOMAIN
+      - VITE_APP_FRONTEND_DOMAIN
+      - VITE_APP_AUTH_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_API_URL
+      - VITE_APP_ADMIN_EMAIL
+      - VITE_SESSION_INFO_ENDPOINT
+      - VITE_GLOBAL_PEPPER
+      - VITE_APP_APP_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_APP_DOMAIN
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  admin:
+    container_name: ourvoice-admin
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: admin
+        DIR: ourvoice-admin      
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`admin.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    environment:
+      - VITE_APP_NAME
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_AUTH_API_BASE_PATH
+      - VITE_APP_BACKEND_DOMAIN
+      - VITE_APP_FRONTEND_DOMAIN
+      - VITE_APP_AUTH_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_API_URL
+      - VITE_APP_APP_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_APP_DOMAIN
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  auth:
+    container_name: ourvoice-auth
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: auth
+        DIR: ourvoice-auth 
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`auth.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    environment:
+      - VITE_APP_NAME
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_AUTH_API_BASE_PATH
+      - VITE_APP_BACKEND_DOMAIN
+      - VITE_APP_FRONTEND_DOMAIN
+      - VITE_APP_AUTH_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_API_URL
+      - VITE_APP_APP_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_APP_DOMAIN
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  # APIs
+  api:
+    container_name: ourvoice-api
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: api
+        DIR: ourvoice-api 
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`api.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    environment:
+      
+      - S3_API_VERSION
+      - AWS_ENDPOINT
+      - AWS_REGION
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - SUPERTOKENS_APP_NAME
+      - SUPERTOKENS_URI
+      - SUPERTOKENS_API_KEY
+      - SUPERTOKENS_API_DOMAIN
+      - SUPERTOKENS_API_BASE_PATH
+      - SUPERTOKENS_WEBSITE_DOMAIN
+      - SUPERTOKENS_WEBSITE_BASE_PATH
+      - SUPERTOKENS_COOKIE_DOMAIN
+      - SUPERTOKENS_ADMIN_EMAIL
+      - SUPERTOKENS_ADMIN_PASSWORD
+      - VITE_APP_API_URL
+      - VITE_APP_APP_DOMAIN
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_AUTH_URL
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASSWORD
+      - CONTACT_FORM_RECAPTCHA_SECRET
+      - DATABASE_CONTACT_FORM_HOST
+      - DATABASE_CONTACT_FORM_PORT
+      - DATABASE_CONTACT_FORM_NAME
+      - DATABASE_CONTACT_FORM_URL
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB_HOST
+      - POSTGRES_DB_PORT
+      - POSTGRES_DB
+      - POSTGRES_DB_TEST_HOST
+      - POSTGRES_DB_TEST_PORT
+      - POSTGRES_DB_TEST
+      - POSTGRES_DB_PREMODERATION_HOST
+      - POSTGRES_DB_PREMODERATION_PORT
+      - POSTGRES_DB_PREMODERATION
+      - POSTGRES_DB_PREMODERATION_TEST_HOST
+      - POSTGRES_DB_PREMODERATION_TEST_PORT
+      - POSTGRES_DB_PREMODERATION_TEST
+      - DATABASE_MAIN_URL
+      - DATABASE_PREMODERATION_URL
+      - DATABASE_MAIN_TEST_URL
+      - DATABASE_PREMODERATION_TEST_URL
+      - TEST_MODE
+      - PRE_AUTH_SESSION_ID
+      - CODE_ID
+      - DEVICE_ID
+      - LINK_CODE
+      - USER_EMAIL
+      - USER_ID
+      - USER_TIME_JOINED
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  authapi:
+    container_name: ourvoice-auth-api
+    platform: linux/amd64
+    build:
+      context: ../
+      args:
+        APP: admin
+        DIR: ourvoice-auth-api
+    restart: always
+    expose:
+      - 80
+    networks:
+      - frontend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=frontend'
+      - 'traefik.http.routers.ourvoice-admin.rule=Host(`authapi.${DEPLOYMENT}`)'
+      - 'traefik.http.routers.ourvoice-admin.entrypoints=websecure'
+      - 'traefik.http.routers.ourvoice-admin.tls=true'
+      - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
+    environment:
+      - SUPERTOKENS_APP_NAME
+      - SUPERTOKENS_URI
+      - SUPERTOKENS_API_KEY
+      - SUPERTOKENS_API_DOMAIN
+      - SUPERTOKENS_API_BASE_PATH
+      - SUPERTOKENS_WEBSITE_DOMAIN
+      - SUPERTOKENS_WEBSITE_BASE_PATH
+      - SUPERTOKENS_COOKIE_DOMAIN
+      - SUPERTOKENS_ADMIN_EMAIL
+      - SUPERTOKENS_ADMIN_PASSWORD
+      - VITE_APP_API_URL
+      - VITE_APP_APP_DOMAIN
+      - VITE_APP_AUTH_API_URL
+      - VITE_APP_PORTAL_URL
+      - VITE_APP_ADMIN_URL
+      - VITE_APP_AUTH_URL
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASSWORD
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '1024k'
+        max-file: '10'
+
+  # main db
+  db:
+    image: postgres:15-alpine
+    container_name: ourvoice-app-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      # mount db volume to the container
+      - db:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - backend
+
+  # main test db     
+  test-db:
+    image: postgres:15-alpine
+    container_name: ourvoice-app-db-test
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB_TEST}
+      DATABASE_URL: ${TEST_DATABASE_URL}
+    expose:
+      - 5432
+    networks:
+      - test
+
+  # premoderation db 
+  premoderation-db:
+    image: postgres:15-alpine
+    container_name: ourvoice-db-premoderation
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB_PREMODERATION}
+    volumes:
+      # mount db volume to the container
+      - premoderation-db:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - backend
+
+  # test premoderation db 
+  test-premoderation-db:
+    image: postgres:15-alpine
+    container_name: ourvoice-db-premoderation-test
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB_PREMODERATION_TEST}
+      DATABASE_URL: ${TEST_DATABASE_URL_PREMODERATION}
+    expose:
+      - 5432
+    networks:
+      - test
+
+  # auth db
+  authdb:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_USER: ${AUTH_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AUTH_POSTGRES_DB}
+    volumes:
+      - authdb:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready',
+          '-d',
+          "'${AUTH_POSTGRES_DB}'"
+        ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  # auth manager
+  supertokens:
+    image: registry.supertokens.io/supertokens/supertokens-postgresql:5.0
+    container_name: supertokens
+    depends_on:
+      authdb:
+        condition: service_healthy
+    expose:
+      - 3567
+    environment:
+      POSTGRESQL_CONNECTION_URI: 'postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@authdb:5432/${AUTH_POSTGRES_DB}'
+    networks:
+      - backend
+      # - test
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db:
+    name: backend
+  premoderation-db:
+    name: premoderation
+  authdb:
+    name: auth

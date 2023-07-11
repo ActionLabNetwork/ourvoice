@@ -45,7 +45,7 @@ export default () => ({
   },
   contact: {
     recaptchaSecret:
-      process.env.CONTACT_FORM_RECAPTCHA_SECRET || 'sandbox.smtp.mailtrap.io',
+      process.env.CONTACT_FORM_RECAPTCHA_SECRET || 'supersecret-recaptcha',
     database: {
       host: process.env.DATABASE_CONTACT_FORM_HOST || '127.0.0.1',
       port: parseInt(process.env.DATABASE_CONTACT_FORM_PORT, 10) || 27017,

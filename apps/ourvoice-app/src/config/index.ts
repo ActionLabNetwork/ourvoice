@@ -10,7 +10,7 @@ export default {
   adminEmail: `${import.meta.env.VITE_APP_ADMIN_EMAIL || 'admin@ourvoice.app'}`,
   sessionEndpoint: `${import.meta.env.VITE_SESSION_INFO_ENDPOINT || '/sessioninfo'}`,
   globalPepper: `${
-    import.meta.env.VITE_SESSION_INFO_ENDPOINT ||
+    import.meta.env.VITE_GLOBAL_PEPPER ||
     'Are7pNzysGMRjfgF4eKhp8sHtgCFF9Cjft6ut9RVLcdSZPVkYU46xfb9Eqjwft2zkUP9KBGDkg3UpnCfh8C3zhCsKDDxa5u8xUyC43cQM4cwRw7TpMnb5KYRbuGQwnGfWf28Kf3HPhBuzf7ujzZzVvkTrk2h9NjwN8Kpe8aZfd8HuYHwqVscG8WdbdDwGFhH9G8cbqBVaQAQd5GBzSKRwwV5WdLWX2CEqm2FRtYBYz3W9Yq6yG7R4RwWBvWcmqCE'
   }`,
   appURL: `${import.meta.env.VITE_APP_APP_URL || 'http://demo.ourvoice.test'}`,
