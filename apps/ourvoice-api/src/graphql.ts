@@ -370,6 +370,7 @@ export class Category {
     parent?: Nullable<Category>;
     children?: Nullable<Category[]>;
     posts?: Nullable<Post[]>;
+    numPosts: number;
 }
 
 export class CategoryEdge {

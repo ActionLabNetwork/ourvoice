@@ -24,7 +24,10 @@ useCategoriesStore().fetchCategories()
 
 //use posts store
 const postStore = usePostsStore()
-const { data } = storeToRefs(postStore)
+const { data, loading } = storeToRefs(postStore)
+if (!loading) {
+  postStore.fetchPosts()
+}
 
 //setup scroll behaviour for loading more posts
 const scrollContainer = ref<HTMLElement | null>(null)

@@ -1,11 +1,19 @@
 import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { Category } from '@prisma/client';
+import {
   CategoriesFilterInput,
   CategoryCreateInput,
-  CategoryUpdateInput,
   CategoryPaginationInput,
+  CategoryUpdateInput,
 } from './../../graphql';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Category } from '@prisma/client';
 import { CategoryService } from './category.service';
 
 @Resolver('Category')
@@ -26,6 +34,12 @@ export class CategoryResolver {
       await this.categoryService.getCategories(filter, pagination);
 
     return { totalCount, edges, pageInfo };
+  }
+
+  @ResolveField()
+  async numPosts(@Parent() category: Category): Promise<number> {
+    const { id } = category;
+    return this.categoryService.countNumPostsOfCategory(id);
   }
 
   @Mutation()

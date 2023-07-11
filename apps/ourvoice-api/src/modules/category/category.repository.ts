@@ -81,6 +81,12 @@ export class CategoryRepository {
       where: { id },
     });
   }
+
+  async countNumPostsOfCategory(id: number): Promise<number> {
+    return this.prisma.post.count({
+      where: { categories: { some: { id } } },
+    });
+  }
 }
 
 // Helper functions for applying filters
