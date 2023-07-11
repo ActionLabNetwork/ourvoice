@@ -64,14 +64,25 @@
           </div>
         </div>
       </div>
-      <CommentTextarea v-if="showReply" @submit="(payload) => createComment(payload)" />
+      <CommentTextarea
+        v-if="showReply"
+        @submit="(commentContent) => createComment(commentContent)"
+      />
+
+      <Toast
+        v-if="showToast"
+        class="fixed bottom-0 right-0"
+        :type="toastType"
+        :message="toastMessage"
+        @click="showToast = false"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { timePassed } from '@/utils'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useCommentsStore } from '@/stores/comments'
 import CommentTextarea from './CommentTextarea.vue'
 import { storeToRefs } from 'pinia'
@@ -79,12 +90,16 @@ import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { useUserStore } from '@/stores/user'
+import Toast from '@/components/common/Toast.vue'
 const props = defineProps({
   commentId: {
     type: Number,
     required: true
   }
 })
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref('warning')
 const votes = ref<Vote[]>([])
 const hasUpvote = computed(() => {
   return votes.value.some(
@@ -131,18 +146,32 @@ const comment = computed(() => data.value.find((comment) => comment.id === props
 
 const showReply = ref(false)
 
-const createComment = (payload: string) => {
+const createComment = async (commentContent: string) => {
   if (!comment.value) return
-  commentStore.createComment({
+  const res = await commentStore.createComment({
     authorHash: userStore.sessionHash,
     authorNickname: userStore.nickname,
     postId: comment.value.post.id,
     parentId: props.commentId,
-    content: payload
+    content: commentContent
   })
   showReply.value = false
+  showToast.value = true
+  if (res) {
+    toastMessage.value = 'Comment created successfully, waiting for moderation'
+    toastType.value = 'success'
+  } else {
+    toastMessage.value = 'Error creating comment'
+    toastType.value = 'danger'
+  }
 }
-
+watch(showToast, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      showToast.value = false
+    }, 3000)
+  }
+})
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
 const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   if (!comment.value) {

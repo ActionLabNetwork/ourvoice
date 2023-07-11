@@ -7,7 +7,6 @@ import { GetManyRepositoryResponse } from './../../../types/general';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  Comment,
   Prisma,
   CommentVersion,
   CommentModeration,
@@ -460,6 +459,8 @@ export class CommentModerationRepository {
       const comment = await tx.comment.findUnique({
         where: { id: commentId },
         include: {
+          post: { select: { postIdInMainDb: true } },
+          parent: { select: { commentIdInMainDb: true } },
           versions: {
             include: { moderations: { orderBy: { timestamp: 'desc' } } },
             orderBy: { version: 'desc' },
@@ -495,6 +496,8 @@ export class CommentModerationRepository {
           content: comment.versions[0].content,
           authorHash: comment.versions[0].authorHash,
           authorNickname: comment.versions[0].authorNickname,
+          postId: comment.post.postIdInMainDb,
+          parentId: comment.parent?.commentIdInMainDb,
         });
 
         this.logger.log(
@@ -502,12 +505,12 @@ export class CommentModerationRepository {
           newCommentInMainDb.id,
         );
 
-        await tx.post.update({
+        await tx.comment.update({
           where: { id: comment.id },
-          data: { postIdInMainDb: newCommentInMainDb.id },
+          data: { commentIdInMainDb: newCommentInMainDb.id },
         });
         this.logger.log(
-          'Updated post with id',
+          'Updated comment with id',
           comment.id,
           ' to have main db id',
           newCommentInMainDb.id,
