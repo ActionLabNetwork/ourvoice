@@ -108,9 +108,7 @@ export class UserController {
     const adminId = session.getUserId();
     // TODO: add user pagination
     const allUsers = await this.userService.getUsers('emailpassword');
-    console.log(allUsers);
     const deploymentUsers = allUsers.users.flatMap(async (object) => {
-      console.log(object);
       // check if self
       if (adminId === object.user.id) {
         return [];
@@ -167,5 +165,45 @@ export class UserController {
           );
       return { message: 'role changed successfully' };
     }
+  }
+  // assign role to specific user
+  @Put('moderators')
+  @UseGuards(new AuthGuard())
+  async addModerators(
+    @Session() session: SessionContainer,
+    @Body()
+    add: {
+      moderators: string[];
+    },
+  ): Promise<{ message: string }> {
+    // check of admin
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status } = await this.metadataService.addModeratorsToAllowlist(
+      add.moderators,
+    );
+    if (status === 'OK')
+      return { message: 'successfully added moderator emails' };
+  }
+
+  // assign allowed emails
+  @Put('allowed')
+  @UseGuards(new AuthGuard())
+  async addAllowedEmails(
+    @Session() session: SessionContainer,
+    @Body()
+    add: {
+      emails: string[];
+    },
+  ): Promise<{ message: string }> {
+    // check of admin
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status } = await this.metadataService.addEmailsToAllowlist(
+      add.emails,
+    );
+    if (status === 'OK') return { message: 'successfully updated user emails' };
   }
 }

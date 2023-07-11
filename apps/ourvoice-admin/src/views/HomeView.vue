@@ -15,6 +15,8 @@
         A safe space for employees and community members to anonymously discuss issues and concerns
         about their work environments.
       </p>
+      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <p>Manage moderators:</p>
       <table class="table table-striped table-bordered">
         <thead>
           <tr>
@@ -54,9 +56,44 @@
           </tr>
         </tbody>
       </table>
-      <div class="flex justify-center flex-wrap gap-6">
+
+      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <p>Add allowed user emails:</p>
+      <input
+        type="email"
+        inputmode="text"
+        multiple
+        v-model="allowedEmails"
+        @keydown="emailsChanged"
+      />
+      <button
+        :disabled="!emailsValid || allowedEmails.length === 1"
+        type="button"
+        class="btn btn-red btn-hover"
+        @click="addAllowedEmails()"
+      >
+        Submit
+      </button>
+      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <p>Add allowed moderator emails:</p>
+      <input
+        type="email"
+        inputmode="text"
+        multiple
+        v-model="moderators"
+        @keydown="moderatorsChanged"
+      />
+      <button
+        :disabled="!moderatorsValid || moderators.length === 1"
+        type="button"
+        class="btn btn-red btn-hover"
+        @click="addAllowedModerators()"
+      >
+        Submit
+      </button>
+      <!-- <div class="flex justify-center flex-wrap gap-6">
         <button type="button" class="btn btn-red btn-hover">Deploy</button>
-      </div>
+      </div> -->
     </div>
     <!-- Image -->
     <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
@@ -92,16 +129,37 @@ export default defineComponent({
       // if session is false, we show a blank screen
       // else we render the UI
       session: false,
+      emailsValid: false,
+      moderatorsValid: false,
       userId: '',
       users: [] as User[],
       roles: [
         { name: 'user', id: 1 },
         { name: 'moderator', id: 2 },
         { name: 'admin', id: 2 }
-      ]
+      ],
+      allowedEmails: '',
+      moderators: ''
     }
   },
   methods: {
+    emailsChanged() {
+      // remove empty values
+      const emails = this.allowedEmails.split(',').filter((e) => String(e).trim())
+      this.emailsValid = emails.every(this.validateEmail)
+    },
+    moderatorsChanged() {
+      // remove empty values
+      const emails = this.moderators.split(',').filter((e) => String(e).trim())
+      this.moderatorsValid = emails.every(this.validateEmail)
+    },
+    validateEmail(email: string) {
+      return email
+        .toLowerCase()
+        .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )
+    },
     signOut: async function () {
       await Session.signOut()
       window.location.href = authURL
@@ -129,7 +187,6 @@ export default defineComponent({
         }
       }
     },
-
     callAPI: async function () {
       const response = await fetch(`${apiURL}/sessioninfo`)
 
@@ -188,6 +245,68 @@ export default defineComponent({
         .catch((error) => {
           console.error('There was an error!', error)
         })
+    },
+    async addAllowedEmails() {
+      const emails = this.allowedEmails.split(',').filter((e) => String(e).trim())
+      await fetch(`${apiURL}/users/allowed`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          emails
+        })
+      })
+        .then(async (response) => {
+          const data = await response.json()
+
+          // check for error response
+          if (response.status === 401) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status
+            window.location.href = authURL
+            return Promise.reject(error)
+          }
+          // TODO: show user message
+          if (response.status === 200) {
+            this.allowedEmails = ''
+          }
+        })
+        .catch((error) => {
+          console.error('There was an error!', error)
+        })
+    },
+    async addAllowedModerators() {
+      const moderators = this.moderators.split(',').filter((e) => String(e).trim())
+      await fetch(`${apiURL}/users/moderators`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          moderators
+        })
+      })
+        .then(async (response) => {
+          const data = await response.json()
+
+          // check for error response
+          if (response.status === 401) {
+            // get error message from body or default to response status
+            const error = (data && data.message) || response.status
+            window.location.href = authURL
+            return Promise.reject(error)
+          }
+          // TODO: show user message
+          if (response.status === 200) {
+            this.moderators = ''
+          }
+        })
+        .catch((error) => {
+          console.error('There was an error!', error)
+        })
     }
   },
 
@@ -230,5 +349,27 @@ export default defineComponent({
   justify-content: center;
   color: white;
   font-weight: bold;
+}
+input {
+  border: 2px solid black;
+  display: block;
+  width: 100%;
+  margin: 1rem auto;
+}
+
+input:focus {
+  outline: none; /* To make sure you see the border-color change as you type */
+}
+
+input:invalid {
+  border-color: red;
+}
+
+input:valid {
+  border-color: green;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 </style>

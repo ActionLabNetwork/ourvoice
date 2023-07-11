@@ -3,7 +3,7 @@ import UserMetadata from 'supertokens-node/recipe/usermetadata';
 export async function addEmailToAllowlist(email: string) {
   const existingData = await UserMetadata.getUserMetadata('emailAllowList');
   let allowList: string[] = existingData.metadata.allowList || [];
-  allowList = [...allowList, email];
+  allowList = [...new Set([...allowList, email])];
   await UserMetadata.updateUserMetadata('emailAllowList', {
     allowList,
   });
@@ -11,7 +11,7 @@ export async function addEmailToAllowlist(email: string) {
 export async function addEmailsToAllowlist(emails: string[]) {
   const existingData = await UserMetadata.getUserMetadata('emailAllowList');
   let allowList: string[] = existingData.metadata.allowList || [];
-  allowList = [...allowList, ...emails];
+  allowList = [...new Set([...allowList, ...emails])];
   await UserMetadata.updateUserMetadata('emailAllowList', {
     allowList,
   });
@@ -35,7 +35,7 @@ export async function addModeratorsToAllowlist(moderators: string[]) {
     'phoneNumberAllowList',
   );
   let allowList: string[] = existingData.metadata.allowList || [];
-  allowList = [...allowList, ...moderators];
+  allowList = [...new Set([...allowList, ...moderators])];
   await UserMetadata.updateUserMetadata('phoneNumberAllowList', {
     allowList,
   });
@@ -57,7 +57,8 @@ export async function isModeratorAllowed(moderator: string) {
     'phoneNumberAllowList',
   );
   const allowList: string[] = existingData.metadata.allowList || [];
-  return allowList.includes(moderator);
+  // NOTE: if allowlist is empty then this feature is disabled
+  return allowList.includes(moderator) || allowList.length === 0;
 }
 
 export async function clearModeratorAllowList() {

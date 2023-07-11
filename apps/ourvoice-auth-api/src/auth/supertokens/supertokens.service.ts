@@ -288,7 +288,7 @@ export class SupertokensService {
                     }
                   }
                 }
-                return await originalImplementation.createCodePOST!(input);
+                return await originalImplementation.createCodePOST?.(input);
               },
               consumeCodePOST: async (input) => {
                 if (originalImplementation.consumeCodePOST === undefined) {
