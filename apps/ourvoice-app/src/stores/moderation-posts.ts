@@ -104,6 +104,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         // Fetch posts from Moderation DB
         this.loading = true
 
+        console.log(`Fetching ${status} posts...`)
+
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POSTS_QUERY,
           variables: { status: status }
@@ -113,17 +115,19 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           (edge: Edge<ModerationPostModel>) => edge.node
         )
 
-        switch (status) {
-          case 'PENDING':
-            this.pendingPosts = newPosts
-            break
-          case 'APPROVED':
-            this.acceptedPosts = newPosts
-            break
-          case 'REJECTED':
-            this.rejectedPosts = newPosts
-            break
-        }
+        this.posts = newPosts
+
+        // switch (status) {
+        //   case 'PENDING':
+        //     this.pendingPosts = newPosts
+        //     break
+        //   case 'APPROVED':
+        //     this.acceptedPosts = newPosts
+        //     break
+        //   case 'REJECTED':
+        //     this.rejectedPosts = newPosts
+        //     break
+        // }
         this.loading = false
       } catch (error) {
         console.error(error)

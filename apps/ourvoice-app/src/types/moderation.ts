@@ -31,4 +31,5 @@ export interface Moderation {
   moderatorNickname: any
 }
 
-export type ModerationListTabs = { name: ModerationStatus; current: boolean }[]
+export type ModerationListTab = { name: ModerationStatus; current: boolean }
+export type ModerationListTabs = ModerationListTab[]
