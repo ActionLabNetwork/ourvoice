@@ -1,10 +1,10 @@
 <template>
   <Suspense>
-    <div class="overflow-y-scroll">
+    <div class="w-full overflow-y-scroll max-w-4xl mx-auto px-4">
       <PostCard :postId="postId">
         <div></div>
       </PostCard>
-      <CommentList class="max-w-4xl mx-auto" :postId="postId" />
+      <CommentList :postId="postId" />
     </div>
   </Suspense>
 </template>
