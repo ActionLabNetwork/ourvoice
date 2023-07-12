@@ -286,6 +286,7 @@ jobs:
 
         # Building docker containers
       - name: Docker metadata
+        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request'
         id: metadata
         uses: docker/metadata-action@v4
         with:
@@ -294,13 +295,29 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }}
-
+      
+      - name: Automatic Tagging of Releases
+        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request'
+        id: increment-git-tag
+        run: |
+          bash ./deployment/build-docker/git_tag_update.sh -v major
+      
       - name: Login to DockerHub
         uses: docker/login-action@v2
-        if: github.event_name != 'pull_request' && github.ref_type == 'tag'
+        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && github.ref_type == 'tag'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push Docker images
+        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && github.ref_type == 'tag'
+        env:
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        run: |
+          docker build -t ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }} .
+          docker push ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }}
+          docker tag ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMG_NAME }}:latest
+          docker push ${{ env.IMG_NAME }}:latest
 
   deploy-staging:
     name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
