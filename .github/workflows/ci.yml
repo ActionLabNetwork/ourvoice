@@ -1,13 +1,15 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: CI
+name: CI/CD
 
 on:
   push:
     branches: ['dev', 'main']
     paths-ignore:
       - 'deployment/**'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Push events to tags matching v1.0.0
   pull_request:
     branches: ['dev', 'main']
     paths-ignore:
@@ -169,7 +171,7 @@ jobs:
       #   run: node_modules/.bin/cypress run
 
   # APPS Build
-  build-apps:
+  build-apps-and-docker-images:
     name: Build APPS (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
     runs-on: ubuntu-latest
     needs: lint
@@ -181,6 +183,13 @@ jobs:
       DB_APP_API_DB_PREMOD_DRIVER: postgres
       DB_APP_API_DB_PREMOD_HOST: localhost
       DB_APP_API_DB_PREMOD_PORT: 5435
+      APPS_PORTAL_APP: portal
+      APPS_ADMIN_APP: admin
+      APPS_API_APP: api
+      APPS_APP_APP: app
+      APPS_APP_AUTH: auth
+      APPS_APP_AUTHAPI: authapi
+      IMG_NAME: ${{ github.repository }}
 
     strategy:
       matrix:
@@ -221,6 +230,9 @@ jobs:
     steps:
       - name: Repository checkout
         uses: actions/checkout@v3.5.3
+
+      - name: Info
+        run: echo "Parameters. ${{ github.event.base_ref }}, ${{ github.ref_type }}, ${{ github.ref }}"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.2.4
@@ -272,6 +284,24 @@ jobs:
         working-directory: apps/ourvoice-portal
         run: pnpm build
 
+        # Building docker containers
+      - name: Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.IMG_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        if: github.event_name != 'pull_request' && github.ref_type == 'tag'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
   deploy-staging:
     name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
     if: startsWith(github.ref, 'refs/heads/dev')
@@ -318,22 +348,22 @@ jobs:
       - name: Echo test hello world
         run: echo "Hello world"
 
-      - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+      # - name: Repository checkout
+      #   uses: actions/checkout@v3.5.3
 
       # - name: Install pnpm
       #   uses: pnpm/action-setup@v2.2.4
       #   with:
       #     version: 8
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+      # - name: Use Node.js ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3.6.0
+      #   with:
+      #     node-version: ${{ matrix.node-version }}
+      #     cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install
+      # - name: Install dependencies
+      #   run: pnpm install
 
       # - name: Prisma Migration API main DB
       #   working-directory: apps/ourvoice-api
