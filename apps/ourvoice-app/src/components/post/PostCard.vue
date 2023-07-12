@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:shadow-lg transition duration-500 ease-in-out"
+    class="overflow-hidden border-2 my-6 p-6 bg-white rounded-xl break-all hover:shadow-lg transition duration-500 ease-in-out"
   >
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}

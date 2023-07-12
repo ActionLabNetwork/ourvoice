@@ -119,7 +119,7 @@ const { onResult, refetch } = useQuery(
     }
   },
   {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'no-cache'
   }
 )
 onResult(({ data, loading }) => {
