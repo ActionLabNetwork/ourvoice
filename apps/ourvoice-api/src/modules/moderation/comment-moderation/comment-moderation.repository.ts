@@ -519,6 +519,50 @@ export class CommentModerationRepository {
     });
   }
 
+  async rejectComment(commentId: number) {
+    await this.prisma.$transaction(async (tx) => {
+      // Check if the comment has reached the rejection threshold
+      const comment = await tx.comment.findUnique({
+        where: { id: commentId },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      const latestVersion = comment.versions[0];
+      const decisionsCount =
+        countCommentVersionModerationDecisions(latestVersion);
+
+      if (!decisionsCount) {
+        throw new Error('Comment has no moderations');
+      }
+
+      if (decisionsCount.ACCEPTED > 0) {
+        throw new Error(
+          `Unable to move comment to rejected status. It has ${decisionsCount.ACCEPTED} approvals`,
+        );
+      }
+
+      if (decisionsCount.REJECTED >= comment.requiredModerations) {
+        await tx.comment.update({
+          where: { id: commentId },
+          data: { status: 'REJECTED' },
+        });
+
+        this.logger.log(
+          'Finished rejecting comment with comment id',
+          commentId,
+        );
+
+        // TODO: Schedule to be deleted the next publishing cycle
+      }
+    });
+  }
+
   async approveOrRejectComments(): Promise<void> {
     const pendingComments = await this.prisma.comment.findMany({
       where: { status: 'PENDING' },
@@ -535,8 +579,14 @@ export class CommentModerationRepository {
           `Error approving comment with comment id ${comment.id}. ${error.message}`,
         );
       }
-    }
 
-    // TODO: Reject comments (awaiting conditions/business logic)
+      try {
+        await this.rejectComment(comment.id);
+      } catch (error) {
+        this.logger.error(
+          `Error rejecting comment with comment id ${comment.id}. ${error.message}`,
+        );
+      }
+    }
   }
 }

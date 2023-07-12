@@ -31,7 +31,7 @@
     "prisma:generate:moderation:test": "NODE_ENV=test prisma generate --schema ./prisma-moderation/test/schema.prisma",
     "graphql:generate": "pnpm exec tsx ./src/graphql/generate-typings.ts",
     "prisma:generate:contactform": "prisma generate --schema ./prisma-contactform/schema.prisma",
-    "prisma:seed:main": "pnpm exec tsx ./prisma/exec-seed.ts",
+    "prisma:seed:main": "pnpm exec tsx ./prisma-main/exec-seed.ts",
     "prisma:seed:moderation": "pnpm exec tsx ./prisma-moderation/exec-seed.ts"
   },
   "dependencies": {

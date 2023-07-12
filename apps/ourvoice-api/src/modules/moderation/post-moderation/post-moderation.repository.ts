@@ -373,7 +373,9 @@ export class PostModerationRepository {
       }
 
       if (decisionsCount.REJECTED > 0) {
-        throw new Error(`Post has ${decisionsCount.REJECTED} rejections`);
+        throw new Error(
+          `Unable to move post to accepted status. Post has ${decisionsCount.REJECTED} rejections`,
+        );
       }
 
       if (decisionsCount.ACCEPTED >= post.requiredModerations) {
@@ -382,9 +384,8 @@ export class PostModerationRepository {
           data: { status: 'APPROVED' },
         });
 
-        this.logger.log('Finished approving post with post id', postId);
+        this.logger.debug('Finished approving post with post id', postId);
 
-        // TODO: Add as a new post entry in the main db
         const newPostInMainDb = await this.postService.createPost({
           title: post.versions[0].title,
           content: post.versions[0].content,
@@ -393,7 +394,7 @@ export class PostModerationRepository {
           authorHash: post.versions[0].authorHash,
           authorNickname: post.versions[0].authorNickname,
         });
-        this.logger.log(
+        this.logger.debug(
           'Created new post in main db with id',
           newPostInMainDb.id,
         );
@@ -402,12 +403,52 @@ export class PostModerationRepository {
           where: { id: post.id },
           data: { postIdInMainDb: newPostInMainDb.id },
         });
-        this.logger.log(
+        this.logger.debug(
           'Updated post with id',
           post.id,
           ' to have main db id',
           newPostInMainDb.id,
         );
+      }
+    });
+  }
+
+  async rejectPost(postId: number) {
+    await this.prisma.$transaction(async (tx) => {
+      // Check if the post has reached the rejection threshold
+      const post = await tx.post.findUnique({
+        where: { id: postId },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      const latestVersion = post.versions[0];
+      const decisionsCount = countPostVersionModerationDecisions(latestVersion);
+
+      if (!decisionsCount) {
+        throw new Error('Post has no moderations');
+      }
+
+      if (decisionsCount.ACCEPTED > 0) {
+        throw new Error(
+          `Unable to move post to rejected status. It has ${decisionsCount.ACCEPTED} approvals`,
+        );
+      }
+
+      if (decisionsCount.REJECTED >= post.requiredModerations) {
+        await tx.post.update({
+          where: { id: postId },
+          data: { status: 'REJECTED' },
+        });
+
+        this.logger.log(`Finished rejecting post with post id ${postId}`);
+
+        // TODO: Schedule to be deleted the next publishing cycle
       }
     });
   }
@@ -424,13 +465,19 @@ export class PostModerationRepository {
       try {
         await this.approvePost(post.id);
       } catch (error) {
-        this.logger.error(
-          `Error approving post with post id ${post.id}. ${error.message}`,
+        this.logger.debug(
+          `Post with post id ${post.id} was not approved. ${error.message}`,
+        );
+      }
+
+      try {
+        await this.rejectPost(post.id);
+      } catch (error) {
+        this.logger.debug(
+          `Post with post id ${post.id} was not rejected. ${error.message}`,
         );
       }
     }
-
-    // TODO: Reject posts (awaiting conditions/business logic)
   }
 
   async findPostWithVersionsAndModerations(
