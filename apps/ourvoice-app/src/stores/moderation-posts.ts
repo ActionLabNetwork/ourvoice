@@ -99,7 +99,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
     errorMessage: undefined
   }),
   actions: {
-    async fetchPosts1(status: PostStatus) {
+    async fetchPostsByStatus(status: PostStatus) {
       try {
         // Fetch posts from Moderation DB
         this.loading = true
@@ -124,8 +124,9 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
             this.rejectedPosts = newPosts
             break
         }
+        this.loading = false
       } catch (error) {
-        // TODO: Handle error
+        console.error(error)
       }
     },
     async fetchPosts(loadMore = false) {

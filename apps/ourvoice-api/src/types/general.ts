@@ -18,3 +18,5 @@ export type ModerationPublishFrequency = {
   unit: 'minutes' | 'hours' | 'days';
   value: number;
 };
+
+export type AuthRoles = 'super' | 'admin' | 'moderator' | 'user';

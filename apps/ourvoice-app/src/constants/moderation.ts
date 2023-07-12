@@ -1,6 +1,8 @@
-export const LIST_TABS = [
+import type { ModerationListTabs } from './../types/moderation'
+
+export const LIST_TABS: ModerationListTabs = [
   { name: 'Pending', current: true },
-  { name: 'Accepted', current: false },
+  { name: 'Approved', current: false },
   { name: 'Rejected', current: false }
 ]
 

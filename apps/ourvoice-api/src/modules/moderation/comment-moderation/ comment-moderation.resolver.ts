@@ -10,6 +10,9 @@ import { CommentModerationService } from './comment-moderation.service';
 import { Comment, CommentVersion } from '@prisma-moderation-db/client';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../../auth/auth.guard';
+import { GqlSession } from 'src/auth/session.decorator';
+import { SessionContainer } from 'supertokens-node/recipe/session';
+import { validateUserPermission } from 'src/utils/auth';
 
 @UseGuards(new AuthGuard())
 @Resolver('ModerationComment')
@@ -17,16 +20,22 @@ export class CommentModerationResolver {
   constructor(private commentModerationService: CommentModerationService) {}
 
   @Query()
-  async moderationComment(@Args('id') id: number): Promise<Comment> {
+  async moderationComment(
+    @GqlSession() session: SessionContainer,
+    @Args('id') id: number,
+  ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.getModerationCommentById(id);
   }
 
   @Query()
   async moderationComments(
+    @GqlSession() session: SessionContainer,
     @Args('filter', { nullable: true }) filter?: ModerationCommentsFilterInput,
     @Args('pagination', { nullable: true })
     pagination?: ModerationCommentPaginationInput,
   ): Promise<ModerationCommentsResponse> {
+    await validateUserPermission(session);
     const { totalCount, edges, pageInfo } =
       await this.commentModerationService.getModerationComments(
         filter,
@@ -37,24 +46,32 @@ export class CommentModerationResolver {
   }
 
   @Query()
-  async commentVersion(@Args('id') id: number): Promise<CommentVersion> {
+  async commentVersion(
+    @GqlSession() session: SessionContainer,
+    @Args('id') id: number,
+  ): Promise<CommentVersion> {
+    await validateUserPermission(session);
     return await this.commentModerationService.getCommentVersionById(id);
   }
 
   @Mutation()
   async createModerationComment(
+    @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationCommentCreateInput,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.createComment(data);
   }
 
   @Mutation()
   async approveModerationCommentVersion(
+    @GqlSession() session: SessionContainer,
     @Args('id') id: number,
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.approveCommentVersion(
       id,
       moderatorHash,
@@ -65,11 +82,13 @@ export class CommentModerationResolver {
 
   @Mutation()
   async rejectModerationCommentVersion(
+    @GqlSession() session: SessionContainer,
     @Args('id') id: number,
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.rejectCommentVersion(
       id,
       moderatorHash,
@@ -80,12 +99,14 @@ export class CommentModerationResolver {
 
   @Mutation()
   async modifyModerationComment(
+    @GqlSession() session: SessionContainer,
     @Args('commentId') id: number,
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationCommentModifyInput,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.modifyModerationComment(
       id,
       moderatorHash,
@@ -97,8 +118,10 @@ export class CommentModerationResolver {
 
   @Mutation()
   async rollbackModifiedModerationComment(
+    @GqlSession() session: SessionContainer,
     @Args('commentId') commentId: number,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.rollbackModifiedModerationComment(
       commentId,
     );
@@ -106,9 +129,11 @@ export class CommentModerationResolver {
 
   @Mutation()
   async renewCommentModeration(
+    @GqlSession() session: SessionContainer,
     @Args('commentModerationId') id: number,
     @Args('moderatorHash') moderatorHash: string,
   ): Promise<Comment> {
+    await validateUserPermission(session);
     return await this.commentModerationService.renewCommentModeration(
       id,
       moderatorHash,

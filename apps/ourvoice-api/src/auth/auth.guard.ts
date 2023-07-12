@@ -33,15 +33,12 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     let err = undefined;
+    const req = this.getRequest(context);
     const resp = this.getResponse(context);
 
-    await verifySession(this.verifyOptions)(
-      this.getRequest(context),
-      resp,
-      (res) => {
-        err = res;
-      },
-    );
+    await verifySession(this.verifyOptions)(req, resp, (res) => {
+      err = res;
+    });
 
     // if (resp.headersSent) {
     //   throw new STError({

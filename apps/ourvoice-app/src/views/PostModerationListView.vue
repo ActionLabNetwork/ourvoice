@@ -27,7 +27,7 @@ import { useModerationPostsStore } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationPost } from '@/stores/moderation-posts'
-import type { ModerationVersionStatus } from '@/types/moderation'
+import type { ModerationListTabs, ModerationVersionStatus } from '@/types/moderation'
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
@@ -51,7 +51,8 @@ const moderationPosts = computed(() => {
   )
 })
 
-const handleTabSwitched = () => {
+const handleTabSwitched = (tab: ModerationListTabs) => {
   // If we need to know when the tab is switched, we can do it here
+  console.log(tab)
 }
 </script>
