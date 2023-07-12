@@ -67,8 +67,8 @@
         </button>
       </div>
     </div>
-    <div class="flex overflow-x-auto py-4 space-x-5 backdrop-blur-md items-center">
-      <span class="hidden md:inline-block font-semibold md:text-xl md:pl-10">Categories</span>
+    <div class="py-4 flex flex-row space-x-5 items-center overflow-x-auto backdrop-blur-md">
+      <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span>
       <PostSortFilterCategoryButton
         :active="!sortFilter.selectedCategoryIds"
         :count="3"
@@ -83,6 +83,9 @@
         :text="category.name"
         @select="selectCategory(category.id)"
       />
+      <div v-if="state == 'loading-initial'" class="flex flex-row space-x-5">
+        <div v-for="i in 5" :key="i" class="w-28 h-10 shrink-0 rounded-full skeleton" />
+      </div>
     </div>
     <!-- {{ selectedTimeRangeOption }} -->
     <!-- <div class="border-2">{{ selectedSortOption }}</div>
@@ -108,6 +111,7 @@ import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
+import CategoryList from '@/components/post/CategoryList.vue'
 interface CategoryWithCount {
   id: number
   name: string
@@ -155,7 +159,10 @@ const handleTimeRangeSelected = (index: number) => {
 }
 const categoriesStore = useCategoriesStore()
 const postsStore = usePostsStore()
-const { data: categories } = storeToRefs(categoriesStore)
+const { data: categories, state } = storeToRefs(categoriesStore)
+if (state.value == 'initial') {
+  categoriesStore.fetchCategories()
+}
 const { sortFilter } = storeToRefs(postsStore)
 const selectCategory = (id: number | null) => {
   postsStore.setSelectedCategoryIds(id ? [id] : null)
