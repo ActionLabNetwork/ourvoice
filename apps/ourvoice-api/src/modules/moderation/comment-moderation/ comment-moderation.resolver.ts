@@ -56,10 +56,8 @@ export class CommentModerationResolver {
 
   @Mutation()
   async createModerationComment(
-    @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationCommentCreateInput,
   ): Promise<Comment> {
-    await validateUserPermission(session);
     return await this.commentModerationService.createComment(data);
   }
 

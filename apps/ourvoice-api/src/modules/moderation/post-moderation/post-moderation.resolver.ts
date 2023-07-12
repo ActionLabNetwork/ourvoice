@@ -54,10 +54,8 @@ export class PostModerationResolver {
 
   @Mutation()
   async createModerationPost(
-    @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationPostCreateInput,
   ): Promise<Post> {
-    await validateUserPermission(session);
     return await this.postModerationService.createPost(data);
   }
 
