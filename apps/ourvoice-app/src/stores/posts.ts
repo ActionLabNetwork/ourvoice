@@ -47,7 +47,7 @@ export interface PostsState {
   data: Post[]
   totalCount: number
   pageInfo: pageInfo | undefined
-  loading: boolean
+  state: "initial" | "loading-initial" | "loaded" | "loading-more" | "error"
   error: Error | undefined
   errorMessage: string | undefined
   sortFilter: SortFilter
@@ -60,7 +60,7 @@ export const usePostsStore = defineStore('posts', {
     data: [],
     totalCount: 0,
     pageInfo: undefined,
-    loading: false,
+    state: "initial",
     error: undefined,
     errorMessage: undefined,
     sortFilter: {
@@ -77,6 +77,7 @@ export const usePostsStore = defineStore('posts', {
   },
   actions: {
     async fetchPosts(loadMore = false) {
+      this.state = loadMore ? "loading-more" : "loading-initial"
       try {
         const { data } = await apolloClient.query({
           query: GET_POSTS_QUERY,
@@ -122,11 +123,11 @@ export const usePostsStore = defineStore('posts', {
         this.data = loadMore ? [...this.data, ...newPosts] : newPosts
         this.totalCount = data.posts.totalCount
         this.pageInfo = data.posts.pageInfo
+        this.state = "loaded"
       } catch (error) {
         this.error = error as ApolloError
         this.errorMessage = 'Failed to load posts. Please try again.'
-      } finally {
-        this.loading = false
+        this.state = "error"
       }
     },
 
@@ -245,7 +246,7 @@ export const usePostsStore = defineStore('posts', {
       this.sortFilter.sortOrder = sortOrder
     },
 
-    async setCreatedAfter(createdAfter: Date | null) {
+     setCreatedAfter(createdAfter: Date | null) {
       this.sortFilter.createdAfter = createdAfter
     },
 
