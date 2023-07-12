@@ -316,8 +316,8 @@ jobs:
         run: |
           docker build -t ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }} .
           docker push ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }}
-          docker tag ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMG_NAME }}:latest
-          docker push ${{ env.IMG_NAME }}:latest
+# docker tag ${{ env.IMG_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMG_NAME }}:latest
+# docker push ${{ env.IMG_NAME }}:latest
 
   deploy-staging:
     name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
