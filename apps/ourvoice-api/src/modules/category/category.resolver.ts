@@ -8,7 +8,7 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Category } from '@prisma-main-db/client';
 import { CategoryService } from './category.service';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../../auth/auth.guard';
 
 @UseGuards(new AuthGuard())
 @Resolver('Category')

@@ -2,7 +2,7 @@ import {
   Comment,
   CommentVersion,
   CommentModeration,
-} from '../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 import { GetManyResponse } from '../general';
 
 export type ModerationCommentsResponse = GetManyResponse<Comment>;

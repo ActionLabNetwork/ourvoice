@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { seedMainDb } from '../../../prisma/seed';
+import { seedMainDb } from '../../../prisma-main/seed';
 import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CategoryRepository } from './category.repository';

@@ -5,8 +5,8 @@ import {
   Prisma,
   PostVersion,
   PostModeration,
-} from '../../../../node_modules/@internal/prisma/client';
-import { PrismaService } from '../../../database/premoderation/prisma.service';
+} from '@prisma-moderation-db/client';
+import { PrismaService } from '../../../database/moderation/prisma.service';
 import {
   ModerationPostsFilterInput,
   ModerationPostPaginationInput,

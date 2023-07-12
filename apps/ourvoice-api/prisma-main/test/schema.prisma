@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma-main-db/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_MAIN_TEST_URL")
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String
+  files     Json?
+  moderated Boolean @default(false)
+  published Boolean @default(false)
+  votesDown Int     @default(0)
+  votesUp   Int     @default(0)
+
+  // Meta
+  createdAt   DateTime  @default(now())
+  disabledAt  DateTime?
+  moderatedAt DateTime?
+  publishedAt DateTime?
+
+  authorHash     String
+  authorNickname String
+  categories     Category[]
+  comments       Comment[]
+  votes          Vote[]
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  weight      Int     @default(0)
+  active      Boolean @default(true)
+
+  // Meta
+  createdAt  DateTime  @default(now())
+  disabledAt DateTime?
+
+  // Relations
+  parent   Category?  @relation("Subcategories", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentId Int?
+  children Category[] @relation("Subcategories")
+  posts    Post[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  moderated Boolean? @default(false)
+  published Boolean? @default(false)
+  votesDown Int      @default(0)
+  votesUp   Int      @default(0)
+
+  // Meta
+  createdAt   DateTime  @default(now())
+  moderatedAt DateTime?
+  publishedAt DateTime?
+  disabledAt  DateTime?
+
+  // Relations
+  authorHash     String
+  authorNickname String
+  post           Post?     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId         Int?
+  parent         Comment?  @relation("ChildComments", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parentId       Int?
+  children       Comment[] @relation("ChildComments")
+  votes          Vote[]
+}
+
+model Vote {
+  id             Int      @id @default(autoincrement())
+  voteType       String
+  authorHash     String
+  authorNickname String
+  post           Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId         Int
+  comment        Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentId      Int?
+}

@@ -7,7 +7,7 @@ import {
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommentService } from '../../modules/comment/comment.service';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../../auth/auth.guard';
 
 @Resolver('Comment')
 @UseGuards(new AuthGuard())

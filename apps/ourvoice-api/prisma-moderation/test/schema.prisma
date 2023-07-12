@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator moderationClient {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma-moderation-db/client"
+}
+
+datasource moderation {
+  provider = "postgresql"
+  url      = env("DATABASE_MODERATION_TEST_URL")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+
+  // Moderation
+  status              PostStatus    @default(PENDING)
+  versions            PostVersion[]
+  requiredModerations Int           @default(1)
+
+  // Relations
+  comments       Comment[]
+  authorHash     String
+  authorNickname String
+  postIdInMainDb Int?
+}
+
+model PostVersion {
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  categoryIds    Int[]
+  files          Json?
+  version        Int              @default(0)
+  authorHash     String
+  authorNickname String
+  reason         String?
+  latest         Boolean          @default(false)
+  timestamp      DateTime         @default(now())
+  postId         Int
+  post           Post             @relation(fields: [postId], references: [id])
+  moderations    PostModeration[]
+
+  @@unique([postId, version])
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+
+  // Moderation
+  status              PostStatus       @default(PENDING)
+  versions            CommentVersion[]
+  requiredModerations Int              @default(1)
+
+  // Relations
+  authorHash        String
+  authorNickname    String
+  post              Post?     @relation(fields: [postId], references: [id])
+  postId            Int?
+  parentId          Int?
+  parent            Comment?  @relation("CommentToComment", fields: [parentId], references: [id])
+  children          Comment[] @relation("CommentToComment")
+  commentIdInMainDb Int?
+}
+
+model CommentVersion {
+  id             Int                 @id @default(autoincrement())
+  content        String
+  version        Int                 @default(0)
+  authorHash     String
+  authorNickname String
+  reason         String?
+  latest         Boolean             @default(false)
+  timestamp      DateTime            @default(now())
+  commentId      Int
+  comment        Comment             @relation(fields: [commentId], references: [id])
+  moderations    CommentModeration[]
+
+  @@unique([commentId, version])
+}
+
+model PostModeration {
+  id                Int         @id @default(autoincrement())
+  postVersionId     Int
+  postVersion       PostVersion @relation(fields: [postVersionId], references: [id])
+  moderatorHash     String
+  moderatorNickname String
+  decision          Decision
+  reason            String?
+  timestamp         DateTime    @default(now())
+
+  @@index([postVersionId])
+}
+
+model CommentModeration {
+  id                Int            @id @default(autoincrement())
+  commentVersionId  Int
+  commentVersion    CommentVersion @relation(fields: [commentVersionId], references: [id])
+  moderatorHash     String
+  moderatorNickname String
+  decision          Decision
+  reason            String?
+  timestamp         DateTime       @default(now())
+
+  @@index([commentVersionId])
+}
+
+enum Decision {
+  ACCEPTED
+  REJECTED
+}
+
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

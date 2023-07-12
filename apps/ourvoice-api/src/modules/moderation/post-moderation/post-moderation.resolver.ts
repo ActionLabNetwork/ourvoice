@@ -7,12 +7,9 @@ import {
   ModerationPostModifyInput,
 } from '../../../graphql';
 import { PostModerationService } from './post-moderation.service';
-import {
-  Post,
-  PostVersion,
-} from '../../../../node_modules/@internal/prisma/client';
+import { Post, PostVersion } from '@prisma-moderation-db/client';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../../../auth/auth.guard';
 
 @UseGuards(new AuthGuard())
 @Resolver('ModerationPost')

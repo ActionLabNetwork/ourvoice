@@ -3,10 +3,10 @@ import {
   PostStatus,
   PostVersion,
   Decision,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
-import { seedDb } from '../../../../prisma-premoderation/seed';
-import { PrismaService } from '../../../database/premoderation/prisma.service';
+import { seedDb } from '../../../../prisma-moderation/seed';
+import { PrismaService } from '../../../database/moderation/prisma.service';
 import { Test } from '@nestjs/testing';
 import { PostModule } from './../../post/post.module';
 import { PostModerationRepository } from './post-moderation.repository';
@@ -143,14 +143,14 @@ describe('PostRepository', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (key === 'database.premoderationUrl') {
+              if (key === 'database.moderationUrl') {
                 return (
-                  process.env.DATABASE_PREMODERATION_URL ||
+                  process.env.DATABASE_MODERATION_URL ||
                   'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer'
                 );
-              } else if (key === 'database.premoderationTestUrl') {
+              } else if (key === 'database.moderationTestUrl') {
                 return (
-                  process.env.DATABASE_PREMODERATION_TEST_URL ||
+                  process.env.DATABASE_MODERATION_TEST_URL ||
                   'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
                 );
               } else if (key === 'database.mainTestUrl') {

@@ -9,10 +9,7 @@ import {
   ModerationPostPaginationInput,
   ModerationPostsFilterInput,
 } from '../../../graphql';
-import {
-  Post,
-  PostVersion,
-} from '../../../../node_modules/@internal/prisma/client';
+import { Post, PostVersion } from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
