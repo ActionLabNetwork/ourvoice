@@ -189,7 +189,7 @@ jobs:
       APPS_API_APP: api
       APPS_APP_APP: app
       APPS_APP_AUTH: auth
-      APPS_APP_AUTHAPI: authapi
+      APPS_APP_AUTHAPI: auth-api
       RUN_POST: false
       DOCKER_BUILD: true
       IMG_NAME: ${{ github.repository }}
