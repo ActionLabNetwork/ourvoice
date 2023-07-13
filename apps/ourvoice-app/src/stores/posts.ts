@@ -1,6 +1,6 @@
 import { type sortOptions, type sortOrder } from '@/constants/post'
 import type { GetPostsQuery } from '@/graphql/generated/graphql'
-import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
+import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresignedDownloadUrls'
 import type { ApolloError } from '@apollo/client/errors'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
