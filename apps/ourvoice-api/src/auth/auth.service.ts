@@ -3,6 +3,7 @@ import * as Base64 from 'crypto-js/enc-base64';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthModuleConfig, ConfigInjectionToken } from './config.interface';
+import { SessionContainer } from 'supertokens-node/recipe/session';
 
 @Injectable()
 export class AuthService {
@@ -22,5 +23,29 @@ export class AuthService {
     hash: string,
   ): Promise<boolean> {
     return (await this.hashInput(input, deployment)) === hash;
+  }
+
+  async validateModeratorHash(
+    session: SessionContainer,
+    moderatorHash: string,
+  ): Promise<void> {
+    const verifyHashesAreEqual = async (
+      session: SessionContainer,
+      hash: string,
+    ): Promise<boolean> => {
+      const userId = session.getUserId();
+      const deployment = session['userDataInAccessToken'].deployment;
+      const sessionHash = await this.hashInput(userId, deployment);
+
+      return sessionHash === hash;
+    };
+
+    const hashesAreEqual = await verifyHashesAreEqual(session, moderatorHash);
+
+    if (!hashesAreEqual) {
+      throw new Error(
+        'The moderator hash provided does not match the session hash',
+      );
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { AuthService } from '../../../auth/auth.service';
 import { ModerationCommentsResponse } from '../../../types/moderation/comment-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
@@ -17,7 +18,10 @@ import { validateUserPermission } from 'src/utils/auth';
 @UseGuards(new AuthGuard())
 @Resolver('ModerationComment')
 export class CommentModerationResolver {
-  constructor(private commentModerationService: CommentModerationService) {}
+  constructor(
+    private commentModerationService: CommentModerationService,
+    private authService: AuthService,
+  ) {}
 
   @Query()
   async moderationComment(
@@ -70,6 +74,8 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
+    await this.authService.validateModeratorHash(session, moderatorHash);
+
     return await this.commentModerationService.approveCommentVersion(
       id,
       moderatorHash,
@@ -87,6 +93,8 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
+    await this.authService.validateModeratorHash(session, moderatorHash);
+
     return await this.commentModerationService.rejectCommentVersion(
       id,
       moderatorHash,
@@ -105,6 +113,8 @@ export class CommentModerationResolver {
     @Args('data') data: ModerationCommentModifyInput,
   ): Promise<Comment> {
     await validateUserPermission(session);
+    await this.authService.validateModeratorHash(session, moderatorHash);
+
     return await this.commentModerationService.modifyModerationComment(
       id,
       moderatorHash,
@@ -132,6 +142,8 @@ export class CommentModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
+    await this.authService.validateModeratorHash(session, moderatorHash);
+
     return await this.commentModerationService.renewCommentModeration(
       id,
       moderatorHash,
