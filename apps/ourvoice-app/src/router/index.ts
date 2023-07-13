@@ -1,17 +1,5 @@
 import { useUserStore } from './../stores/user'
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import AboutView from '../views/AboutView.vue'
-import PollViewVue from '@/views/PollView.vue'
-import PostsView from '../views/PostsView.vue'
-import NoticeView from '../views/NoticeView.vue'
-import PostPage from '../views/PostPage.vue'
-import CreatePostView from '../views/CreatePostView.vue'
-// import CreateCommentView from '../views/CreateCommentView.vue'
-import PostModerationListView from '../views/PostModerationListView.vue'
-import PostModerationView from '../views/PostModerationView.vue'
-import CommentModerationListView from '../views/CommentModerationListView.vue'
-import CommentModerationView from '../views/CommentModerationView.vue'
 import {
   getCurrentDeploymentDomain,
   checkForSession,
@@ -26,6 +14,17 @@ import { useDeploymentStore } from '@/stores/deployment'
 
 // const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
 // const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
+const HomeView = () => import('../views/HomeView.vue')
+const AboutView = () => import('../views/AboutView.vue')
+const PollViewVue = () => import('@/views/PollView.vue')
+const PostsView = () => import('../views/PostsView.vue')
+const NoticeView = () => import('../views/NoticeView.vue')
+const PostPage = () => import('../views/PostPage.vue')
+const CreatePostView = () => import('../views/CreatePostView.vue')
+const PostModerationListView = () => import('../views/PostModerationListView.vue')
+const PostModerationView = () => import('../views/PostModerationView.vue')
+const CommentModerationListView = () => import('../views/CommentModerationListView.vue')
+const CommentModerationView = () => import('../views/CommentModerationView.vue')
 
 const authBaseURL = config.authURL
 const authURL = `${authBaseURL}/signinWithoutPassword?d=${getCurrentDeploymentDomain().deployment}`
