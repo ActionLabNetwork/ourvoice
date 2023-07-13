@@ -184,7 +184,6 @@ jobs:
       checks: read
 
     env:
-      NODE_ENV: production
       APPS_PORTAL_APP: portal
       APPS_ADMIN_APP: admin
       APPS_API_APP: api
@@ -236,18 +235,26 @@ jobs:
         run: pnpm prisma:generate:contactform
 
       - name: API - build
+        env:
+          NODE_ENV: production
         working-directory: apps/ourvoice-api
         run: pnpm build
 
       - name: ADMIN - build
+        env:
+          NODE_ENV: production
         working-directory: apps/ourvoice-admin
         run: pnpm build
 
       - name: WEB APP - build
+        env:
+          NODE_ENV: production
         working-directory: apps/ourvoice-app
         run: pnpm build:ci
 
       - name: WEB PORTAL - build
+        env:
+          NODE_ENV: production
         working-directory: apps/ourvoice-portal
         run: pnpm build
 
@@ -288,6 +295,7 @@ jobs:
           IMAGE_BASE_NAME: ${{ github.event.repository.name}}
           IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
           DOCKER_REPO: ${{ secrets.DOCKERHUB_USERNAME }}
+          NODE_ENV: production
         with:
           context: apps/${{env.APPS_API_APP}}
           file: apps/${{env.APPS_API_APP}}/Dockerfile
