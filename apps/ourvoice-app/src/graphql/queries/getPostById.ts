@@ -1,6 +1,6 @@
-import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_POST_BY_ID_QUERY = gql`
+export const GET_POST_BY_ID_QUERY = graphql(`
   query Post($postId: Int!) {
     post(id: $postId) {
       authorHash
@@ -25,6 +25,10 @@ export const GET_POST_BY_ID_QUERY = gql`
       title
       votesDown
       votesUp
+      votes {
+        authorHash
+        voteType
+      }
     }
   }
-`
+`)

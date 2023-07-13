@@ -270,9 +270,9 @@ export abstract class IQuery {
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
-    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): PostConnection | Promise<PostConnection>;
 
-    abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): PostConnection | Promise<PostConnection>;
 
     abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
@@ -550,8 +550,8 @@ export class Post {
     authorHash?: Nullable<string>;
     authorNickname?: Nullable<string>;
     categories: Category[];
-    comments?: Nullable<Comment[]>;
-    votes?: Nullable<Vote[]>;
+    comments: Comment[];
+    votes: Vote[];
 }
 
 export class PresignedUrl {
@@ -565,15 +565,15 @@ export class PostEdge {
 }
 
 export class PostConnection {
-    totalCount?: Nullable<number>;
+    totalCount: number;
     pageInfo: PostPageInfo;
-    edges?: Nullable<Nullable<PostEdge>[]>;
+    edges: PostEdge[];
 }
 
 export class PostPageInfo {
-    startCursor?: Nullable<string>;
-    endCursor?: Nullable<string>;
-    hasNextPage?: Nullable<boolean>;
+    startCursor: string;
+    endCursor: string;
+    hasNextPage: boolean;
 }
 
 export class Vote {

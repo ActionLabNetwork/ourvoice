@@ -1,6 +1,7 @@
 import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_POSTS_QUERY = gql`
+export const GET_POSTS_QUERY = graphql(`
   query GetPosts(
     $sort: PostSortingInput
     $pagination: PostPaginationInput
@@ -30,6 +31,10 @@ export const GET_POSTS_QUERY = gql`
           }
           votesUp
           votesDown
+          votes {
+            authorHash
+            voteType
+          }
         }
       }
       totalCount
@@ -40,7 +45,7 @@ export const GET_POSTS_QUERY = gql`
       }
     }
   }
-`
+`)
 
 export const GET_POST_COUNT_BY_CATEGORY_QUERY = gql`
   query Posts(

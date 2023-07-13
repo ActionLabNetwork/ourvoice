@@ -1,4 +1,8 @@
-import { PostPaginationInput, PostSortingInput } from './../../graphql';
+import {
+  PostConnection,
+  PostPaginationInput,
+  PostSortingInput,
+} from './../../graphql';
 import {
   BadRequestException,
   Injectable,
@@ -24,15 +28,7 @@ export class PostService {
     filter?: PostsFilterDto,
     pagination?: PostPaginationInput,
     sort?: PostSortingInput,
-  ): Promise<{
-    totalCount: number;
-    edges: { node: Post; cursor: string }[];
-    pageInfo: {
-      startCursor: string;
-      endCursor: string;
-      hasNextPage: boolean;
-    };
-  }> {
+  ) {
     // Validate filters
     if (filter) {
       const postsFilterDto = plainToClass(PostsFilterDto, filter);

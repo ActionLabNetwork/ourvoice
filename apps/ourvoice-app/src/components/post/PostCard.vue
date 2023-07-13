@@ -2,10 +2,6 @@
   <div
     class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:shadow-lg transition duration-500 ease-in-out"
   >
-    <!-- {{ post }} -->
-    <!-- <pre>{{ votes }}</pre> -->
-    <!-- {{ hasUpvote }} -->
-    <!-- {{ hasDownvote }} -->
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}
       <div>
@@ -76,17 +72,18 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { timePassed } from '@/utils/index'
-import { usePostsStore } from '@/stores/posts'
-import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
-import { useQuery, useMutation } from '@vue/apollo-composable'
 import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { usePostsStore } from '@/stores/posts'
 import { useUserStore } from '@/stores/user'
+import { timePassed } from '@/utils/index'
+import { useMutation } from '@vue/apollo-composable'
+import { storeToRefs } from 'pinia'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
+const { sessionHash } = storeToRefs(userStore)
 const router = useRouter()
 
 const props = defineProps({
@@ -116,50 +113,13 @@ const presignedUrls = ref<string[]>([])
 const res = await getPresignedUrls(post.value?.files ?? [])
 presignedUrls.value = res.map((item: any) => item.url) ?? []
 
-const votes = ref<Vote[]>([])
-const hasUpvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
-const hasDownvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
+const userVote = computed(() =>
+  post.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
+)
+const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
+const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
 
 const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
-const { onResult, refetch } = useQuery(
-  GET_VOTES_QUERY,
-  {
-    filter: {
-      postId: props.postId,
-      voteType: null,
-      authorHash: null,
-      authorNickname: null,
-      commentId: null
-    }
-  },
-  {
-    fetchPolicy: 'network-only'
-  }
-)
-onResult(({ data, loading }) => {
-  if (loading) return
-  votes.value = data.votes
-    .filter((vote: any) => !vote.comment)
-    .map((vote: any) => ({
-      id: vote.id,
-      voteType: vote.voteType,
-      authorHash: vote.authorHash,
-      authorNickname: vote.authorNickname,
-      post: {
-        id: vote.post.id
-      },
-      comment: null
-    }))
-  // console.log(`votes for post:${props.postId}`, votes.value)
-})
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   try {
@@ -172,8 +132,6 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    await refetch()
-    console.log('refetched votes for post:', props.postId)
     postsStore.syncVotesForPostById(props.postId)
   } catch (error) {
     console.log(error)

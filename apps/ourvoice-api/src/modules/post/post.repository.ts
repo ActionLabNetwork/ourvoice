@@ -18,6 +18,7 @@ export class PostRepository {
       include: include ?? {
         categories: true,
         comments: true,
+        votes: true,
       },
     });
   }
@@ -26,7 +27,7 @@ export class PostRepository {
     filter?: PostsFilterInput,
     pagination?: PostPaginationInput,
     sort?: PostSortingInput,
-  ): Promise<{ totalCount: number; posts: Post[] }> {
+  ) {
     const {
       title,
       content,
