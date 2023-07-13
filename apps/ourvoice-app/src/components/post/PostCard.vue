@@ -119,11 +119,11 @@ const userVote = computed(() =>
 const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
 const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
 
-const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
+const { mutate: createOrDeleteVoteForPost } = useMutation(VOTE_MUTATION)
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   try {
-    const res = await createOrDeleteVoteForPost({
+    await createOrDeleteVoteForPost({
       data: {
         commentId: null,
         postId: props.postId,
