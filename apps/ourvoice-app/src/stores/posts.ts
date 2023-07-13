@@ -191,22 +191,36 @@ export const usePostsStore = defineStore('posts', {
       })
     },
 
-    async syncVotesForPostById(postId: number) {
+    async syncVotesForPostById({
+      postId,
+      votesUp,
+      votesDown,
+      authorHash,
+      voteType
+    }: {
+      postId: number
+      votesUp: number
+      votesDown: number
+      authorHash: string
+      voteType: string
+    }) {
       try {
-        const { data } = await apolloClient.query({
-          query: GET_POST_BY_ID_QUERY,
-          variables: { postId },
-          fetchPolicy: 'no-cache'
-        })
-        const post = data?.post
-        if (!post) {
-          throw Error('post is null')
-        }
         //sync votesUp/votesDown state with the post table
         const storedPost = this.data.find((post) => post.id === postId)!
-        storedPost.votesUp = post.votesUp
-        storedPost.votesDown = post.votesDown
-        storedPost.votes = post.votes
+        storedPost.votesUp = votesUp
+        storedPost.votesDown = votesDown
+        const userVoteForStoredPost = storedPost.votes.find(
+          (vote) => vote.authorHash === authorHash
+        )
+        if (userVoteForStoredPost) {
+          if (userVoteForStoredPost.voteType === voteType) {
+            storedPost.votes = storedPost.votes.filter((vote) => vote.authorHash !== authorHash)
+          } else {
+            userVoteForStoredPost.voteType = voteType
+          }
+        } else {
+          storedPost.votes.push({ authorHash, voteType })
+        }
       } catch (error) {
         if (error instanceof Error) {
           this.error = error

@@ -123,7 +123,7 @@ const { mutate: createOrDeleteVoteForPost } = useMutation(VOTE_MUTATION)
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   try {
-    await createOrDeleteVoteForPost({
+    const res = await createOrDeleteVoteForPost({
       data: {
         commentId: null,
         postId: props.postId,
@@ -132,7 +132,15 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    postsStore.syncVotesForPostById(props.postId)
+    // console.log({ res })
+    if (res?.data)
+      postsStore.syncVotesForPostById({
+        postId: props.postId,
+        votesUp: res.data.createVote.post.votesUp,
+        votesDown: res.data.createVote.post.votesDown,
+        authorHash: userStore.sessionHash,
+        voteType: res.data.createVote.voteType
+      })
   } catch (error) {
     console.log(error)
   }
