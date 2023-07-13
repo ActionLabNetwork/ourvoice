@@ -16,6 +16,9 @@ export default () => ({
   api: {
     url: process.env.VITE_APP_API_URL || 'http://api.ourvoice.test',
     port: parseInt(process.env.API_PORT, 10) || 3000,
+    globalPepper:
+      process.env.GLOBAL_PEPPER ||
+      'Are7pNzysGMRjfgF4eKhp8sHtgCFF9Cjft6ut9RVLcdSZPVkYU46xfb9Eqjwft2zkUP9KBGDkg3UpnCfh8C3zhCsKDDxa5u8xUyC43cQM4cwRw7TpMnb5KYRbuGQwnGfWf28Kf3HPhBuzf7ujzZzVvkTrk2h9NjwN8Kpe8aZfd8HuYHwqVscG8WdbdDwGFhH9G8cbqBVaQAQd5GBzSKRwwV5WdLWX2CEqm2FRtYBYz3W9Yq6yG7R4RwWBvWcmqCE',
   },
   app: {
     domain: process.env.VITE_APP_APP_DOMAIN || 'ourvoice.test',

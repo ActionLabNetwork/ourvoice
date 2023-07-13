@@ -1,3 +1,4 @@
+import { AuthService } from './../../../auth/auth.service';
 import { validateUserPermission } from './../../../utils/auth';
 import { ModerationPostsResponse } from './../../../types/moderation/post-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
@@ -17,7 +18,37 @@ import { GqlSession } from 'src/auth/session.decorator';
 @UseGuards(new AuthGuard())
 @Resolver('ModerationPost')
 export class PostModerationResolver {
-  constructor(private postModerationService: PostModerationService) {}
+  constructor(
+    private postModerationService: PostModerationService,
+    private authService: AuthService,
+  ) {}
+
+  private async verifyHashesAreEqual(
+    session: SessionContainer,
+    hash: string,
+  ): Promise<boolean> {
+    const userId = session.getUserId();
+    const deployment = session['userDataInAccessToken'].deployment;
+    const sessionHash = await this.authService.hashInput(userId, deployment);
+
+    return sessionHash === hash;
+  }
+
+  private async validateModeratorHash(
+    session: SessionContainer,
+    moderatorHash: string,
+  ): Promise<void> {
+    const hashesAreEqual = await this.verifyHashesAreEqual(
+      session,
+      moderatorHash,
+    );
+
+    if (!hashesAreEqual) {
+      throw new Error(
+        'The moderator hash provided does not match the session hash',
+      );
+    }
+  }
 
   @Query()
   async moderationPost(
@@ -68,6 +99,8 @@ export class PostModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Post> {
     await validateUserPermission(session);
+    await this.validateModeratorHash(session, moderatorHash);
+
     return await this.postModerationService.approvePostVersion(
       id,
       moderatorHash,
@@ -85,6 +118,19 @@ export class PostModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Post> {
     await validateUserPermission(session);
+    await this.validateModeratorHash(session, moderatorHash);
+
+    const hashesAreEqual = await this.verifyHashesAreEqual(
+      session,
+      moderatorHash,
+    );
+
+    if (!hashesAreEqual) {
+      throw new Error(
+        'The moderator hash provided does not match the session hash',
+      );
+    }
+
     return await this.postModerationService.rejectPostVersion(
       id,
       moderatorHash,
@@ -103,6 +149,8 @@ export class PostModerationResolver {
     @Args('data') data: ModerationPostModifyInput,
   ): Promise<Post> {
     await validateUserPermission(session);
+    await this.validateModeratorHash(session, moderatorHash);
+
     return await this.postModerationService.modifyModerationPost(
       id,
       moderatorHash,
@@ -130,6 +178,8 @@ export class PostModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
   ): Promise<Post> {
     await validateUserPermission(session);
+    await this.validateModeratorHash(session, moderatorHash);
+
     return await this.postModerationService.renewPostModeration(
       id,
       moderatorHash,

@@ -12,6 +12,7 @@ import {
   AuthModuleAsyncConfig,
 } from './config.interface';
 import { SupertokensService } from './supertokens/supertokens.service';
+import { AuthService } from './auth.service';
 
 @Module({
   providers: [],
@@ -28,6 +29,7 @@ export class AuthModule implements NestModule {
     apiKey,
     appInfo,
     smtpSettings,
+    globalPepper,
   }: AuthModuleConfig): DynamicModule {
     return {
       providers: [
@@ -37,12 +39,14 @@ export class AuthModule implements NestModule {
             connectionURI,
             smtpSettings,
             apiKey,
+            globalPepper,
           },
           provide: ConfigInjectionToken,
         },
         SupertokensService,
+        AuthService,
       ],
-      exports: [],
+      exports: [AuthService],
       imports: [],
       module: AuthModule,
     };
@@ -59,8 +63,9 @@ export class AuthModule implements NestModule {
           provide: ConfigInjectionToken,
         },
         SupertokensService,
+        AuthService,
       ],
-      exports: [],
+      exports: [AuthService],
     };
   }
 }

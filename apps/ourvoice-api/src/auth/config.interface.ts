@@ -15,6 +15,7 @@ export type AuthModuleConfig = {
   smtpSettings: SMTPConfig;
   apiKey?: string;
   cookieDomain?: string;
+  globalPepper: string;
 };
 
 export type AuthModuleAsyncConfig = Pick<ModuleMetadata, 'imports'> &
