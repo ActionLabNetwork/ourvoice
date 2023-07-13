@@ -10,6 +10,7 @@ export const GET_CATEGORIES_QUERY = graphql(`
           name
           numPosts
         }
+        cursor
       }
     }
   }

@@ -11,12 +11,10 @@ type Query {
     pagination: PostPaginationInput
   ): PostConnection!
   getPresignedUrls(
-    bucket: String!
     keys: [String!]!
     expiresIn: Int!
   ): [PresignedUrl!]!
   getPresignedDownloadUrls(
-    bucket: String!
     keys: [String!]!
     expiresIn: Int!
   ): [PresignedUrl!]!

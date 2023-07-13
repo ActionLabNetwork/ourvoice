@@ -70,9 +70,7 @@
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
-import IconMessageCircle from '../icons/IconMessageCircle.vue'
-import CreateComment from '../comment/CreateComment.vue'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { postFilesPresignedUrlTTL } from '@/constants/post'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { usePostsStore } from '@/stores/posts'
 import { useUserStore } from '@/stores/user'
@@ -81,6 +79,8 @@ import { useMutation } from '@vue/apollo-composable'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import CreateComment from '../comment/CreateComment.vue'
+import IconMessageCircle from '../icons/IconMessageCircle.vue'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const { sessionHash } = storeToRefs(userStore)
@@ -106,12 +106,12 @@ const handleCommentBtnClicked = () => {
 }
 
 const getPresignedUrls = (keys: string[]) => {
-  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
+  return postsStore.getPresignedUrls(keys, postFilesPresignedUrlTTL)
 }
 
 const presignedUrls = ref<string[]>([])
 const res = await getPresignedUrls(post.value?.files ?? [])
-presignedUrls.value = res.map((item: any) => item.url) ?? []
+presignedUrls.value = res?.map((item: any) => item.url) ?? []
 
 const userVote = computed(() =>
   post.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)

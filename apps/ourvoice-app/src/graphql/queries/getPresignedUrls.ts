@@ -1,10 +1,10 @@
-import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_PRESIGNED_URLS_QUERY = gql`
-  query GetPresignedUrls($bucket: String!, $keys: [String!]!, $expiresIn: Int!) {
-    getPresignedUrls(bucket: $bucket, keys: $keys, expiresIn: $expiresIn) {
+export const GET_PRESIGNED_URLS_QUERY = graphql(`
+  query GetPresignedUrls($keys: [String!]!, $expiresIn: Int!) {
+    getPresignedUrls(keys: $keys, expiresIn: $expiresIn) {
       key
       url
     }
   }
-`
+`)

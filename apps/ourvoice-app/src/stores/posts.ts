@@ -4,7 +4,7 @@ import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresigne
 import type { ApolloError } from '@apollo/client/errors'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { apolloClient, evictItem } from './../graphql/client/index'
+import { apolloClient } from './../graphql/client/index'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
 import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
@@ -117,11 +117,11 @@ export const usePostsStore = defineStore('posts', {
       }
     },
 
-    async getPresignedUrls(bucket: string, keys: string[], expiresIn: number) {
+    async getPresignedUrls(keys: string[], expiresIn: number) {
       try {
         const { data } = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
-          variables: { bucket, keys, expiresIn }
+          variables: { keys, expiresIn }
         })
         return data.getPresignedDownloadUrls
       } catch (error) {

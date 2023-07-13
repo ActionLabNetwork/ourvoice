@@ -82,8 +82,9 @@ import ModerationHistory from '@/components/post/moderation/ModerationHistory.vu
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
-import { storeToRefs } from 'pinia'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+
+import { storeToRefs } from 'pinia';
+import { postFilesPresignedUrlTTL } from '@/constants/post';
 import type { ModerationActions } from '@/types/moderation'
 
 interface PostFields {
@@ -166,7 +167,6 @@ async function refreshVersion(newVersion: PostVersion) {
   // If there are files, request their download urls
   if (newVersion.files && newVersion.files.length > 0)
     await postModerationStore.getPresignedDownloadUrls(
-      postFilesBucket,
       newVersion.files,
       postFilesPresignedUrlTTL
     )

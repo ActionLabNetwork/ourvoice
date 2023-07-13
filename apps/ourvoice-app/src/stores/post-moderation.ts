@@ -168,7 +168,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
           variables: { filter: { ids: Array.from(categoryIds) } }
         })
 
-        const categories = categoriesData.categories.edges.map(
+        const categories = categoriesData.categories?.edges.map(
           (edge: Edge<Category>) => edge.node
         ) as Category[]
 
@@ -204,14 +204,11 @@ export const usePostModerationStore = defineStore('post-moderation', {
       }
       this.loading = false
     },
-    async getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number) {
-      this.loading = true
-      this.hasErrors = false
+    async getPresignedDownloadUrls(keys: string[], expiresIn: number) {
       try {
         const downloadUrls = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
           variables: {
-            bucket,
             keys,
             expiresIn
           }
@@ -223,11 +220,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
         }
       } catch (error) {
         console.error(error)
-        this.hasErrors = true
       }
-      this.loading = false
     },
-
     async createPost({
       title,
       content,

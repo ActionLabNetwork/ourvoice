@@ -187,7 +187,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import AttachmentList from '../inputs/AttachmentList.vue'
 import {
   createPostContentCharacterLimit,
-  postFilesBucket,
+ 
   postFilesPresignedUrlTTL,
   inputPlaceholders
 } from '@/constants/post'
@@ -284,7 +284,6 @@ const updateAttachments = async (event: Event) => {
 
   try {
     const response = await postsStore.getPresignedUrls(
-      postFilesBucket,
       keys,
       postFilesPresignedUrlTTL
     )
