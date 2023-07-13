@@ -6,7 +6,7 @@
           <template #pending>
             <CommentModerationList :comments="moderationComments.PENDING" />
           </template>
-          <template #accepted>
+          <template #approved>
             <CommentModerationList :comments="moderationComments.APPROVED" />
           </template>
           <template #rejected>
@@ -27,9 +27,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useModerationCommentsStore } from '@/stores/moderation-comments'
 
 import type { ModerationComment } from '@/stores/moderation-comments'
-import type { ModerationVersionStatus } from '@/types/moderation'
-// import type { Tab } from '@/types'
+import type { ModerationStatus, ModerationVersionStatus } from '@/types/moderation'
+import type { PostStatus } from '@/stores/moderation-posts'
 
+const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+  Pending: 'PENDING',
+  Approved: 'APPROVED',
+  Rejected: 'REJECTED'
+} as const
 const commentsStore = useModerationCommentsStore()
 onMounted(async () => {
   await commentsStore.fetchComments()

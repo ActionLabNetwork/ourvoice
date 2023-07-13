@@ -1,12 +1,9 @@
-import { GET_CATEGORIES_QUERY } from './../graphql/queries/getCategories'
 import { apolloClient } from './../graphql/client/index'
 import { GET_MODERATION_POSTS_QUERY } from './../graphql/queries/getModerationPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
 
-import type { ApolloError } from '@apollo/client/errors'
-
-type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
+export type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
 interface PostVersionWithCategoryIds {
   id: number
@@ -55,27 +52,18 @@ export interface Category {
 
 export interface PageInfo {
   endCursor: string
+  hasPreviousPage: boolean
   hasNextPage: boolean
   startCursor: string
 }
 
-interface PostsResponse {
-  posts: ModerationPost[]
-  totalCount: number
-  pageInfo: PageInfo | undefined
-}
-
 export interface ModerationPostsState {
   posts: ModerationPost[]
-  pendingPosts: PostsResponse
-  acceptedPosts: PostsResponse
-  rejectedPosts: PostsResponse
-  categories: Map<number, Category>
   totalCount: number
-  pageInfo: PageInfo | undefined
+  startCursor: string | null
+  endCursor: string | null
+  hasNextPage: boolean
   loading: boolean
-  error: Error | undefined
-  errorMessage: string | undefined
 }
 
 interface Edge<T> {
@@ -88,127 +76,72 @@ provideApolloClient(apolloClient)
 export const useModerationPostsStore = defineStore('moderation-posts', {
   state: (): ModerationPostsState => ({
     posts: [],
-    pendingPosts: { posts: [], totalCount: 0, pageInfo: undefined },
-    acceptedPosts: { posts: [], totalCount: 0, pageInfo: undefined },
-    rejectedPosts: { posts: [], totalCount: 0, pageInfo: undefined },
-    categories: new Map(),
     totalCount: 0,
-    pageInfo: undefined,
-    loading: false,
-    error: undefined,
-    errorMessage: undefined
+    startCursor: null,
+    endCursor: null,
+    hasNextPage: false,
+    loading: false
   }),
   actions: {
-    async fetchPostsByStatus(status: PostStatus) {
+    async fetchPostsByStatus(
+      status: PostStatus,
+      before: string | null = null,
+      after: string | null = null
+    ) {
       try {
         // Fetch posts from Moderation DB
         this.loading = true
 
-        console.log(`Fetching ${status} posts...`)
-
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POSTS_QUERY,
-          variables: { status: status }
+          variables: { status: status, limit: 2, before: before, after: after }
         })
 
         const newPosts = data.moderationPosts.edges.map(
           (edge: Edge<ModerationPostModel>) => edge.node
         )
 
-        this.posts = newPosts
+        if (newPosts.length > 0) {
+          this.posts = newPosts
+          this.totalCount = data.moderationPosts.totalCount
+          this.startCursor = data.moderationPosts.pageInfo.startCursor
+          this.endCursor = data.moderationPosts.pageInfo.endCursor
 
-        // switch (status) {
-        //   case 'PENDING':
-        //     this.pendingPosts = newPosts
-        //     break
-        //   case 'APPROVED':
-        //     this.acceptedPosts = newPosts
-        //     break
-        //   case 'REJECTED':
-        //     this.rejectedPosts = newPosts
-        //     break
-        // }
+          const forwardPaginating =
+            (before === null && after !== null) || (before === null && after === null)
+          const backwardPaginating = before !== null && after === null
+
+          if (backwardPaginating) {
+            this.hasNextPage = true
+          }
+
+          if (forwardPaginating) {
+            this.hasNextPage = data.moderationPosts.pageInfo.hasNextPage
+          }
+        }
+
         this.loading = false
       } catch (error) {
         console.error(error)
       }
     },
-    async fetchPosts(loadMore = false) {
+    async fetchPreviousPostsByStatus(status: PostStatus) {
+      this.loading = true
       try {
-        // Fetch posts from Moderation DB
-        this.loading = true
-
-        const { data } = await apolloClient.query({
-          query: GET_MODERATION_POSTS_QUERY,
-          variables: this.pageInfo && loadMore ? { after: this.pageInfo.endCursor } : {}
-        })
-
-        // If we're loading more posts, append them. Otherwise, replace the posts.
-        const newPosts = data.moderationPosts.edges.map(
-          (edge: Edge<ModerationPostModel>) => edge.node
-        )
-        this.posts = loadMore ? [...this.posts, ...newPosts] : newPosts
-
-        this.totalCount = data.moderationPosts.totalCount
-        this.pageInfo = data.moderationPosts.pageInfo
-
-        // Fetch category names from Main DB
-        const categoryIds = Array.from(
-          this.posts.reduce((acc, post: ModerationPost) => {
-            post.versions
-              .flatMap((version) => version.categoryIds)
-              .forEach((id) => {
-                acc.add(id)
-              })
-            return acc
-          }, new Set())
-        )
-
-        const { data: categoriesData } = await apolloClient.query({
-          query: GET_CATEGORIES_QUERY,
-          variables: { filter: { ids: categoryIds } }
-        })
-
-        const categories = categoriesData.categories.edges.map(
-          (edge: Edge<Category>) => edge.node
-        ) as Category[]
-
-        const categoriesMap = categories.reduce((acc, category) => {
-          acc.set(category.id, category)
-          return acc
-        }, new Map<number, Category>())
-
-        this.categories = categoriesMap
-
-        // Replace category Ids in each post with categories
-        this.posts = this.posts.map((post) => {
-          const versionsWithCategoriesIncluded = post.versions.map((version) => {
-            const categoryObjs: Category[] = []
-
-            version.categoryIds.forEach((categoryId: number) => {
-              const category = categoriesMap.get(categoryId)
-              if (category) {
-                categoryObjs.push(category)
-              }
-            })
-
-            return { ...version, categories: categoryObjs }
-          })
-          return { ...post, versions: versionsWithCategoriesIncluded }
-        })
-
-        if (this.pageInfo?.hasNextPage) {
-          await this.loadMorePosts()
-        }
+        this.fetchPostsByStatus(status, this.startCursor, null)
       } catch (error) {
-        this.error = error as ApolloError
-        this.errorMessage = 'Failed to load posts. Please try again.'
-      } finally {
-        this.loading = false
+        console.error(error)
       }
+      this.loading = false
     },
-    async loadMorePosts() {
-      await this.fetchPosts(true)
+    async fetchNextPostsByStatus(status: PostStatus) {
+      this.loading = true
+      try {
+        this.fetchPostsByStatus(status, null, this.endCursor)
+      } catch (error) {
+        console.error(error)
+      }
+      this.loading = false
     }
   }
 })

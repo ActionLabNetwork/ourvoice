@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, type PropType } from 'vue'
+import { type PropType } from 'vue'
 import ModerationPostCard from './ModerationPostCard.vue'
 import type { ModerationPost } from '@/stores/moderation-posts'
 

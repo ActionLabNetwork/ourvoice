@@ -84,7 +84,7 @@ export class PostModerationService {
     }
 
     // Forward pagination is the default if no cursor is provided
-    if (!pagination?.before || pagination?.after) {
+    if (!pagination?.before || !pagination?.after) {
       hasNextPage = moderationPosts.length > limit;
       if (hasNextPage) moderationPosts.pop();
     }

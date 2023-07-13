@@ -14,6 +14,7 @@
           </template>
         </BaseTab>
       </div>
+      <Pagination @page-change="handlePageChange" :has-next-page="hasNextPage" />
     </main>
   </div>
 </template>
@@ -21,18 +22,19 @@
 <script setup lang="ts">
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
+import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
 
-import { computed, onMounted, ref } from 'vue'
-import { useModerationPostsStore } from '@/stores/moderation-posts'
+import { onMounted, ref } from 'vue'
+import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
-import type { ModerationPost } from '@/stores/moderation-posts'
-import type {
-  ModerationListTab,
-  ModerationListTabs,
-  ModerationVersionStatus
-} from '@/types/moderation'
+import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
 import { storeToRefs } from 'pinia'
+
+const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+  Pending: 'PENDING',
+  Approved: 'APPROVED',
+  Rejected: 'REJECTED'
+} as const
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
@@ -40,26 +42,21 @@ onMounted(async () => {
 })
 
 const tabs = ref(LIST_TABS)
-const { posts: allPosts } = storeToRefs(postsStore)
+const currentTab = ref(tabs.value[0].name)
+const { posts: allPosts, hasNextPage } = storeToRefs(postsStore)
 
-// Group the posts by their moderation status
-// const moderationPosts = computed(() => {
-//   const initialGroups: Record<ModerationVersionStatus, ModerationPost[]> = {
-//     PENDING: [],
-//     APPROVED: [],
-//     REJECTED: []
-//   }
+const handlePageChange = (page: PageChangePayload) => {
+  if (page.direction === 'Previous') {
+    postsStore.fetchPreviousPostsByStatus(tabToStatusMapping[currentTab.value])
+  }
 
-//   const retVal = allPosts.value.reduce(
-//     (groups, post) => getGroupsByProperty('status', groups, post),
-//     initialGroups
-//   )
-//   return retVal
-// })
+  if (page.direction === 'Next') {
+    postsStore.fetchNextPostsByStatus(tabToStatusMapping[currentTab.value])
+  }
+}
 
 const handleTabSwitched = async (tab: ModerationListTab) => {
-  // If we need to know when the tab is switched, we can do it here
-  console.log(`switched to tab ${tab.name}`)
+  currentTab.value = tab.name
   switch (tab.name) {
     case 'Pending':
       await postsStore.fetchPostsByStatus('PENDING')
@@ -71,7 +68,5 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
       await postsStore.fetchPostsByStatus('REJECTED')
       break
   }
-
-  console.log(allPosts.value)
 }
 </script>
