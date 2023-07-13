@@ -7,6 +7,11 @@ import { GetManyRepositoryResponse } from './../../../types/general';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import {
+<<<<<<< HEAD
+=======
+  Comment,
+  PostStatus,
+>>>>>>> c30ec57 (feat(scheduled-moderation): separate out updating status from cron job; cron job publishes/archives)
   Prisma,
   CommentVersion,
   CommentModeration,
@@ -210,19 +215,14 @@ export class CommentModerationRepository {
         throw new Error('Moderator has already moderated this comment version');
       }
 
-      // Ensure that another moderator hasn't created a new version (modified) for the comment
       const commentVersion = await tx.commentVersion.findUnique({
         where: { id },
         include: { comment: true },
       });
 
-      if (!commentVersion.latest) {
-        throw new Error('Comment version is not the latest');
-      }
-
       // Check that comment has pending status
       if (commentVersion.comment.status !== 'PENDING') {
-        throw new Error('Post status is not PENDING');
+        throw new Error('Comment status is not PENDING');
       }
 
       // Create a new comment moderation entry
@@ -236,6 +236,9 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
+
+      // Change status if there are enough moderations
+      this.approveComment(commentVersion.comment.id);
 
       return newCommentModeration;
     });
@@ -298,6 +301,9 @@ export class CommentModerationRepository {
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
+
+      // Change status if there are enough moderations
+      this.rejectComment(commentVersion.comment.id);
 
       return newCommentModeration;
     });
@@ -453,6 +459,88 @@ export class CommentModerationRepository {
     });
   }
 
+  private async publishComment(commentId: number): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const comment = await tx.comment.findFirst({
+        where: { id: commentId, commentIdInMainDb: null },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      if (!comment) {
+        throw new Error(
+          `Comment with id ${commentId} not found. It is likely that is has already been published`,
+        );
+      }
+
+      if (comment.status !== PostStatus.APPROVED) {
+        throw new Error(
+          `Comment with id ${commentId} does not have the 'approved' status`,
+        );
+      }
+
+      const newCommentInMainDb = await this.commentService.createComment({
+        content: comment.versions[0].content,
+        authorHash: comment.versions[0].authorHash,
+        authorNickname: comment.versions[0].authorNickname,
+      });
+
+      this.logger.debug(
+        'Created new comment in main db with id',
+        newCommentInMainDb.id,
+      );
+
+      await tx.comment.update({
+        where: { id: comment.id },
+        data: { commentIdInMainDb: newCommentInMainDb.id },
+      });
+
+      this.logger.log(
+        `Updated comment with id ${comment.id} to have main db id ${newCommentInMainDb.id}`,
+      );
+    });
+  }
+
+  private async archiveComment(commentId: number): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      // Check that comment has the rejected status
+      const comment = await tx.comment.findFirst({
+        where: { id: commentId, archived: false },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      if (!comment) {
+        throw new Error(
+          `No comment with id ${comment.id} found. It is likely that is has already been archived.`,
+        );
+      }
+
+      if (comment.status !== PostStatus.REJECTED) {
+        throw new Error(
+          `Comment with id ${commentId} does not have the 'rejected' status`,
+        );
+      }
+
+      await tx.comment.update({
+        where: { id: commentId },
+        data: { archived: true },
+      });
+
+      this.logger.debug(`Archived comment with id ${comment.id}`);
+    });
+  }
+
   async approveComment(commentId: number): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       // Check if the comment has enough number of moderations
@@ -478,7 +566,9 @@ export class CommentModerationRepository {
       }
 
       if (decisionsCount.REJECTED > 0) {
-        throw new Error(`Comment has ${decisionsCount.REJECTED} rejections`);
+        throw new Error(
+          `Unable to move comment to accepted status. Comment has ${decisionsCount.REJECTED} rejection(s)`,
+        );
       }
 
       if (decisionsCount.ACCEPTED >= comment.requiredModerations) {
@@ -488,6 +578,7 @@ export class CommentModerationRepository {
         });
 
         this.logger.log(
+<<<<<<< HEAD
           'Finished approving comment with comment id',
           commentId,
         );
@@ -514,6 +605,9 @@ export class CommentModerationRepository {
           comment.id,
           ' to have main db id',
           newCommentInMainDb.id,
+=======
+          `Finished approving comment with comment id ${commentId}`,
+>>>>>>> c30ec57 (feat(scheduled-moderation): separate out updating status from cron job; cron job publishes/archives)
         );
       }
     });
@@ -543,7 +637,7 @@ export class CommentModerationRepository {
 
       if (decisionsCount.ACCEPTED > 0) {
         throw new Error(
-          `Unable to move comment to rejected status. It has ${decisionsCount.ACCEPTED} approvals`,
+          `Unable to move comment to rejected status. It has ${decisionsCount.ACCEPTED} approval(s)`,
         );
       }
 
@@ -557,36 +651,52 @@ export class CommentModerationRepository {
           'Finished rejecting comment with comment id',
           commentId,
         );
-
-        // TODO: Schedule to be deleted the next publishing cycle
       }
     });
   }
 
-  async approveOrRejectComments(): Promise<void> {
-    const pendingComments = await this.prisma.comment.findMany({
-      where: { status: 'PENDING' },
-      include: {
-        versions: { orderBy: { version: 'desc' }, take: 1 },
+  async publishOrArchiveComments(): Promise<void> {
+    const comments = await this.prisma.comment.findMany({
+      where: {
+        OR: [
+          { status: 'APPROVED', commentIdInMainDb: null },
+          { status: 'REJECTED', archived: false },
+        ],
       },
+      include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
     });
 
-    for (const comment of pendingComments) {
-      try {
-        await this.approveComment(comment.id);
-      } catch (error) {
-        this.logger.error(
-          `Error approving comment with comment id ${comment.id}. ${error.message}`,
-        );
-      }
+    let publishedCount = 0;
+    let archivedCount = 0;
 
-      try {
-        await this.rejectComment(comment.id);
-      } catch (error) {
-        this.logger.error(
-          `Error rejecting comment with comment id ${comment.id}. ${error.message}`,
-        );
+    const tasks = comments.map((comment) => {
+      if (comment.status === 'APPROVED') {
+        return this.publishComment(comment.id)
+          .then(() => {
+            publishedCount++;
+          })
+          .catch((error) => {
+            this.logger.debug(
+              `Comment with post id ${comment.id} was not published. ${error.message}`,
+            );
+          });
+      } else if (comment.status === 'REJECTED') {
+        return this.archiveComment(comment.id)
+          .then(() => {
+            archivedCount++;
+          })
+          .catch((error) => {
+            this.logger.debug(
+              `Comment with comment id ${comment.id} was not archived. ${error.message}`,
+            );
+          });
       }
-    }
+    });
+
+    await Promise.all(tasks);
+
+    this.logger.debug(
+      `Number of comments published: ${publishedCount}, Number of comments archived: ${archivedCount}`,
+    );
   }
 }

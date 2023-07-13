@@ -46,8 +46,8 @@ export class ScheduledModerationService {
 
   async handleCron() {
     const promises = [
-      this.moderationPostRepository.approveOrRejectPosts(),
-      this.moderationCommentRepository.approveOrRejectComments(),
+      this.moderationPostRepository.publishOrArchivePosts(),
+      this.moderationCommentRepository.publishOrArchiveComments(),
     ];
 
     await Promise.all(promises);
