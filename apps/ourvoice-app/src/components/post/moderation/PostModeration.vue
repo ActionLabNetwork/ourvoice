@@ -72,7 +72,7 @@ import ModerationVersionList from '@/components/post/moderation/ModerationVersio
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import { storeToRefs } from 'pinia';
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post';
+import { postFilesPresignedUrlTTL } from '@/constants/post';
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -142,7 +142,6 @@ async function refreshVersion(newVersion: PostVersion) {
   // If there are files, request their download urls
   if (newVersion.files && newVersion.files.length > 0)
     await moderationPostsStore.getPresignedDownloadUrls(
-      postFilesBucket,
       newVersion.files,
       postFilesPresignedUrlTTL
     )

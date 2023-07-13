@@ -274,9 +274,9 @@ export abstract class IQuery {
 
     abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
 
-    abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+    abstract getPresignedUrls(keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
-    abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+    abstract getPresignedDownloadUrls(keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
     abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
 

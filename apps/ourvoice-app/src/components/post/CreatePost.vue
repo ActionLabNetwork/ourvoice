@@ -183,7 +183,7 @@ import Multiselect from '@vueform/multiselect';
 import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories';
 import AttachmentList from '../inputs/AttachmentList.vue';
-import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
+import { createPostContentCharacterLimit, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
 import { usePostsStore } from '@/stores/posts';
 import { generateUniqueKey, uploadFileUsingPresignedUrl } from '@/services/s3-service';
 import { useForm, useField } from 'vee-validate';
@@ -268,7 +268,6 @@ const updateAttachments = async (event: Event) => {
 
   try {
     const response = await postsStore.getPresignedUrls(
-      postFilesBucket,
       keys,
       postFilesPresignedUrlTTL
     )

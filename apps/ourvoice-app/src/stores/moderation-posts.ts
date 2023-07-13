@@ -282,12 +282,11 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         console.error(`Failed to load post with ID ${id}. Please try again.`, error)
       }
     },
-    async getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number) {
+    async getPresignedDownloadUrls(keys: string[], expiresIn: number) {
       try {
         const downloadUrls = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
           variables: {
-            bucket,
             keys,
             expiresIn
           }

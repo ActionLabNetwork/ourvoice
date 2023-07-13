@@ -82,7 +82,7 @@ import { usePostsStore } from '@/stores/posts'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { postFilesPresignedUrlTTL } from '@/constants/post'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 const postsStore = usePostsStore()
@@ -109,12 +109,12 @@ const handleCommentBtnClicked = () => {
 }
 
 const getPresignedUrls = (keys: string[]) => {
-  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
+  return postsStore.getPresignedUrls(keys, postFilesPresignedUrlTTL)
 }
 
 const presignedUrls = ref<string[]>([])
 const res = await getPresignedUrls(post.value?.files ?? [])
-presignedUrls.value = res.map((item: any) => item.url) ?? []
+presignedUrls.value = res?.map((item: any) => item.url) ?? []
 
 const votes = ref<Vote[]>([])
 const hasUpvote = computed(() => {

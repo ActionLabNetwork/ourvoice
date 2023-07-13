@@ -146,11 +146,11 @@ export const usePostsStore = defineStore('posts', {
       }
     },
 
-    async getPresignedUrls(bucket: string, keys: string[], expiresIn: number) {
+    async getPresignedUrls(keys: string[], expiresIn: number) {
       try {
         const { data } = await apolloClient.query({
           query: GET_PRESIGNED_URLS_QUERY,
-          variables: { bucket, keys, expiresIn }
+          variables: { keys, expiresIn }
         })
         return data.getPresignedUrls
       } catch (error) {
