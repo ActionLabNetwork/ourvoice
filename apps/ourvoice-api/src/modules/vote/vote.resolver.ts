@@ -8,11 +8,12 @@ export class VoteResolver {
 
   @Mutation()
   async createVote(@Args('data') data: VoteCreateInput) {
-    return this.voteService.createVote(data);
+    // endpoint for creating and deleting votes
+    return this.voteService.createOrDeleteVote(data);
   }
 
   @Query()
   async votes(@Args('filter', { nullable: true }) filter?: VotesFilterInput) {
-    return this.voteService.getVote(filter);
+    return this.voteService.getVotes(filter);
   }
 }
