@@ -4,12 +4,12 @@ type Query {
     filter: PostsFilterInput
     pagination: PostPaginationInput
     sort: PostSortingInput
-  ): PostConnection
+  ): PostConnection!
   postsByCategories(
     categories: [String!]!
     filter: PostsFilterInput
     pagination: PostPaginationInput
-  ): PostConnection
+  ): PostConnection!
   getPresignedUrls(
     bucket: String!
     keys: [String!]!
@@ -44,8 +44,8 @@ type Post {
   authorHash: String
   authorNickname: String
   categories: [Category!]!
-  comments: [Comment!]
-  votes: [Vote!]
+  comments: [Comment!]!
+  votes: [Vote!]!,
 }
 
 input PostUpdateInput {
@@ -109,13 +109,13 @@ type PostEdge {
 }
 
 type PostConnection {
-  totalCount: Int
+  totalCount: Int!
   pageInfo: PostPageInfo!
-  edges: [PostEdge]
+  edges: [PostEdge!]!
 }
 
 type PostPageInfo {
-  startCursor: String
-  endCursor: String
-  hasNextPage: Boolean
+  startCursor: String!
+  endCursor: String!
+  hasNextPage: Boolean!
 }

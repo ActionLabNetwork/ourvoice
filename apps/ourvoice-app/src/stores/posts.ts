@@ -1,37 +1,16 @@
-import { useUserStore } from './user'
-import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
-import { apolloClient } from './../graphql/client/index'
-import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
-import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
-import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
-import { defineStore } from 'pinia'
-import { provideApolloClient } from '@vue/apollo-composable'
-import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 import { type sortOptions, type sortOrder } from '@/constants/post'
+import type { GetPostsQuery } from '@/graphql/generated/graphql'
+import { GET_PRESIGNED_URLS_QUERY } from '@/graphql/queries/getPresignedUrls'
 import type { ApolloError } from '@apollo/client/errors'
-export interface Post {
-  id: number
-  title: string
-  content: string
-  createdAt: string
-  moderatedAt: string
-  publishedAt: string
-  published: boolean
-  moderated: boolean
-  authorHash: string
-  authorNickname: string
-  categories: {
-    id: number
-    name: string
-  }[]
-  comments: {
-    id: number
-    content: string
-  }[]
-  votesUp: number
-  votesDown: number
-  files: string[]
-}
+import { provideApolloClient } from '@vue/apollo-composable'
+import { defineStore } from 'pinia'
+import { apolloClient } from './../graphql/client/index'
+import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
+import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
+import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
+import { GET_POSTS_QUERY } from './../graphql/queries/getPosts'
+import { useUserStore } from './user'
+
 export interface SortFilter {
   sortBy: sortOptions
   sortOrder: sortOrder
@@ -43,11 +22,15 @@ export interface pageInfo {
   hasNextPage: boolean
   startCursor: string
 }
+
+type Unpacked<T> = T extends (infer U)[] ? U : T
+type PostsEdge = Unpacked<GetPostsQuery['posts']['edges']>
+
 export interface PostsState {
-  data: Post[]
+  data: Array<PostsEdge['node']>
   totalCount: number
   pageInfo: pageInfo | undefined
-  state: "initial" | "loading-initial" | "loaded" | "loading-more" | "error"
+  state: 'initial' | 'loading-initial' | 'loaded' | 'loading-more' | 'error'
   error: Error | undefined
   errorMessage: string | undefined
   sortFilter: SortFilter
@@ -60,7 +43,7 @@ export const usePostsStore = defineStore('posts', {
     data: [],
     totalCount: 0,
     pageInfo: undefined,
-    state: "initial",
+    state: 'initial',
     error: undefined,
     errorMessage: undefined,
     sortFilter: {
@@ -77,7 +60,7 @@ export const usePostsStore = defineStore('posts', {
   },
   actions: {
     async fetchPosts(loadMore = false) {
-      this.state = loadMore ? "loading-more" : "loading-initial"
+      this.state = loadMore ? 'loading-more' : 'loading-initial'
       try {
         const { data } = await apolloClient.query({
           query: GET_POSTS_QUERY,
@@ -96,38 +79,26 @@ export const usePostsStore = defineStore('posts', {
           fetchPolicy: 'no-cache'
         })
 
-        const newPosts = data.posts.edges.map((edge: any) => ({
-          id: edge.node.id,
-          title: edge.node.title,
-          content: edge.node.content,
-          createdAt: edge.node.createdAt,
-          moderatedAt: edge.node.moderatedAt,
-          publishedAt: edge.node.publishedAt,
-          published: edge.node.published,
-          moderated: edge.node.moderated,
-          authorHash: edge.node.authorHash,
-          authorNickname: edge.node.authorNickname,
-          categories: edge.node.categories.map((category: any) => ({
-            id: category.id,
-            name: category.name
-          })),
-          comments: edge.node.comments.map((comment: any) => ({
-            id: comment.id,
-            content: comment.content
-          })),
-          votesUp: edge.node.votesUp,
-          votesDown: edge.node.votesDown,
-          files: edge.node.files
-        }))
+        if (!data) {
+          throw Error('data is null')
+        }
+        const posts = data?.posts
+        if (!posts) {
+          throw Error('posts is null')
+        }
+
+        // console.log(posts.edges[0].node)
+
+        const newPosts = posts.edges.map((edge) => edge.node)
 
         this.data = loadMore ? [...this.data, ...newPosts] : newPosts
-        this.totalCount = data.posts.totalCount
-        this.pageInfo = data.posts.pageInfo
-        this.state = "loaded"
+        this.totalCount = data.posts.totalCount ?? 0
+        this.pageInfo = data.posts.pageInfo ?? 0
+        this.state = 'loaded'
       } catch (error) {
         this.error = error as ApolloError
         this.errorMessage = 'Failed to load posts. Please try again.'
-        this.state = "error"
+        this.state = 'error'
       }
     },
 
@@ -227,9 +198,15 @@ export const usePostsStore = defineStore('posts', {
           variables: { postId },
           fetchPolicy: 'no-cache'
         })
+        const post = data?.post
+        if (!post) {
+          throw Error('post is null')
+        }
         //sync votesUp/votesDown state with the post table
-        this.data.find((post) => post.id === postId)!.votesUp = data.post.votesUp
-        this.data.find((post) => post.id === postId)!.votesDown = data.post.votesDown
+        const storedPost = this.data.find((post) => post.id === postId)!
+        storedPost.votesUp = post.votesUp
+        storedPost.votesDown = post.votesDown
+        storedPost.votes = post.votes
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
@@ -246,7 +223,7 @@ export const usePostsStore = defineStore('posts', {
       this.sortFilter.sortOrder = sortOrder
     },
 
-     setCreatedAfter(createdAfter: Date | null) {
+    setCreatedAfter(createdAfter: Date | null) {
       this.sortFilter.createdAfter = createdAfter
     },
 
@@ -258,29 +235,6 @@ export const usePostsStore = defineStore('posts', {
           query: GET_POST_BY_ID_QUERY,
           variables: { postId },
           fetchPolicy: 'no-cache'
-        })
-        this.data.push({
-          id: data.post.id,
-          title: data.post.title,
-          content: data.post.content,
-          createdAt: data.post.createdAt,
-          moderatedAt: data.post.moderatedAt,
-          publishedAt: data.post.publishedAt,
-          published: data.post.published,
-          moderated: data.post.moderated,
-          authorHash: data.post.authorHash,
-          authorNickname: data.post.authorNickname,
-          categories: data.post.categories.map((category: any) => ({
-            id: category.id,
-            name: category.name
-          })),
-          comments: data.post.comments.map((comment: any) => ({
-            id: comment.id,
-            content: comment.content
-          })),
-          votesUp: data.post.votesUp,
-          votesDown: data.post.votesDown,
-          files: data.post.files
         })
       } catch (error) {
         if (error instanceof Error) {
