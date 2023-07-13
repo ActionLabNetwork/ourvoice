@@ -41,3 +41,4 @@ postFrequency:
   unit: 'hours'
   value: 1
 persistNickNames: true
+attachmentBucket: test-bucket

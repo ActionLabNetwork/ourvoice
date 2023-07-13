@@ -6,6 +6,7 @@ import {
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PostService } from '../../modules/post/post.service';
 import { s3 } from '../../config/s3-config';
+import getDeploymentConfig from '../../config/deployment';
 import {
   generatePresignedDownloadUrl,
   generatePresignedUploadUrl,
@@ -13,6 +14,8 @@ import {
 
 @Resolver('Post')
 export class PostResolver {
+  private readonly config = getDeploymentConfig();
+
   constructor(private postService: PostService) {}
 
   @Query()
@@ -50,7 +53,6 @@ export class PostResolver {
 
   @Query()
   async getPresignedUrls(
-    @Args('bucket') bucket: string,
     @Args('keys', { type: () => [String] }) keys: string[],
     @Args('expiresIn') expiresIn: number,
   ) {
@@ -58,7 +60,7 @@ export class PostResolver {
       keys.map(async (key) => {
         const url = await generatePresignedUploadUrl(
           s3,
-          bucket,
+          this.config['attachmentBucket'],
           key,
           expiresIn,
         );
@@ -70,7 +72,6 @@ export class PostResolver {
 
   @Query()
   async getPresignedDownloadUrls(
-    @Args('bucket') bucket: string,
     @Args('keys', { type: () => [String] }) keys: string[],
     @Args('expiresIn') expiresIn: number,
   ) {
@@ -78,7 +79,7 @@ export class PostResolver {
       keys.map(async (key) => {
         const url = await generatePresignedDownloadUrl(
           s3,
-          bucket,
+          this.config['attachmentBucket'],
           key,
           expiresIn,
         );
