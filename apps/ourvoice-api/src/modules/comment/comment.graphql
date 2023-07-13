@@ -12,7 +12,7 @@ type Mutation {
   deleteComment(id: Int!): Comment!
 }
 
-type Comment {
+type Comment @cacheControl(maxAge: 600) {
   id: Int!
   content: String!
   votesDown: Int
@@ -72,18 +72,18 @@ input CommentPaginationInput {
   limit: Int
 }
 
-type CommentEdge {
+type CommentEdge @cacheControl(inheritMaxAge: true) {
   node: Comment!
   cursor: String!
 }
 
-type CommentConnection {
+type CommentConnection @cacheControl(maxAge: 600) {
   totalCount: Int
   pageInfo: CommentPageInfo!
   edges: [CommentEdge]
 }
 
-type CommentPageInfo {
+type CommentPageInfo @cacheControl(inheritMaxAge: true) {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean

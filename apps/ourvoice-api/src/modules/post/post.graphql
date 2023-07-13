@@ -28,7 +28,7 @@ type Mutation {
   deletePost(id: Int!): Post!
 }
 
-type Post {
+type Post @cacheControl(maxAge: 600) {
   id: Int!
   title: String!
   content: String!
@@ -103,18 +103,18 @@ input PostPaginationInput {
   limit: Int
 }
 
-type PostEdge {
+type PostEdge @cacheControl(inheritMaxAge: true) {
   node: Post!
   cursor: String!
 }
 
-type PostConnection {
+type PostConnection @cacheControl(maxAge: 600) {
   totalCount: Int!
   pageInfo: PostPageInfo!
   edges: [PostEdge!]!
 }
 
-type PostPageInfo {
+type PostPageInfo @cacheControl(inheritMaxAge: true) {
   startCursor: String!
   endCursor: String!
   hasNextPage: Boolean!
