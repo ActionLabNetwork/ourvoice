@@ -33,3 +33,20 @@ if (process.env.RUN_POST !== 'false') {
     './apps/ourvoice-auth-api/config/config.yml'
   )
 }
+
+if (process.env.DOCKER_BUILD === 'true') {
+  //copy files for docker APPS build
+  copyFileSync('./Dockerfile-for-apps.template', './apps/auth-api/Dockerfile')
+  copyFileSync(
+    './Dockerfile-for-apps.template',
+    './apps/ourvoice-api/Dockerfile'
+  )
+  copyFileSync(
+    './Dockerfile-for-apps.template',
+    './apps/ourvoice-admin/Dockerfile'
+  )
+  copyFileSync(
+    './Dockerfile-for-apps.template',
+    './apps/ourvoice-app/Dockerfile'
+  )
+}
