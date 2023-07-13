@@ -6,51 +6,56 @@ import { VoteRepository } from './vote.repository';
 export class VoteService {
   constructor(private readonly votetRepository: VoteRepository) {}
 
-  async createVote(data: VoteCreateInput) {
-    // send the same data will delete the vote
+  async createOrDeleteVote(data: VoteCreateInput) {
     const { authorHash, authorNickname, postId, commentId, voteType } = data;
 
-    const votes = await this.votetRepository.getVote({
+    // check if the user has already voted for the post or comment
+    const votes = await this.votetRepository.getVotes({
       authorHash,
       authorNickname,
       postId,
       commentId,
     });
-    if (votes.length == 1) {
-      if (votes[0].voteType == voteType) {
-        return this.votetRepository.deleteVote({ id: votes[0].id });
+
+    if (votes.length === 1) {
+      // if the user has one vote for the post/comment
+      if (votes[0].voteType === voteType) {
+        // should delete it if the voteType is the same
+        // console.log('delete vote');
+        return await this.votetRepository.deleteVote({ id: votes[0].id });
+      } else {
+        // should update it if the voteType is different
+        // console.log('update vote');
+        return await this.votetRepository.updateVoteById(votes[0].id, {
+          voteType,
+          post: postId ? { connect: { id: postId } } : undefined,
+          comment: commentId ? { connect: { id: commentId } } : undefined,
+        });
       }
-      this.votetRepository.deleteVote({ id: votes[0].id });
-    }
-    if (votes.length > 1) {
-      votes.forEach((vote) => {
-        this.votetRepository.deleteVote({ id: vote.id });
+    } else if (votes.length === 0) {
+      // if there are no such votes, create a new one
+      // console.log('create vote');
+      return await this.votetRepository.createVote({
+        voteType,
+        authorHash,
+        authorNickname,
+        post: postId ? { connect: { id: postId } } : undefined,
+        comment: commentId ? { connect: { id: commentId } } : undefined,
       });
+    } else {
+      // if there are more than one such vote, it means there is an error
+      console.log('error: more than one vote for the same user');
     }
-
-    const voteData = {
-      voteType,
-      authorHash,
-      authorNickname,
-      post: postId ? { connect: { id: postId } } : undefined,
-      comment: commentId ? { connect: { id: commentId } } : undefined,
-    };
-    return this.votetRepository.createVote(voteData);
   }
 
-  async deleteVote(id: number) {
-    return this.votetRepository.deleteVote({ id });
-  }
-
-  async getVote(filter?: VotesFilterInput) {
-    const { authorNickname, authorHash, postId, commentId, voteType } = filter;
+  async getVotes(filter?: VotesFilterInput) {
     const where = {
-      voteType: voteType ?? undefined,
-      authorHash: authorHash ?? undefined,
-      authorNickname: authorNickname ?? undefined,
-      postId: postId ?? undefined,
-      commentId: commentId ?? undefined,
+      voteType: filter?.voteType ?? undefined,
+      authorHash: filter?.authorHash ?? undefined,
+      authorNickname: filter?.authorNickname ?? undefined,
+      postId: filter?.postId ?? undefined,
+      commentId: filter?.commentId ?? undefined,
     };
-    return this.votetRepository.getVote(where);
+    return this.votetRepository.getVotes(where);
   }
 }

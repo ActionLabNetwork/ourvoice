@@ -7,64 +7,89 @@ export class VoteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createVote(data: Prisma.VoteCreateInput) {
-    const { post, comment, voteType } = data; //comment is undefined means the vote is for post
-    const vote = await this.prisma.vote.create({
-      data,
-      include: { post: true, comment: true },
+    return await this.prisma.$transaction(async (tx) => {
+      const { post, comment, voteType } = data;
+      if (comment) {
+        // console.log('create vote for comment');
+        await tx.comment.update({
+          where: { id: comment.connect.id },
+          data: {
+            [voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
+              increment: 1,
+            },
+          },
+        });
+      } else {
+        // console.log('create vote for post');
+        await tx.post.update({
+          where: { id: post.connect.id },
+          data: {
+            [voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
+              increment: 1,
+            },
+          },
+        });
+      }
+      const vote = await tx.vote.create({
+        data,
+        include: { post: true, comment: true },
+      });
+      return vote;
     });
-    if (comment) {
-      await this.prisma.comment.update({
-        where: { id: comment.connect.id },
-        data: {
-          [voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
-            increment: 1,
-          },
-        },
-      });
-    } else if (post) {
-      await this.prisma.post.update({
-        where: { id: post.connect.id },
-        data: {
-          [voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
-            increment: 1,
-          },
-        },
-      });
-    }
-    return vote;
   }
 
   async deleteVote(where: Prisma.VoteWhereUniqueInput) {
-    const voteToBeDeleted = await this.prisma.vote.findUnique({ where });
-    if (voteToBeDeleted.commentId) {
-      await this.prisma.comment.update({
-        where: { id: voteToBeDeleted.commentId },
-        data: {
-          [voteToBeDeleted.voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
-            decrement: 1,
+    return await this.prisma.$transaction(async (tx) => {
+      const voteToBeDeleted = await tx.vote.findUnique({ where });
+      if (voteToBeDeleted.commentId) {
+        await tx.comment.update({
+          where: { id: voteToBeDeleted.commentId },
+          data: {
+            [voteToBeDeleted.voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
+              decrement: 1,
+            },
           },
-        },
-      });
-    } else if (voteToBeDeleted.postId) {
-      await this.prisma.post.update({
-        where: { id: voteToBeDeleted.postId },
-        data: {
-          [voteToBeDeleted.voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
-            decrement: 1,
+        });
+      } else {
+        await tx.post.update({
+          where: { id: voteToBeDeleted.postId },
+          data: {
+            [voteToBeDeleted.voteType == 'UPVOTE' ? 'votesUp' : 'votesDown']: {
+              decrement: 1,
+            },
           },
-        },
+        });
+      }
+      const vote = await tx.vote.delete({
+        where: { id: voteToBeDeleted.id },
+        include: { post: true, comment: true },
       });
-    }
+      return vote;
+    });
+  }
 
-    const vote = await this.prisma.vote.delete({
-      where: { id: voteToBeDeleted.id },
+  async updateVoteById(id: number, data: Prisma.VoteUpdateInput) {
+    const vote = await this.prisma.vote.update({
+      where: { id },
+      data: {
+        voteType: data.voteType,
+        [data.comment ? 'comment' : 'post']: {
+          connect: data[data.comment ? 'comment' : 'post'].connect,
+          update: {
+            votesUp:
+              data.voteType == 'UPVOTE' ? { increment: 1 } : { decrement: 1 },
+            votesDown:
+              data.voteType == 'DOWNVOTE' ? { increment: 1 } : { decrement: 1 },
+          },
+        },
+      },
       include: { post: true, comment: true },
     });
-
+    // console.log(vote);
     return vote;
   }
 
-  async getVote(filter?: Prisma.VoteWhereInput) {
+  async getVotes(filter?: Prisma.VoteWhereInput) {
     return this.prisma.vote.findMany({
       where: filter,
       include: {

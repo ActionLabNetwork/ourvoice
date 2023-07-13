@@ -123,7 +123,7 @@ const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   try {
-    await createVoteForPost({
+    const res = await createOrDeleteVoteForPost({
       data: {
         commentId: null,
         postId: props.postId,
