@@ -288,6 +288,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Copy Dockerfile template from the root to APPS folders
+        id: dockerfile-copy
+        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
+        run: |
+          cp Dockerfile-for-apps.template apps/${{env.APPS_PORTAL_APP}}/Dockerfile
+          cp Dockerfile-for-apps.template apps/${{env.APPS_ADMIN_APP}}/Dockerfile
+          cp Dockerfile-for-apps.template apps/${{env.APPS_API_APP}}/Dockerfile
+          cp Dockerfile-for-apps.template apps/${{env.APPS_APP_APP}}/Dockerfile
+          cp Dockerfile-for-apps.template apps/${{env.APPS_APP_AUTH}}/Dockerfile
+          cp Dockerfile-for-apps.template apps/${{env.APPS_APP_AUTHAPI}}/Dockerfile
+
       - name: Build and push Docker images for API
         if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.login-to-docker-hub.conclusion == 'success'
         uses: docker/build-push-action@v4
