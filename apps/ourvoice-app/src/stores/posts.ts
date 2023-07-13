@@ -250,6 +250,11 @@ export const usePostsStore = defineStore('posts', {
           variables: { postId },
           fetchPolicy: 'no-cache'
         })
+        const post = data?.post
+        if (!post) {
+          throw Error('post is null')
+        }
+        this.data.push(post)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
