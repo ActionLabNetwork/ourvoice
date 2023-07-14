@@ -237,14 +237,19 @@ export class CommentModerationRepository {
         select: { commentVersion: { select: { commentId: true } } },
       });
 
-      // Change status if there are enough moderations
-      this.approveComment(commentVersion.comment.id);
-
       return newCommentModeration;
     });
 
-    // Return the new comment
     const commentId = newCommentModeration.commentVersion.commentId;
+
+    try {
+      // Change status if there are enough moderations
+      await this.approveComment(commentId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new comment
     return await this.prisma.comment.findUnique({
       where: { id: commentId },
       include: {
@@ -302,14 +307,19 @@ export class CommentModerationRepository {
         select: { commentVersion: { select: { commentId: true } } },
       });
 
-      // Change status if there are enough moderations
-      this.rejectComment(commentVersion.comment.id);
-
       return newCommentModeration;
     });
 
-    // Return the new comment
     const commentId = newCommentModeration.commentVersion.commentId;
+
+    try {
+      // Change status if there are enough moderations
+      await this.rejectComment(commentId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new comment
     return await this.prisma.comment.findUnique({
       where: { id: commentId },
       include: {

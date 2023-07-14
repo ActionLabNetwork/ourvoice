@@ -196,14 +196,19 @@ export class PostModerationRepository {
         select: { postVersion: { select: { postId: true } } },
       });
 
-      // Change status if there are enough moderations
-      this.approvePost(postVersion.post.id);
-
       return newPostModeration;
     });
 
-    // Return the new post
     const postId = newPostModeration.postVersion.postId;
+
+    // Try to change the status of the post
+    try {
+      await this.approvePost(postId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new post
     return await this.findPostWithVersionsAndModerations(postId);
   }
 
@@ -247,14 +252,19 @@ export class PostModerationRepository {
         select: { postVersion: { select: { postId: true } } },
       });
 
-      // Change status if there are enough moderations
-      this.rejectPost(postVersion.post.id);
-
       return newPostModeration;
     });
 
-    // Return the new post
     const postId = newPostModeration.postVersion.postId;
+
+    // Change status if there are enough moderations
+    try {
+      await this.rejectPost(postId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new post
     return await this.findPostWithVersionsAndModerations(postId);
   }
 
@@ -443,7 +453,7 @@ export class PostModerationRepository {
   }
 
   private async approvePost(postId: number): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       // Check if the post has enough number of moderations
       const post = await tx.post.findUnique({
         where: { id: postId },
@@ -481,7 +491,7 @@ export class PostModerationRepository {
   }
 
   private async rejectPost(postId: number) {
-    await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       // Check if the post has reached the rejection threshold
       const post = await tx.post.findUnique({
         where: { id: postId },
