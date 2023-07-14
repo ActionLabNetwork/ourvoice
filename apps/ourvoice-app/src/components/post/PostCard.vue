@@ -40,9 +40,9 @@
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          <span :class="{ 'text-ourvoice-purple': hasUpvote }">
+          <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
-            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+            <IconThumb :fill="hasUpvote" :thumbup="true" />
           </span>
         </button>
 
@@ -51,9 +51,9 @@
           type="button"
           class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
         >
-          <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+          <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}
-            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+            <IconThumb :fill="hasDownvote" :thumbup="false" />
           </span>
         </button>
       </div>
@@ -72,6 +72,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import IconThumb from '@/components/icons/IconThumb.vue'
 import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { usePostsStore } from '@/stores/posts'
