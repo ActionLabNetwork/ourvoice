@@ -200,21 +200,37 @@ export const useCommentsStore = defineStore('comments', {
       }
     },
 
-    async syncVotesForCommentById(commentId: number) {
+    async syncVotesForCommentById({
+      commentId,
+      votesUp,
+      votesDown,
+      authorHash,
+      voteType
+    }: {
+      commentId: number
+      votesUp: number
+      votesDown: number
+      authorHash: string
+      voteType: string
+    }) {
       try {
-        const { data } = await apolloClient.query({
-          query: GET_COMMENT_BY_ID_QUERY,
-          variables: {
-            commentId
-          },
-          fetchPolicy: 'no-cache'
-        })
-        const comment = this.data.find((comment) => comment.id === commentId)
-        if (comment) {
-          comment.votesDown = data.comment.votesDown
-          comment.votesUp = data.comment.votesUp
-        }
-        console.log(`refetching commentId: ${commentId}`, data)
+        //sync votesUp/votesDown state with the comment table
+        const storedComment = this.data.find((comment) => comment.id === commentId)!
+        storedComment.votesUp = votesUp
+        storedComment.votesDown = votesDown
+        // TODO: sync votes in comments store once the vote mutation is implemented
+        // const userVoteForStoredComment = storedComment.votes.find(
+        //   (vote) => vote.authorHash === authorHash
+        // )
+        // if (userVoteForStoredComment) {
+        //   if (userVoteForStoredComment.voteType === voteType) {
+        //     storedComment.votes = storedComment.votes.filter((vote) => vote.authorHash !== authorHash)
+        //   } else {
+        //     userVoteForStoredComment.voteType = voteType
+        //   }
+        // } else {
+        //   storedComment.votes.push({ authorHash, voteType })
+        // }
       } catch (error) {
         if (error instanceof Error) {
           this.error = error

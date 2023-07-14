@@ -179,7 +179,7 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
     return
   }
   try {
-    await createVoteForComemnt({
+    const res = await createVoteForComemnt({
       data: {
         commentId: props.commentId,
         postId: comment.value.post.id,
@@ -188,14 +188,19 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
+    // console.log(res)
+    if (res?.data)
+      commentStore.syncVotesForCommentById({
+        commentId: props.commentId,
+        votesUp: res.data.createVote.comment.votesUp,
+        votesDown: res.data.createVote.comment.votesDown,
+        authorHash: userStore.sessionHash,
+        voteType: res.data.createVote.voteType
+      })
     await refetch()
-    await syncVote()
   } catch (error) {
     console.log(error)
   }
-}
-const syncVote = async () => {
-  await commentStore.syncVotesForCommentById(props.commentId)
 }
 
 const commentCardClick = (commentId: number | undefined) => {
