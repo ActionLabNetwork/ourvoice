@@ -111,7 +111,7 @@ import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
-import CategoryList from '@/components/post/CategoryList.vue'
+// import CategoryList from '@/components/post/CategoryList.vue'
 interface CategoryWithCount {
   id: number
   name: string
