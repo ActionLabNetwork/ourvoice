@@ -121,22 +121,18 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
       }
     },
     async fetchPreviousCommentsByStatus(status: CommentStatus) {
-      this.loading = true
       try {
         this.fetchCommentsByStatus(status, this.startCursor, null)
       } catch (error) {
         console.error(error)
       }
-      this.loading = false
     },
     async fetchNextCommentsByStatus(status: CommentStatus) {
-      this.loading = true
       try {
         this.fetchCommentsByStatus(status, null, this.endCursor)
       } catch (error) {
         console.error(error)
       }
-      this.loading = false
     }
   }
 })

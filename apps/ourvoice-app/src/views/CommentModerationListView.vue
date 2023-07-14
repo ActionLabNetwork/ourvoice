@@ -2,7 +2,12 @@
   <div class="w-full h-full bg-gray-100">
     <main>
       <div class="px-10 py-10 bg-gray-100">
-        <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
+        <BaseTab
+          :tabs="tabs"
+          :initialTab="tabs[0]"
+          @tab-switched="handleTabSwitched"
+          :loading="loading"
+        >
           <template #pending>
             <CommentModerationList :comments="allComments" />
           </template>
@@ -44,7 +49,7 @@ onMounted(async () => {
 
 const tabs = ref(LIST_TABS)
 const currentTab = ref(tabs.value[0].name)
-const { comments: allComments, hasNextPage } = storeToRefs(commentsStore)
+const { comments: allComments, hasNextPage, loading } = storeToRefs(commentsStore)
 
 const handlePageChange = (page: PageChangePayload) => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })

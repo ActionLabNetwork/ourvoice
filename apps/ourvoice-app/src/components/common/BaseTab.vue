@@ -10,7 +10,8 @@
           {{ tab.name }}
         </option>
       </select>
-      <div>
+      <div v-if="props.loading"><Loading /></div>
+      <div v-if="!props.loading">
         <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
       </div>
     </div>
@@ -37,20 +38,30 @@
           />
         </div>
       </nav>
-      <div class="tab-content">
-        <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
-      </div>
+      <transition name="fade">
+        <div v-if="props.loading" class="h-[80vh]">
+          <Loading>Loading...</Loading>
+        </div>
+      </transition>
+      <transition name="fade">
+        <div v-if="!props.loading">
+          <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Loading from './Loading.vue'
+
 import type { Tab } from '@/types'
 import { type PropType, ref, watchEffect } from 'vue'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },
-  initialTab: { type: Object as PropType<Tab>, required: true }
+  initialTab: { type: Object as PropType<Tab>, required: true },
+  loading: { type: Boolean, required: true }
 })
 
 const emit = defineEmits(['tab-switched'])
@@ -69,3 +80,14 @@ const switchTab = (selectedTab: Tab) => {
   emit('tab-switched', selectedTab)
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
