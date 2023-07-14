@@ -85,4 +85,6 @@ model Vote {
   postId         Int
   comment        Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   commentId      Int?
+
+  @@unique([authorHash, postId, commentId])
 }
