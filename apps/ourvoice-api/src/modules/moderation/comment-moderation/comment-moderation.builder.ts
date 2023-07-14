@@ -86,6 +86,11 @@ class CommentBuilder {
     return this;
   }
 
+  withArchived(archived: boolean): CommentBuilder {
+    this.comment.archived = archived;
+    return this;
+  }
+
   build(): Partial<Comment> {
     return this.comment;
   }

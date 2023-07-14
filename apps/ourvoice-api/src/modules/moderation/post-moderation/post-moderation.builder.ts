@@ -49,6 +49,11 @@ class PostBuilder {
     return this;
   }
 
+  withArchived(archived: boolean): PostBuilder {
+    this.post.archived = archived;
+    return this;
+  }
+
   build(): Partial<Post> {
     return this.post;
   }

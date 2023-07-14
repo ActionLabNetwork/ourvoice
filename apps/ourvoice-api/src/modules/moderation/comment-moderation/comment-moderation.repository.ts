@@ -220,6 +220,10 @@ export class CommentModerationRepository {
         include: { comment: true },
       });
 
+      if (!commentVersion.latest) {
+        throw new Error('Comment version is not the latest');
+      }
+
       // Check that comment has pending status
       if (commentVersion.comment.status !== 'PENDING') {
         throw new Error('Comment status is not PENDING');

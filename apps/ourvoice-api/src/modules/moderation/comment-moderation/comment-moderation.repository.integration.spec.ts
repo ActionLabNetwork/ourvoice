@@ -130,6 +130,7 @@ describe('CommentRepository', () => {
     .withAuthorNickname('correct_teal_duck')
     .withPostIdInMainDb(1)
     .withVersions([pVersion3])
+    .withArchived(false)
     .build();
 
   const moderation1 = new CommentModerationBuilder()
@@ -216,6 +217,7 @@ describe('CommentRepository', () => {
       .withPostId(1)
       .withParent(null)
       .withParentId(null)
+      .withArchived(false)
       .build();
 
     // Act

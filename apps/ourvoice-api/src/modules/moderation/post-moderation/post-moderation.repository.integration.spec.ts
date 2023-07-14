@@ -124,6 +124,7 @@ describe('PostRepository', () => {
     .withAuthorNickname('correct_teal_duck')
     .withPostIdInMainDb(1)
     .withVersions([version3, version2, version1])
+    .withArchived(false)
     .build();
 
   let postModerationRepository: PostModerationRepository;
