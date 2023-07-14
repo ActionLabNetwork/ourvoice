@@ -206,6 +206,6 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
 
 const commentCardClick = (commentId: number | undefined) => {
   // might add certain click logic here
-  console.log('commentId:', commentId, 'clicked')
+  // console.log('commentId:', commentId, 'clicked')
 }
 </script>
