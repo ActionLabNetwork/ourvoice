@@ -7,11 +7,7 @@ import { GetManyRepositoryResponse } from './../../../types/general';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import {
-<<<<<<< HEAD
-=======
-  Comment,
   PostStatus,
->>>>>>> c30ec57 (feat(scheduled-moderation): separate out updating status from cron job; cron job publishes/archives)
   Prisma,
   CommentVersion,
   CommentModeration,
@@ -592,36 +588,7 @@ export class CommentModerationRepository {
         });
 
         this.logger.log(
-<<<<<<< HEAD
-          'Finished approving comment with comment id',
-          commentId,
-        );
-
-        const newCommentInMainDb = await this.commentService.createComment({
-          content: comment.versions[0].content,
-          authorHash: comment.versions[0].authorHash,
-          authorNickname: comment.versions[0].authorNickname,
-          postId: comment.post.postIdInMainDb,
-          parentId: comment.parent?.commentIdInMainDb,
-        });
-
-        this.logger.log(
-          'Created new comment in main db with id',
-          newCommentInMainDb.id,
-        );
-
-        await tx.comment.update({
-          where: { id: comment.id },
-          data: { commentIdInMainDb: newCommentInMainDb.id },
-        });
-        this.logger.log(
-          'Updated comment with id',
-          comment.id,
-          ' to have main db id',
-          newCommentInMainDb.id,
-=======
           `Finished approving comment with comment id ${commentId}`,
->>>>>>> c30ec57 (feat(scheduled-moderation): separate out updating status from cron job; cron job publishes/archives)
         );
       }
     });
