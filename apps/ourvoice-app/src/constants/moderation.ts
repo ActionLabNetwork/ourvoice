@@ -26,3 +26,6 @@ export const MODERATION_ACTIONS = [
     validate: true
   }
 ]
+
+export const MODERATION_LIST_POSTS_PER_PAGE = 10
+export const MODERATION_LIST_COMMENTS_PER_PAGE = 10

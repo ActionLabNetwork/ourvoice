@@ -20,15 +20,15 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
-
-import { onMounted, ref } from 'vue'
 import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
-import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
 import { storeToRefs } from 'pinia'
+
+import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
 
 const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
   Pending: 'PENDING',
@@ -46,6 +46,7 @@ const currentTab = ref(tabs.value[0].name)
 const { posts: allPosts, hasNextPage } = storeToRefs(postsStore)
 
 const handlePageChange = (page: PageChangePayload) => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   if (page.direction === 'Previous') {
     postsStore.fetchPreviousPostsByStatus(tabToStatusMapping[currentTab.value])
   }

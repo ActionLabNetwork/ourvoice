@@ -1,3 +1,4 @@
+import { MODERATION_LIST_POSTS_PER_PAGE } from './../constants/moderation'
 import { apolloClient } from './../graphql/client/index'
 import { GET_MODERATION_POSTS_QUERY } from './../graphql/queries/getModerationPosts'
 import { defineStore } from 'pinia'
@@ -94,7 +95,12 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
 
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POSTS_QUERY,
-          variables: { status: status, limit: 2, before: before, after: after }
+          variables: {
+            status: status,
+            limit: MODERATION_LIST_POSTS_PER_PAGE,
+            before: before,
+            after: after
+          }
         })
 
         const newPosts = data.moderationPosts.edges.map(

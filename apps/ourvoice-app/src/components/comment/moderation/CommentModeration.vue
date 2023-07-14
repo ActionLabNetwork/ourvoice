@@ -99,11 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  useModerationCommentsStore,
-  type Moderation,
-  type CommentVersion
-} from '@/stores/moderation-comments'
+import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -115,6 +111,7 @@ import ModerationVersionList from '@/components/comment/moderation/ModerationVer
 import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import { storeToRefs } from 'pinia'
+import { useCommentModerationStore } from '@/stores/comment-moderation'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -128,19 +125,19 @@ interface CommentFields {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const moderationCommentsStore = useModerationCommentsStore()
+const commentModerationStore = useCommentModerationStore()
 
 // Comment and Version refs
 const { commentInModeration: comment, versionInModeration: version } =
-  storeToRefs(moderationCommentsStore)
+  storeToRefs(commentModerationStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 
-const isLatestVersion = computed(() => moderationCommentsStore.latestCommentVersion)
-const hasNotBeenModeratedBySelf = computed(() => !moderationCommentsStore.userHasModeratedComment)
+const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
+const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
 const hasModerationHistory = computed(() => {
   const wasModified =
     version.value?.authorHash !== comment.value?.versions?.at(-1)?.authorHash ||
@@ -162,15 +159,14 @@ const decisionIcon = {
 }
 
 onMounted(async () => {
-  console.log(comment.value)
-  await initializeModerationComments()
+  await initializeCommentModeration()
 })
 
-async function initializeModerationComments() {
+async function initializeCommentModeration() {
   await userStore.verifyUserSession()
 
-  moderationCommentsStore.$reset()
-  await moderationCommentsStore.fetchCommentById(+route.params.id)
+  commentModerationStore.$reset()
+  await commentModerationStore.fetchCommentById(+route.params.id)
 
   if (version.value) {
     await refreshVersion()
@@ -179,9 +175,9 @@ async function initializeModerationComments() {
 
 async function refreshVersion() {
   // Check if user has moderated this version
-  await moderationCommentsStore.checkIfUserHasModerated(userStore.userId)
+  await commentModerationStore.checkIfUserHasModerated(userStore.userId)
 
-  selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 }
 
 function toggleSidePane() {
@@ -193,7 +189,7 @@ function handleSidePaneToggle(open: boolean) {
 }
 
 async function handleVersionChange(newVersion: CommentVersion) {
-  moderationCommentsStore.versionInModeration = newVersion
+  commentModerationStore.versionInModeration = newVersion
   await refreshVersion()
 }
 
@@ -214,7 +210,7 @@ function handleModerationControlsSubmit({
 
 function handleModerationControlsActionChange(action: ModerationActions) {
   if (action === 'Modify') {
-    moderationCommentsStore.resetVersionInModification()
+    commentModerationStore.resetVersionInModification()
     showModifyForm.value = true
   } else {
     showModifyForm.value = false
@@ -234,8 +230,8 @@ function handleModifyFormUpdate({
 }
 
 async function handleRenewModeration() {
-  await moderationCommentsStore.renewCommentModeration()
-  selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
+  await commentModerationStore.renewCommentModeration()
+  selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 }
 
 async function performModeration({
@@ -245,7 +241,7 @@ async function performModeration({
   actionHandler: Function
   reason: string
 }) {
-  const version = moderationCommentsStore.versionInModeration
+  const version = commentModerationStore.versionInModeration
 
   if (!userStore.userId) {
     console.error('User not logged in')
@@ -258,25 +254,25 @@ async function performModeration({
   }
 
   await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
-  selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 }
 
 function acceptComment(reason: string) {
   performModeration({
-    actionHandler: moderationCommentsStore.approveCommentVersion,
+    actionHandler: commentModerationStore.approveCommentVersion,
     reason
   })
 }
 
 function rejectComment(reason: string) {
   performModeration({
-    actionHandler: moderationCommentsStore.rejectCommentVersion,
+    actionHandler: commentModerationStore.rejectCommentVersion,
     reason
   })
 }
 
 const modifyComment = async (reason: string) => {
-  const version = moderationCommentsStore.versionInModeration
+  const version = commentModerationStore.versionInModeration
 
   if (!userStore.userId) {
     console.error('User not logged in')
@@ -288,7 +284,7 @@ const modifyComment = async (reason: string) => {
     return
   }
 
-  const comment = moderationCommentsStore.commentInModeration
+  const comment = commentModerationStore.commentInModeration
   if (!comment) {
     console.error('No comment selected')
     return
@@ -299,14 +295,14 @@ const modifyComment = async (reason: string) => {
     return
   }
 
-  await moderationCommentsStore.modifyModerationComment(
+  await commentModerationStore.modifyModerationComment(
     comment.id,
     userStore.sessionHash,
     userStore.nickname,
     reason,
     modifyValues.value
   )
-  selfModeration.value = (await moderationCommentsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 
   // Reload the page
   router.go(0)

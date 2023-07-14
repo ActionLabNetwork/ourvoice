@@ -97,13 +97,13 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-comment-validator'
-import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
+import { useCommentModerationStore } from '@/stores/comment-moderation'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
-const moderationCommentsStore = useModerationCommentsStore()
+const commentModerationStore = useCommentModerationStore()
 
 const actions = MODERATION_ACTIONS
 const action = ref(actions[0])
@@ -122,7 +122,7 @@ function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
 let moderationReasonField = useVeeValidateField<string>('moderationReason', action.value.validate)
 
 const isValidForm = computed(() => {
-  const modifyFormHasNoErrors = moderationCommentsStore.versionInModification.isValid
+  const modifyFormHasNoErrors = commentModerationStore.versionInModification.isValid
   const reasonFieldHasNoErrors =
     moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null
 
