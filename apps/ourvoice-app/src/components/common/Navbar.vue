@@ -1,9 +1,6 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-    <nav
-      class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
-      aria-label="Global"
-    >
+    <nav class="mx-auto flex items-center justify-between p-6 lg:px-8" aria-label="Global">
       <!-- Logo -->
       <div class="flex lg:flex-1">
         <a href="#" class="-m-1.5 p-1.5">
@@ -122,6 +119,27 @@
           </TransitionRoot>
         </Popover>
       </div>
+      <router-link
+        v-if="route.path !== '/post'"
+        to="/post"
+        class="text-sm ml-5 font-semibold hidden lg:inline-flex items-center gap-2 bg-yellow-400 py-3 px-4 rounded-full hover:bg-yellow-500"
+      >
+        Create Post
+        <svg
+          width="21"
+          height="21"
+          viewBox="0 0 21 21"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M14.1299 10.5848H6.12988M10.1299 14.5848V6.58484M19.1299 10.5848C19.1299 15.5554 15.1004 19.5848 10.1299 19.5848H1.85401C1.50419 19.5848 1.2625 19.2348 1.38645 18.9077L2.28009 16.5491C2.50931 15.9441 2.41815 15.2723 2.12213 14.697C1.4879 13.4644 1.12988 12.0664 1.12988 10.5848C1.12988 5.61428 5.15932 1.58484 10.1299 1.58484C15.1004 1.58484 19.1299 5.61428 19.1299 10.5848Z"
+            stroke="#111111"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </router-link>
     </nav>
     <!-- Mobile Menu -->
     <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
