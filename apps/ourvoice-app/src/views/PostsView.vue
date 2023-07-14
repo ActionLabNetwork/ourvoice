@@ -1,14 +1,19 @@
 <template>
-  <div class="flex flex-col overflow-y-auto relative border-r" ref="scrollContainer">
+  <div class="flex flex-col overflow-y-auto relative" ref="scrollContainer">
     <PostSortFilter />
-    <div v-for="post in posts" :key="post.id">
-      <PostCard :postId="post.id" @click="showCommentList(post.id)" />
+    <div class="max-w-5xl w-full mx-auto px-5">
+      <PostCard
+        v-for="post in posts"
+        :key="post.id"
+        :postId="post.id"
+        @click="showCommentList(post.id)"
+      />
     </div>
     <div v-if="state == 'loading-initial'" class="flex flex-col">
       <div
         v-for="i in 3"
         :key="i"
-        class="max-w-4xl w-full h-[160px] mx-auto mx-6 my-6 rounded-xl skeleton"
+        class="max-w-5xl w-full h-[160px] mx-auto my-6 rounded-xl skeleton"
       />
     </div>
   </div>

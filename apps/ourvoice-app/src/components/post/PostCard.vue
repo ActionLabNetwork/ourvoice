@@ -62,9 +62,9 @@
           <!-- default slot -->
           <button
             @click.stop="handleCommentBtnClicked"
-            class="underline hover:bg-gray-200 px-1 rounded-md transition duration-300 ease-in-out"
+            class="text-xs hover:bg-gray-200 inline-flex items-center gap-1 px-1 rounded-md transition duration-300 ease-in-out"
           >
-            COMMENTS({{ post?.comments?.length ?? 0 }})
+            {{ post?.comments?.length ?? 0 }} comments
           </button>
         </slot>
       </div>
