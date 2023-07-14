@@ -36,9 +36,9 @@
               type="button"
               class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
             >
-              <span :class="{ 'text-ourvoice-purple': hasUpvote }">
+              <span class="inline-flex items-center gap-1">
                 {{ comment?.votesUp }}
-                <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+                <IconThumb :fill="hasUpvote" :thumbup="true" />
               </span>
             </button>
 
@@ -47,9 +47,9 @@
               type="button"
               class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
             >
-              <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+              <span class="inline-flex items-center gap-1">
                 {{ comment?.votesDown }}
-                <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+                <IconThumb :fill="hasDownvote" :thumbup="false" />
               </span>
             </button>
           </div>
@@ -85,6 +85,7 @@ import { timePassed } from '@/utils'
 import { computed, ref, watch } from 'vue'
 import { useCommentsStore } from '@/stores/comments'
 import CommentTextarea from './CommentTextarea.vue'
+import IconThumb from '@/components/icons/IconThumb.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
