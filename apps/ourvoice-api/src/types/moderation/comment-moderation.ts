@@ -20,3 +20,7 @@ export type CommentIncludesVersion = Comment & { versions: CommentVersion[] };
 export type ModerationIncludesVersion = CommentModeration & {
   commentVersion: CommentVersion;
 };
+
+export type ModerationIncludesVersionIncludesComment = CommentModeration & {
+  commentVersion: CommentVersion & { comment: Comment };
+};

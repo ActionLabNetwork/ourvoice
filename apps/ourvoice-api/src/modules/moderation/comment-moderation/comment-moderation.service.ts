@@ -241,6 +241,10 @@ export class CommentModerationService {
       throw new BadRequestException('Invalid moderator hash');
     }
 
+    if (moderationToBeRenewed.commentVersion.comment.status !== 'PENDING') {
+      throw new BadRequestException('Comment is not pending');
+    }
+
     return await this.moderationCommentRepository.renewCommentModeration(
       id,
       moderatorHash,

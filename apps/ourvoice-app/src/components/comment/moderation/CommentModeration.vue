@@ -75,7 +75,7 @@
           </div>
           <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
             <!-- Renew button -->
-            <div class="mt-4 flex justify-end">
+            <div class="mt-4 flex justify-end" v-if="comment.status === 'PENDING'">
               <div>
                 <button
                   @click="handleRenewModeration"
@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
 import { useUserStore } from '@/stores/user'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
 import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue'
@@ -160,6 +160,12 @@ const decisionIcon = {
 
 onMounted(async () => {
   await initializeCommentModeration()
+})
+
+watchEffect(() => {
+  if (comment.value?.id === Number(route.params.id) && comment.value.status !== 'PENDING') {
+    router.push('/moderation/comments')
+  }
 })
 
 async function initializeCommentModeration() {

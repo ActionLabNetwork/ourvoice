@@ -90,7 +90,8 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
             limit: MODERATION_LIST_COMMENTS_PER_PAGE,
             before: before,
             after: after
-          }
+          },
+          fetchPolicy: 'no-cache'
         })
 
         const newComments = data.moderationComments.edges.map(

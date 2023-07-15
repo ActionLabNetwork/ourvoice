@@ -20,9 +20,6 @@ import EmptyState from '@/components/comment/EmptyState.vue'
 const props = defineProps({
   posts: { type: Array as PropType<ModerationPost[]>, required: true }
 })
-
-console.log('hello')
-console.log(props.posts.length)
 </script>
 
 <style scoped>

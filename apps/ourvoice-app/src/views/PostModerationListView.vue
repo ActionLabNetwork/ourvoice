@@ -43,6 +43,7 @@ const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
+  console.log('Fetching new posts')
   await postsStore.fetchPostsByStatus('PENDING')
 })
 

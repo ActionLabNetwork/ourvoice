@@ -2,6 +2,7 @@ import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
   ModerationIncludesVersion,
+  ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
 import { CommentModifyDto } from './dto/comment-modify.dto';
@@ -127,10 +128,10 @@ export class CommentModerationRepository {
 
   async getCommentModerationById(
     id: number,
-  ): Promise<ModerationIncludesVersion> {
+  ): Promise<ModerationIncludesVersionIncludesComment> {
     return await this.prisma.commentModeration.findUnique({
       where: { id },
-      include: { commentVersion: true },
+      include: { commentVersion: { include: { comment: true } } },
     });
   }
 

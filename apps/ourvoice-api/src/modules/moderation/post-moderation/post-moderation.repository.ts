@@ -344,7 +344,7 @@ export class PostModerationRepository {
       // Fetch the postModeration and related post
       const postModeration = await tx.postModeration.findUnique({
         where: { id },
-        include: { postVersion: true },
+        include: { postVersion: { include: { post: true } } },
       });
 
       if (!postModeration) {
@@ -353,6 +353,10 @@ export class PostModerationRepository {
 
       if (postModeration.moderatorHash !== moderatorHash) {
         throw new Error('Moderator hash does not match');
+      }
+
+      if (postModeration.postVersion.post.status !== 'PENDING') {
+        throw new Error('Post is not pending');
       }
 
       const postId = postModeration.postVersion.postId;
