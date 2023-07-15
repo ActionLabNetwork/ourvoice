@@ -128,8 +128,11 @@ const userStore = useUserStore()
 const commentModerationStore = useCommentModerationStore()
 
 // Comment and Version refs
-const { commentInModeration: comment, versionInModeration: version } =
-  storeToRefs(commentModerationStore)
+const {
+  commentInModeration: comment,
+  versionInModeration: version,
+  hasErrors
+} = storeToRefs(commentModerationStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
@@ -163,8 +166,14 @@ onMounted(async () => {
 })
 
 watchEffect(() => {
-  if (comment.value?.id === Number(route.params.id) && comment.value.status !== 'PENDING') {
-    router.push('/moderation/comments')
+  if (comment.value?.id === Number(route.params.id)) {
+    if (comment.value.status !== 'PENDING') {
+      router.push('/moderation/comments')
+    }
+    // TODO: Show a toast with the error and countdown before redirecting
+    else if (hasErrors.value) {
+      router.push('/moderation/comments')
+    }
   }
 })
 

@@ -99,7 +99,11 @@ const userStore = useUserStore()
 const postModerationStore = usePostModerationStore()
 
 // Post and Version refs
-const { postInModeration: post, versionInModeration: version } = storeToRefs(postModerationStore)
+const {
+  postInModeration: post,
+  versionInModeration: version,
+  hasErrors
+} = storeToRefs(postModerationStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
@@ -131,8 +135,14 @@ onMounted(async () => {
 })
 
 watchEffect(async () => {
-  if (post.value?.id === Number(route.params.id) && post.value.status !== 'PENDING') {
-    router.push('/moderation/posts')
+  if (post.value?.id === Number(route.params.id)) {
+    if (post.value.status !== 'PENDING') {
+      router.push('/moderation/posts')
+    }
+    // TODO: Show a toast with the error and a countdown to redirect
+    else if (hasErrors.value) {
+      router.push('/moderation/posts')
+    }
   }
 })
 

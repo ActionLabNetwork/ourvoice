@@ -78,8 +78,7 @@ export interface PostModerationState {
   totalCount: number
   pageInfo: pageInfo | undefined
   loading: boolean
-  error: Error | undefined
-  errorMessage: string | undefined
+  hasErrors: boolean
   userHasModeratedPost: boolean
 }
 
@@ -121,8 +120,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
     totalCount: 0,
     pageInfo: undefined,
     loading: false,
-    error: undefined,
-    errorMessage: undefined,
+    hasErrors: false,
     userHasModeratedPost: false
   }),
   getters: {
@@ -146,6 +144,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       }
     },
     async fetchPostById(id: number) {
+      this.loading = true
+      this.hasErrors = false
       try {
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POST_BY_ID_QUERY,
@@ -200,9 +200,13 @@ export const usePostModerationStore = defineStore('post-moderation', {
         this.versionInModeration = post.versions[0]
       } catch (error) {
         console.error(`Failed to load post with ID ${id}. Please try again.`, error)
+        this.hasErrors = true
       }
+      this.loading = false
     },
     async getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number) {
+      this.loading = true
+      this.hasErrors = false
       try {
         const downloadUrls = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
@@ -219,7 +223,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
         }
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
     },
 
     async createPost({
@@ -233,6 +239,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
       categoryIds: number[]
       files: string[]
     }) {
+      this.loading = true
+      this.hasErrors = false
+
       // Check for valid deployment and user session
       const deploymentStore = useDeploymentStore()
       const userStore = useUserStore()
@@ -262,11 +271,16 @@ export const usePostModerationStore = defineStore('post-moderation', {
         })
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
     },
 
     // Moderation actions
     async checkIfUserHasModerated(userId: string) {
+      this.loading = true
+      this.hasErrors = false
+
       const version = this.versionInModeration
 
       if (!version) return
@@ -284,6 +298,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
 
       const hasModeratedList = await Promise.all(promises)
       this.userHasModeratedPost = hasModeratedList.includes(true)
+
+      this.loading = false
     },
     async approvePostVersion(
       id: number,
@@ -292,6 +308,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
       if (!this.postInModeration) return null
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -308,7 +327,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
       return null
     },
 
@@ -319,6 +340,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
       reason: string
     ): Promise<PostVersionWithCategoryIds | null> {
       if (!this.postInModeration) return null
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -335,7 +359,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
       return null
     },
 
@@ -347,6 +373,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
       modifiedData: PostFields
     ) {
       if (!this.postInModeration) return null
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -360,6 +389,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
       } catch (error) {
         console.error(error)
       }
+      this.loading = false
       return null
     },
 
@@ -374,6 +404,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
         console.error('No self moderation found for post version')
         return
       }
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -394,7 +427,9 @@ export const usePostModerationStore = defineStore('post-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
     }
   }
 })

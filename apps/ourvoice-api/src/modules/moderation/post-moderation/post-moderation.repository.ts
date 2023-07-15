@@ -240,6 +240,10 @@ export class PostModerationRepository {
         throw new Error('Post version is not the latest');
       }
 
+      if (postVersion.post.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
+      }
+
       // Create a new post moderation entry
       const newPostModeration = await tx.postModeration.create({
         data: {

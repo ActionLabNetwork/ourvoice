@@ -71,6 +71,7 @@ export interface ModerationCommentsState {
   }
   loading: boolean
   userHasModeratedComment: boolean
+  hasErrors: boolean
 }
 
 interface CommentFields {
@@ -96,7 +97,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       isValid: false
     },
     loading: false,
-    userHasModeratedComment: false
+    userHasModeratedComment: false,
+    hasErrors: false
   }),
   getters: {
     latestCommentVersion: (state) =>
@@ -119,6 +121,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       }
     },
     async fetchCommentById(id: number) {
+      this.loading = true
+      this.hasErrors = false
+
       try {
         const { data } = await apolloClient.query({
           query: GET_MODERATION_COMMENT_BY_ID_QUERY,
@@ -133,54 +138,57 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         this.versionInModeration = comment.versions[0]
       } catch (error) {
         console.error(`Failed to load comment with ID ${id}. Please try again.`, error)
+        this.hasErrors = true
       }
+      this.loading = false
     },
-    async createComment({
-      content,
-      postId,
-      parentId
-    }: {
-      content: string
-      postId: number | undefined
-      parentId: number | undefined
-    }) {
-      // Check for valid deployment and user session
-      const userStore = useUserStore()
+    // async createComment({
+    //   content,
+    //   postId,
+    //   parentId
+    // }: {
+    //   content: string
+    //   postId: number | undefined
+    //   parentId: number | undefined
+    // }) {
+    //   // Check for valid deployment and user session
+    //   const userStore = useUserStore()
 
-      // Check if we can access the session and generate a user hash for storing in the db
-      if (!(await userStore.isLoggedIn)) {
-        // TODO: Set up a proper error handling module
-        throw new Error('User session is invalid')
-      }
+    //   // Check if we can access the session and generate a user hash for storing in the db
+    //   if (!(await userStore.isLoggedIn)) {
+    //     // TODO: Set up a proper error handling module
+    //     throw new Error('User session is invalid')
+    //   }
 
-      const authorHash = userStore.sessionHash
-      const authorNickname = userStore.nickname
-      const requiredModerations = 1
+    //   const authorHash = userStore.sessionHash
+    //   const authorNickname = userStore.nickname
+    //   const requiredModerations = 1
 
-      try {
-        const { data } = await apolloClient.mutate({
-          mutation: CREATE_MODERATION_COMMENT_MUTATION,
-          variables: {
-            data: {
-              content,
-              postId: postId,
-              parentId: parentId,
-              authorHash,
-              authorNickname,
-              requiredModerations
-            }
-          }
-        })
-      } catch (error) {
-        console.error(error)
-      }
-    },
+    //   try {
+    //     const { data } = await apolloClient.mutate({
+    //       mutation: CREATE_MODERATION_COMMENT_MUTATION,
+    //       variables: {
+    //         data: {
+    //           content,
+    //           postId: postId,
+    //           parentId: parentId,
+    //           authorHash,
+    //           authorNickname,
+    //           requiredModerations
+    //         }
+    //       }
+    //     })
+    //   } catch (error) {
+    //     console.error(error)
+    //   }
+    // },
 
     // Moderation actions
     async checkIfUserHasModerated(userId: string) {
       const version = this.versionInModeration
-
       if (!version) return
+
+      this.loading = true
 
       const versionModerators: string[] = Array.from(
         version.moderations.reduce((acc, moderation) => {
@@ -195,6 +203,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
 
       const hasModeratedList = await Promise.all(promises)
       this.userHasModeratedComment = hasModeratedList.includes(true)
+
+      this.loading = false
     },
 
     async approveCommentVersion(
@@ -204,6 +214,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       reason: string
     ): Promise<CommentVersion | null> {
       if (!this.commentInModeration) return null
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -218,7 +231,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
       return null
     },
 
@@ -229,6 +244,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       reason: string
     ): Promise<CommentVersion | null> {
       if (!this.commentInModeration) return null
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -243,7 +261,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
       return null
     },
 
@@ -256,6 +276,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
     ) {
       if (!this.commentInModeration) return null
 
+      this.loading = true
+      this.hasErrors = false
+
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_COMMENT_MUTATION,
@@ -266,7 +289,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
       return null
     },
     async renewCommentModeration() {
@@ -280,6 +305,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         console.error('No self moderation found for comment version')
         return
       }
+
+      this.loading = true
+      this.hasErrors = false
 
       try {
         const { data } = await apolloClient.mutate({
@@ -296,7 +324,9 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         return data
       } catch (error) {
         console.error(error)
+        this.hasErrors = true
       }
+      this.loading = false
     }
   }
 })
