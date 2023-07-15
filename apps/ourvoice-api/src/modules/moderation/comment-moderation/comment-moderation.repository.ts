@@ -629,8 +629,7 @@ export class CommentModerationRepository {
         });
 
         this.logger.log(
-          'Finished rejecting comment with comment id',
-          commentId,
+          `Finished rejecting comment with comment id ${commentId}`,
         );
       }
     });

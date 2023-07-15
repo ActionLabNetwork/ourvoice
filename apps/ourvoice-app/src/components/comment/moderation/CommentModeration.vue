@@ -252,9 +252,16 @@ async function performModeration({
     console.error('No version selected')
     return
   }
+  console.log(commentModerationStore.commentInModeration?.status)
 
   await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
+
+  console.log(commentModerationStore.commentInModeration?.status)
+  // Redirect to comments list if status changes
+  if (commentModerationStore.commentInModeration?.status !== 'PENDING') {
+    router.push('/moderation/comments')
+  }
 }
 
 function acceptComment(reason: string) {

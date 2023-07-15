@@ -100,30 +100,29 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
             limit: MODERATION_LIST_POSTS_PER_PAGE,
             before: before,
             after: after
-          }
+          },
+          fetchPolicy: 'no-cache'
         })
 
         const newPosts = data.moderationPosts.edges.map(
           (edge: Edge<ModerationPostModel>) => edge.node
         )
 
-        if (newPosts.length > 0) {
-          this.posts = newPosts
-          this.totalCount = data.moderationPosts.totalCount
-          this.startCursor = data.moderationPosts.pageInfo.startCursor
-          this.endCursor = data.moderationPosts.pageInfo.endCursor
+        this.posts = newPosts
+        this.totalCount = data.moderationPosts.totalCount
+        this.startCursor = data.moderationPosts.pageInfo.startCursor
+        this.endCursor = data.moderationPosts.pageInfo.endCursor
 
-          const forwardPaginating =
-            (before === null && after !== null) || (before === null && after === null)
-          const backwardPaginating = before !== null && after === null
+        const forwardPaginating =
+          (before === null && after !== null) || (before === null && after === null)
+        const backwardPaginating = before !== null && after === null
 
-          if (backwardPaginating) {
-            this.hasNextPage = true
-          }
+        if (backwardPaginating) {
+          this.hasNextPage = true
+        }
 
-          if (forwardPaginating) {
-            this.hasNextPage = data.moderationPosts.pageInfo.hasNextPage
-          }
+        if (forwardPaginating) {
+          this.hasNextPage = data.moderationPosts.pageInfo.hasNextPage
         }
 
         this.loading = false

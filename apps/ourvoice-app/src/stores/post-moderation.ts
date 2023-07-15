@@ -149,7 +149,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       try {
         const { data } = await apolloClient.query({
           query: GET_MODERATION_POST_BY_ID_QUERY,
-          variables: { moderationPostId: id }
+          variables: { moderationPostId: id },
+          fetchPolicy: 'no-cache'
         })
 
         const moderationPost = data.moderationPost as ModerationPostModel
@@ -295,7 +296,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: APPROVE_MODERATION_POST_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason },
+          fetchPolicy: 'no-cache'
         })
 
         console.log('Post version has been approved', data)
@@ -321,7 +323,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_POST_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason },
+          fetchPolicy: 'no-cache'
         })
 
         console.log('Post version has been rejected', data)

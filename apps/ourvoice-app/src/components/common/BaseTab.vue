@@ -10,10 +10,16 @@
           {{ tab.name }}
         </option>
       </select>
-      <div v-if="props.loading"><Loading /></div>
-      <div v-if="!props.loading">
-        <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
-      </div>
+      <transition name="fade">
+        <div v-if="props.loading" class="h-[80vh]">
+          <Loading>Loading...</Loading>
+        </div>
+      </transition>
+      <transition name="fade">
+        <div v-if="!props.loading">
+          <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
+        </div>
+      </transition>
     </div>
     <div class="hidden sm:block">
       <nav class="isolate flex divide-x divide-gray-200 rounded-lg shadow">

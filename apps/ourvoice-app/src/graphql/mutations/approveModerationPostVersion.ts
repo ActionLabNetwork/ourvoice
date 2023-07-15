@@ -7,6 +7,7 @@ export const APPROVE_MODERATION_POST_VERSION_MUTATION = gql`
       authorHash
       authorNickname
       requiredModerations
+      status
       versions {
         id
         title

@@ -96,18 +96,18 @@ interface PostFields {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const moderationPostsStore = usePostModerationStore()
+const postModerationStore = usePostModerationStore()
 
 // Post and Version refs
-const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
+const { postInModeration: post, versionInModeration: version } = storeToRefs(postModerationStore)
 
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 
-const isLatestVersion: ComputedRef<boolean> = computed(() => moderationPostsStore.latestPostVersion)
-const hasNotBeenModeratedBySelf = computed(() => !moderationPostsStore.userHasModeratedPost)
+const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
+const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
 const hasModerationHistory = computed(() => {
   const wasModified = version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
   const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
@@ -133,8 +133,8 @@ onMounted(async () => {
 async function initializeModerationPosts() {
   await userStore.verifyUserSession()
 
-  moderationPostsStore.$reset()
-  await moderationPostsStore.fetchPostById(Number(route.params.id))
+  postModerationStore.$reset()
+  await postModerationStore.fetchPostById(Number(route.params.id))
 
   if (version.value) {
     await refreshVersion(version.value)
@@ -143,13 +143,13 @@ async function initializeModerationPosts() {
 
 async function refreshVersion(newVersion: PostVersion) {
   // Check if user has moderated this version
-  await moderationPostsStore.checkIfUserHasModerated(userStore.userId)
+  await postModerationStore.checkIfUserHasModerated(userStore.userId)
 
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 
   // If there are files, request their download urls
   if (newVersion.files && newVersion.files.length > 0)
-    await moderationPostsStore.getPresignedDownloadUrls(
+    await postModerationStore.getPresignedDownloadUrls(
       postFilesBucket,
       newVersion.files,
       postFilesPresignedUrlTTL
@@ -165,7 +165,7 @@ function handleSidePaneToggle(open: boolean) {
 }
 
 async function handleVersionChange(newVersion: PostVersion) {
-  moderationPostsStore.versionInModeration = newVersion
+  postModerationStore.versionInModeration = newVersion
   await refreshVersion(newVersion)
 }
 
@@ -186,7 +186,7 @@ function handleModerationControlsSubmit({
 
 function handleModerationControlsActionChange(action: ModerationActions) {
   if (action === 'Modify') {
-    moderationPostsStore.resetVersionInModification()
+    postModerationStore.resetVersionInModification()
     showModifyForm.value = true
   } else {
     showModifyForm.value = false
@@ -211,8 +211,8 @@ function handleModifyFormUpdate({
 }
 
 async function handleRenewModeration() {
-  await moderationPostsStore.renewPostModeration()
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+  await postModerationStore.renewPostModeration()
+  selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 }
 
 async function performModeration({
@@ -222,7 +222,7 @@ async function performModeration({
   actionHandler: Function
   reason: string
 }) {
-  const version = moderationPostsStore.versionInModeration
+  const version = postModerationStore.versionInModeration
 
   if (!userStore.userId) {
     console.error('User not logged in')
@@ -235,25 +235,30 @@ async function performModeration({
   }
 
   await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
+
+  // Redirect to posts list if status changes
+  if (postModerationStore.postInModeration?.status !== 'PENDING') {
+    router.push({ name: 'moderate-post-list' })
+  }
 }
 
 function acceptPost(reason: string) {
   performModeration({
-    actionHandler: moderationPostsStore.approvePostVersion,
+    actionHandler: postModerationStore.approvePostVersion,
     reason
   })
 }
 
 function rejectPost(reason: string) {
   performModeration({
-    actionHandler: moderationPostsStore.rejectPostVersion,
+    actionHandler: postModerationStore.rejectPostVersion,
     reason
   })
 }
 
 const modifyPost = async (reason: string) => {
-  const version = moderationPostsStore.versionInModeration
+  const version = postModerationStore.versionInModeration
 
   if (!userStore.userId) {
     console.error('User not logged in')
@@ -265,7 +270,7 @@ const modifyPost = async (reason: string) => {
     return
   }
 
-  const post = moderationPostsStore.postInModeration
+  const post = postModerationStore.postInModeration
   if (!post) {
     console.error('No post selected')
     return
@@ -276,14 +281,14 @@ const modifyPost = async (reason: string) => {
     return
   }
 
-  await moderationPostsStore.modifyModerationPost(
+  await postModerationStore.modifyModerationPost(
     post.id,
     userStore.sessionHash,
     userStore.nickname,
     reason,
     modifyValues.value
   )
-  selfModeration.value = (await moderationPostsStore.selfModerationForVersion)?.decision
+  selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 
   // Reload the page
   router.go(0)

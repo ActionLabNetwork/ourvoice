@@ -122,7 +122,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       try {
         const { data } = await apolloClient.query({
           query: GET_MODERATION_COMMENT_BY_ID_QUERY,
-          variables: { moderationCommentId: id }
+          variables: { moderationCommentId: id },
+          fetchPolicy: 'no-cache'
         })
 
         const comment = data.moderationComment as ModerationComment
@@ -207,7 +208,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: APPROVE_MODERATION_COMMENT_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason },
+          fetchPolicy: 'no-cache'
         })
 
         await this.fetchCommentById(this.commentInModeration.id)
@@ -231,7 +233,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_COMMENT_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason }
+          variables: { id, moderatorHash, moderatorNickname, reason },
+          fetchPolicy: 'no-cache'
         })
 
         await this.fetchCommentById(this.commentInModeration.id)

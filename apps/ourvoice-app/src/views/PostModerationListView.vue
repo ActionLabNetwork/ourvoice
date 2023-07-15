@@ -74,5 +74,6 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
       await postsStore.fetchPostsByStatus('REJECTED')
       break
   }
+  console.log(postsStore.posts)
 }
 </script>
