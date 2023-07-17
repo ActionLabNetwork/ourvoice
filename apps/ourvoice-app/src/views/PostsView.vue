@@ -9,12 +9,8 @@
         class="card card-outline card-hover"
       />
     </div>
-    <div v-if="state == 'loading-initial'" class="flex flex-col">
-      <div
-        v-for="i in 3"
-        :key="i"
-        class="max-w-5xl w-full h-[160px] mx-auto my-6 rounded-xl skeleton"
-      />
+    <div v-if="state == 'loading-initial'" class="max-w-5xl w-full mx-auto px-5">
+      <div v-for="i in 3" :key="i" class="h-[300px] card skeleton" />
     </div>
   </div>
 </template>
