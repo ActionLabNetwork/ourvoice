@@ -237,112 +237,112 @@ jobs:
         working-directory: apps/ourvoice-portal
         run: pnpm build
 
-  build-docker-images-and-push:
-    name: Build APPS (Node.js ${{ matrix.node-version }}) and push to Docker-Hub if tagged
-    runs-on: ubuntu-latest
-    # needs: build-apps-test
+  # build-docker-images-and-push:
+  #   name: Build APPS (Node.js ${{ matrix.node-version }}) and push to Docker-Hub if tagged
+  #   runs-on: ubuntu-latest
+  #   # needs: build-apps-test
 
-    strategy:
-      matrix:
-        node-version: [18.x]
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x]
 
-    permissions:
-      deployments: write
-      contents: write
-      statuses: write
-      actions: write
-      checks: read
+  #   permissions:
+  #     deployments: write
+  #     contents: write
+  #     statuses: write
+  #     actions: write
+  #     checks: read
     
-    env:
-      APPS_PORTAL_APP: portal
-      APPS_ADMIN_APP: admin
-      APPS_API_APP: api
-      APPS_APP_APP: app
-      APPS_APP_AUTH: auth
-      APPS_APP_AUTHAPI: auth-api
-      RUN_POST: false
-      DOCKER_BUILD: true
-      IMG_NAME: ${{ github.repository }}
+  #   env:
+  #     APPS_PORTAL_APP: portal
+  #     APPS_ADMIN_APP: admin
+  #     APPS_API_APP: api
+  #     APPS_APP_APP: app
+  #     APPS_APP_AUTH: auth
+  #     APPS_APP_AUTHAPI: auth-api
+  #     RUN_POST: false
+  #     DOCKER_BUILD: true
+  #     IMG_NAME: ${{ github.repository }}
 
-    steps: 
+  #   steps: 
       
-      - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+  #     - name: Repository checkout
+  #       uses: actions/checkout@v3.5.3
 
-      - name: Info
-        run: echo "Parameters. ${{ github.event.base_ref }}, ${{ github.ref_type }}, ${{ github.ref }}"
+  #     - name: Info
+  #       run: echo "Parameters. ${{ github.event.base_ref }}, ${{ github.ref_type }}, ${{ github.ref }}"
       
-      - name: Automatic Tagging of Releases
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && github.ref_type != 'tag'
-        id: increment-git-tag
-        run: |
-          echo "Incrementing git tag"
-          # bash ./deployment/build-docker/git_tag_update.sh -v patch
+  #     - name: Automatic Tagging of Releases
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && github.ref_type != 'tag'
+  #       id: increment-git-tag
+  #       run: |
+  #         echo "Incrementing git tag"
+  #         # bash ./deployment/build-docker/git_tag_update.sh -v patch
 
 
-      # Building docker containers
-      - name: Docker metadata
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request'
-        id: metadata
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.IMG_NAME }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }} 
+  #     # Building docker containers
+  #     - name: Docker metadata
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request'
+  #       id: metadata
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: ${{ env.IMG_NAME }}
+  #         tags: |
+  #           type=semver,pattern={{version}}
+  #           type=semver,pattern={{major}}.{{minor}}
+  #           type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }} 
 
-      - name: Set up Docker Buildx
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
-        uses: docker/setup-buildx-action@v2
+  #     - name: Set up Docker Buildx
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
+  #       uses: docker/setup-buildx-action@v2
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        id: login-to-docker-hub
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v2
+  #       id: login-to-docker-hub
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Copy Dockerfile template from the root to APPS folders
-        id: dockerfile-copy
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
-        run: |
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_PORTAL_APP}}/Dockerfile
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_ADMIN_APP}}/Dockerfile
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_API_APP}}/Dockerfile
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_APP}}/Dockerfile
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_AUTH}}/Dockerfile
-          cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_AUTHAPI}}/Dockerfile
+  #     - name: Copy Dockerfile template from the root to APPS folders
+  #       id: dockerfile-copy
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
+  #       run: |
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_PORTAL_APP}}/Dockerfile
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_ADMIN_APP}}/Dockerfile
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_API_APP}}/Dockerfile
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_APP}}/Dockerfile
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_AUTH}}/Dockerfile
+  #         cp Dockerfile-for-apps.template apps/ourvoice-${{env.APPS_APP_AUTHAPI}}/Dockerfile
 
-      - name: Build and push Docker images for API
-        if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.login-to-docker-hub.conclusion == 'success'
-        uses: docker/build-push-action@v4
-        env:
-          IMAGE_BASE_NAME: ${{ github.event.repository.name}}
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
-          DOCKER_REPO: ${{ secrets.DOCKERHUB_USERNAME }}
-          NODE_ENV: production
-        with:
-          context: apps/ourvoice-${{env.APPS_API_APP}}
-          file: apps/ourvoice-${{env.APPS_API_APP}}/Dockerfile
-          push: true
-          build-args: |
-            NODE_ENV=${{env.NODE_ENV}}
-            DIR=${{env.APPS_API_APP}}
-            APP=${{env.APPS_API_APP}}
-          tags: ${{env.APPS_API_APP}}
-        # run: |
-        #   docker build -t ${{env.DOCKER_REPO}}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }} .
-        #   docker push ${{env.DOCKER_REPO}}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }}
-        # docker tag ${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_BASE_NAME }}:latest
-        # docker push ${{ env.IMAGE_BASE_NAME }}:latest
+  #     - name: Build and push Docker images for API
+  #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.login-to-docker-hub.conclusion == 'success'
+  #       uses: docker/build-push-action@v4
+  #       env:
+  #         IMAGE_BASE_NAME: ${{ github.event.repository.name}}
+  #         IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+  #         DOCKER_REPO: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         NODE_ENV: production
+  #       with:
+  #         context: apps/ourvoice-${{env.APPS_API_APP}}
+  #         file: apps/ourvoice-${{env.APPS_API_APP}}/Dockerfile
+  #         push: true
+  #         build-args: |
+  #           NODE_ENV=${{env.NODE_ENV}}
+  #           DIR=${{env.APPS_API_APP}}
+  #           APP=${{env.APPS_API_APP}}
+  #         tags: ${{env.APPS_API_APP}}
+  #       # run: |
+  #       #   docker build -t ${{env.DOCKER_REPO}}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }} .
+  #       #   docker push ${{env.DOCKER_REPO}}/${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }}
+  #       # docker tag ${{ env.IMAGE_BASE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_BASE_NAME }}:latest
+  #       # docker push ${{ env.IMAGE_BASE_NAME }}:latest
 
   deploy-staging:
     name: Deploy APPS on staging server with PM2 (Node.js ${{ matrix.node-version }}, Postgres ${{ matrix.postgres-version }})
     if: startsWith(github.ref, 'refs/heads/dev')
     runs-on: [self-hosted, linux]
-    needs: build-docker-images-and-push
+    needs: build-apps-test
 
     strategy:
       matrix:
