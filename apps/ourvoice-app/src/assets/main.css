@@ -85,7 +85,7 @@
 }
 
 .card {
-  @apply my-6 p-6 rounded-lg break-all;
+  @apply p-6 rounded-lg break-all;
 }
 .card-outline {
   @apply bg-white shadow-lg border;

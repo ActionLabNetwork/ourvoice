@@ -6,11 +6,11 @@
         v-for="post in posts"
         :key="post.id"
         :postId="post.id"
-        class="card card-outline card-hover"
+        class="card card-outline card-hover my-6"
       />
     </div>
     <div v-if="state == 'loading-initial'" class="max-w-5xl w-full mx-auto px-5">
-      <div v-for="i in 3" :key="i" class="h-[300px] card skeleton" />
+      <div v-for="i in 3" :key="i" class="h-[300px] card my-6 skeleton" />
     </div>
   </div>
 </template>
