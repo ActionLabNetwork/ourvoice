@@ -1,9 +1,13 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
+<<<<<<< HEAD
     <nav
       class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
       aria-label="Global"
     >
+=======
+    <nav class="mx-auto flex items-center justify-between p-6 h-20 lg:px-8" aria-label="Global">
+>>>>>>> 68bb072 (fix(vote): fix vote icon display error due to css stacking context change)
       <!-- Logo -->
       <div class="flex">
         <a href="#" class="-m-1.5 p-1.5">

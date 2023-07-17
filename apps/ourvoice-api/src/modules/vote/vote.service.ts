@@ -43,8 +43,18 @@ export class VoteService {
         comment: commentId ? { connect: { id: commentId } } : undefined,
       });
     } else {
-      // if there are more than one such vote, it means there is an error
-      console.log('error: more than one vote for the same user');
+      // if there are more than one such vote, which means there is an error
+      // console.log('error: more than one vote for the same user');
+      for (const vote of votes) {
+        await this.votetRepository.deleteVote({ id: vote.id });
+      }
+      return await this.votetRepository.createVote({
+        voteType,
+        authorHash,
+        authorNickname,
+        post: postId ? { connect: { id: postId } } : undefined,
+        comment: commentId ? { connect: { id: commentId } } : undefined,
+      });
     }
   }
 
