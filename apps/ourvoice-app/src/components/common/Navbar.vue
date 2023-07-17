@@ -1,6 +1,6 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-    <nav class="mx-auto flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+    <nav class="mx-auto flex items-center justify-between p-6 h-20 lg:px-8" aria-label="Global">
       <!-- Logo -->
       <div class="flex lg:flex-1">
         <a href="#" class="-m-1.5 p-1.5">
