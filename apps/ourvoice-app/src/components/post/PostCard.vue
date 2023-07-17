@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="overflow-hidden border my-6 p-6 bg-white rounded-xl break-all shadow transition duration-500 ease-in-out"
-  >
+  <div class="overflow-hidden my-6 p-6 break-all">
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}
       <div>
@@ -33,7 +31,7 @@
         file
       </a>
     </div>
-    <div class="flex justify-between items-center">
+    <div class="mt-6 flex justify-between items-center">
       <div class="flex">
         <button
           @click.stop="voteForPost('UPVOTE')"
@@ -60,11 +58,8 @@
       <div>
         <slot>
           <!-- default slot -->
-          <button
-            @click.stop="handleCommentBtnClicked"
-            class="text-xs hover:bg-gray-200 inline-flex items-center gap-1 px-1 rounded-md transition duration-300 ease-in-out"
-          >
-            {{ post?.comments?.length ?? 0 }} comments
+          <button @click.stop="handleCommentBtnClicked" class="inline-flex items-center gap-1">
+            {{ post?.comments?.length ?? 0 }} <IconMessageCircle />
           </button>
         </slot>
       </div>
@@ -75,6 +70,7 @@
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
+import IconMessageCircle from '../icons/IconMessageCircle.vue'
 import CreateComment from '../comment/CreateComment.vue'
 import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'

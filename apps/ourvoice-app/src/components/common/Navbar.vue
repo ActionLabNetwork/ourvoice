@@ -1,13 +1,9 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-<<<<<<< HEAD
     <nav
       class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
       aria-label="Global"
     >
-=======
-    <nav class="mx-auto flex items-center justify-between p-6 h-20 lg:px-8" aria-label="Global">
->>>>>>> 68bb072 (fix(vote): fix vote icon display error due to css stacking context change)
       <!-- Logo -->
       <div class="flex">
         <a href="#" class="-m-1.5 p-1.5">
@@ -25,7 +21,10 @@
         />
       </div>
       <!-- Hamburger icon -->
-      <div class="flex lg:hidden justify-self-end">
+      <div class="flex lg:hidden justify-self-end"></div>
+      <!-- Desktop Menu -->
+      <div class="flex lg:hidden">
+        <CreatePostNavButton class="inline-flex mr-5" v-if="route.path === '/posts'" />
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -157,8 +156,9 @@
           </Popover>
         </div>
       </div>
-      <CreatePostNavButton v-if="route.path === '/posts'" />
+      <CreatePostNavButton class="hidden lg:inline-flex ml-5" v-if="route.path === '/posts'" />
     </nav>
+
     <!-- Mobile Menu -->
     <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
       <div class="fixed inset-0 z-30" />

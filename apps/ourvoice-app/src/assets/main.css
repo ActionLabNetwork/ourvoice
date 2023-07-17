@@ -61,7 +61,7 @@
 }
 
 .btn {
-  @apply shadow-md py-3 px-6 rounded-md transition duration-300;
+  @apply py-2 px-4 rounded-full transition duration-300;
 }
 
 .btn-purple {
@@ -72,16 +72,31 @@
   @apply bg-ourvoice-red text-white;
 }
 
+.btn-yellow {
+  @apply bg-ourvoice-yellow text-black;
+}
+
 .btn-hover {
   @apply hover:bg-ourvoice-grey hover:text-black;
 }
 
+.btn-outline {
+  @apply border-2 border-ourvoice-purple text-ourvoice-purple;
+}
+
+.card {
+  @apply rounded-lg;
+}
+.card-outline {
+  @apply bg-white shadow-lg border;
+}
+
 .card-hover {
-  @apply hover:bg-ourvoice-purple;
+  @apply hover:shadow-xl transition duration-300 ease-in-out;
 }
 
 .skeleton {
-  animation: skeleton-loading 1s linear infinite alternate
+  animation: skeleton-loading 1s linear infinite alternate;
 }
 
 @keyframes skeleton-loading {
