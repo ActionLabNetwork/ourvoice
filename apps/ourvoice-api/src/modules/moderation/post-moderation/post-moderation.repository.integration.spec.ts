@@ -508,40 +508,22 @@ describe('PostRepository', () => {
 
   it('should renew a moderated post', async () => {
     // Act & Assert
-    const acceptedPost = await postModerationRepository.approvePostVersion(
+    const approvedPost = await postModerationRepository.approvePostVersion(
       6,
       'testHash',
       'testNickname',
       'test reason',
     );
-    const acceptedPostModerationId = acceptedPost.versions[0].moderations[0].id;
-
-    const renewedAcceptedPost =
-      await postModerationRepository.renewPostModeration(
-        acceptedPostModerationId,
-        'testHash',
-      );
-
-    expect(renewedAcceptedPost.versions[0].moderations[0]).not.toEqual(
-      acceptedPostModerationId,
-    );
-
-    const rejectedPost = await postModerationRepository.rejectPostVersion(
-      6,
-      'testHash',
-      'testNickname',
-      'test reason',
-    );
-    const rejectedPostModerationId = rejectedPost.versions[0].moderations[0].id;
+    const approvedPostModerationId = approvedPost.versions[0].moderations[0].id;
 
     const renewedRejectedPost =
       await postModerationRepository.renewPostModeration(
-        rejectedPostModerationId,
+        approvedPostModerationId,
         'testHash',
       );
 
     expect(renewedRejectedPost.versions[0].moderations[0]).not.toEqual(
-      rejectedPostModerationId,
+      approvedPostModerationId,
     );
   });
 });

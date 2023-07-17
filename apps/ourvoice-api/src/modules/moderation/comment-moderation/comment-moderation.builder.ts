@@ -172,7 +172,11 @@ class CommentVersionBuilder {
 
 class CommentModerationBuilder {
   private moderation: Partial<
-    CommentModeration & { commentVersion: Partial<CommentVersion> }
+    CommentModeration & {
+      commentVersion: Partial<CommentVersion> & {
+        comment: Partial<Comment> | undefined;
+      };
+    }
   > = {};
 
   constructor(moderation?: CommentModeration) {
@@ -184,7 +188,14 @@ class CommentModerationBuilder {
     return this;
   }
 
-  withCommentVersion(commentVersion: CommentVersion): CommentModerationBuilder {
+  withComment(comment: Comment): CommentModerationBuilder {
+    this.moderation.commentVersion.comment = comment;
+    return this;
+  }
+
+  withCommentVersion(
+    commentVersion: CommentVersion & { comment: Partial<Comment> | undefined },
+  ): CommentModerationBuilder {
     this.moderation.commentVersion = commentVersion;
     return this;
   }
