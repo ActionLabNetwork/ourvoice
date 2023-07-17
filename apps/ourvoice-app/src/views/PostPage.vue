@@ -1,7 +1,7 @@
 <template>
   <Suspense>
-    <div class="overflow-y-auto">
-      <div class="sticky top-0 pt-5 pl-5">
+    <div class="overflow-y-scroll">
+      <div class="pt-10 pl-10">
         <BackButton />
       </div>
       <div class="max-w-5xl w-full mx-auto px-5">

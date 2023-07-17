@@ -1,6 +1,8 @@
 <template>
-  <div class="mx-auto p-5 w-full min-h-screen bg-gray-200 overflow-y-scroll">
-    <BackButton />
+  <div class="mx-auto w-full min-h-screen bg-gray-200 overflow-y-scroll">
+    <div class="pt-10 pl-10">
+      <BackButton />
+    </div>
     <Suspense>
       <CreatePost />
     </Suspense>

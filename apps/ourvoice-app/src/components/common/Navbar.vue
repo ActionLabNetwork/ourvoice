@@ -10,6 +10,7 @@
       </div>
       <!-- Desktop Menu -->
       <div class="flex lg:hidden">
+        <CreatePostNavButton class="inline-flex mr-5" v-if="route.path === '/posts'" />
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -103,24 +104,25 @@
             <PopoverPanel
               class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
             >
-              <div class="p-4">
-                <div
-                  class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
-                >
-                  <div class="flex-auto">
-                    <div v-on:click="signOut" class="block font-semibold text-white">
-                      Sign Out
-                      <span class="absolute inset-0" />
-                    </div>
+              <!-- <div class="p-4"> -->
+              <div
+                class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+              >
+                <div class="flex-auto">
+                  <div v-on:click="signOut" class="block font-semibold text-white">
+                    Sign Out
+                    <span class="absolute inset-0" />
                   </div>
                 </div>
               </div>
+              <!-- </div> -->
             </PopoverPanel>
           </TransitionRoot>
         </Popover>
       </div>
-      <CreatePostNavButton v-if="route.path === '/posts'" />
+      <CreatePostNavButton class="hidden lg:inline-flex ml-5" v-if="route.path === '/posts'" />
     </nav>
+
     <!-- Mobile Menu -->
     <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
       <div class="fixed inset-0 z-10" />

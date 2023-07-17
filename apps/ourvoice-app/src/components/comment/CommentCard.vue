@@ -4,66 +4,63 @@
   <!-- {{ hasUpvote }} -->
   <!-- {{ hasDownvote }} -->
   <div class="flex">
-    <div class="flex-shrink-0 mr-1 md:mr-3">
-      <img
-        class="rounded-full w-6 h-6 sm:w-8 sm:h-8 hover:cursor-pointer"
-        :src="`https://ui-avatars.com/api/?size=48?&name=${comment?.authorNickname}`"
-      />
-    </div>
-    <div class="flex-1">
-      <b class="text-sm">
-        {{ comment?.authorNickname }} reply to
-        <span class="text-blue-500 hover:underline hover:cursor-pointer">
-          @{{ comment?.parent?.authorNickname ?? 'original post' }}
-        </span>
-      </b>
-      <span class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</span>
-      <div
-        class="bg-white rounded-lg border transition duration-300 ease-in-out px-6 py-4 leading-relaxed"
+    <div class="flex-none w-12 mr-2">
+      <!-- TODO -->
+      <span
+        class="h-12 w-12 rounded-full inline-flex justify-center items-center uppercase font-semibold text-white text-2xl"
+        :class="bgclass"
+        >{{ comment?.authorNickname[0] }}</span
       >
-        <div class="text-sm md:text-md py-2">
-          <p class="break-all">
-            <font-awesome-icon icon="fa-solid fa-quote-left" />
-            {{ comment?.content }}
-            <font-awesome-icon icon="fa-solid fa-quote-right" />
-          </p>
-        </div>
-        <div class="flex justify-between">
-          <div class="flex">
-            <button
-              @click.stop="voteForComment('UPVOTE')"
-              type="button"
-              class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
-            >
-              <span class="inline-flex items-center gap-1">
-                {{ comment?.votesUp }}
-                <IconThumb :fill="hasUpvote" :thumbup="true" />
-              </span>
-            </button>
-
-            <button
-              @click.stop="voteForComment('DOWNVOTE')"
-              type="button"
-              class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
-            >
-              <span class="inline-flex items-center gap-1">
-                {{ comment?.votesDown }}
-                <IconThumb :fill="hasDownvote" :thumbup="false" />
-              </span>
-            </button>
-          </div>
-          <div>
-            <button
-              @click="showReply = !showReply"
-              type="button"
-              class="hover:underline text-sm lg:text-base"
-            >
-              reply
-            </button>
-          </div>
-        </div>
-        <CreateComment v-if="showReply" :commentId="comment?.id" :postId="comment?.post.id" />
+    </div>
+    <!-- TODO -->
+    <div class="flex-1 pl-4 pr-6 py-4 leading-relaxed card bg-opacity-10" :class="bgclass">
+      <span class="font-semibold">{{ comment?.authorNickname }} reply to</span>
+      <span class="text-ourvoice-sky text-sm hover:underline hover:cursor-pointer">
+        @{{ comment?.parent?.authorNickname ?? 'original post' }}
+      </span>
+      <div class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</div>
+      <div class="text-sm md:text-md py-2">
+        <p class="break-all">
+          <font-awesome-icon icon="fa-solid fa-quote-left" />
+          {{ comment?.content }}
+          <font-awesome-icon icon="fa-solid fa-quote-right" />
+        </p>
       </div>
+      <div class="flex justify-between">
+        <div class="flex">
+          <button
+            @click.stop="voteForComment('UPVOTE')"
+            type="button"
+            class="text-gray-900 border border-gray-300 font-medium rounded-full text-sm px-5 py-1 mr-2"
+          >
+            <span class="inline-flex items-center gap-1">
+              {{ comment?.votesUp }}
+              <IconThumb :fill="hasUpvote" :thumbup="true" />
+            </span>
+          </button>
+
+          <button
+            @click.stop="voteForComment('DOWNVOTE')"
+            type="button"
+            class="text-gray-900 border border-gray-300 font-medium rounded-full text-sm px-5 py-1 mr-2"
+          >
+            <span class="inline-flex items-center gap-1">
+              {{ comment?.votesDown }}
+              <IconThumb :fill="hasDownvote" :thumbup="false" />
+            </span>
+          </button>
+        </div>
+        <div>
+          <button
+            @click="showReply = !showReply"
+            type="button"
+            class="hover:underline text-sm lg:text-base"
+          >
+            reply
+          </button>
+        </div>
+      </div>
+      <CreateComment v-if="showReply" :commentId="comment?.id" :postId="comment?.post.id" />
     </div>
   </div>
 </template>
@@ -79,11 +76,15 @@ import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { useUserStore } from '@/stores/user'
-
+import { indexToColor } from '@/utils'
 const props = defineProps({
   commentId: {
     type: Number,
     required: true
+  },
+  indexInList: {
+    type: Number,
+    required: false
   }
 })
 
@@ -124,6 +125,9 @@ onResult(({ data, loading }) => {
       id: vote.comment.id
     }
   }))
+})
+const bgclass = computed(() => {
+  return indexToColor(props.indexInList ?? 0)
 })
 
 const commentStore = useCommentsStore()

@@ -9,7 +9,7 @@
     <div class="flex-1">
       <textarea
         v-model="input"
-        class="rounded-3xl p-3 bg-gray-100 resize-none w-full focus:outline-none max-h-40 hover:cursor-pointer focus:cursor-auto"
+        class="rounded-3xl px-4 py-3 bg-stone-300/25 resize-none w-full focus:outline-none max-h-40 hover:cursor-pointer focus:cursor-auto"
         :class="[{ 'placeholder:opacity-50': focused }]"
         @focus="handleFocus"
         maxlength="255"
@@ -19,9 +19,9 @@
       <div class="flex">
         <span v-if="showErrorMessage" class="text-xs text-red-500"> Content cannot be empty </span>
         <span class="flex-1"></span>
-        <span v-if="focused || input" class="text-xs text-blue-500"
+        <!-- <span v-if="focused || input" class="text-xs text-blue-500"
           >{{ input?.length ?? 0 }}/255</span
-        >
+        > -->
       </div>
     </div>
 

@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-col overflow-y-auto relative" ref="scrollContainer">
+  <div class="flex flex-col overflow-y-scroll relative" ref="scrollContainer">
     <PostSortFilter />
     <div class="max-w-5xl w-full mx-auto px-5">
       <PostCard
         v-for="post in posts"
         :key="post.id"
         :postId="post.id"
-        @click="showCommentList(post.id)"
+        class="card card-outline card-hover"
       />
     </div>
     <div v-if="state == 'loading-initial'" class="flex flex-col">
@@ -40,9 +40,4 @@ watchEffect(() => {
     postStore.loadMorePosts()
   }
 })
-
-const showCommentList = (postId: number) => {
-  // might add certain click logic here
-  // console.log('postId:', postId, 'clicked')
-}
 </script>
