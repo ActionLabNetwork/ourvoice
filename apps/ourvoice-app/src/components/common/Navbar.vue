@@ -156,7 +156,9 @@
           </Popover>
         </div>
       </div>
-      <CreatePostNavButton class="hidden lg:inline-flex ml-5" v-if="route.path === '/posts'" />
+      <div class="hidden lg:flex lg:flex-none lg:justify-end">
+        <CreatePostNavButton class="hidden lg:inline-flex ml-5" v-if="route.path === '/posts'" />
+      </div>
     </nav>
 
     <!-- Mobile Menu -->

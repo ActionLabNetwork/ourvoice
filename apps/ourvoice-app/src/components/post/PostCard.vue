@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden my-6 p-6 break-all">
+  <div class="break-all">
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}
       <div>
