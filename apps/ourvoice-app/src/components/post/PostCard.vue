@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden border-2 my-6 p-6 bg-white rounded-xl break-all hover:shadow-lg transition duration-500 ease-in-out"
+    class="overflow-hidden border my-6 p-6 bg-white rounded-xl break-all shadow transition duration-500 ease-in-out"
   >
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}
@@ -8,7 +8,7 @@
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
           ># {{ cat?.name }}
         </span>
       </div>
@@ -24,7 +24,7 @@
     </p>
     <div id="fileUrlsWrapper" class="text-right">
       <a
-        class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline"
+        class="font-medium text-sm text-blue-600 hover:underline"
         v-for="url in presignedUrls"
         :key="url"
         :href="url"
@@ -38,7 +38,7 @@
         <button
           @click.stop="voteForPost('UPVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
@@ -49,7 +49,7 @@
         <button
           @click.stop="voteForPost('DOWNVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}
@@ -69,10 +69,13 @@
         </slot>
       </div>
     </div>
+    <div class="h-px my-5 border border-stone-300 border-opacity-50"></div>
+    <CreateComment :postId="post?.id" />
   </div>
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
+import CreateComment from '../comment/CreateComment.vue'
 import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { usePostsStore } from '@/stores/posts'
