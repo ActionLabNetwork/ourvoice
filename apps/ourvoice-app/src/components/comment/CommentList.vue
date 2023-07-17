@@ -1,5 +1,5 @@
 <template>
-  <div class="px-6 mb-10">
+  <div class="px-6 my-10">
     <div class="mb-3 flex items-center tracking-wide">
       <div v-if="totalCount" class="text-xs lg:text-sm text-gray-500 font-semibold">
         {{ totalCount }} Comments

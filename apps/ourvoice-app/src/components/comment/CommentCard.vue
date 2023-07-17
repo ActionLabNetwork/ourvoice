@@ -3,17 +3,15 @@
   <!-- {{ votes }} -->
   <!-- {{ hasUpvote }} -->
   <!-- {{ hasDownvote }} -->
-  <div class="flex">
-    <div class="flex-none w-12 mr-2">
-      <!-- TODO -->
+  <div class="flex gap-2">
+    <div class="flex-none w-12">
       <span
         class="h-12 w-12 rounded-full inline-flex justify-center items-center uppercase font-semibold text-white text-2xl"
         :class="bgclass"
         >{{ comment?.authorNickname[0] }}</span
       >
     </div>
-    <!-- TODO -->
-    <div class="flex-1 pl-4 pr-6 py-4 leading-relaxed card bg-opacity-10" :class="bgclass">
+    <div class="flex-1 leading-relaxed card bg-opacity-10" :class="bgclass">
       <span class="font-semibold">{{ comment?.authorNickname }} reply to</span>
       <span class="text-ourvoice-sky text-sm hover:underline hover:cursor-pointer">
         @{{ comment?.parent?.authorNickname ?? 'original post' }}
