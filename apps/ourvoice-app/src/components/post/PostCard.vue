@@ -32,11 +32,11 @@
       </a>
     </div>
     <div class="mt-6 flex justify-between items-center">
-      <div class="flex">
+      <div class="flex gap-2">
         <button
           @click.stop="voteForPost('UPVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
+          class="btn-outline btn-rounded font-medium text-sm"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
@@ -47,7 +47,7 @@
         <button
           @click.stop="voteForPost('DOWNVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2"
+          class="btn-outline btn-rounded font-medium text-sm"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}
