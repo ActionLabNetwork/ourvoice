@@ -26,12 +26,7 @@
     </div>
 
     <div v-if="focused || input" class="flex-none">
-      <button
-        class="bg-yellow-400 hover:bg-yellow-500 py-3 px-4 rounded-full text-sm"
-        @click="handleSubmit"
-      >
-        Send
-      </button>
+      <button class="btn-yellow btn-rounded py-3 text-sm" @click="handleSubmit">Send</button>
     </div>
     <Toast
       :type="toastType"

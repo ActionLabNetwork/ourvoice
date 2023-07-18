@@ -25,13 +25,13 @@
         </p>
       </div>
       <div class="flex justify-between">
-        <div class="flex">
+        <div class="flex gap-2">
           <button
             @click.stop="voteForComment('UPVOTE')"
             type="button"
-            class="text-gray-900 border border-gray-300 font-medium rounded-full text-sm px-5 py-1 mr-2"
+            class="btn-outline btn-rounded font-medium text-sm"
           >
-            <span class="inline-flex items-center gap-1">
+            <span class="inline-flex items-center gap-2">
               {{ comment?.votesUp }}
               <IconThumb :fill="hasUpvote" :thumbup="true" />
             </span>
@@ -40,7 +40,7 @@
           <button
             @click.stop="voteForComment('DOWNVOTE')"
             type="button"
-            class="text-gray-900 border border-gray-300 font-medium rounded-full text-sm px-5 py-1 mr-2"
+            class="btn-outline btn-rounded font-medium text-sm"
           >
             <span class="inline-flex items-center gap-1">
               {{ comment?.votesDown }}
