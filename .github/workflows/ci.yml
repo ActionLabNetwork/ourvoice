@@ -137,12 +137,10 @@ jobs:
         run: pnpm install
 
       - name: API - unit tests
-        working-directory: apps/ourvoice-api
-        run: pnpm test
+        run: pnpm test:api
 
       - name: API - integration tests
-        working-directory: apps/ourvoice-api
-        run: pnpm test:integration
+        run: pnpm test:api:integration
 
       # - name: Cypress Cache path
       #   working-directory: apps/ourvoice-app
@@ -318,7 +316,6 @@ jobs:
   #       run: |
   #         echo "Incrementing git tag"
   #         # bash ./deployment/build-docker/git_tag_update.sh -v patch
-
 
   #     # Building docker containers
   #     - name: Docker metadata
