@@ -12,7 +12,7 @@ import {
   Prisma,
   CommentVersion,
   CommentModeration,
-} from '@prisma-moderation-db/client';
+} from '@internals/@prisma-moderation-db/client';
 import { PrismaService } from '../../../database/moderation/prisma.service';
 import {
   ModerationCommentPaginationInput,

@@ -1,5 +1,5 @@
 import { ContactFormRepository } from './contactform.repository';
-import { Prisma } from '@prisma-contactform-db/client';
+import { Prisma } from '@internals/@prisma-contactform-db/client';
 import { ContactFormPrismaService } from '../../database/contactform-prisma.service';
 import { Test } from '@nestjs/testing';
 

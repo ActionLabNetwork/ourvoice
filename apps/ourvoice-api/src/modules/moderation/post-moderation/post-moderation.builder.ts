@@ -4,7 +4,7 @@ import {
   PostModeration,
   PostStatus,
   Decision,
-} from '@prisma-moderation-db/client';
+} from '@internals/@prisma-moderation-db/client';
 
 class PostBuilder {
   private post: Partial<

@@ -5,7 +5,7 @@ import {
   Post,
   PostVersion,
   PostModeration,
-} from '@prisma-moderation-db/client';
+} from '@internals/@prisma-moderation-db/client';
 import { PrismaService } from '../../../database/moderation/prisma.service';
 import { PostModerationService } from './post-moderation.service';
 import { Test, TestingModule } from '@nestjs/testing';

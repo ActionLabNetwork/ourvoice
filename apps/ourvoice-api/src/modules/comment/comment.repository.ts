@@ -1,6 +1,6 @@
 import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Comment } from '@prisma-main-db/client';
+import { Prisma, Comment } from '@internals/@prisma-main-db/client';
 import { CommentsFilterInput, CommentPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 
