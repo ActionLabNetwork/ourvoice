@@ -54,7 +54,7 @@
             type="button"
             class="hover:underline text-sm lg:text-base"
           >
-            reply
+            Reply
           </button>
         </div>
       </div>
