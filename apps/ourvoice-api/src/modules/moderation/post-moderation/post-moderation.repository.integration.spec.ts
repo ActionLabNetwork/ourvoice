@@ -147,12 +147,12 @@ describe('PostRepository', () => {
               if (key === 'database.moderationUrl') {
                 return (
                   process.env.DATABASE_MODERATION_URL ||
-                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer'
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer'
                 );
               } else if (key === 'database.moderationTestUrl') {
                 return (
                   process.env.DATABASE_MODERATION_TEST_URL ||
-                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test'
                 );
               } else if (key === 'database.mainTestUrl') {
                 return (

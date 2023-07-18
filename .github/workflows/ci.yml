@@ -202,7 +202,7 @@ jobs:
         env:
           POSTGRES_USER: your_db_user
           POSTGRES_PASSWORD: your_db_password
-          POSTGRES_DB: ourvoice_db_pre
+          POSTGRES_DB: ourvoice_db_mod
           options: >-
             --health-cmd pg_isready
             --health-interval 10s
