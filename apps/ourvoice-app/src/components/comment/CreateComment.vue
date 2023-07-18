@@ -28,6 +28,8 @@
     <div v-if="focused || input" class="flex-none">
       <button class="btn-yellow btn-rounded py-3 text-sm" @click="handleSubmit">Send</button>
     </div>
+  </div>
+  <div>
     <Toast
       :type="toastType"
       :message="toastMessage"
@@ -101,13 +103,7 @@ const handleSubmit = async () => {
     toastMessage.value = 'Error creating comment'
     toastType.value = 'danger'
   }
-  watch(showToast, (newValue) => {
-    if (newValue) {
-      setTimeout(() => {
-        showToast.value = false
-      }, 3000)
-    }
-  })
+
   // TODO remove this
   console.log({
     postId: props.postId,
@@ -116,4 +112,11 @@ const handleSubmit = async () => {
   })
   input.value = ''
 }
+watch(showToast, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      showToast.value = false
+    }, 3000)
+  }
+})
 </script>
