@@ -71,7 +71,7 @@ jobs:
       DB_TEST_APP_API_DB_MOD_HOST: localhost
       DB_TEST_APP_API_DB_MOD_PORT: 5437
       NODE_ENV: test
-      NODE_PATH: ./node_modules
+      NODE_PATH: apps/ourvoice-api/node_modules
 
     strategy:
       matrix:

@@ -10,7 +10,7 @@ import {
   Comment,
   CommentVersion,
   CommentModeration,
-} from '@internals/@prisma-moderation-db/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationCommentsFilterDto } from './dto/comments-filter.dto';
 import { CommentModerationRepository } from './comment-moderation.repository';

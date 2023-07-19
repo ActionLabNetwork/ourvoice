@@ -16,9 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@internals/*": ["node_modules/*"]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }

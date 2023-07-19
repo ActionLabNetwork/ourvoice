@@ -1,6 +1,6 @@
 import { PrismaService } from '../../database/main/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post, Prisma } from '@internals/@prisma-main-db/client';
+import { Post, Prisma } from '@prisma-main-db/client';
 import {
   PostsFilterInput,
   PostPaginationInput,

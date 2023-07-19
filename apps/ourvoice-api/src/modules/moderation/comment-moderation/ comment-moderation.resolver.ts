@@ -8,10 +8,7 @@ import {
   ModerationCommentsFilterInput,
 } from 'src/graphql';
 import { CommentModerationService } from './comment-moderation.service';
-import {
-  Comment,
-  CommentVersion,
-} from '@internals/@prisma-moderation-db/client';
+import { Comment, CommentVersion } from '@prisma-moderation-db/client';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../../auth/auth.guard';
 import { GqlSession } from 'src/auth/session.decorator';

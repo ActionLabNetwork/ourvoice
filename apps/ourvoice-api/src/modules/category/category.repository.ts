@@ -1,4 +1,4 @@
-import { Category, Prisma } from '@internals/@prisma-main-db/client';
+import { Category, Prisma } from '@prisma-main-db/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/main/prisma.service';
 import { CategoriesFilterInput, CategoryPaginationInput } from 'src/graphql';

@@ -9,7 +9,7 @@ import {
   ModerationPostModifyInput,
 } from '../../../graphql';
 import { PostModerationService } from './post-moderation.service';
-import { Post, PostVersion } from '@internals/@prisma-moderation-db/client';
+import { Post, PostVersion } from '@prisma-moderation-db/client';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';

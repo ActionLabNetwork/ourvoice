@@ -11,7 +11,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { Category } from '@internals/@prisma-main-db/client';
+import { Category } from '@prisma-main-db/client';
 import { CategoryCreateDto } from './dto/category-create.dto';
 import { validate } from 'class-validator';
 import { CategoriesFilterDto } from './dto/categories-filter.dto';

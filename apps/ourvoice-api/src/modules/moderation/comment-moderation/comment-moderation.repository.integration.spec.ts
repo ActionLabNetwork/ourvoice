@@ -5,7 +5,7 @@ import {
   PostVersion,
   CommentVersion,
   Decision,
-} from '@internals/@prisma-moderation-db/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { seedDb } from '../../../../prisma-moderation/seed';
 import { PrismaService } from '../../../database/moderation/prisma.service';

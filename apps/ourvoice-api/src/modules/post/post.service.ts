@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Post } from '@internals/@prisma-main-db/client';
+import { Post } from '@prisma-main-db/client';
 import { PostRepository } from './post.repository';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';

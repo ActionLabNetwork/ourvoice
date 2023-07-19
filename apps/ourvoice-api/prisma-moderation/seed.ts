@@ -2,7 +2,7 @@ import {
   PrismaClient,
   Decision,
   PostStatus,
-} from '@internals/@prisma-moderation-db/client';
+} from '@prisma-moderation-db/client';
 import {
   adjectives,
   animals,
