@@ -2,7 +2,13 @@ import type { CodegenConfig } from '@graphql-codegen/cli'
 import * as path from 'path'
 
 const config: CodegenConfig = {
-  schema: 'http://localhost:3000/graphql',
+  // for some reason codegen needs the datetime.graphql to be specified first
+  // or else it cannot resolve the DateTime scalar type
+  schema: [
+    "../ourvoice-api/src/graphql/schemas/datetime.graphql",
+    "../ourvoice-api/src/modules/**/*.graphql",
+    "../ourvoice-api/src/graphql/schemas/user.graphql",
+  ],
   documents: path.join("./src/graphql/**/**.ts"),
   ignoreNoDocuments: false,
   generates: {
