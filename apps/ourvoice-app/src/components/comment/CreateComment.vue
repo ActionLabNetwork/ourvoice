@@ -26,7 +26,7 @@
     </div>
 
     <div v-if="focused || input" class="flex-none">
-      <button class="btn-yellow btn-rounded py-3 text-sm" @click="handleSubmit">Send</button>
+      <button class="btn-primary btn-rounded py-3 text-sm" @click="handleSubmit">Send</button>
     </div>
   </div>
   <div>

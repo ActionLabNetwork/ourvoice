@@ -5,8 +5,8 @@
     </div> -->
     <!-- Content -->
     <div class="flex fill flex-1 flex-col items-center lg:items-start">
-      <h1 class="text-ourvoice-blue text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
-        <span class="text-ourvoice-red">OurVoice</span> {{ deployment.toUpperCase() }} App
+      <h1 class="text-btn-secondary-1 text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
+        <span class="text-ourvoice-primary-2">OurVoice</span> {{ deployment.toUpperCase() }} App
       </h1>
       <!-- Deployment description -->
       <Description class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
@@ -16,18 +16,18 @@
       </p>
       <div v-if="!session" class="flex justify-center flex-wrap gap-6">
         <a :href="authURL"
-          ><button type="button" class="btn-rounded btn-yellow btn-hover">Get Started</button></a
+          ><button type="button" class="btn-rounded btn-primary btn-hover">Get Started</button></a
         >
       </div>
       <div v-else class="flex justify-center flex-wrap gap-6">
         <a href="/posts"
-          ><button type="button" class="btn-rounded btn-yellow btn-hover">Get Started</button></a
+          ><button type="button" class="btn-rounded btn-primary btn-hover">Get Started</button></a
         >
       </div>
       <!-- Deployment info -->
       <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
       <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"
-        ><button type="button" class="btn-rounded btn-yellow btn-hover">Learn More</button></a
+        ><button type="button" class="btn-rounded btn-primary btn-hover">Learn More</button></a
       >
     </div>
 

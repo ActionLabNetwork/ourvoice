@@ -30,32 +30,6 @@
     @apply px-4 py-2 rounded-full transition duration-300;
   }
 
-  .btn-hover {
-    @apply hover:bg-ourvoice-grey hover:text-white;
-  }
-
-  .card {
-    @apply p-6 rounded-lg break-all;
-  }
-  .card-outline {
-    @apply bg-white shadow-lg border;
-  }
-
-  .card-hover {
-    @apply hover:shadow-xl transition duration-300 ease-in-out;
-  }
-}
-@layer utilities {
-  @variants responsive {
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-
-  .btn-rounded {
-    @apply px-4 py-2 rounded-full transition duration-300;
-  }
-
   .btn-purple {
     @apply bg-ourvoice-purple text-white;
   }
@@ -72,10 +46,6 @@
     @apply hover:bg-ourvoice-grey hover:text-white;
   }
 
-  .btn-outline {
-    @apply border border-stone-300 hover:border-zinc-900 text-black;
-  }
-
   .card {
     @apply p-6 rounded-lg break-all;
   }
@@ -87,6 +57,7 @@
     @apply hover:shadow-xl transition duration-300 ease-in-out;
   }
 }
+
 @layer utilities {
   @variants responsive {
     /* Hide scrollbar for Chrome, Safari and Opera */
