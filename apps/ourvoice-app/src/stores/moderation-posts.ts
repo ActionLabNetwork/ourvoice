@@ -68,7 +68,6 @@ export interface ModerationPostsState {
 }
 
 interface Edge<T> {
-  cursor: string
   node: T
 }
 
