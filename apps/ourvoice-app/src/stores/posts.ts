@@ -4,7 +4,7 @@ import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresigne
 import type { ApolloError } from '@apollo/client/errors'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { apolloClient } from './../graphql/client/index'
+import { apolloClient, evictItem } from './../graphql/client/index'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
 import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
@@ -76,7 +76,6 @@ export const usePostsStore = defineStore('posts', {
               createdAfter: this.sortFilter.createdAfter
             }
           },
-          fetchPolicy: 'no-cache'
         })
 
         if (!data) {
