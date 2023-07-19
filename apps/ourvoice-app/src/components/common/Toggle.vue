@@ -1,13 +1,24 @@
 <template>
   <div class="mx-5 py-1 bg-white rounded-full">
-    <div class="grid grid-cols-2 justify-center text-center px-2 w-64">
-      <div
-        class="rounded-full px-3 py-3 transition duration-300 ease-in-out"
-        :class="[!enabled ? 'translate-x-[7.6rem]' : '']"
-      >
+    <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
+      <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
-          :class="{ 'opacity-0': transitioning, 'opacity-100': !transitioning }"
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
+          :class="[enabled ? 'invisible' : 'visible']"
+        >
+          <span>
+            <img
+              :src="enabled ? props.items.right.iconLight : props.items.left.iconLight"
+              alt="icon"
+            />
+          </span>
+          <span>{{ enabled ? props.items.right.label : props.items.left.label }}</span>
+        </div>
+      </div>
+      <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
+        <div
+          class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
+          :class="[!enabled ? 'invisible' : 'visible']"
         >
           <span>
             <img
@@ -22,8 +33,8 @@
       <!-- This is the element that's moving -->
       <button
         @click="toggle"
-        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out"
-        :class="[enabled ? '' : '-translate-x-[7.6rem]']"
+        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5"
+        :class="[enabled ? '' : 'translate-x-[6.5rem]']"
       >
         <div class="flex gap-2 min-w-24 justify-center">
           <span>
@@ -52,12 +63,18 @@ type ToggleItems = {
   }
 }
 
+type Events = {
+  onToggle: { (e: 'onToggle', direction: 'left' | 'right'): void }
+}
+
 const props = defineProps({
   items: {
     type: Object as () => ToggleItems,
     required: true
   }
 })
+
+const emit = defineEmits<Events['onToggle']>()
 
 const enabled = ref(false)
 const transitioning = ref(false)
@@ -72,5 +89,7 @@ const toggle = () => {
   setTimeout(() => {
     transitioning.value = false
   }, 200)
+
+  emit('onToggle', enabled.value ? 'right' : 'left')
 }
 </script>

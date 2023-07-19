@@ -1,18 +1,22 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
-      class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
+      class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
       aria-label="Global"
     >
       <!-- Logo -->
-      <div class="flex lg:flex-1">
+      <div class="flex">
         <a href="#" class="-m-1.5 p-1.5">
           <span class="sr-only">OurVoice</span>
           <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
         </a>
       </div>
-      <!-- Desktop Menu -->
-      <div class="flex lg:hidden">
+      <!-- Toggle -->
+      <div class="w-fit justify-self-center">
+        <Toggle :items="toggleItems" @on-toggle="handleToggle" />
+      </div>
+      <!-- Hamburger icon -->
+      <div class="flex lg:hidden justify-self-end">
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -23,107 +27,126 @@
           <font-awesome-icon class="w-5 h-5" :icon="['fas', 'fa-bars']" />
         </button>
       </div>
-      <PopoverGroup class="hidden lg:flex lg:gap-x-12">
-        <router-link
-          :to="item.href"
-          v-for="item in navItems"
-          :key="item.id"
-          class="text-sm font-semibold leading-6 text-white hover:bg-gray-700"
-          @click.prevent="handleItemClick(item.id)"
-        >
-          <span :class="{ 'border-b-2': item.current }">
-            {{ item.name }}
-          </span>
-        </router-link>
-        <Popover
-          :class="{
-            hidden: !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
-          }"
-          class="relative"
-        >
-          <PopoverButton
-            class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
-            :class="{ 'border-b-2': isModerationPage }"
+      <!-- Desktop Menu -->
+      <div class="hidden lg:flex lg:gap-x-10 justify-center justify-self-end">
+        <!-- Nav Items -->
+        <PopoverGroup class="flex gap-10 items-center">
+          <router-link
+            :to="item.href"
+            v-for="item in navItems"
+            :key="item.id"
+            class="text-sm font-semibold leading-6 text-white hover:bg-gray-700"
+            @click.prevent="handleItemClick(item.id)"
           >
-            Moderation
-            <font-awesome-icon :icon="['fas', 'fa-chevron-down']" />
-          </PopoverButton>
-
-          <TransitionRoot
-            enter-active-class="transition ease-out duration-200"
-            enter-from-class="opacity-0 translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition ease-in duration-150"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 translate-y-1"
+            <span :class="{ 'border-b-2': item.current }">
+              {{ item.name }}
+            </span>
+          </router-link>
+          <Popover
+            :class="{
+              hidden: !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
+            }"
+            class="relative"
+            v-slot="{ open, close }"
           >
-            <PopoverPanel
-              class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+            <PopoverButton
+              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
+              :class="{ 'border-b-2': isModerationPage }"
             >
-              <div class="p-4">
-                <div
-                  v-for="item in moderation"
-                  :key="item.name"
-                  class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
-                >
-                  <div class="flex-auto">
-                    <router-link :to="item.href" class="block font-semibold text-white">
-                      {{ item.name }}
-                      <span class="absolute inset-0" />
-                    </router-link>
-                  </div>
-                </div>
-              </div>
-            </PopoverPanel>
-          </TransitionRoot>
-        </Popover>
-      </PopoverGroup>
-      <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-        <Popover class="relative">
-          <PopoverButton
-            class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
-          >
-            <div class="flex-shrink-0 mr-0">
-              <img
-                class="inline-block h-9 w-9 rounded-full"
-                :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
-                alt="PseudoNickname"
+              Moderation
+              <font-awesome-icon
+                :icon="['fas', 'fa-chevron-down']"
+                class="transition-transform"
+                :class="{ 'rotate-180': open }"
               />
-            </div>
-            <p class="text-white inline-block my-auto ml-2">
-              {{ userStore.nickname }}
-            </p>
-            <font-awesome-icon :icon="['fas', 'fa-chevron-down']" />
-          </PopoverButton>
-          <TransitionRoot
-            enter-active-class="transition ease-out duration-200"
-            enter-from-class="opacity-0 translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition ease-in duration-150"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 translate-y-1"
-          >
-            <PopoverPanel
-              class="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+            </PopoverButton>
+
+            <TransitionRoot
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="opacity-0 translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-1"
             >
-              <div class="p-4">
-                <div
-                  class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
-                >
-                  <div class="flex-auto">
-                    <div v-on:click="signOut" class="block font-semibold text-white">
-                      Sign Out
-                      <span class="absolute inset-0" />
+              <PopoverPanel
+                class="absolute -left-8 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+                static
+              >
+                <div class="p-4" v-if="open">
+                  <div
+                    v-for="item in moderation"
+                    :key="item.name"
+                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                  >
+                    <div class="flex-auto">
+                      <router-link
+                        :to="item.href"
+                        class="block font-semibold text-white"
+                        @click.prevent="() => close()"
+                      >
+                        {{ item.name }}
+                        <span class="absolute inset-0" />
+                      </router-link>
                     </div>
                   </div>
                 </div>
+              </PopoverPanel>
+            </TransitionRoot>
+          </Popover>
+        </PopoverGroup>
+        <!-- User Settings -->
+        <div>
+          <Popover class="relative" v-slot="{ open }">
+            <PopoverButton
+              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
+            >
+              <div class="flex-shrink-0 mr-0">
+                <img
+                  class="inline-block h-9 w-9 rounded-full"
+                  :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
+                  alt="PseudoNickname"
+                />
               </div>
-            </PopoverPanel>
-          </TransitionRoot>
-        </Popover>
-      </div>
-      <div>
-        <Toggle :items="toggleItems" />
+              <font-awesome-icon
+                :icon="['fas', 'fa-chevron-down']"
+                class="transition-transform"
+                :class="{ 'rotate-180': open }"
+              />
+            </PopoverButton>
+            <TransitionRoot
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="opacity-0 translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-1"
+            >
+              <PopoverPanel
+                class="absolute -left-14 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+              >
+                <div class="p-4">
+                  <div
+                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                  >
+                    <div class="flex-auto">
+                      <div
+                        v-on:click="signOut"
+                        class="block font-semibold text-white cursor-pointer"
+                      >
+                        Sign Out
+                        <span class="absolute inset-0" />
+                      </div>
+                      <p class="text-white inline-block my-auto underline underline-offset-4">
+                        {{ userStore.nickname }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </PopoverPanel>
+            </TransitionRoot>
+          </Popover>
+        </div>
       </div>
     </nav>
     <!-- Mobile Menu -->
@@ -233,6 +256,7 @@ import ThreadsIcon from '@/assets/icons/threads.svg'
 import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
 import PollsIcon from '@/assets/icons/polls.svg'
 import PollsIconDark from '@/assets/icons/polls-dark.svg'
+import router from '@/router'
 
 const toggleItems = {
   left: {
@@ -263,9 +287,7 @@ const signOut = async () => {
 
 // Single level nav items
 const navItems = ref([
-  { id: 1, name: 'Home', href: '/', current: currentPath.value === '/' },
-  { id: 2, name: 'Active Threads', href: '/posts', current: currentPath.value === '/posts' },
-  { id: 3, name: 'Polls', href: '/polls', current: currentPath.value === '/polls' }
+  { id: 1, name: 'About', href: '/about', current: currentPath.value === '/about' }
 ])
 
 // Multi level nav items
@@ -292,6 +314,10 @@ const handleItemClick = (id: number) => {
     item.current = item.id === id
   }
   moderation.value = moderation.value.map((item) => ({ ...item, current: false }))
+
+  if (mobileMenuOpen.value) {
+    mobileMenuOpen.value = false
+  }
 }
 
 const handleChildItemClick = (id: number) => {
@@ -299,6 +325,18 @@ const handleChildItemClick = (id: number) => {
     item.current = item.id === id
   }
   navItems.value = navItems.value.map((item) => ({ ...item, current: false }))
+
+  if (mobileMenuOpen.value) {
+    mobileMenuOpen.value = false
+  }
+}
+
+const handleToggle = (direction: 'left' | 'right') => {
+  if (direction === 'left') {
+    router.push('/posts')
+  } else {
+    router.push('/polls')
+  }
 }
 
 const isModerationPage = computed(() => {
@@ -308,9 +346,7 @@ const isModerationPage = computed(() => {
 watchEffect(() => {
   // Single level nav items
   navItems.value = [
-    { id: 1, name: 'Home', href: '/', current: currentPath.value === '/' },
-    { id: 2, name: 'Active Threads', href: '/posts', current: currentPath.value === '/posts' },
-    { id: 3, name: 'Polls', href: '/polls', current: currentPath.value === '/polls' }
+    { id: 1, name: 'About', href: '/about', current: currentPath.value === '/about' }
   ]
 
   // Multi level nav items
