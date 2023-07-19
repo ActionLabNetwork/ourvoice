@@ -153,7 +153,7 @@
           <div v-if="!categoriesStore.loading" class="flex justify-end gap-2">
             <button
               type="button"
-              class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-yellow/50 disabled:cursor-not-allowed"
+              class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
               data-cy="reset-form-button"
               @click="resetFormFields"
             >
@@ -162,7 +162,7 @@
             <button
               type="submit"
               :disabled="!isValidForm"
-              class="btn-yellow hover:bg-ourvoice-yellow/70 px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-yellow/50 disabled:cursor-not-allowed"
+              class="btn-primary hover:bg-ourvoice-primary/70 px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
               data-cy="create-post-submit-button"
             >
               Create Post

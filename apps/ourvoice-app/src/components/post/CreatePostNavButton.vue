@@ -1,7 +1,7 @@
 <template>
   <router-link
     to="/post"
-    class="text-sm font-semibold items-center gap-2 py-3 btn-rounded btn-yellow"
+    class="text-sm font-semibold items-center gap-2 py-3 btn-rounded btn-primary"
     ref="createPostNavLink"
   >
     Create Post
