@@ -122,6 +122,9 @@
           </TransitionRoot>
         </Popover>
       </div>
+      <div>
+        <Toggle :items="toggleItems" />
+      </div>
     </nav>
     <!-- Mobile Menu -->
     <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
@@ -209,6 +212,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watchEffect } from 'vue'
+import Toggle from './Toggle.vue'
 import {
   Dialog,
   DialogPanel,
@@ -224,6 +228,24 @@ import { useUserStore } from '@/stores/user'
 import { useRoute } from 'vue-router'
 import { useDeploymentStore } from '@/stores/deployment'
 import Session from 'supertokens-web-js/recipe/session'
+
+import ThreadsIcon from '@/assets/icons/threads.svg'
+import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
+import PollsIcon from '@/assets/icons/polls.svg'
+import PollsIconDark from '@/assets/icons/polls-dark.svg'
+
+const toggleItems = {
+  left: {
+    iconLight: ThreadsIcon,
+    iconDark: ThreadsIconDark,
+    label: 'Q/A'
+  },
+  right: {
+    iconLight: PollsIcon,
+    iconDark: PollsIconDark,
+    label: 'Polls'
+  }
+}
 
 const userStore = useUserStore()
 const route = useRoute()
