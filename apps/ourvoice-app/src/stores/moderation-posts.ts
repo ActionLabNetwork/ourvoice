@@ -87,7 +87,6 @@ export interface ModerationPostsState {
 }
 
 interface Edge<T> {
-  cursor: string
   node: T
 }
 
@@ -177,7 +176,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
                 acc.add(id)
               })
             return acc
-          }, new Set())
+          }, new Set<number>())
         )
 
         const { data: categoriesData } = await apolloClient.query({
@@ -185,7 +184,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           variables: { filter: { ids: categoryIds } }
         })
 
-        const categories = categoriesData.categories.edges.map(
+        const categories = categoriesData.categories!.edges.map(
           (edge: Edge<Category>) => edge.node
         ) as Category[]
 
@@ -248,7 +247,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           variables: { filter: { ids: Array.from(categoryIds) } }
         })
 
-        const categories = categoriesData.categories.edges.map(
+        const categories = categoriesData.categories!.edges.map(
           (edge: Edge<Category>) => edge.node
         ) as Category[]
 
