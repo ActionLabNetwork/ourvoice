@@ -122,13 +122,6 @@ export const useCommentsStore = defineStore('comments', {
       authorNickname: string
     }) {
       try {
-        // console.log({
-        //   content,
-        //   parentId,
-        //   postId,
-        //   authorHash,
-        //   authorNickname
-        // })
         const { data } = await apolloClient.mutate({
           mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
@@ -138,7 +131,6 @@ export const useCommentsStore = defineStore('comments', {
               content,
               parentId: parentId ?? null,
               postId: postId ?? null,
-              requiredModerations: 0
             }
           }
         })

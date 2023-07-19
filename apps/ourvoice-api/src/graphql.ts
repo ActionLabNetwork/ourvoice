@@ -136,7 +136,6 @@ export class ModerationCommentCreateInput {
     parentId?: Nullable<number>;
     authorHash: string;
     authorNickname: string;
-    requiredModerations: number;
 }
 
 export class ModerationCommentsFilterInput {
@@ -160,7 +159,6 @@ export class ModerationPostCreateInput {
     files?: Nullable<Nullable<string>[]>;
     authorHash: string;
     authorNickname: string;
-    requiredModerations: number;
 }
 
 export class ModerationPostsFilterInput {

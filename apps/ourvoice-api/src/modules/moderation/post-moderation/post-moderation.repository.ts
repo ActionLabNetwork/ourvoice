@@ -20,6 +20,7 @@ import {
   PostIncludesVersion,
   ModerationIncludesVersion,
 } from '../../../types/moderation/post-moderation';
+import getDeploymentConfig from '../../../config/deployment';
 
 function countPostVersionModerationDecisions(
   version: PostVersion & {
@@ -49,6 +50,7 @@ function countPostVersionModerationDecisions(
 @Injectable()
 export class PostModerationRepository {
   private readonly logger = new Logger(PostModerationRepository.name);
+  private readonly config = getDeploymentConfig();
 
   constructor(
     @Inject(forwardRef(() => PrismaService))
@@ -135,6 +137,7 @@ export class PostModerationRepository {
             version: 1,
           },
         },
+        requiredModerations: this.config.moderatorCount,
       },
       include: { versions: true },
     });

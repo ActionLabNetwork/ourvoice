@@ -119,7 +119,6 @@ describe('CommentModerationService', () => {
       content: '',
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
-      requiredModerations: 1,
     };
 
     // Act & Assert
@@ -134,7 +133,6 @@ describe('CommentModerationService', () => {
       content: 'Test Content',
       authorHash: null,
       authorNickname: null,
-      requiredModerations: 1,
     };
 
     // Act & Assert

@@ -1,7 +1,6 @@
 import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
-  ModerationIncludesVersion,
   ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
@@ -21,6 +20,7 @@ import {
 import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentService } from '../../../modules/comment/comment.service';
+import getDeploymentConfig from '../../../config/deployment';
 
 function countCommentVersionModerationDecisions(
   version: CommentVersion & {
@@ -50,6 +50,7 @@ function countCommentVersionModerationDecisions(
 @Injectable()
 export class CommentModerationRepository {
   private readonly logger = new Logger(CommentModerationRepository.name);
+  private readonly config = getDeploymentConfig();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -179,6 +180,7 @@ export class CommentModerationRepository {
             version: 1,
           },
         },
+        requiredModerations: this.config.moderatorCount,
       },
       include: { versions: { orderBy: { version: 'desc' } } },
     });

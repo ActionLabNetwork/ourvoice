@@ -23,6 +23,7 @@ import {
   PostModerationBuilder,
   PostVersionBuilder,
 } from '../post-moderation/post-moderation.builder';
+import getDeploymentConfig from '../../../config/deployment';
 
 describe('CommentRepository', () => {
   const TOTAL_COMMENTS = 60;
@@ -398,7 +399,7 @@ describe('CommentRepository', () => {
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       postId: 1,
-      requiredModerations: 1,
+      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act
@@ -444,7 +445,7 @@ describe('CommentRepository', () => {
       authorHash: 'Test Nickname',
       postId: 1,
       parentId: 1,
-      requiredModerations: 1,
+      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act

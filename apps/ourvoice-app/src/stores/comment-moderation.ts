@@ -142,46 +142,6 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       }
       this.loading = false
     },
-    // async createComment({
-    //   content,
-    //   postId,
-    //   parentId
-    // }: {
-    //   content: string
-    //   postId: number | undefined
-    //   parentId: number | undefined
-    // }) {
-    //   // Check for valid deployment and user session
-    //   const userStore = useUserStore()
-
-    //   // Check if we can access the session and generate a user hash for storing in the db
-    //   if (!(await userStore.isLoggedIn)) {
-    //     // TODO: Set up a proper error handling module
-    //     throw new Error('User session is invalid')
-    //   }
-
-    //   const authorHash = userStore.sessionHash
-    //   const authorNickname = userStore.nickname
-    //   const requiredModerations = 1
-
-    //   try {
-    //     const { data } = await apolloClient.mutate({
-    //       mutation: CREATE_MODERATION_COMMENT_MUTATION,
-    //       variables: {
-    //         data: {
-    //           content,
-    //           postId: postId,
-    //           parentId: parentId,
-    //           authorHash,
-    //           authorNickname,
-    //           requiredModerations
-    //         }
-    //       }
-    //     })
-    //   } catch (error) {
-    //     console.error(error)
-    //   }
-    // },
 
     // Moderation actions
     async checkIfUserHasModerated(userId: string) {

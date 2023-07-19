@@ -18,7 +18,4 @@ export class CommentCreateDto {
 
   @IsString()
   authorNickname: string;
-
-  @IsNumber()
-  requiredModerations: number;
 }

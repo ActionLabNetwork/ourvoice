@@ -253,7 +253,6 @@ export const usePostModerationStore = defineStore('post-moderation', {
       }
 
       const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
-      const requiredModerations = 1
 
       try {
         await apolloClient.mutate({
@@ -264,8 +263,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
               content,
               categoryIds,
               files,
-              authorHash,
-              requiredModerations
+              authorHash
             }
           }
         })

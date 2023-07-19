@@ -17,6 +17,7 @@ import {
 } from './post-moderation.builder';
 import { ModerationPostStatus } from '../../../graphql';
 import { ConfigService } from '@nestjs/config';
+import getDeploymentConfig from '../../../config/deployment';
 
 describe('PostRepository', () => {
   const TOTAL_POSTS = 10;
@@ -335,7 +336,7 @@ describe('PostRepository', () => {
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       categoryIds: [1, 2],
-      requiredModerations: 1,
+      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act

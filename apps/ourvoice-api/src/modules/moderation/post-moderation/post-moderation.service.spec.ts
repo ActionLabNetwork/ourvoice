@@ -122,7 +122,6 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
-      requiredModerations: 1,
     };
 
     // Act & Assert
@@ -139,7 +138,6 @@ describe('PostModerationService', () => {
       authorHash: null,
       authorNickname: null,
       categoryIds: [1],
-      requiredModerations: 1,
     };
 
     // Act & Assert
@@ -156,7 +154,6 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [],
-      requiredModerations: 1,
     };
 
     const validPostData: PostCreateDto = {
@@ -165,7 +162,6 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
-      requiredModerations: 1,
     };
 
     const tooManyCategoriesData: PostCreateDto = {
@@ -174,7 +170,6 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1, 2, 3],
-      requiredModerations: 1,
     };
 
     // Act & Assert

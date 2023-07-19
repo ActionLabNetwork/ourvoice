@@ -91,7 +91,6 @@ input ModerationCommentCreateInput {
   parentId: Int
   authorHash: String!
   authorNickname: String!
-  requiredModerations: Int!
 }
 
 input ModerationCommentsFilterInput {

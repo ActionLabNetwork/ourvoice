@@ -89,7 +89,6 @@ input ModerationPostCreateInput {
   files: [String]
   authorHash: String!
   authorNickname: String!
-  requiredModerations: Int!
 }
 
 input ModerationPostsFilterInput {
