@@ -6,6 +6,7 @@ export const GET_POSTS_QUERY = graphql(`
     $sort: PostSortingInput
     $pagination: PostPaginationInput
     $filter: PostsFilterInput
+    $presignedUrlExpiresIn: Int!
   ) {
     posts(sort: $sort, pagination: $pagination, filter: $filter) {
       edges {
@@ -13,7 +14,6 @@ export const GET_POSTS_QUERY = graphql(`
           id
           title
           content
-          files
           categories {
             id
             name
@@ -34,6 +34,10 @@ export const GET_POSTS_QUERY = graphql(`
           votes {
             authorHash
             voteType
+          }
+          presignedDownloadUrls(expiresIn: $presignedUrlExpiresIn) {
+            key
+            url
           }
         }
       }

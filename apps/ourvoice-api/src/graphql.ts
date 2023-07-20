@@ -555,6 +555,7 @@ export class Post {
     categories: Category[];
     comments: Comment[];
     votes: Vote[];
+    presignedDownloadUrls?: PresignedUrl[];
 }
 
 export class PresignedUrl {

@@ -1,4 +1,4 @@
-import { type sortOptions, type sortOrder } from '@/constants/post'
+import { postFilesPresignedUrlTTL, type sortOptions, type sortOrder } from '@/constants/post'
 import type { GetPostsQuery } from '@/graphql/generated/graphql'
 import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresignedDownloadUrls'
 import type { ApolloError } from '@apollo/client/errors'
@@ -74,8 +74,9 @@ export const usePostsStore = defineStore('posts', {
             filter: {
               categoryIds: this.sortFilter.selectedCategoryIds,
               createdAfter: this.sortFilter.createdAfter
-            }
-          },
+            },
+            presignedUrlExpiresIn: postFilesPresignedUrlTTL
+          }
         })
 
         if (!data) {
@@ -246,7 +247,7 @@ export const usePostsStore = defineStore('posts', {
 
         const { data } = await apolloClient.query({
           query: GET_POST_BY_ID_QUERY,
-          variables: { postId },
+          variables: { postId, presignedUrlExpiresIn: postFilesPresignedUrlTTL },
           fetchPolicy: 'no-cache'
         })
         const post = data?.post

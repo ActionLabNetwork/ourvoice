@@ -23,7 +23,7 @@
     <div id="fileUrlsWrapper" class="text-right">
       <a
         class="font-medium text-sm text-blue-600 hover:underline"
-        v-for="url in presignedUrls"
+        v-for="url in post?.presignedDownloadUrls.map((url) => url.url)"
         :key="url"
         :href="url"
         target="_blank"
@@ -104,14 +104,6 @@ const handleCommentBtnClicked = () => {
     }
   })
 }
-
-const getPresignedUrls = (keys: string[]) => {
-  return postsStore.getPresignedUrls(keys, postFilesPresignedUrlTTL)
-}
-
-const presignedUrls = ref<string[]>([])
-const res = await getPresignedUrls(post.value?.files ?? [])
-presignedUrls.value = res?.map((item: any) => item.url) ?? []
 
 const userVote = computed(() =>
   post.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
