@@ -145,6 +145,8 @@ export class ModerationCommentCreateInput {
 
 export class ModerationCommentsFilterInput {
     status?: Nullable<ModerationCommentStatus>;
+    published?: Nullable<boolean>;
+    archived?: Nullable<boolean>;
 }
 
 export class ModerationCommentPaginationInput {
@@ -168,6 +170,8 @@ export class ModerationPostCreateInput {
 
 export class ModerationPostsFilterInput {
     status?: Nullable<ModerationPostStatus>;
+    published?: Nullable<boolean>;
+    archived?: Nullable<boolean>;
 }
 
 export class ModerationPostPaginationInput {

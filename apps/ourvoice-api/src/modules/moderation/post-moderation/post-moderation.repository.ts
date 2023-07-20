@@ -78,10 +78,12 @@ export class PostModerationRepository {
   ): Promise<
     GetManyRepositoryResponse<'moderationPosts', PostIncludesVersion>
   > {
-    const { status } = filter ?? {};
+    const { status, published, archived } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {
       status: status ?? undefined,
+      published: published ?? undefined,
+      archived: archived ?? undefined,
     };
 
     const totalCount = await this.prisma.post.count({ where });
@@ -419,7 +421,11 @@ export class PostModerationRepository {
 
       await tx.post.update({
         where: { id: post.id },
-        data: { postIdInMainDb: newPostInMainDb.id },
+        data: {
+          postIdInMainDb: newPostInMainDb.id,
+          published: true,
+          publishedAt: new Date(),
+        },
       });
 
       this.logger.debug(
@@ -456,7 +462,7 @@ export class PostModerationRepository {
 
       await tx.post.update({
         where: { id: postId },
-        data: { archived: true },
+        data: { archived: true, archivedAt: new Date() },
       });
 
       this.logger.debug(`Archived post with id ${post.id}`);

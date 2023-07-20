@@ -96,10 +96,12 @@ export class CommentModerationRepository {
   ): Promise<
     GetManyRepositoryResponse<'moderationComments', CommentIncludesVersion>
   > {
-    const { status } = filter ?? {};
+    const { status, published, archived } = filter ?? {};
 
     const where: Prisma.CommentWhereInput = {
       status: status ?? undefined,
+      published: published ?? undefined,
+      archived: archived ?? undefined,
     };
 
     const totalCount = await this.prisma.comment.count({ where });
@@ -510,7 +512,11 @@ export class CommentModerationRepository {
 
       await tx.comment.update({
         where: { id: comment.id },
-        data: { commentIdInMainDb: newCommentInMainDb.id },
+        data: {
+          commentIdInMainDb: newCommentInMainDb.id,
+          published: true,
+          publishedAt: new Date(),
+        },
       });
 
       this.logger.log(
@@ -547,7 +553,7 @@ export class CommentModerationRepository {
 
       await tx.comment.update({
         where: { id: commentId },
-        data: { archived: true },
+        data: { archived: true, archivedAt: new Date() },
       });
 
       this.logger.debug(`Archived comment with id ${comment.id}`);

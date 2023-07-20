@@ -93,6 +93,8 @@ input ModerationPostCreateInput {
 
 input ModerationPostsFilterInput {
   status: ModerationPostStatus
+  published: Boolean
+  archived: Boolean
 }
 
 input ModerationPostPaginationInput {

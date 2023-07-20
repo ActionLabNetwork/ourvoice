@@ -95,6 +95,8 @@ input ModerationCommentCreateInput {
 
 input ModerationCommentsFilterInput {
   status: ModerationCommentStatus
+  published: Boolean
+  archived: Boolean
 }
 
 input ModerationCommentPaginationInput {
