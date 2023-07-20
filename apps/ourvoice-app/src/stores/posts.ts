@@ -225,7 +225,7 @@ export const usePostsStore = defineStore('posts', {
             })
           }
         } else {
-          storedPost.votes.push({ authorHash, voteType })
+          storedPost.votes = [...storedPost.votes, { authorHash, voteType }]
         }
         this.data = this.data.map((post) =>  post.id === postId ? storedPost : post)
       } catch (error) {
