@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col w-full">
     <div
-      class="sticky top-0 z-40 transition-transform duration-500 ease-in-out"
+      class="sticky top-0 z-30 transition-transform duration-500 ease-in-out"
       :class="{ '-translate-y-full': isNavbarHidden, 'translate-y-0': !isNavbarHidden }"
     >
       <div>
         <Navbar />
       </div>
     </div>
-    <div class="z-30">
+    <div class="z-20">
       <Suspense>
         <RouterView />
       </Suspense>
