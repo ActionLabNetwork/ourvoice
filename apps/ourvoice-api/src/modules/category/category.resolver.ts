@@ -7,7 +7,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Category } from '@prisma/client';
+import { Category } from '@prisma-main-db/client';
 import {
   CategoriesFilterInput,
   CategoryCreateInput,
