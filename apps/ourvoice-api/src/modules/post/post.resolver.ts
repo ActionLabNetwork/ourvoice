@@ -3,6 +3,7 @@ import {
   PostPaginationInput,
   PostsFilterInput,
   PostSortingInput,
+  PresignedUrl,
 } from './../../graphql';
 import {
   Args,
@@ -53,8 +54,11 @@ export class PostResolver {
   async presignedDownloadUrls(
     @Parent() post: Post,
     @Args('expiresIn') expiresIn: number,
-  ) {
+  ): Promise<PresignedUrl[]> {
     const keys = post.files;
+    if (!keys) {
+      return [];
+    }
     return this.getPresignedDownloadUrls(keys, expiresIn);
   }
 
