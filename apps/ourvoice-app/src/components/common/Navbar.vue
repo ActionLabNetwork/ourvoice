@@ -1,9 +1,5 @@
 <template>
-  <header
-    class="bg-black"
-    v-if="userStore.sessionHash"
-    data-cy="ourvoice-navbar"
-  >
+  <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
       class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
       aria-label="Global"
@@ -48,7 +44,7 @@
           </router-link>
           <Popover
             :class="{
-              hidden: !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
+              hidden: hasElevatedPermissions
             }"
             class="relative"
             v-slot="{ open, close }"
@@ -187,7 +183,16 @@
                   {{ item.name }}
                 </span>
               </router-link>
-              <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+
+              <!-- Mobile Moderation Dropdown Disclosure -->
+              <Disclosure
+                as="div"
+                class="-mx-3"
+                :class="{
+                  hidden: hasElevatedPermissions
+                }"
+                v-slot="{ open }"
+              >
                 <DisclosureButton
                   class="flex w-full items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-white hover:bg-gray-700"
                 >
@@ -219,16 +224,38 @@
               </Disclosure>
             </div>
             <div class="py-6 flex">
-              <div class="flex-shrink-0 mr-0">
-                <img
-                  class="inline-block h-9 w-9 rounded-full"
-                  :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
-                  alt="PseudoNickname"
-                />
-              </div>
-              <p class="text-white inline-block my-auto ml-2">
-                {{ userStore.nickname }}
-              </p>
+              <!-- User Settings Disclosure -->
+              <Disclosure as="div" class="-mx-3" v-slot="{ open }">
+                <DisclosureButton
+                  class="flex w-full gap-3 items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                >
+                  <div class="flex-shrink-0 mr-0">
+                    <img
+                      class="inline-block h-9 w-9 rounded-full"
+                      :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
+                      alt="PseudoNickname"
+                    />
+                  </div>
+                  <p class="text-white inline-block my-auto underline underline-offset-4">
+                    {{ userStore.nickname }}
+                  </p>
+                  <font-awesome-icon
+                    :icon="['fas', 'fa-chevron-down']"
+                    class="h-5 w-5 flex-none"
+                    :class="{ 'rotate-180': open }"
+                  />
+                </DisclosureButton>
+                <!-- User Settings Dropdown Panel -->
+                <DisclosurePanel class="mt-2 space-y-2">
+                  <DisclosureButton
+                    as="div"
+                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-white"
+                    @click.prevent="signOut"
+                  >
+                    Sign Out
+                  </DisclosureButton>
+                </DisclosurePanel>
+              </Disclosure>
             </div>
           </div>
         </div>
@@ -254,7 +281,6 @@ import {
 import { useUserStore } from '@/stores/user'
 import { useRoute } from 'vue-router'
 import { useDeploymentStore } from '@/stores/deployment'
-import { useScrollHide } from '@/composables/useScrollHide'
 import Session from 'supertokens-web-js/recipe/session'
 
 import ThreadsIcon from '@/assets/icons/threads.svg'
@@ -279,6 +305,10 @@ const toggleItems = {
 const userStore = useUserStore()
 const route = useRoute()
 const currentPath = computed(() => route.fullPath)
+
+const hasElevatedPermissions = computed(
+  () => !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
+)
 
 onMounted(() => {
   console.log('Current path: ', currentPath.value)
