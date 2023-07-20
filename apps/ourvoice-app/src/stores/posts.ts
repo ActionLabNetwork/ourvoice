@@ -4,7 +4,7 @@ import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresigne
 import type { ApolloError } from '@apollo/client/errors'
 import { provideApolloClient } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { apolloClient } from './../graphql/client/index'
+import { apolloClient, evictItem } from './../graphql/client/index'
 import { CREATE_MODERATION_POST_MUTATION } from './../graphql/mutations/createModerationPost'
 import { VOTE_MUTATION } from './../graphql/mutations/createOrDeleteVote'
 import { GET_POST_BY_ID_QUERY } from './../graphql/queries/getPostById'
@@ -210,7 +210,8 @@ export const usePostsStore = defineStore('posts', {
     }) {
       try {
         //sync votesUp/votesDown state with the post table
-        const storedPost = this.data.find((post) => post.id === postId)!
+        const storedPost = {...this.data.find((post) => post.id === postId)!}
+        evictItem(storedPost)
         storedPost.votesUp = votesUp
         storedPost.votesDown = votesDown
         const userVoteForStoredPost = storedPost.votes.find(
@@ -220,11 +221,17 @@ export const usePostsStore = defineStore('posts', {
           if (userVoteForStoredPost.voteType === voteType) {
             storedPost.votes = storedPost.votes.filter((vote) => vote.authorHash !== authorHash)
           } else {
-            userVoteForStoredPost.voteType = voteType
+            storedPost.votes = storedPost.votes.map((vote) => {
+              if (vote.authorHash !== authorHash) {
+                return vote
+              }
+              return {...vote, voteType}
+            })
           }
         } else {
           storedPost.votes.push({ authorHash, voteType })
         }
+        this.data = this.data.map((post) =>  post.id === postId ? storedPost : post)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
