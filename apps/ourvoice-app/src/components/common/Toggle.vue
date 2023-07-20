@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-5 py-1 bg-white rounded-full">
+  <button class="mx-5 py-1 bg-white rounded-full" @click="toggle">
     <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
@@ -31,8 +31,7 @@
       </div>
 
       <!-- This is the element that's moving -->
-      <button
-        @click="toggle"
+      <div
         class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5"
         :class="[enabled ? '' : 'translate-x-[6.5rem]']"
       >
@@ -47,9 +46,9 @@
             enabled ? props.items.left.label : props.items.right.label
           }}</span>
         </div>
-      </button>
+      </div>
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">

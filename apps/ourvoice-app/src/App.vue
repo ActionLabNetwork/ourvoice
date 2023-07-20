@@ -1,21 +1,33 @@
 <template>
   <div class="flex flex-col w-full">
-    <Navbar />
-    <Suspense>
-      <RouterView />
-    </Suspense>
+    <div
+      class="sticky top-0 z-40 transition-transform duration-500 ease-in-out"
+      :class="{ '-translate-y-full': isNavbarHidden, 'translate-y-0': !isNavbarHidden }"
+    >
+      <div>
+        <Navbar />
+      </div>
+    </div>
+    <div class="z-30">
+      <Suspense>
+        <RouterView />
+      </Suspense>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Navbar from './components/common/Navbar.vue'
+import Navbar from '@/components/common/Navbar.vue'
+import { useScrollHide } from '@/composables/useScrollHide'
+
+const { isElementHidden: isNavbarHidden } = useScrollHide()
 </script>
 <style>
 @import '@/assets/main.css';
 
 #app {
   width: 100vw;
-  height: 100vh;
+  height: fit-content;
   margin: 0 auto;
   font-weight: normal;
 }

@@ -1,5 +1,9 @@
 <template>
-  <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
+  <header
+    class="bg-black"
+    v-if="userStore.sessionHash"
+    data-cy="ourvoice-navbar"
+  >
     <nav
       class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
       aria-label="Global"
@@ -250,6 +254,7 @@ import {
 import { useUserStore } from '@/stores/user'
 import { useRoute } from 'vue-router'
 import { useDeploymentStore } from '@/stores/deployment'
+import { useScrollHide } from '@/composables/useScrollHide'
 import Session from 'supertokens-web-js/recipe/session'
 
 import ThreadsIcon from '@/assets/icons/threads.svg'
