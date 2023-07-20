@@ -36,31 +36,6 @@
         alt="OurVoice interface"
       />
     </div>
-
-    <!-- Consent Modal -->
-    <div
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-      id="my-modal"
-      v-show="isConsentModalVisible"
-    >
-      <!-- consent modal content-->
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">Consent Form</h3>
-          <div class="mt-2 px-7 py-3">
-            <Consent class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
-          </div>
-          <div class="items-center px-4 py-3">
-            <button
-              class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              @click="acceptConsent"
-            >
-              I agree
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -72,12 +47,11 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
 import Information from '../../../../config/content/information.md'
-import Consent from '../../../../config/content/consent.md'
 
-import UserService from '@/services/user-service'
-
-import { useDeploymentStore } from '@/stores/deployment'
-import config from '@/config'
+import { useDeploymentStore } from '../stores/deployment'
+import config from '../config'
+import { mapStores } from 'pinia'
+import { useUserStore } from '../stores/user'
 
 const apiURL = config.apiURL
 const authBaseURL = config.authURL + '/signinWithoutPassword'
@@ -85,8 +59,8 @@ const authBaseURL = config.authURL + '/signinWithoutPassword'
 export default defineComponent({
   components: {
     Description,
-    Information,
-    Consent
+    Information
+    // Consent
   },
   props: ['deployment'],
   data() {
@@ -96,9 +70,11 @@ export default defineComponent({
       session: false,
       userId: '',
       authURL: `${authBaseURL}?d=${this.deployment}`,
-      deploymentStore: useDeploymentStore(),
-      isConsentModalVisible: false
+      deploymentStore: useDeploymentStore()
     }
+  },
+  computed: {
+    ...mapStores(useUserStore)
   },
   methods: {
     // TODO: this list might be coming from the database later
@@ -137,24 +113,11 @@ export default defineComponent({
       const json = await response.json()
 
       window.alert('Session Information:\n' + JSON.stringify(json, null, 2))
-    },
-    checkForConsent: async function () {
-      let payload = await Session.getAccessTokenPayloadSecurely()
-      if (!payload.consent) this.isConsentModalVisible = true
-    },
-    acceptConsent: async function () {
-      const response = await UserService.updateUserConsent()
-      if (response.status === 200) {
-        this.isConsentModalVisible = false
-      }
     }
   },
 
   async mounted() {
-    // this function checks if a session exists, and if not,
-    // it will redirect to the login screen.
     await this.checkForSession()
-    await this.checkForConsent()
   }
 })
 </script>
