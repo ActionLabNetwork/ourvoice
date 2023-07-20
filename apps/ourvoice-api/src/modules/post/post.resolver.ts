@@ -1,9 +1,17 @@
 import {
+  Post,
   PostPaginationInput,
   PostsFilterInput,
   PostSortingInput,
 } from './../../graphql';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { PostService } from '../../modules/post/post.service';
 import { s3 } from '../../config/s3-config';
 import getDeploymentConfig from '../../config/deployment';
@@ -36,6 +44,15 @@ export class PostResolver {
     );
 
     return { totalCount, edges, pageInfo };
+  }
+
+  @ResolveField()
+  async presignedDownloadUrls(
+    @Parent() post: Post,
+    @Args('expiresIn') expiresIn: number,
+  ) {
+    const keys = post.files;
+    return this.getPresignedDownloadUrls(keys, expiresIn);
   }
 
   @Query()

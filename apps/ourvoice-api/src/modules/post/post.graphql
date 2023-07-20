@@ -43,7 +43,8 @@ type Post @cacheControl(maxAge: 600) {
   authorNickname: String
   categories: [Category!]!
   comments: [Comment!]!
-  votes: [Vote!]!,
+  votes: [Vote!]!
+  presignedDownloadUrls(expiresIn: Int!): [PresignedUrl!]!
 }
 
 input PostUpdateInput {

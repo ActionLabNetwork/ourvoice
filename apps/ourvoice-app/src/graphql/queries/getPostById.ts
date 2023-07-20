@@ -1,7 +1,10 @@
 import { graphql } from '../generated'
 
 export const GET_POST_BY_ID_QUERY = graphql(`
-  query Post($postId: Int!) {
+  query Post(
+    $postId: Int!
+    $presignedUrlExpiresIn: Int!  
+  ) {
     post(id: $postId) {
       authorHash
       authorNickname
@@ -16,7 +19,6 @@ export const GET_POST_BY_ID_QUERY = graphql(`
       content
       createdAt
       disabledAt
-      files
       id
       moderated
       moderatedAt
@@ -28,6 +30,10 @@ export const GET_POST_BY_ID_QUERY = graphql(`
       votes {
         authorHash
         voteType
+      }
+      presignedDownloadUrls(expiresIn: $presignedUrlExpiresIn) {
+        key
+        url
       }
     }
   }
