@@ -8,6 +8,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum CacheControlScope {
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE"
+}
+
 export enum ModerationDecision {
     ACCEPTED = "ACCEPTED",
     REJECTED = "REJECTED"
@@ -30,9 +35,26 @@ export enum sortOrder {
     desc = "desc"
 }
 
-export enum CacheControlScope {
-    PUBLIC = "PUBLIC",
-    PRIVATE = "PRIVATE"
+export class UserCreateInput {
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId: number;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+}
+
+export class UserUpdateInput {
+    orgId?: Nullable<number>;
+    hash?: Nullable<string>;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    typeId?: Nullable<number>;
+    active?: Nullable<boolean>;
+    disabledAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
 }
 
 export class CategoryCreateInput {
@@ -274,28 +296,6 @@ export class VotesFilterInput {
     commentId?: Nullable<number>;
 }
 
-export class UserCreateInput {
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId: number;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-}
-
-export class UserUpdateInput {
-    orgId?: Nullable<number>;
-    hash?: Nullable<string>;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    typeId?: Nullable<number>;
-    active?: Nullable<boolean>;
-    disabledAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-}
-
 export interface BasePoll {
     id: number;
     question: string;
@@ -313,6 +313,12 @@ export interface BasePollOption {
 }
 
 export abstract class IQuery {
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract users(): User[] | Promise<User[]>;
+
     abstract category(id: number): Nullable<Category> | Promise<Nullable<Category>>;
 
     abstract categories(filter?: Nullable<CategoriesFilterInput>, pagination?: Nullable<CategoryPaginationInput>): Nullable<CategoryConnection> | Promise<Nullable<CategoryConnection>>;
@@ -352,15 +358,17 @@ export abstract class IQuery {
     abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
 
     abstract votes(filter?: Nullable<VotesFilterInput>): Vote[] | Promise<Vote[]>;
-
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract user(id: number): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract users(): User[] | Promise<User[]>;
 }
 
 export abstract class IMutation {
+    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract createUser(data: UserCreateInput): User | Promise<User>;
+
+    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
+
+    abstract deleteUser(id: number): User | Promise<User>;
+
     abstract createCategory(data: CategoryCreateInput): Category | Promise<Category>;
 
     abstract updateCategory(id: number, data: CategoryUpdateInput): Category | Promise<Category>;
@@ -412,14 +420,28 @@ export abstract class IMutation {
     abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
 
     abstract deleteVote(id: number): Vote | Promise<Vote>;
+}
 
-    abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
+export class User {
+    id: number;
+    orgId: number;
+    hash: string;
+    title?: Nullable<string>;
+    nickname?: Nullable<string>;
+    type: UserType;
+    active?: Nullable<boolean>;
+    createdAt?: Nullable<DateTime>;
+    disabledAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
+    verifiedAt?: Nullable<DateTime>;
+    comments: Comment[];
+    posts: Post[];
+}
 
-    abstract createUser(data: UserCreateInput): User | Promise<User>;
-
-    abstract updateUser(id: number, data: UserUpdateInput): User | Promise<User>;
-
-    abstract deleteUser(id: number): User | Promise<User>;
+export class UserType {
+    id: number;
+    type: string;
+    users: User[];
 }
 
 export class Category {
@@ -734,28 +756,6 @@ export class Vote {
     authorNickname: string;
     post: Post;
     comment?: Nullable<Comment>;
-}
-
-export class User {
-    id: number;
-    orgId: number;
-    hash: string;
-    title?: Nullable<string>;
-    nickname?: Nullable<string>;
-    type: UserType;
-    active?: Nullable<boolean>;
-    createdAt?: Nullable<DateTime>;
-    disabledAt?: Nullable<DateTime>;
-    updatedAt?: Nullable<DateTime>;
-    verifiedAt?: Nullable<DateTime>;
-    comments: Comment[];
-    posts: Post[];
-}
-
-export class UserType {
-    id: number;
-    type: string;
-    users: User[];
 }
 
 export type DateTime = any;
