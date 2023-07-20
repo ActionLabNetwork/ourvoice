@@ -12,8 +12,13 @@
         </a>
       </div>
       <!-- Toggle -->
-      <div class="w-fit justify-self-center">
-        <Toggle :items="toggleItems" @on-toggle="handleToggle" />
+      <div class="w-fit justify-self-center" v-if="currentPathIsReady">
+        <Toggle
+          :items="toggleItems"
+          @on-toggle="handleToggle"
+          :start-left="currentPath === '/posts'"
+          :current-path="currentPath"
+        />
       </div>
       <!-- Hamburger icon -->
       <div class="flex lg:hidden justify-self-end">
@@ -293,14 +298,17 @@ const toggleItems = {
   left: {
     iconLight: ThreadsIcon,
     iconDark: ThreadsIconDark,
-    label: 'Q/A'
+    label: 'Q/A',
+    hasUpdates: false
   },
   right: {
     iconLight: PollsIcon,
     iconDark: PollsIconDark,
-    label: 'Polls'
+    label: 'Polls',
+    hasUpdates: false
   }
 }
+let currentPathIsReady = ref(false)
 
 const userStore = useUserStore()
 const route = useRoute()
@@ -310,9 +318,11 @@ const hasElevatedPermissions = computed(
   () => !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
 )
 
-onMounted(() => {
+onMounted(async () => {
+  await router.isReady()
   console.log('Current path: ', currentPath.value)
   console.log('Deployment', useDeploymentStore().deployment)
+  currentPathIsReady.value = true
 })
 
 const signOut = async () => {
