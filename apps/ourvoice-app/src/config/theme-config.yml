@@ -1,0 +1,80 @@
+default: 
+  colors:
+    ourvoice-primary:
+      DEFAULT: '#FFCD29'
+      1: '#FFCD29'
+      2: '#FA5959'
+      3: '#FFCD29'
+    ourvoice-secondary:
+      DEFAULT: '#242A45'
+      1: '#242A45'
+      2: '#F7F8F8'
+      3: '#A6ADBA'
+    ourvoice-accent:
+      DEFAULT: '#FFCD29'
+      1: '#FFCD29'
+      2: '#FA5959'
+      3: '#CF8799'
+    ourvoice-util: # Utility colors for polls, avatar, etc.
+      green: '#14AE5C'
+      yellow: '#FFCD29'
+      red: '#FA5959'
+      blue: '#0D99FF'
+    ourvoice-neutral:
+      DEFAULT:: '#2A323C'
+      focus: '#242B33'
+      content: '#A6ADBA'
+    ourvoice-base: # Base color of page, used for blank backgrounds
+      DEFAULT: '#F7F8F8'
+      light-100: '#FFFFFF'
+      light-200: '#F2F2F2'
+      light-300: '#E5E6E6'
+      dark-100: '#1D232A'
+      dark-200: '#191E24'
+      dark-300: '#15191E'
+    ourvoice-error: 
+      DEFAULT: '#FA5959'
+      light: '#FFE9E9'
+      dark: '#A3361E'
+    ourvoice-info: 
+      DEFAULT: '#0D99FF'
+      light: '#F1F9FF'
+      dark: '#0080FF'
+    ourvoice-success: 
+      DEFAULT: '#14AE5C'
+      light: '#E9FFE9'
+      dark: '#0D8C4F'
+    ourvoice-warning: 
+      DEFAULT: '#FF7629'
+      light: '#FFF1E1'
+      dark: '#E45C0D'
+    ourvoice: 
+      purple: '#5267DF'
+      red: '#FA5959'
+      blue: '#242A45'
+      grey: '#9194A2'
+      white: '#f7f7f7'
+  fontFamily: 
+    roboto:
+      - Roboto
+      - sans-serif
+# custom: 
+#   colors:
+#     ourvoice-primary:
+#       1: '#DE5644'
+#       2: '#651650'
+#       3: '#CF8799'
+#     ourvoice-secondary:
+#       1: '#f5c06a'
+#       2: '#F7F8F8'
+#     ourvoice-accent:
+#       1: ''
+#     ourvoice-util:
+#       green: '#14AE5C'
+#       yellow: '#FFCD29'
+#       red: '#FA5959'
+#       blue: '#0D99FF'
+#   fontFamily: 
+#     default:
+#       - Roboto
+#       - sans-serif
