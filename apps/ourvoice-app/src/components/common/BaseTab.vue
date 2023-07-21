@@ -22,26 +22,32 @@
       </transition>
     </div>
     <div class="hidden sm:block">
-      <nav class="isolate flex divide-x divide-gray-200 rounded-lg shadow">
+      <nav class="isolate flex relative">
         <div
-          v-for="(tab, tabIdx) in tabs"
+          v-for="tab in tabs"
           :key="tab.name"
           :data-cy="`${tab.name.toLowerCase()}-tab`"
+          :ref="(el) => (tabElements[tab.name] = el)"
           @click.prevent="switchTab(tab)"
           :class="[
-            tab.current ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700',
-            tabIdx === 0 ? 'rounded-l-lg' : '',
-            tabIdx === tabs.length - 1 ? 'rounded-r-lg' : '',
-            'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 hover:cursor-pointer focus:z-10'
+            tab.current ? 'text-ourvoice-black' : 'text-gray-500 hover:text-gray-700',
+            'group min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 hover:cursor-pointer focus:z-10 border-none outline-none'
           ]"
         >
           <span>{{ tab.name }}</span>
-          <span
-            :class="[
-              tab.current ? 'bg-indigo-500' : 'bg-transparent',
-              'absolute inset-x-0 bottom-0 h-0.5'
-            ]"
-          />
+
+          <!-- Underline accent for active state -->
+          <div>
+            <span :class="['absolute inset-x-0 bottom-0 z-10 bg-gray-500 h-0.5 rounded-md w-[99%] left-1']" />
+            <span
+              v-if="tab.current"
+              :style="{
+                transform: `translateX(${underlinePosition}px)`,
+                width: `${underlineWidth}px`
+              }"
+              class="absolute bottom-0 z-20 h-1.5 bg-ourvoice-primary rounded-md transition-all duration-500 ease-in-out left-0"
+            />
+          </div>
         </div>
       </nav>
       <transition name="fade">
@@ -62,7 +68,16 @@
 import Loading from './Loading.vue'
 
 import type { Tab } from '@/types'
-import { type PropType, ref, watchEffect } from 'vue'
+import {
+  type PropType,
+  ref,
+  watchEffect,
+  nextTick,
+  reactive,
+  type Ref,
+  onMounted,
+  watch
+} from 'vue'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },
@@ -73,9 +88,28 @@ const props = defineProps({
 const emit = defineEmits(['tab-switched'])
 
 let currentTab = ref<Tab>(props.initialTab)
+const tabElements = reactive<Record<string, any>>({})
+console.log({ tabElements })
+
+const underlinePosition = ref(0)
+const underlineWidth = ref(0)
+
+const updateUnderline = () => {
+  nextTick(() => {
+    const activeTab = currentTab.value.name
+    if (activeTab) {
+      const el = tabElements[activeTab]
+      underlinePosition.value = el.offsetLeft
+      underlineWidth.value = el.offsetWidth
+    }
+  })
+}
 
 watchEffect(() => {
   currentTab.value = props.tabs.find((tab) => tab.current) || props.initialTab
+
+  console.log(underlinePosition.value)
+  console.log(underlineWidth.value)
 })
 
 const switchTab = (selectedTab: Tab) => {
@@ -84,7 +118,10 @@ const switchTab = (selectedTab: Tab) => {
   })
   currentTab.value = selectedTab
   emit('tab-switched', selectedTab)
+  updateUnderline()
 }
+
+onMounted(updateUnderline)
 </script>
 
 <style scoped>

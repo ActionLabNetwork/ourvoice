@@ -1,7 +1,10 @@
 <template>
-  <div class="w-full h-full bg-gray-100">
+  <div class="w-full h-full bg-white">
     <main>
-      <div class="px-10 py-10 bg-gray-100 border">
+      <div class="px-10 py-10 bg-white border">
+        <div class="flex">
+          <h1 class="font-semibold text-2xl mb-24">Moderation</h1>
+        </div>
         <BaseTab
           :tabs="tabs"
           :initialTab="tabs[0]"
@@ -19,7 +22,7 @@
           </template>
         </BaseTab>
       </div>
-      <Pagination @page-change="handlePageChange" :has-next-page="hasNextPage" />
+      <Pagination @page-change="handlePageChanged" :has-next-page="hasNextPage" />
     </main>
   </div>
 </template>
@@ -43,7 +46,6 @@ const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
-  console.log('Fetching new posts')
   await postsStore.fetchPostsByStatus('PENDING')
 })
 
@@ -51,7 +53,7 @@ const tabs = ref(LIST_TABS)
 const currentTab = ref(tabs.value[0].name)
 const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
 
-const handlePageChange = (page: PageChangePayload) => {
+const handlePageChanged = (page: PageChangePayload) => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   if (page.direction === 'Previous') {
     postsStore.fetchPreviousPostsByStatus(tabToStatusMapping[currentTab.value])
@@ -75,6 +77,5 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
       await postsStore.fetchPostsByStatus('REJECTED')
       break
   }
-  console.log(postsStore.posts)
 }
 </script>

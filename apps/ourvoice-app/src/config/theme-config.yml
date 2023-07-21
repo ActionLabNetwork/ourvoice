@@ -1,4 +1,4 @@
-default: 
+default:
   colors:
     ourvoice-primary:
       DEFAULT: '#FFCD29'
@@ -32,33 +32,34 @@ default:
       dark-100: '#1D232A'
       dark-200: '#191E24'
       dark-300: '#15191E'
-    ourvoice-error: 
+    ourvoice-error:
       DEFAULT: '#FA5959'
       light: '#FFE9E9'
       dark: '#A3361E'
-    ourvoice-info: 
+    ourvoice-info:
       DEFAULT: '#0D99FF'
       light: '#F1F9FF'
       dark: '#0080FF'
-    ourvoice-success: 
+    ourvoice-success:
       DEFAULT: '#14AE5C'
       light: '#E9FFE9'
       dark: '#0D8C4F'
-    ourvoice-warning: 
+    ourvoice-warning:
       DEFAULT: '#FF7629'
       light: '#FFF1E1'
       dark: '#E45C0D'
-    ourvoice: 
+    ourvoice:
       purple: '#5267DF'
       red: '#FA5959'
       blue: '#242A45'
       grey: '#9194A2'
       white: '#f7f7f7'
-  fontFamily: 
+      black: '#1A1A1A'
+  fontFamily:
     roboto:
       - Roboto
       - sans-serif
-# custom: 
+# custom:
 #   colors:
 #     ourvoice-primary:
 #       1: '#DE5644'
@@ -74,7 +75,7 @@ default:
 #       yellow: '#FFCD29'
 #       red: '#FA5959'
 #       blue: '#0D99FF'
-#   fontFamily: 
+#   fontFamily:
 #     default:
 #       - Roboto
 #       - sans-serif

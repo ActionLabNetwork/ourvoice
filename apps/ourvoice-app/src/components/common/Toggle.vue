@@ -1,16 +1,13 @@
 <template>
-  <button class="mx-5 py-1 bg-white rounded-full" @click="toggle">
+  <button class="mx-5 py-1 bg-white rounded-full h-fit" @click="toggle">
     <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
           :class="[isOnTheLeft ? 'invisible' : 'visible']"
         >
-          <span>
-            <img
-              :src="isOnTheLeft ? props.items.right.iconLight : props.items.left.iconLight"
-              alt="icon"
-            />
+          <span :v-if="!!props.items.left.iconLight">
+            <img :src="props.items.left.iconLight" alt="icon" />
           </span>
           <span>{{ isOnTheLeft ? props.items.right.label : props.items.left.label }}</span>
         </div>
@@ -20,11 +17,8 @@
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
           :class="[!isOnTheLeft ? 'invisible' : 'visible']"
         >
-          <span>
-            <img
-              :src="isOnTheLeft ? props.items.right.iconLight : props.items.left.iconLight"
-              alt="icon"
-            />
+          <span :v-if="!!props.items.right.iconLight">
+            <img :src="props.items.right.iconLight" alt="icon" />
           </span>
           <span>
             {{ isOnTheLeft ? props.items.right.label : props.items.left.label }}
@@ -41,7 +35,7 @@
         :class="[isOnTheLeft ? '' : 'translate-x-[6.5rem]']"
       >
         <div class="flex gap-2 min-w-24 justify-center">
-          <span>
+          <span :v-if="props.items.right.iconDark && props.items.left.iconDark">
             <img
               :src="!isOnTheLeft ? props.items.right.iconDark : props.items.left.iconDark"
               alt="icon"
@@ -57,16 +51,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ToggleItems } from '@/types'
 import { ref } from 'vue'
-
-type ToggleItems = {
-  [K in 'left' | 'right']: {
-    label: string
-    iconLight: string
-    iconDark: string
-    hasUpdates: boolean
-  }
-}
 
 type Events = {
   onToggle: { (e: 'onToggle', direction: 'left' | 'right'): void }
@@ -80,8 +66,7 @@ const props = defineProps({
   startLeft: {
     type: Boolean,
     default: true
-  },
-  currentPath: { type: String, required: false }
+  }
 })
 
 const emit = defineEmits<Events['onToggle']>()
