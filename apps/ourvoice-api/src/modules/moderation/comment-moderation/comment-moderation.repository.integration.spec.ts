@@ -1,3 +1,4 @@
+import { CommentCreateDto } from './../../comment/dto/comment-create.dto';
 import {
   PostModeration,
   CommentModeration,
@@ -132,6 +133,7 @@ describe('CommentRepository', () => {
     .withPostIdInMainDb(1)
     .withVersions([pVersion3])
     .withArchived(false)
+    .withPublished(false)
     .build();
 
   const moderation1 = new CommentModerationBuilder()
@@ -219,6 +221,7 @@ describe('CommentRepository', () => {
       .withParent(null)
       .withParentId(null)
       .withArchived(false)
+      .withPublished(false)
       .build();
 
     // Act
@@ -227,6 +230,10 @@ describe('CommentRepository', () => {
     );
 
     // Assert
+    delete comment.publishedAt;
+    delete comment.archivedAt;
+    delete comment.post.publishedAt;
+    delete comment.post.archivedAt;
     expect(comment).toEqual(firstComment);
   });
 
@@ -394,12 +401,11 @@ describe('CommentRepository', () => {
 
   it('should create a new comment for a published post', async () => {
     // Arrange
-    const commentData = {
+    const commentData: CommentCreateDto = {
       content: 'Test Content',
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       postId: 1,
-      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act
@@ -409,7 +415,7 @@ describe('CommentRepository', () => {
     // Assert
     expect(createdComment.status).toEqual(PostStatus.PENDING);
     expect(createdComment.requiredModerations).toEqual(
-      commentData.requiredModerations,
+      getDeploymentConfig().moderatorCount,
     );
     expect(createdComment.versions.length).toEqual(1);
     expect(createdComment.versions[0].content).toEqual(commentData.content);
@@ -439,13 +445,12 @@ describe('CommentRepository', () => {
 
   it('should create a new child comment for a published comment of a published post', async () => {
     // Arrange
-    const commentData = {
+    const commentData: CommentCreateDto = {
       content: 'Test Content',
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       postId: 1,
       parentId: 1,
-      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act
@@ -455,7 +460,7 @@ describe('CommentRepository', () => {
     // Assert
     expect(createdComment.status).toEqual(PostStatus.PENDING);
     expect(createdComment.requiredModerations).toEqual(
-      commentData.requiredModerations,
+      getDeploymentConfig().moderatorCount,
     );
     expect(createdComment.versions.length).toEqual(1);
     expect(createdComment.versions[0].content).toEqual(commentData.content);

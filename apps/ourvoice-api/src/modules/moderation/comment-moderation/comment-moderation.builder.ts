@@ -91,6 +91,21 @@ class CommentBuilder {
     return this;
   }
 
+  withArchivedAt(archivedAt: Date | null): CommentBuilder {
+    this.comment.archivedAt = archivedAt;
+    return this;
+  }
+
+  withPublished(published: boolean): CommentBuilder {
+    this.comment.published = published;
+    return this;
+  }
+
+  withPublishedAt(publishedAt: Date | null): CommentBuilder {
+    this.comment.publishedAt = publishedAt;
+    return this;
+  }
+
   build(): Partial<Comment> {
     return this.comment;
   }

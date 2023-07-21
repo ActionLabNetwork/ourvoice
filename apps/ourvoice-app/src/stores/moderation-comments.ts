@@ -87,6 +87,8 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
           query: GET_MODERATION_COMMENTS_QUERY,
           variables: {
             status: status,
+            published: status === 'APPROVED' ? false : undefined,
+            archived: status === 'REJECTED' ? false : undefined,
             limit: MODERATION_LIST_COMMENTS_PER_PAGE,
             before: before,
             after: after
@@ -98,24 +100,23 @@ export const useModerationCommentsStore = defineStore('moderation-comments', {
           (edge: Edge<ModerationComment>) => edge.node
         )
 
-        if (newComments.length > 0) {
-          this.comments = newComments
-          this.totalCount = data.moderationComments.totalCount
-          this.startCursor = data.moderationComments.pageInfo.startCursor
-          this.endCursor = data.moderationComments.pageInfo.endCursor
+        this.comments = newComments
+        this.totalCount = data.moderationComments.totalCount
+        this.startCursor = data.moderationComments.pageInfo.startCursor
+        this.endCursor = data.moderationComments.pageInfo.endCursor
 
-          const forwardPaginating =
-            (before === null && after !== null) || (before === null && after === null)
-          const backwardPaginating = before !== null && after === null
+        const forwardPaginating =
+          (before === null && after !== null) || (before === null && after === null)
+        const backwardPaginating = before !== null && after === null
 
-          if (backwardPaginating) {
-            this.hasNextPage = true
-          }
-
-          if (forwardPaginating) {
-            this.hasNextPage = data.moderationComments.pageInfo.hasNextPage
-          }
+        if (backwardPaginating) {
+          this.hasNextPage = true
         }
+
+        if (forwardPaginating) {
+          this.hasNextPage = data.moderationComments.pageInfo.hasNextPage
+        }
+
         this.loading = false
       } catch (error) {
         console.error(error)

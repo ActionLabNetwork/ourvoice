@@ -96,6 +96,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           query: GET_MODERATION_POSTS_QUERY,
           variables: {
             status: status,
+            published: status === 'APPROVED' ? false : undefined,
+            archived: status === 'REJECTED' ? false : undefined,
             limit: MODERATION_LIST_POSTS_PER_PAGE,
             before: before,
             after: after

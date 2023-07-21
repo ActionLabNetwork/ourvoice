@@ -1,3 +1,4 @@
+import { PostCreateDto } from './../../post/dto/post-create.dto';
 import {
   PostModeration,
   PostStatus,
@@ -188,7 +189,16 @@ describe('PostRepository', () => {
     const post = await postModerationRepository.getModerationPostById(1);
 
     // Assert
-    expect(post).toEqual(firstPost);
+    const expectedPost = new PostBuilder(firstPost)
+      .withArchivedAt(null)
+      .withPublished(false)
+      .withPublishedAt(new Date())
+      .build();
+
+    delete post.publishedAt;
+    delete expectedPost.publishedAt;
+
+    expect(post).toEqual(expectedPost);
   });
 
   it('should return null for non existent post id', async () => {
@@ -330,13 +340,12 @@ describe('PostRepository', () => {
 
   it('should create a new post', async () => {
     // Arrange
-    const postData = {
+    const postData: PostCreateDto = {
       title: 'Test Title',
       content: 'Test Content',
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       categoryIds: [1, 2],
-      requiredModerations: getDeploymentConfig().moderatorCount,
     };
 
     // Act
@@ -347,7 +356,7 @@ describe('PostRepository', () => {
     // Assert
     expect(createdPost.status).toEqual(PostStatus.PENDING);
     expect(createdPost.requiredModerations).toEqual(
-      postData.requiredModerations,
+      getDeploymentConfig().moderatorCount,
     );
     expect(createdPost.versions.length).toEqual(1);
     expect(createdPost.versions[0].title).toEqual(postData.title);
