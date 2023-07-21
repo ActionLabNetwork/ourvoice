@@ -27,18 +27,30 @@
           v-for="tab in tabs"
           :key="tab.name"
           :data-cy="`${tab.name.toLowerCase()}-tab`"
-          :ref="(el) => (tabElements[tab.name] = el)"
+          :ref="(el: VNodeRef) => (tabElements[tab.name] = el)"
           @click.prevent="switchTab(tab)"
           :class="[
             tab.current ? 'text-ourvoice-black' : 'text-gray-500 hover:text-gray-700',
             'group min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 hover:cursor-pointer focus:z-10 border-none outline-none'
           ]"
         >
-          <span>{{ tab.name }}</span>
+          <div class="flex items-center justify-center gap-5">
+            {{ tab.name }}
+            <span
+              v-if="!!tab.count && tab.count > 0"
+              class="bg-ourvoice-primary text-ourvoice-black text-xs w-5 h-5 rounded-full flex items-center justify-center"
+            >
+              {{ tab.count }}
+            </span>
+          </div>
 
           <!-- Underline accent for active state -->
           <div>
-            <span :class="['absolute inset-x-0 bottom-0 z-10 bg-gray-500 h-0.5 rounded-md w-[99%] left-1']" />
+            <span
+              :class="[
+                'absolute inset-x-0 bottom-0.5 z-10 bg-gray-500 h-0.5 rounded-md w-[99%] left-1'
+              ]"
+            />
             <span
               v-if="tab.current"
               :style="{
@@ -68,16 +80,7 @@
 import Loading from './Loading.vue'
 
 import type { Tab } from '@/types'
-import {
-  type PropType,
-  ref,
-  watchEffect,
-  nextTick,
-  reactive,
-  type Ref,
-  onMounted,
-  watch
-} from 'vue'
+import { type PropType, ref, watchEffect, nextTick, reactive, onMounted, type VNodeRef } from 'vue'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },
@@ -88,7 +91,7 @@ const props = defineProps({
 const emit = defineEmits(['tab-switched'])
 
 let currentTab = ref<Tab>(props.initialTab)
-const tabElements = reactive<Record<string, any>>({})
+const tabElements = reactive<Record<string, VNodeRef>>({})
 console.log({ tabElements })
 
 const underlinePosition = ref(0)
@@ -98,7 +101,7 @@ const updateUnderline = () => {
   nextTick(() => {
     const activeTab = currentTab.value.name
     if (activeTab) {
-      const el = tabElements[activeTab]
+      const el = tabElements[activeTab] as unknown as HTMLElement
       underlinePosition.value = el.offsetLeft
       underlineWidth.value = el.offsetWidth
     }

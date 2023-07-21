@@ -1,5 +1,6 @@
 export interface Tab {
   name: string
+  count?: number
   current: boolean
 }
 

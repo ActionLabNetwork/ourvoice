@@ -71,12 +71,15 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
   switch (tab.name) {
     case 'Pending':
       await commentsStore.fetchCommentsByStatus('PENDING')
+      tab.count = allComments.value.length
       break
     case 'Approved':
       await commentsStore.fetchCommentsByStatus('APPROVED')
+      tab.count = allComments.value.length
       break
     case 'Rejected':
       await commentsStore.fetchCommentsByStatus('REJECTED')
+      tab.count = allComments.value.length
       break
   }
 }

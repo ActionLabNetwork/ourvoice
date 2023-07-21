@@ -45,13 +45,16 @@ const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
 } as const
 
 const postsStore = useModerationPostsStore()
-onMounted(async () => {
-  await postsStore.fetchPostsByStatus('PENDING')
-})
-
 const tabs = ref(LIST_TABS)
 const currentTab = ref(tabs.value[0].name)
 const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
+
+onMounted(async () => {
+  await postsStore.fetchPostsByStatus('PENDING')
+  tabs.value.forEach((tab: ModerationListTab) => {
+    tab.count = 2
+  })
+})
 
 const handlePageChanged = (page: PageChangePayload) => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
@@ -66,15 +69,19 @@ const handlePageChanged = (page: PageChangePayload) => {
 
 const handleTabSwitched = async (tab: ModerationListTab) => {
   currentTab.value = tab.name
+
   switch (tab.name) {
     case 'Pending':
       await postsStore.fetchPostsByStatus('PENDING')
+      tab.count = allPosts.value.length
       break
     case 'Approved':
       await postsStore.fetchPostsByStatus('APPROVED')
+      tab.count = allPosts.value.length
       break
     case 'Rejected':
       await postsStore.fetchPostsByStatus('REJECTED')
+      tab.count = allPosts.value.length
       break
   }
 }
