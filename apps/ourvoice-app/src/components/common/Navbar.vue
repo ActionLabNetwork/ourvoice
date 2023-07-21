@@ -1,18 +1,21 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
-      class="mx-auto grid grid-cols-3 max-w-7xl items-center justify-between p-6 lg:px-8"
+      class="mx-auto grid grid-cols-3 grid-flow-row-dense max-w-7xl items-center justify-between p-6 lg:px-8 gap-y-5"
       aria-label="Global"
     >
       <!-- Logo -->
-      <div class="flex">
+      <div class="flex items-center justify-between">
         <a href="#" class="-m-1.5 p-1.5">
           <span class="sr-only">OurVoice</span>
           <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
         </a>
+        <div class="hidden lg:flex lg:flex-none">
+          <CreatePostNavButton class="hidden lg:inline-flex" v-if="route.path === '/posts'" />
+        </div>
       </div>
       <!-- Toggle -->
-      <div class="w-fit justify-self-center" v-if="currentPathIsReady">
+      <div class="w-fit justify-self-center col-span-full sm:col-span-1" v-if="currentPathIsReady">
         <Toggle
           :items="toggleItems"
           @on-toggle="handleToggle"
@@ -20,11 +23,29 @@
           :current-path="currentPath"
         />
       </div>
-      <!-- Hamburger icon -->
-      <div class="flex lg:hidden justify-self-end"></div>
-      <!-- Desktop Menu -->
-      <div class="flex lg:hidden">
-        <CreatePostNavButton class="inline-flex mr-5" v-if="route.path === '/posts'" />
+
+      <!-- Create Post Button & Mobile Menu MD -->
+      <div class="hidden md:flex lg:hidden place-self-end gap-10">
+        <CreatePostNavButton class="inline-flex" v-if="route.path === '/posts'" />
+        <!-- Mobile Menu Icon -->
+        <button
+          type="button"
+          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
+          @click="mobileMenuOpen = true"
+        >
+          <span class="sr-only">Open main menu</span>
+          <font-awesome-icon class="w-5 h-5" :icon="['fas', 'fa-bars']" />
+        </button>
+      </div>
+
+      <!-- Create Post Button & Mobile Menu SM -->
+      <div class="grid md:hidden col-span-full">
+        <CreatePostNavButton
+          class="inline-flex mx-auto text-center"
+          v-if="route.path === '/posts'"
+        />
+      </div>
+      <div class="grid col-start-3 md:hidden justify-self-end">
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -38,7 +59,7 @@
       <!-- Desktop Menu -->
       <div class="hidden lg:flex lg:gap-x-10 justify-center justify-self-end">
         <!-- Nav Items -->
-        <PopoverGroup class="flex gap-10 items-center">
+        <PopoverGroup class="flex gap-5 items-center">
           <router-link
             :to="item.href"
             v-for="item in navItems"
@@ -102,62 +123,59 @@
               </PopoverPanel>
             </TransitionRoot>
           </Popover>
-        </PopoverGroup>
-        <!-- User Settings -->
-        <div>
-          <Popover class="relative" v-slot="{ open }">
-            <PopoverButton
-              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
-            >
-              <div class="flex-shrink-0 mr-0">
-                <img
-                  class="inline-block h-9 w-9 rounded-full"
-                  :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
-                  alt="PseudoNickname"
-                />
-              </div>
-              <font-awesome-icon
-                :icon="['fas', 'fa-chevron-down']"
-                class="transition-transform"
-                :class="{ 'rotate-180': open }"
-              />
-            </PopoverButton>
-            <TransitionRoot
-              enter-active-class="transition ease-out duration-200"
-              enter-from-class="opacity-0 translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition ease-in duration-150"
-              leave-from-class="opacity-100 translate-y-0"
-              leave-to-class="opacity-0 translate-y-1"
-            >
-              <PopoverPanel
-                class="absolute -left-14 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+          <!-- User Settings -->
+          <div>
+            <Popover class="relative" v-slot="{ open }">
+              <PopoverButton
+                class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
               >
-                <div class="p-4">
-                  <div
-                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
-                  >
-                    <div class="flex-auto">
-                      <div
-                        v-on:click="signOut"
-                        class="block font-semibold text-white cursor-pointer"
-                      >
-                        Sign Out
-                        <span class="absolute inset-0" />
+                <div class="flex-shrink-0 mr-0">
+                  <img
+                    class="inline-block h-9 w-9 rounded-full"
+                    :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
+                    alt="PseudoNickname"
+                  />
+                </div>
+                <font-awesome-icon
+                  :icon="['fas', 'fa-chevron-down']"
+                  class="transition-transform"
+                  :class="{ 'rotate-180': open }"
+                />
+              </PopoverButton>
+              <TransitionRoot
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0 translate-y-1"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 translate-y-1"
+              >
+                <PopoverPanel
+                  class="absolute -left-14 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+                >
+                  <div class="p-4">
+                    <div
+                      class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                    >
+                      <div class="flex-auto">
+                        <div
+                          v-on:click="signOut"
+                          class="block font-semibold text-white cursor-pointer"
+                        >
+                          Sign Out
+                          <span class="absolute inset-0" />
+                        </div>
+                        <p class="text-white inline-block my-auto underline underline-offset-4">
+                          {{ userStore.nickname }}
+                        </p>
                       </div>
-                      <p class="text-white inline-block my-auto underline underline-offset-4">
-                        {{ userStore.nickname }}
-                      </p>
                     </div>
                   </div>
-                </div>
-              </PopoverPanel>
-            </TransitionRoot>
-          </Popover>
-        </div>
-      </div>
-      <div class="hidden lg:flex lg:flex-none lg:justify-end">
-        <CreatePostNavButton class="hidden lg:inline-flex ml-5" v-if="route.path === '/posts'" />
+                </PopoverPanel>
+              </TransitionRoot>
+            </Popover>
+          </div>
+        </PopoverGroup>
       </div>
     </nav>
 
