@@ -6,7 +6,7 @@ const YAML_CONFIG_FILENAME = 'config.yml';
 
 export default () => {
   if (process.env.NODE_ENV === 'test') {
-    return {};
+    return { moderatorCount: 1 };
   }
   return yaml.load(
     readFileSync(join('../../config/', YAML_CONFIG_FILENAME), 'utf8'),

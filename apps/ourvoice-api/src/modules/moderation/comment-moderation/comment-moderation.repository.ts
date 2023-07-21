@@ -1,6 +1,7 @@
 import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
+  CommentIncludesVersionIncludesModerationsIncludesPost,
   ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
@@ -59,7 +60,7 @@ export class CommentModerationRepository {
 
   async getModerationCommentById(
     id: number,
-  ): Promise<CommentIncludesVersionIncludesModerations> {
+  ): Promise<CommentIncludesVersionIncludesModerationsIncludesPost> {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
