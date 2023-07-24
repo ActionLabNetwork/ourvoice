@@ -1,23 +1,31 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
-      <!-- Side pane button -->
-      <div
-        @click="toggleSidePane"
-        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
-        data-cy="moderation-history-button"
-      >
-        <p>
-          Moderation History
-          <span>
-            <font-awesome-icon :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']" />
-          </span>
-        </p>
+    <div class="flex justify-between items-center">
+      <div>
+        <BackButton />
       </div>
-      <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
-        <ModerationHistory />
-      </SidePane>
+      <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
+        <!-- Side pane button -->
+        <div
+          @click="toggleSidePane"
+          class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
+          data-cy="moderation-history-button"
+        >
+          <p>
+            Moderation History
+            <span>
+              <font-awesome-icon
+                :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
+              />
+            </span>
+          </p>
+        </div>
+        <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
+          <ModerationHistory />
+        </SidePane>
+      </div>
     </div>
+
     <div class="grid grid-cols-4 gap-2">
       <!-- Versioning -->
       <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="post">
@@ -72,7 +80,11 @@
 </template>
 
 <script setup lang="ts">
-import { usePostModerationStore, type Moderation, type PostVersion } from '@/stores/post-moderation'
+import {
+  usePostModerationStore,
+  type Moderation,
+  type ModerationPostVersion
+} from '@/stores/post-moderation'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, type ComputedRef, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -82,9 +94,10 @@ import ModerationHistory from '@/components/post/moderation/ModerationHistory.vu
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
 import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
+import BackButton from '@/components/common/BackButton.vue'
 
-import { storeToRefs } from 'pinia';
-import { postFilesPresignedUrlTTL } from '@/constants/post';
+import { storeToRefs } from 'pinia'
+import { postFilesPresignedUrlTTL } from '@/constants/post'
 import type { ModerationActions } from '@/types/moderation'
 
 interface PostFields {
@@ -158,7 +171,7 @@ async function initializeModerationPosts() {
   }
 }
 
-async function refreshVersion(newVersion: PostVersion) {
+async function refreshVersion(newVersion: ModerationPostVersion) {
   // Check if user has moderated this version
   await postModerationStore.checkIfUserHasModerated(userStore.userId)
 
@@ -166,10 +179,7 @@ async function refreshVersion(newVersion: PostVersion) {
 
   // If there are files, request their download urls
   if (newVersion.files && newVersion.files.length > 0)
-    await postModerationStore.getPresignedDownloadUrls(
-      newVersion.files,
-      postFilesPresignedUrlTTL
-    )
+    await postModerationStore.getPresignedDownloadUrls(newVersion.files, postFilesPresignedUrlTTL)
 }
 
 function toggleSidePane() {
@@ -180,7 +190,7 @@ function handleSidePaneToggle(open: boolean) {
   showSidePane.value = open
 }
 
-async function handleVersionChange(newVersion: PostVersion) {
+async function handleVersionChange(newVersion: ModerationPostVersion) {
   postModerationStore.versionInModeration = newVersion
   await refreshVersion(newVersion)
 }
@@ -213,7 +223,7 @@ function handleModifyFormUpdate({
   version: editedVersion,
   isValid
 }: {
-  version: PostVersion
+  version: ModerationPostVersion
   isValid: boolean
 }) {
   if (!isValid) return

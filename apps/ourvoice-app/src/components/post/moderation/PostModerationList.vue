@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { type PropType } from 'vue'
 import ModerationPostCard from './ModerationPostCard.vue'
-import type { ModerationPost } from '@/stores/moderation-posts'
+import type { ModerationPost } from '@/graphql/generated/graphql'
 import EmptyState from '@/components/comment/EmptyState.vue'
 
 const props = defineProps({

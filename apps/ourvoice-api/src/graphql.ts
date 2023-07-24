@@ -492,7 +492,6 @@ export class ModerationPost {
     status: ModerationPostStatus;
     versions: ModerationPostVersion[];
     requiredModerations: number;
-    comments: ModerationComment[];
     authorHash: string;
     authorNickname: string;
 }
@@ -506,10 +505,8 @@ export class ModerationPostVersion {
     version: number;
     authorHash: string;
     authorNickname: string;
-    reason?: Nullable<string>;
     latest: boolean;
     timestamp: string;
-    post: ModerationPost;
     moderations?: Nullable<PostModeration[]>;
 }
 

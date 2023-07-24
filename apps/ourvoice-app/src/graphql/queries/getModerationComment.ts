@@ -24,7 +24,6 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
           version
           authorHash
           authorNickname
-          reason
           latest
           moderations {
             id

@@ -1,5 +1,6 @@
 <template>
   <div v-bind="$attrs">
+    <!-- Mobile -->
     <div class="sm:hidden">
       <select
         id="tabs"
@@ -22,7 +23,7 @@
       </transition>
     </div>
     <div class="hidden sm:block">
-      <nav class="isolate flex relative">
+      <nav class="isolate flex relative mb-5">
         <div
           v-for="tab in tabs"
           :key="tab.name"

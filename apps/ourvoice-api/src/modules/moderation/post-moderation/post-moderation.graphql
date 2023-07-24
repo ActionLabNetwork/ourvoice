@@ -40,7 +40,6 @@ type ModerationPost {
   status: ModerationPostStatus!
   versions: [ModerationPostVersion!]!
   requiredModerations: Int!
-  comments: [ModerationComment!]!
   authorHash: String!
   authorNickname: String!
 }
@@ -54,10 +53,8 @@ type ModerationPostVersion {
   version: Int!
   authorHash: String!
   authorNickname: String!
-  reason: String
   latest: Boolean!
   timestamp: String!
-  post: ModerationPost!
   moderations: [PostModeration!]
 }
 

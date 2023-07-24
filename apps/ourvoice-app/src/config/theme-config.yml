@@ -4,7 +4,7 @@ default:
       DEFAULT: '#FFCD29'
       1: '#FFCD29'
       2: '#FA5959'
-      3: '#FFCD29'
+      3: '#0446C6'
     ourvoice-secondary:
       DEFAULT: '#242A45'
       1: '#242A45'
@@ -12,18 +12,21 @@ default:
       3: '#A6ADBA'
     ourvoice-accent:
       DEFAULT: '#FFCD29'
-      1: '#FFCD29'
+      1: '#FFBE00'
       2: '#FA5959'
       3: '#CF8799'
+
     ourvoice-util: # Utility colors for polls, avatar, etc.
       green: '#14AE5C'
       yellow: '#FFCD29'
       red: '#FA5959'
       blue: '#0D99FF'
+      pink: '#FDE2E2'
     ourvoice-neutral:
       DEFAULT:: '#2A323C'
       focus: '#242B33'
       content: '#A6ADBA'
+      body: '#3D3D3D'
     ourvoice-base: # Base color of page, used for blank backgrounds
       DEFAULT: '#F7F8F8'
       light-100: '#FFFFFF'

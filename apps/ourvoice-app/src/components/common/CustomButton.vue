@@ -2,7 +2,7 @@
   <template v-if="!props.to">
     <button
       v-if="isVisible"
-      class="inline-flex items-center rounded-md bg-ourvoice-primary-1 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ourvoice-primary-1 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+      class="inline-flex items-center rounded-2xl bg-ourvoice-primary-1 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ourvoice-primary-1 disabled:bg-indigo-300 disabled:cursor-not-allowed"
       :data-cy="props.dataCy"
       :disabled="isDisabled"
     >

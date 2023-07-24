@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
@@ -37,11 +37,12 @@ import ModerationListHeaderAndToggle from '@/components/common/ModerationListHea
 
 import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
 import router from '@/router'
+import { ModerationPostStatus } from '@/graphql/generated/graphql'
 
-const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
-  Pending: 'PENDING',
-  Approved: 'APPROVED',
-  Rejected: 'REJECTED'
+const tabToStatusMapping: Record<ModerationStatus, ModerationPostStatus> = {
+  Pending: ModerationPostStatus.Pending,
+  Approved: ModerationPostStatus.Approved,
+  Rejected: ModerationPostStatus.Rejected
 } as const
 
 const postsStore = useModerationPostsStore()
@@ -51,10 +52,8 @@ const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
 
 onMounted(async () => {
   await router.isReady()
-  await postsStore.fetchPostsByStatus('PENDING')
-  tabs.value.forEach((tab: ModerationListTab) => {
-    tab.count = 2
-  })
+  await postsStore.fetchPostsByStatus(ModerationPostStatus.Pending)
+  tabs.value[0].count = allPosts.value.length
 })
 
 const handlePageChanged = (page: PageChangePayload) => {
@@ -73,15 +72,15 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
 
   switch (tab.name) {
     case 'Pending':
-      await postsStore.fetchPostsByStatus('PENDING')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Pending)
       tab.count = allPosts.value.length
       break
     case 'Approved':
-      await postsStore.fetchPostsByStatus('APPROVED')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Approved)
       tab.count = allPosts.value.length
       break
     case 'Rejected':
-      await postsStore.fetchPostsByStatus('REJECTED')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Rejected)
       tab.count = allPosts.value.length
       break
   }

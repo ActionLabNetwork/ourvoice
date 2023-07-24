@@ -1,6 +1,7 @@
 import gql from 'graphql-tag'
+import { graphql } from '@/graphql/generated/gql'
 
-export const GET_MODERATION_POSTS_QUERY = gql`
+export const GET_MODERATION_POSTS_QUERY = graphql(`
   query GetModerationPosts(
     $before: String
     $after: String
@@ -32,6 +33,14 @@ export const GET_MODERATION_POSTS_QUERY = gql`
             timestamp
             version
             latest
+            moderations {
+              id
+              decision
+              moderatorHash
+              moderatorNickname
+              reason
+              timestamp
+            }
           }
         }
       }
@@ -44,4 +53,4 @@ export const GET_MODERATION_POSTS_QUERY = gql`
       }
     }
   }
-`
+`)

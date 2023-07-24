@@ -76,7 +76,10 @@ export class PostModerationRepository {
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
   ): Promise<
-    GetManyRepositoryResponse<'moderationPosts', PostIncludesVersion>
+    GetManyRepositoryResponse<
+      'moderationPosts',
+      PostIncludesVersionIncludesModerations
+    >
   > {
     const { status, published, archived } = filter ?? {};
 
@@ -101,7 +104,12 @@ export class PostModerationRepository {
 
     const moderationPosts = await this.prisma.post.findMany({
       where,
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          orderBy: { version: 'desc' },
+        },
+      },
       skip: cursor ? 1 : undefined,
       cursor: cursor,
       take: (pagination?.limit ?? 10) * cursorDirection,

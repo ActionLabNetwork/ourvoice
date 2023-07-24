@@ -13,7 +13,7 @@
           <span :v-if="!!props.items.left.iconLight">
             <img :src="props.items.left.iconLight" alt="icon" />
           </span>
-          <span>{{ isOnTheLeft ? props.items.right.label : props.items.left.label }}</span>
+          <span>{{ props.items.left.label }}</span>
         </div>
       </div>
       <!-- Right Element -->
@@ -26,10 +26,10 @@
             <img :src="props.items.right.iconLight" alt="icon" />
           </span>
           <span>
-            {{ isOnTheLeft ? props.items.right.label : props.items.left.label }}
+            {{ props.items.right.label }}
           </span>
           <span v-if="isOnTheLeft ? props.items.right.hasUpdates : props.items.left.hasUpdates">
-            <div class="h-2 w-2 rounded-full bg-current text-[#FFBE00]" />
+            <div class="h-2 w-2 rounded-full bg-current text-ourvoice-accent-1" />
           </span>
         </div>
       </div>
@@ -62,7 +62,7 @@ import { twMerge } from 'tailwind-merge'
 import type { ToggleItems } from '@/types'
 
 type Events = {
-  onToggle: { (e: 'onToggle', direction: 'left' | 'right'): void }
+  onToggle: (e: 'onToggle', direction: 'left' | 'right') => void
 }
 
 const props = defineProps({

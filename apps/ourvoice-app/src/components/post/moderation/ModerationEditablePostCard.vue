@@ -109,7 +109,11 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue'
-import { usePostModerationStore, type Moderation, type PostVersion } from '@/stores/post-moderation'
+import {
+  usePostModerationStore,
+  type Moderation,
+  type ModerationPostVersion
+} from '@/stores/post-moderation'
 import { formatTimestampToReadableDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categories'
@@ -199,7 +203,7 @@ const categoriesOptions = computed(() => {
 })
 
 if (version.value) {
-  selectedCategories.value = version.value.categories.map(({ id }) => id)
+  selectedCategories.value = version.value.categories?.map(({ id }) => id) ?? []
 }
 
 // The ref returned by veevalidate doesn't work with @vueform/multiselect, so we need this workaround
@@ -227,6 +231,8 @@ const formWasUpdated = computed(() => {
 
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
+  if (!version.value?.moderations) return { ACCEPTED: 0, REJECTED: 0 }
+
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
     version.value?.moderations.reduce(
       (acc, moderation) => {
@@ -249,7 +255,7 @@ const moderationResultGroups = computed(() => {
   return groupsCount
 })
 
-const formattedDate = (version: PostVersion) => formatTimestampToReadableDate(+version.timestamp)
+const formattedDate = (version: ModerationPostVersion) => formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 const localVersion = reactive({
