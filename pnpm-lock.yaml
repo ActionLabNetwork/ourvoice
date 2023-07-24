@@ -362,6 +362,9 @@ importers:
       supertokens-web-js:
         specifier: ^0.6.0
         version: 0.6.0
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
       unique-names-generator:
         specifier: ^4.7.1
         version: 4.7.1
@@ -14073,6 +14076,10 @@ packages:
     dependencies:
       '@pkgr/utils': 2.4.1
       tslib: 2.5.3
+
+  /tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
+    dev: false
 
   /tailwindcss@3.3.2:
     resolution: {integrity: sha512-9jPkMiIBXvPc2KywkraqsUfbfj+dHDb+JPWtSJa9MLFdrPyazI7q6WX2sUrm7R9eVR7qqv3Pas7EvQFzxKnI6w==}

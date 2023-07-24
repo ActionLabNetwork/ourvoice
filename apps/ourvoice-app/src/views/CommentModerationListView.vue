@@ -1,7 +1,8 @@
 <template>
-  <div class="w-full h-full bg-gray-100">
+  <div class="w-full h-full">
     <main>
-      <div class="px-10 py-10 bg-gray-100">
+      <div class="px-10 py-10 bg-white">
+        <ModerationListHeaderAndToggle />
         <BaseTab
           :tabs="tabs"
           :initialTab="tabs[0]"
@@ -31,6 +32,7 @@ import BaseTab from '@/components/common/BaseTab.vue'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { storeToRefs } from 'pinia'
+import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
 import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
 import type { PostStatus } from '@/stores/moderation-posts'

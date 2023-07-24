@@ -18,9 +18,8 @@
       <div class="w-fit justify-self-center col-span-full sm:col-span-1" v-if="currentPathIsReady">
         <Toggle
           :items="toggleItems"
-          @on-toggle="handleToggle"
           :start-left="currentPath === '/posts'"
-          :current-path="currentPath"
+          @on-toggle="handleToggle"
         />
       </div>
 
@@ -345,13 +344,13 @@ const hasElevatedPermissions = computed(
 )
 
 onMounted(async () => {
-  await router.isReady()
   console.log('Current path: ', currentPath.value)
   console.log('Deployment', useDeploymentStore().deployment)
   currentPathIsReady.value = true
 })
 
 const signOut = async () => {
+  await router.isReady()
   await Session.signOut()
   window.location.assign('/')
 }

@@ -1,5 +1,8 @@
 <template>
-  <button class="mx-5 py-1 bg-white rounded-full h-fit" @click="toggle">
+  <button
+    :class="twMerge('mx-5 py-1 bg-white rounded-full h-fit', props.className)"
+    @click="toggle"
+  >
     <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
@@ -51,8 +54,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ToggleItems } from '@/types'
 import { ref } from 'vue'
+import { twMerge } from 'tailwind-merge'
+
+import type { ToggleItems } from '@/types'
 
 type Events = {
   onToggle: { (e: 'onToggle', direction: 'left' | 'right'): void }
@@ -66,6 +71,10 @@ const props = defineProps({
   startLeft: {
     type: Boolean,
     default: true
+  },
+  className: {
+    type: String,
+    default: ''
   }
 })
 

@@ -1,10 +1,8 @@
 <template>
   <div class="w-full h-full bg-white">
     <main>
-      <div class="px-10 py-10 bg-white border">
-        <div class="flex">
-          <h1 class="font-semibold text-2xl mb-24">Moderation</h1>
-        </div>
+      <div class="px-10 py-10 bg-white">
+        <ModerationListHeaderAndToggle />
         <BaseTab
           :tabs="tabs"
           :initialTab="tabs[0]"
@@ -28,15 +26,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
 import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
 import { storeToRefs } from 'pinia'
+import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
 import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import router from '@/router'
 
 const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
   Pending: 'PENDING',
@@ -50,6 +50,7 @@ const currentTab = ref(tabs.value[0].name)
 const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
 
 onMounted(async () => {
+  await router.isReady()
   await postsStore.fetchPostsByStatus('PENDING')
   tabs.value.forEach((tab: ModerationListTab) => {
     tab.count = 2
