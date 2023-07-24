@@ -10,46 +10,46 @@ networks:
 services:
   # reverse proxy
   reverse-proxy:
-    image: "traefik:v2.10"
-    container_name: "traefik"
+    image: 'traefik:v2.10'
+    container_name: 'traefik'
     restart: always
     command:
       #- "--log.level=DEBUG"
-      - "--api.insecure=false"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=frontend"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - '--api.insecure=false'
+      - '--api.dashboard=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--providers.docker.network=frontend'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
+      - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+      - '--entrypoints.websecure.address=:443'
+      - '--certificatesresolvers.myresolver.acme.httpchallenge=true'
+      - '--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web'
       #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - '--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}'
+      - '--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json'
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DEPLOYMENT}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=${DASHBOARD_USER}:${DASHBOARD_PASSWORD}"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.dashboard.rule=Host(`traefik.${DEPLOYMENT}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))'
+      - 'traefik.http.routers.dashboard.service=api@internal'
+      - 'traefik.http.routers.dashboard.middlewares=auth'
+      - 'traefik.http.middlewares.auth.basicauth.users=${DASHBOARD_USER}:${DASHBOARD_PASSWORD}'
+      - 'traefik.http.routers.dashboard.entrypoints=websecure'
+      - 'traefik.http.routers.dashboard.tls=true'
+      - 'traefik.http.routers.dashboard.tls.certresolver=myresolver'
     networks:
       - frontend
     ports:
       # The HTTP port
-      - "80:80"
+      - '80:80'
       # The HTTPS port
-      - "443:443"
+      - '443:443'
       # The Web UI (enabled by --api.insecure=true)
       # - "8080:8080"
     volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - './letsencrypt:/letsencrypt'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
   # APPs
   portal:
@@ -129,7 +129,7 @@ services:
       context: ../
       args:
         APP: admin
-        DIR: ourvoice-admin      
+        DIR: ourvoice-admin
     restart: always
     expose:
       - 80
@@ -167,7 +167,7 @@ services:
       context: ../
       args:
         APP: auth
-        DIR: ourvoice-auth 
+        DIR: ourvoice-auth
     restart: always
     expose:
       - 80
@@ -206,7 +206,7 @@ services:
       context: ../
       args:
         APP: api
-        DIR: ourvoice-api 
+        DIR: ourvoice-api
     restart: always
     expose:
       - 80
@@ -220,7 +220,6 @@ services:
       - 'traefik.http.routers.ourvoice-admin.tls=true'
       - 'traefik.http.routers.ourvoice-admin.tls.certresolver=myresolver'
     environment:
-      
       - S3_API_VERSION
       - AWS_ENDPOINT
       - AWS_REGION
@@ -259,16 +258,16 @@ services:
       - POSTGRES_DB_TEST_HOST
       - POSTGRES_DB_TEST_PORT
       - POSTGRES_DB_TEST
-      - POSTGRES_DB_PREMODERATION_HOST
-      - POSTGRES_DB_PREMODERATION_PORT
-      - POSTGRES_DB_PREMODERATION
-      - POSTGRES_DB_PREMODERATION_TEST_HOST
-      - POSTGRES_DB_PREMODERATION_TEST_PORT
-      - POSTGRES_DB_PREMODERATION_TEST
+      - POSTGRES_DB_MODERATION_HOST
+      - POSTGRES_DB_MODERATION_PORT
+      - POSTGRES_DB_MODERATION
+      - POSTGRES_DB_MODERATION_TEST_HOST
+      - POSTGRES_DB_MODERATION_TEST_PORT
+      - POSTGRES_DB_MODERATION_TEST
       - DATABASE_MAIN_URL
-      - DATABASE_PREMODERATION_URL
+      - DATABASE_MODERATION_URL
       - DATABASE_MAIN_TEST_URL
-      - DATABASE_PREMODERATION_TEST_URL
+      - DATABASE_MODERATION_TEST_URL
       - TEST_MODE
       - PRE_AUTH_SESSION_ID
       - CODE_ID
@@ -347,7 +346,7 @@ services:
     networks:
       - backend
 
-  # main test db     
+  # main test db
   test-db:
     image: postgres:15-alpine
     container_name: ourvoice-app-db-test
@@ -362,33 +361,33 @@ services:
     networks:
       - test
 
-  # premoderation db 
-  premoderation-db:
+  # MODERATION db
+  MODERATION-db:
     image: postgres:15-alpine
-    container_name: ourvoice-db-premoderation
+    container_name: ourvoice-db-MODERATION
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB_PREMODERATION}
+      POSTGRES_DB: ${POSTGRES_DB_MODERATION}
     volumes:
       # mount db volume to the container
-      - premoderation-db:/var/lib/postgresql/data
+      - MODERATION-db:/var/lib/postgresql/data
     expose:
       - 5432
     networks:
       - backend
 
-  # test premoderation db 
-  test-premoderation-db:
+  # test MODERATION db
+  test-MODERATION-db:
     image: postgres:15-alpine
-    container_name: ourvoice-db-premoderation-test
+    container_name: ourvoice-db-MODERATION-test
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB_PREMODERATION_TEST}
-      DATABASE_URL: ${TEST_DATABASE_URL_PREMODERATION}
+      POSTGRES_DB: ${POSTGRES_DB_MODERATION_TEST}
+      DATABASE_URL: ${TEST_DATABASE_URL_MODERATION}
     expose:
       - 5432
     networks:
@@ -409,13 +408,7 @@ services:
       - backend
     restart: unless-stopped
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'pg_isready',
-          '-d',
-          "'${AUTH_POSTGRES_DB}'"
-        ]
+      test: ['CMD-SHELL', 'pg_isready', '-d', "'${AUTH_POSTGRES_DB}'"]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -446,7 +439,7 @@ services:
 volumes:
   db:
     name: backend
-  premoderation-db:
-    name: premoderation
+  MODERATION-db:
+    name: MODERATION
   authdb:
     name: auth
