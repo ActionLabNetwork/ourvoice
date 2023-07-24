@@ -35,7 +35,7 @@ authModules:
   - Verify
   - Dashboard
 logo: /ourvoice_logo.svg
-slogan: 'This is the deployment slogan text from config.yml file'
+slogan: 'Are you ready to share experiences, ask questions and propose solutions with your colleagues?'
 moderatorCount: 3
 postFrequency:
   unit: 'minutes'

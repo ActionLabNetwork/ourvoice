@@ -1,37 +1,47 @@
 <template>
-  <div class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28 fill">
+  <div class="container flex lg:flex-row items-center gap-12 mt-14 lg:mt-28">
     <!-- Content -->
-    <div class="flex fill flex-1 flex-col items-center lg:items-start">
-      <h1 class="text-ourvoice-blue text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
-        <span class="text-ourvoice-red">OurVoice</span> {{ deployment.toUpperCase() }} App
-      </h1>
-      <!-- Deployment description -->
-      <Description class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
-      <!-- Deployment slogan -->
-      <p class="text-ourvoice-grey text-lg text-center lg:text-left mb-6">
-        {{ getConfig('slogan') }}
-      </p>
-      <div v-if="!session" class="flex justify-center flex-wrap gap-6">
-        <a :href="authURL"
-          ><button type="button" class="btn btn-purple btn-hover">Get Started</button></a
-        >
-      </div>
-      <div v-else class="flex justify-center flex-wrap gap-6">
-        <a href="/noauth/post">
-          <button type="button" class="btn btn-purple btn-hover">Get Started</button>
+    <div class="flex basis-1/2 flex-col items-center lg:items-start">
+      <div v-if="!session" class="">
+        <a href="#" class="-m-1.5 p-1.5">
+          <span class="sr-only">OurVoice</span>
+          <img class="h-8 w-auto" src="@/assets/ourvoice_logo_black.png" alt="OurVoice Logo" />
         </a>
       </div>
+      <!-- Deployment slogan -->
+      <p class="text-center lg:text-left mb-6 slogan-text">
+        {{ getConfig('slogan') }}
+      </p>
+      <!-- Deployment description -->
+      <Description class="description-text text-lg text-center lg:text-left mb-6" />
+      <div class="flex justify-center space-x-2">
+        <a v-if="!session" :href="authURL"
+          ><button type="button" class="ourvoice-button-active">Get Started</button></a
+        >
+        <a v-else href="/posts"
+          ><button type="button" class="ourvoice-button-active">Get Started</button></a
+        >
+        <a
+          class="btn-flat white-text waves-effect waves-light btn-large blue darken-3"
+          href="/about"
+          ><button type="button" class="ourvoice-button">FAQ</button></a
+        >
+      </div>
       <!-- Deployment info -->
-      <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
-      <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"
-        ><button type="button" class="btn btn-purple btn-hover">Learn More</button></a
-      >
+      <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
 
     <!-- Deployment image -->
-    <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
+    <!-- <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
       <img
         class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+        :src="getConfig('logo')"
+        alt="OurVoice interface"
+      />
+    </div> -->
+    <div class="basis-1/2">
+      <img
+        class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:h-5/6 md:h-5/6"
         :src="getConfig('logo')"
         alt="OurVoice interface"
       />
@@ -46,7 +56,7 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 
 import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
-import Information from '../../../../config/content/information.md'
+// import Information from '../../../../config/content/information.md'
 
 import { useDeploymentStore } from '../stores/deployment'
 import config from '../config'
@@ -58,8 +68,8 @@ const authBaseURL = config.authURL + '/signinWithoutPassword'
 
 export default defineComponent({
   components: {
-    Description,
-    Information
+    Description
+    // Information
     // Consent
   },
   props: ['deployment'],
@@ -152,5 +162,46 @@ export default defineComponent({
   justify-content: center;
   color: white;
   font-weight: bold;
+}
+.slogan-text {
+  align-self: stretch;
+  color: var(--headings, #1a1a1a);
+  /* Desktop/H1 */
+  font-family: Roboto;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 120%; /* 57.6px */
+}
+.description-text {
+  align-self: stretch;
+  color: var(--body-text, #3d3d3d);
+  /* Desktop/Caption_Regular */
+  font-family: Roboto;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%; /* 16.8px */
+}
+.ourvoice-button-active {
+  display: flex;
+  width: 212px;
+  padding: 16px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 96px;
+  background: var(--primary, #ffcd29);
+}
+.ourvoice-button {
+  display: flex;
+  width: 212px;
+  padding: 16px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 96px;
+  border: 2px solid var(--headings, #1a1a1a);
+  background: #fff;
 }
 </style>
