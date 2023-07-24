@@ -327,7 +327,6 @@ export type ModerationPostsFilterInput = {
 };
 
 export type Mutation = {
-  _empty: Maybe<Scalars['String']['output']>;
   approveModerationCommentVersion: Maybe<ModerationComment>;
   approveModerationPostVersion: Maybe<ModerationPost>;
   createCategory: Category;
@@ -603,7 +602,6 @@ export type PresignedUrl = {
 };
 
 export type Query = {
-  _empty: Maybe<Scalars['String']['output']>;
   categories: Maybe<CategoryConnection>;
   category: Maybe<Category>;
   comment: Maybe<Comment>;
