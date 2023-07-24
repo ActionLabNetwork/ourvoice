@@ -6,7 +6,7 @@
     >
       <!-- Logo -->
       <div class="flex items-center justify-between">
-        <a href="#" class="-m-1.5 p-1.5">
+        <a href="/" class="-m-1.5 p-1.5">
           <span class="sr-only">OurVoice</span>
           <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
         </a>

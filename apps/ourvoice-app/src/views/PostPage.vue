@@ -1,6 +1,6 @@
 <template>
   <Suspense>
-    <div class="overflow-y-scroll h-screen">
+    <div class="overflow-y-auto h-screen">
       <div class="mb-5 pt-5 pl-5 lg:pt-10 lg:pl-10">
         <BackButton />
       </div>

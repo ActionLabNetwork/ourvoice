@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-col overflow-y-scroll relative" ref="scrollContainer">
+  <div class="flex flex-col overflow-y-auto relative p-10" ref="scrollContainer">
     <PostSortFilter />
-    <div class="max-w-5xl w-full mx-auto px-5">
+    <div class="max-w-5xl w-full mx-auto space-y-3">
       <PostCard
         v-for="post in posts"
         :key="post.id"
         :postId="post.id"
-        class="card card-outline card-hover my-6"
+        class="card card-outline card-hover"
       />
     </div>
     <div v-if="state == 'loading-initial'" class="max-w-5xl w-full mx-auto px-5">

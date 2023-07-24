@@ -1,6 +1,34 @@
 <template>
-  <div class="sticky top-0">
-    <div class="flex py-3 bg-white shadow-md justify-between items-center px-6">
+  <div class="flex flex-col space-y-10 max-w-5xl w-full mx-auto mb-3">
+    <!-- Categories Filter start -->
+    <div
+      class="flex md:block md:space-y-2 md:mx-auto flex-row space-x-5 items-center overflow-x-auto no-scrollbar md:overflow-hidden"
+    >
+      <!-- <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span> -->
+      <PostSortFilterCategoryButton
+        :active="!sortFilter.selectedCategoryIds"
+        :count="3"
+        text="All"
+        @select="selectCategory(null)"
+      />
+      <PostSortFilterCategoryButton
+        v-for="category in categories"
+        :key="category.id"
+        :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
+        :count="category.numPosts"
+        :text="category.name"
+        @select="selectCategory(category.id)"
+      />
+      <div v-if="state == 'loading-initial'" class="flex flex-row space-x-5">
+        <div v-for="i in 5" :key="i" class="w-28 h-10 shrink-0 rounded-full skeleton" />
+      </div>
+    </div>
+    <!-- Categories Filter end -->
+    <div class="flex text-center text-3xl font-semibold">
+      Discuss your experience of balancing out your work and personal life in your organization, and
+      any suggestions to improve matters.
+    </div>
+    <div class="flex justify-between items-center">
       <div class="flex text-base md:text-xl font-bold">
         <button
           v-for="(option, index) in timeRangeOptions"
@@ -67,30 +95,9 @@
         </button>
       </div>
     </div>
-    <div class="py-4 flex flex-row space-x-5 items-center overflow-x-auto backdrop-blur-md">
-      <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span>
-      <PostSortFilterCategoryButton
-        :active="!sortFilter.selectedCategoryIds"
-        :count="3"
-        text="All"
-        @select="selectCategory(null)"
-      />
-      <PostSortFilterCategoryButton
-        v-for="category in categories"
-        :key="category.id"
-        :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
-        :count="category.numPosts"
-        :text="category.name"
-        @select="selectCategory(category.id)"
-      />
-      <div v-if="state == 'loading-initial'" class="flex flex-row space-x-5">
-        <div v-for="i in 5" :key="i" class="w-28 h-10 shrink-0 rounded-full skeleton" />
-      </div>
-    </div>
-    <!-- {{ selectedTimeRangeOption }} -->
-    <!-- <div class="border-2">{{ selectedSortOption }}</div>
+    <!-- <div class="border-2">{{ selectedTimeRangeOption }}</div>
+    <div class="border-2">{{ selectedSortOption }}</div>
     <div class="border-2">{{ sortAscending }}</div> -->
-    <!-- <div class="border-2">{{ selectedCategoryIds }}</div> -->
   </div>
 </template>
 
@@ -111,13 +118,15 @@ import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
-// import CategoryList from '@/components/post/CategoryList.vue'
+
 interface CategoryWithCount {
   id: number
   name: string
   count: number
   active: boolean
 }
+const categoriesStore = useCategoriesStore()
+const postsStore = usePostsStore()
 const sortAscending = ref(false)
 const toggleSortOrder = useToggle(sortAscending)
 
@@ -130,11 +139,11 @@ const sortOptions = [
 const selectedSortOption = ref(sortOptions[0])
 watchEffect(async () => {
   console.log(selectedSortOption.value.value, sortAscending.value ? 'asc' : 'desc')
-  await usePostsStore().setSortOption(
+  await postsStore.setSortOption(
     selectedSortOption.value.value,
     sortAscending.value ? 'asc' : 'desc'
   )
-  usePostsStore().fetchPosts()
+  postsStore.fetchPosts()
 })
 
 const timeRangeOptions = [
@@ -148,17 +157,16 @@ const timeRangeOptions = [
 const selectedTimeRangeOption = ref(timeRangeOptions[0])
 watchEffect(async () => {
   if (selectedTimeRangeOption.value.label === 'Latest 3 Days') {
-    await usePostsStore().setCreatedAfter(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000))
+    postsStore.setCreatedAfter(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000))
   } else {
-    await usePostsStore().setCreatedAfter(null)
+    postsStore.setCreatedAfter(null)
   }
-  usePostsStore().fetchPosts()
+  postsStore.fetchPosts()
 })
 const handleTimeRangeSelected = (index: number) => {
   selectedTimeRangeOption.value = timeRangeOptions[index]
 }
-const categoriesStore = useCategoriesStore()
-const postsStore = usePostsStore()
+
 const { data: categories, state } = storeToRefs(categoriesStore)
 if (state.value == 'initial') {
   categoriesStore.fetchCategories()
