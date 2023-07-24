@@ -50,10 +50,9 @@ export default defineComponent({
   methods: {
     checkForConsent: async function () {
       if (!(await this.userStore.isLoggedIn)) return
+      const userConsent = await this.userStore.getConsent
       this.isConsentModalVisible =
-        !this.userStore.consentDate || this.consentEffectiveDate > this.userStore.consentDate
-          ? true
-          : false
+        !userConsent || this.consentEffectiveDate > userConsent ? true : false
     },
     acceptConsent: async function () {
       const response = await UserService.updateUserConsent()
