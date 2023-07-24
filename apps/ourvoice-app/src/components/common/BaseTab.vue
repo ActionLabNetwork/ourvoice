@@ -92,7 +92,6 @@ const emit = defineEmits(['tab-switched'])
 
 let currentTab = ref<Tab>(props.initialTab)
 const tabElements = reactive<Record<string, VNodeRef>>({})
-console.log({ tabElements })
 
 const underlinePosition = ref(0)
 const underlineWidth = ref(0)
@@ -110,9 +109,6 @@ const updateUnderline = () => {
 
 watchEffect(() => {
   currentTab.value = props.tabs.find((tab) => tab.current) || props.initialTab
-
-  console.log(underlinePosition.value)
-  console.log(underlineWidth.value)
 })
 
 const switchTab = (selectedTab: Tab) => {

@@ -3,7 +3,8 @@
     :class="twMerge('mx-5 py-1 bg-white rounded-full h-fit', props.className)"
     @click="toggle"
   >
-    <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
+    <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-[18.7rem]">
+      <!-- Left element -->
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
@@ -15,6 +16,7 @@
           <span>{{ isOnTheLeft ? props.items.right.label : props.items.left.label }}</span>
         </div>
       </div>
+      <!-- Right Element -->
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
@@ -34,8 +36,8 @@
 
       <!-- This is the element that's moving -->
       <div
-        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5"
-        :class="[isOnTheLeft ? '' : 'translate-x-[6.5rem]']"
+        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5 w-[9.7rem]"
+        :class="[isOnTheLeft ? '' : `translate-x-[8.5rem]`]"
       >
         <div class="flex gap-2 min-w-24 justify-center">
           <span :v-if="props.items.right.iconDark && props.items.left.iconDark">
