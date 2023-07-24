@@ -109,11 +109,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch, watchEffect, onMounted } from 'vue'
-import {
-  useModerationPostsStore,
-  type Moderation,
-  type PostVersion
-} from '@/stores/moderation-posts'
+import { usePostModerationStore, type Moderation, type PostVersion } from '@/stores/post-moderation'
 import { formatTimestampToReadableDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categories'
@@ -161,7 +157,7 @@ const nickname = computed(() => {
 })
 
 // Pinia Stores
-const moderationPostsStore = useModerationPostsStore()
+const moderationPostsStore = usePostModerationStore()
 const { postInModeration: post, versionInModeration: version } = storeToRefs(moderationPostsStore)
 
 const categoriesStore = useCategoriesStore()

@@ -4,7 +4,7 @@ import {
   PostModeration,
   PostStatus,
   Decision,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 
 class PostBuilder {
   private post: Partial<
@@ -46,6 +46,11 @@ class PostBuilder {
 
   withPostIdInMainDb(postIdInMainDb: number | null): PostBuilder {
     this.post.postIdInMainDb = postIdInMainDb;
+    return this;
+  }
+
+  withArchived(archived: boolean): PostBuilder {
+    this.post.archived = archived;
     return this;
   }
 

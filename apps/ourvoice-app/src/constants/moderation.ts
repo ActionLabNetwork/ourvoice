@@ -1,6 +1,8 @@
-export const LIST_TABS = [
+import type { ModerationListTabs } from './../types/moderation'
+
+export const LIST_TABS: ModerationListTabs = [
   { name: 'Pending', current: true },
-  { name: 'Accepted', current: false },
+  { name: 'Approved', current: false },
   { name: 'Rejected', current: false }
 ]
 
@@ -24,3 +26,6 @@ export const MODERATION_ACTIONS = [
     validate: true
   }
 ]
+
+export const MODERATION_LIST_POSTS_PER_PAGE = 10
+export const MODERATION_LIST_COMMENTS_PER_PAGE = 10

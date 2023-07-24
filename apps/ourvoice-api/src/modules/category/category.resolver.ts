@@ -5,9 +5,12 @@ import {
   CategoryPaginationInput,
 } from './../../graphql';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Category } from '@prisma/client';
+import { Category } from '@prisma-main-db/client';
 import { CategoryService } from './category.service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../../auth/auth.guard';
 
+@UseGuards(new AuthGuard())
 @Resolver('Category')
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}

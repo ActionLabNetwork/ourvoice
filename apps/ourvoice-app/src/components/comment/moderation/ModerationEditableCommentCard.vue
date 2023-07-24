@@ -42,11 +42,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watchEffect, onMounted } from 'vue'
-import {
-  useModerationCommentsStore,
-  type Moderation,
-  type CommentVersion
-} from '@/stores/moderation-comments'
+import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
 import { formatTimestampToReadableDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categories'
@@ -55,6 +51,7 @@ import { validateContent } from '@/validators/moderation-comment-validator'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationVersionDecision } from '@/types/moderation'
+import { useCommentModerationStore } from '@/stores/comment-moderation'
 
 const emit = defineEmits(['update'])
 
@@ -87,9 +84,9 @@ const nickname = computed(() => {
 })
 
 // Pinia Stores
-const moderationCommentsStore = useModerationCommentsStore()
+const commentModerationStore = useCommentModerationStore()
 const { commentInModeration: comment, versionInModeration: version } =
-  storeToRefs(moderationCommentsStore)
+  storeToRefs(commentModerationStore)
 
 const categoriesStore = useCategoriesStore()
 
@@ -158,14 +155,14 @@ watchEffect(() => {
   localVersion.content = contentField.value.value
 
   if (formWasUpdated.value && formHasNoErrors.value) {
-    moderationCommentsStore.versionInModification = {
+    commentModerationStore.versionInModification = {
       version: localVersion,
       isValid: true
     }
     emit('update', { version: localVersion, isValid: true })
   } else {
-    moderationCommentsStore.versionInModification = {
-      ...moderationCommentsStore.versionInModification,
+    commentModerationStore.versionInModification = {
+      ...commentModerationStore.versionInModification,
       isValid: false
     }
     emit('update', { version: localVersion, isValid: false })

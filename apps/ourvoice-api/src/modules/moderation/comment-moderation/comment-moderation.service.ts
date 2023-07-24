@@ -10,7 +10,7 @@ import {
   Comment,
   CommentVersion,
   CommentModeration,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationCommentsFilterDto } from './dto/comments-filter.dto';
 import { CommentModerationRepository } from './comment-moderation.repository';
@@ -239,6 +239,10 @@ export class CommentModerationService {
 
     if (moderationToBeRenewed.moderatorHash !== moderatorHash) {
       throw new BadRequestException('Invalid moderator hash');
+    }
+
+    if (moderationToBeRenewed.commentVersion.comment.status !== 'PENDING') {
+      throw new BadRequestException('Comment is not pending');
     }
 
     return await this.moderationCommentRepository.renewCommentModeration(

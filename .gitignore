@@ -107,8 +107,8 @@ dist
 deployment/db
 deployment/db/*
 deployment/db_old
-deployment/db-premoderation
-deployment/db-premoderation/*
+deployment/db-moderation
+deployment/db-moderation/*
 
 # Localstack (s3)
 deployment/s3

@@ -42,11 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
 import type { ModerationVersionDecisionHistory } from '@/types/moderation'
+import { useCommentModerationStore } from '@/stores/comment-moderation'
 
 interface History {
   id: number
@@ -57,9 +57,9 @@ interface History {
   moderatorNickname: string
 }
 
-const moderationCommentsStore = useModerationCommentsStore()
+const commentModerationStore = useCommentModerationStore()
 
-const { versionInModeration: version } = storeToRefs(moderationCommentsStore)
+const { versionInModeration: version } = storeToRefs(commentModerationStore)
 
 const moderations = computed(() => {
   if (!version.value) return []

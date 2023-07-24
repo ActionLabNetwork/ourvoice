@@ -1,60 +1,83 @@
 <template>
   <div class="w-full h-full bg-gray-100">
-    <Header title="Moderation Comments List" />
     <main>
       <div class="px-10 py-10 bg-gray-100">
-        <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
+        <BaseTab
+          :tabs="tabs"
+          :initialTab="tabs[0]"
+          @tab-switched="handleTabSwitched"
+          :loading="loading"
+        >
           <template #pending>
-            <CommentModerationList :comments="moderationComments.PENDING" />
+            <CommentModerationList :comments="allComments" />
           </template>
-          <template #accepted>
-            <CommentModerationList :comments="moderationComments.APPROVED" />
+          <template #approved>
+            <CommentModerationList :comments="allComments" />
           </template>
           <template #rejected>
-            <CommentModerationList :comments="moderationComments.REJECTED" />
+            <CommentModerationList :comments="allComments" />
           </template>
         </BaseTab>
       </div>
+      <Pagination @page-change="handlePageChange" :has-next-page="hasNextPage" />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import Header from '@/components/common/Header.vue'
 import CommentModerationList from '@/components/comment/moderation/CommentModerationList.vue'
 import { LIST_TABS } from '@/constants/moderation'
 import BaseTab from '@/components/common/BaseTab.vue'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { useModerationCommentsStore } from '@/stores/moderation-comments'
+import { storeToRefs } from 'pinia'
 
-import type { ModerationComment } from '@/stores/moderation-comments'
-import type { ModerationVersionStatus } from '@/types/moderation'
-// import type { Tab } from '@/types'
+import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import type { PostStatus } from '@/stores/moderation-posts'
+import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
+
+const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+  Pending: 'PENDING',
+  Approved: 'APPROVED',
+  Rejected: 'REJECTED'
+} as const
 
 const commentsStore = useModerationCommentsStore()
 onMounted(async () => {
-  await commentsStore.fetchComments()
+  await commentsStore.fetchCommentsByStatus('PENDING')
 })
 
 const tabs = ref(LIST_TABS)
-const allComments = computed(() => commentsStore.comments)
+const currentTab = ref(tabs.value[0].name)
+const { comments: allComments, hasNextPage, loading } = storeToRefs(commentsStore)
 
-// Group the comments by their moderation status
-const moderationComments = computed(() => {
-  const initialGroups: Record<ModerationVersionStatus, ModerationComment[]> = {
-    PENDING: [],
-    APPROVED: [],
-    REJECTED: []
-  }
-
-  return allComments.value.reduce(
-    (groups, post) => getGroupsByProperty('status', groups, post),
-    initialGroups
-  )
+watchEffect(() => {
+  console.log(allComments.value)
 })
 
-const handleTabSwitched = () => {
-  // If we need to know when the tab is switched, we can do it here
+const handlePageChange = (page: PageChangePayload) => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  if (page.direction === 'Previous') {
+    commentsStore.fetchPreviousCommentsByStatus(tabToStatusMapping[currentTab.value])
+  }
+
+  if (page.direction === 'Next') {
+    commentsStore.fetchNextCommentsByStatus(tabToStatusMapping[currentTab.value])
+  }
+}
+
+const handleTabSwitched = async (tab: ModerationListTab) => {
+  currentTab.value = tab.name
+  switch (tab.name) {
+    case 'Pending':
+      await commentsStore.fetchCommentsByStatus('PENDING')
+      break
+    case 'Approved':
+      await commentsStore.fetchCommentsByStatus('APPROVED')
+      break
+    case 'Rejected':
+      await commentsStore.fetchCommentsByStatus('REJECTED')
+      break
+  }
 }
 </script>

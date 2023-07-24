@@ -1,6 +1,6 @@
 import { numberToCursor } from '../../utils/cursor-pagination';
 import { NotFoundException } from '@nestjs/common';
-import { seedMainDb } from './../../../prisma/seed';
+import { seedMainDb } from '../../../prisma-main/seed';
 import { PrismaService } from '../../database/main/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CommentRepository } from './comment.repository';
@@ -92,6 +92,8 @@ describe('CommentRepository', () => {
       authorNickname: 'user1',
       postId: 1,
       parentId: 1,
+      votesDown: 0,
+      votesUp: 0,
     };
 
     // Act

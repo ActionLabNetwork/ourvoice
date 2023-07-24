@@ -10,8 +10,11 @@ import {
   generatePresignedDownloadUrl,
   generatePresignedUploadUrl,
 } from '../../services/s3-service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../../auth/auth.guard';
 
 @Resolver('Post')
+@UseGuards(new AuthGuard())
 export class PostResolver {
   constructor(private postService: PostService) {}
 

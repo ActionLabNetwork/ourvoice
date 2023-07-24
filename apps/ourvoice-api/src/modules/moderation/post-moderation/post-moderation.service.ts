@@ -9,10 +9,7 @@ import {
   ModerationPostPaginationInput,
   ModerationPostsFilterInput,
 } from '../../../graphql';
-import {
-  Post,
-  PostVersion,
-} from '../../../../node_modules/@internal/prisma/client';
+import { Post, PostVersion } from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
 import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
@@ -136,8 +133,6 @@ export class PostModerationService {
     moderatorNickname,
     reason: string,
   ): Promise<Post> {
-    // TODO: Validate moderator hash to see if they have permission/role
-
     // Validate id exists
     const postToBeApproved =
       await this.moderationPostRepository.getPostVersionById(id);
@@ -164,8 +159,6 @@ export class PostModerationService {
     moderatorNickname: string,
     reason: string,
   ): Promise<Post> {
-    // TODO: Validate moderator hash to see if they have permission/role
-
     // Validate id exists
     const postToBeRejected =
       await this.moderationPostRepository.getPostVersionById(id);
@@ -194,8 +187,6 @@ export class PostModerationService {
     reason: string,
     data: PostModifyDto,
   ): Promise<Post> {
-    // TODO: Validate moderator hash to see if they have permission/role
-
     // Validate data
     const postModifyDto = plainToClass(PostModifyDto, data);
     const errors = await validate(postModifyDto);
@@ -216,7 +207,6 @@ export class PostModerationService {
     if (!postToBeModified) {
       throw new NotFoundException('Post version does not exist');
     }
-    // TODO: Validate moderator hash to see if they have permission/role
     return await this.moderationPostRepository.modifyModerationPost(
       postId,
       moderatorHash,

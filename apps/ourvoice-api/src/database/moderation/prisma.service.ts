@@ -4,7 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { PrismaClient } from '@internal/prisma/client';
+import { PrismaClient } from '@prisma-moderation-db/client';
 
 @Injectable()
 export class PrismaService
@@ -14,13 +14,13 @@ export class PrismaService
   constructor() {
     super({
       datasources: {
-        premoderation: {
+        moderation: {
           url:
             process.env.NODE_ENV === 'test'
-              ? process.env.DATABASE_PREMODERATION_TEST_URL ||
-                'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
-              : process.env.DATABASE_PREMODERATION_URL ||
-                'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer',
+              ? process.env.DATABASE_MODERATION_TEST_URL ||
+                'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test'
+              : process.env.DATABASE_MODERATION_URL ||
+                'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer',
         },
       },
     });

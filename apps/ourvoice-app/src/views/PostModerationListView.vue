@@ -1,60 +1,80 @@
 <template>
   <div class="w-full h-full bg-gray-100">
-    <Header title="Moderation Posts List" />
     <main>
-      <div class="px-10 py-10 bg-gray-100">
-        <BaseTab :tabs="tabs" :initialTab="tabs[0]" @tab-switched="handleTabSwitched">
+      <div class="px-10 py-10 bg-gray-100 border">
+        <BaseTab
+          :tabs="tabs"
+          :initialTab="tabs[0]"
+          @tab-switched="handleTabSwitched"
+          :loading="loading"
+        >
           <template #pending>
-            <PostModerationList :posts="moderationPosts.PENDING" />
+            <PostModerationList :posts="allPosts" />
           </template>
-          <template #accepted>
-            <PostModerationList :posts="moderationPosts.APPROVED" />
+          <template #approved>
+            <PostModerationList :posts="allPosts" />
           </template>
           <template #rejected>
-            <PostModerationList :posts="moderationPosts.REJECTED" />
+            <PostModerationList :posts="allPosts" />
           </template>
         </BaseTab>
       </div>
+      <Pagination @page-change="handlePageChange" :has-next-page="hasNextPage" />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import Header from '@/components/common/Header.vue'
+import { onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
-
-import { computed, onMounted, ref } from 'vue'
-import { useModerationPostsStore } from '@/stores/moderation-posts'
+import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
+import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
-import type { ModerationPost } from '@/stores/moderation-posts'
-import type { ModerationVersionStatus } from '@/types/moderation'
-// import type { Tab } from '@/types'
+import { storeToRefs } from 'pinia'
+
+import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+
+const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+  Pending: 'PENDING',
+  Approved: 'APPROVED',
+  Rejected: 'REJECTED'
+} as const
 
 const postsStore = useModerationPostsStore()
 onMounted(async () => {
-  await postsStore.fetchPosts()
+  console.log('Fetching new posts')
+  await postsStore.fetchPostsByStatus('PENDING')
 })
 
 const tabs = ref(LIST_TABS)
-const allPosts = computed(() => postsStore.posts)
+const currentTab = ref(tabs.value[0].name)
+const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
 
-// Group the posts by their moderation status
-const moderationPosts = computed(() => {
-  const initialGroups: Record<ModerationVersionStatus, ModerationPost[]> = {
-    PENDING: [],
-    APPROVED: [],
-    REJECTED: []
+const handlePageChange = (page: PageChangePayload) => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  if (page.direction === 'Previous') {
+    postsStore.fetchPreviousPostsByStatus(tabToStatusMapping[currentTab.value])
   }
 
-  return allPosts.value.reduce(
-    (groups, post) => getGroupsByProperty('status', groups, post),
-    initialGroups
-  )
-})
+  if (page.direction === 'Next') {
+    postsStore.fetchNextPostsByStatus(tabToStatusMapping[currentTab.value])
+  }
+}
 
-const handleTabSwitched = () => {
-  // If we need to know when the tab is switched, we can do it here
+const handleTabSwitched = async (tab: ModerationListTab) => {
+  currentTab.value = tab.name
+  switch (tab.name) {
+    case 'Pending':
+      await postsStore.fetchPostsByStatus('PENDING')
+      break
+    case 'Approved':
+      await postsStore.fetchPostsByStatus('APPROVED')
+      break
+    case 'Rejected':
+      await postsStore.fetchPostsByStatus('REJECTED')
+      break
+  }
+  console.log(postsStore.posts)
 }
 </script>

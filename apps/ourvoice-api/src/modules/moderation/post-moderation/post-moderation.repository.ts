@@ -3,10 +3,11 @@ import { PostModifyDto } from './dto/post-modify.dto';
 import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import {
   Prisma,
+  PostStatus,
   PostVersion,
   PostModeration,
-} from '../../../../node_modules/@internal/prisma/client';
-import { PrismaService } from '../../../database/premoderation/prisma.service';
+} from '@prisma-moderation-db/client';
+import { PrismaService } from '../../../database/moderation/prisma.service';
 import {
   ModerationPostsFilterInput,
   ModerationPostPaginationInput,
@@ -169,7 +170,6 @@ export class PostModerationRepository {
         throw new Error('Moderator has already moderated this post version');
       }
 
-      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
       const postVersion = await tx.postVersion.findUnique({
         where: { id },
         include: { post: true },
@@ -199,8 +199,16 @@ export class PostModerationRepository {
       return newPostModeration;
     });
 
-    // Return the new post
     const postId = newPostModeration.postVersion.postId;
+
+    // Try to change the status of the post
+    try {
+      await this.approvePost(postId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new post
     return await this.findPostWithVersionsAndModerations(postId);
   }
 
@@ -223,13 +231,17 @@ export class PostModerationRepository {
         throw new Error('Moderator has already moderated this post version');
       }
 
-      // Ensure that another moderator hasn't created a new version (modified) for the post, or else we'll rollback
       const postVersion = await tx.postVersion.findUnique({
         where: { id },
+        include: { post: true },
       });
 
       if (!postVersion.latest) {
         throw new Error('Post version is not the latest');
+      }
+
+      if (postVersion.post.status !== 'PENDING') {
+        throw new Error('Post status is not PENDING');
       }
 
       // Create a new post moderation entry
@@ -247,8 +259,16 @@ export class PostModerationRepository {
       return newPostModeration;
     });
 
-    // Return the new post
     const postId = newPostModeration.postVersion.postId;
+
+    // Change status if there are enough moderations
+    try {
+      await this.rejectPost(postId);
+    } catch (error) {
+      this.logger.error(error);
+    }
+
+    // Return the new post
     return await this.findPostWithVersionsAndModerations(postId);
   }
 
@@ -328,7 +348,7 @@ export class PostModerationRepository {
       // Fetch the postModeration and related post
       const postModeration = await tx.postModeration.findUnique({
         where: { id },
-        include: { postVersion: true },
+        include: { postVersion: { include: { post: true } } },
       });
 
       if (!postModeration) {
@@ -337,6 +357,10 @@ export class PostModerationRepository {
 
       if (postModeration.moderatorHash !== moderatorHash) {
         throw new Error('Moderator hash does not match');
+      }
+
+      if (postModeration.postVersion.post.status !== 'PENDING') {
+        throw new Error('Post is not pending');
       }
 
       const postId = postModeration.postVersion.postId;
@@ -351,8 +375,93 @@ export class PostModerationRepository {
     return await this.findPostWithVersionsAndModerations(renewedPostId);
   }
 
-  async approvePost(postId: number): Promise<void> {
+  private async publishPost(postId: number): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
+      // Check that post has the approved status
+      const post = await tx.post.findFirst({
+        where: { id: postId, postIdInMainDb: null },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      if (!post) {
+        throw new Error(
+          `Post with id ${postId} not found. It is likely that it has already been published`,
+        );
+      }
+
+      if (post.status !== PostStatus.APPROVED) {
+        throw new Error(
+          `Post with id ${postId} does not have the 'approved' status`,
+        );
+      }
+
+      const newPostInMainDb = await this.postService.createPost({
+        title: post.versions[0].title,
+        content: post.versions[0].content,
+        categoryIds: post.versions[0].categoryIds,
+        files: (post.versions[0].files as string[]) ?? undefined,
+        authorHash: post.versions[0].authorHash,
+        authorNickname: post.versions[0].authorNickname,
+      });
+
+      this.logger.debug(
+        `Created new post in main db with id ${newPostInMainDb.id}`,
+      );
+
+      await tx.post.update({
+        where: { id: post.id },
+        data: { postIdInMainDb: newPostInMainDb.id },
+      });
+
+      this.logger.debug(
+        `Updated post with id ${post.id} to have main db id ${newPostInMainDb.id}`,
+      );
+    });
+  }
+
+  private async archivePost(postId: number): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      // Check that post has the rejected status
+      const post = await tx.post.findFirst({
+        where: { id: postId, archived: false },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      if (!post) {
+        throw new Error(
+          `No post with id ${post.id} found. It is likely that it has already been archived.`,
+        );
+      }
+
+      if (post.status !== PostStatus.REJECTED) {
+        throw new Error(
+          `Post with id ${postId} does not have the 'rejected' status`,
+        );
+      }
+
+      await tx.post.update({
+        where: { id: postId },
+        data: { archived: true },
+      });
+
+      this.logger.debug(`Archived post with id ${post.id}`);
+    });
+  }
+
+  private async approvePost(postId: number): Promise<void> {
+    return await this.prisma.$transaction(async (tx) => {
       // Check if the post has enough number of moderations
       const post = await tx.post.findUnique({
         where: { id: postId },
@@ -373,7 +482,9 @@ export class PostModerationRepository {
       }
 
       if (decisionsCount.REJECTED > 0) {
-        throw new Error(`Post has ${decisionsCount.REJECTED} rejections`);
+        throw new Error(
+          `Unable to move post to accepted status. Post has ${decisionsCount.REJECTED} rejection(s)`,
+        );
       }
 
       if (decisionsCount.ACCEPTED >= post.requiredModerations) {
@@ -382,55 +493,92 @@ export class PostModerationRepository {
           data: { status: 'APPROVED' },
         });
 
-        this.logger.log('Finished approving post with post id', postId);
-
-        // TODO: Add as a new post entry in the main db
-        const newPostInMainDb = await this.postService.createPost({
-          title: post.versions[0].title,
-          content: post.versions[0].content,
-          categoryIds: post.versions[0].categoryIds,
-          files: (post.versions[0].files as string[]) ?? undefined,
-          authorHash: post.versions[0].authorHash,
-          authorNickname: post.versions[0].authorNickname,
-        });
-        this.logger.log(
-          'Created new post in main db with id',
-          newPostInMainDb.id,
-        );
-
-        await tx.post.update({
-          where: { id: post.id },
-          data: { postIdInMainDb: newPostInMainDb.id },
-        });
-        this.logger.log(
-          'Updated post with id',
-          post.id,
-          ' to have main db id',
-          newPostInMainDb.id,
-        );
+        this.logger.debug(`Finished approving post with post id ${postId}`);
       }
     });
   }
 
-  async approveOrRejectPosts(): Promise<void> {
-    const pendingPosts = await this.prisma.post.findMany({
-      where: { status: 'PENDING' },
-      include: {
-        versions: { orderBy: { version: 'desc' }, take: 1 },
-      },
-    });
+  private async rejectPost(postId: number) {
+    return await this.prisma.$transaction(async (tx) => {
+      // Check if the post has reached the rejection threshold
+      const post = await tx.post.findUnique({
+        where: { id: postId },
+        include: {
+          versions: {
+            include: { moderations: { orderBy: { timestamp: 'desc' } } },
+            orderBy: { version: 'desc' },
+            take: 1,
+          },
+        },
+      });
 
-    for (const post of pendingPosts) {
-      try {
-        await this.approvePost(post.id);
-      } catch (error) {
-        this.logger.error(
-          `Error approving post with post id ${post.id}. ${error.message}`,
+      const latestVersion = post.versions[0];
+      const decisionsCount = countPostVersionModerationDecisions(latestVersion);
+
+      if (!decisionsCount) {
+        throw new Error('Post has no moderations');
+      }
+
+      if (decisionsCount.ACCEPTED > 0) {
+        throw new Error(
+          `Unable to move post to rejected status. It has ${decisionsCount.ACCEPTED} approval(s)`,
         );
       }
-    }
 
-    // TODO: Reject posts (awaiting conditions/business logic)
+      if (decisionsCount.REJECTED >= post.requiredModerations) {
+        await tx.post.update({
+          where: { id: postId },
+          data: { status: 'REJECTED' },
+        });
+
+        this.logger.log(`Finished rejecting post with post id ${postId}`);
+      }
+    });
+  }
+
+  async publishOrArchivePosts(): Promise<void> {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        OR: [
+          { status: 'APPROVED', postIdInMainDb: null },
+          { status: 'REJECTED', archived: false },
+        ],
+      },
+      include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
+    });
+
+    let publishedCount = 0;
+    let archivedCount = 0;
+
+    const tasks = posts.map((post) => {
+      if (post.status === 'APPROVED') {
+        return this.publishPost(post.id)
+          .then(() => {
+            publishedCount++;
+          })
+          .catch((error) => {
+            this.logger.debug(
+              `Post with post id ${post.id} was not published. ${error.message}`,
+            );
+          });
+      } else if (post.status === 'REJECTED') {
+        return this.archivePost(post.id)
+          .then(() => {
+            archivedCount++;
+          })
+          .catch((error) => {
+            this.logger.debug(
+              `Post with post id ${post.id} was not archived. ${error.message}`,
+            );
+          });
+      }
+    });
+
+    await Promise.all(tasks);
+
+    this.logger.debug(
+      `Number of posts published: ${publishedCount}, Number of posts archived: ${archivedCount}`,
+    );
   }
 
   async findPostWithVersionsAndModerations(

@@ -5,10 +5,10 @@ import {
   PostVersion,
   CommentVersion,
   Decision,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
-import { seedDb } from '../../../../prisma-premoderation/seed';
-import { PrismaService } from '../../../database/premoderation/prisma.service';
+import { seedDb } from '../../../../prisma-moderation/seed';
+import { PrismaService } from '../../../database/moderation/prisma.service';
 import { Test } from '@nestjs/testing';
 import { CommentModule } from './../../comment/comment.module';
 import { CommentModerationRepository } from './comment-moderation.repository';
@@ -130,6 +130,7 @@ describe('CommentRepository', () => {
     .withAuthorNickname('correct_teal_duck')
     .withPostIdInMainDb(1)
     .withVersions([pVersion3])
+    .withArchived(false)
     .build();
 
   const moderation1 = new CommentModerationBuilder()
@@ -216,6 +217,7 @@ describe('CommentRepository', () => {
       .withPostId(1)
       .withParent(null)
       .withParentId(null)
+      .withArchived(false)
       .build();
 
     // Act

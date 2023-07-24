@@ -1,3 +1,4 @@
+import { ModerationPublishFrequency } from './../../types/general';
 import { Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { PostModerationRepository } from './post-moderation/post-moderation.repository';
@@ -45,8 +46,8 @@ export class ScheduledModerationService {
 
   async handleCron() {
     const promises = [
-      this.moderationPostRepository.approveOrRejectPosts(),
-      this.moderationCommentRepository.approveOrRejectComments(),
+      this.moderationPostRepository.publishOrArchivePosts(),
+      this.moderationCommentRepository.publishOrArchiveComments(),
     ];
 
     await Promise.all(promises);
@@ -56,10 +57,15 @@ export class ScheduledModerationService {
   }
 
   onModuleInit() {
-    const postFrequency = this.config['postFrequency'];
+    const postFrequency: ModerationPublishFrequency = this.config[
+      'postFrequency'
+    ] satisfies ModerationPublishFrequency;
     const cronTime = convertFrequencyToCron(postFrequency);
     const job = new CronJob(cronTime, () => this.handleCron());
 
+    this.logger.log(
+      `Adding a cron job for publishing post and comment every ${postFrequency.value} ${postFrequency.unit} `,
+    );
     this.schedulerRegistry.addCronJob('publishPostAndComment', job);
     job.start();
   }

@@ -7,6 +7,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = gql`
       authorHash
       authorNickname
       requiredModerations
+      status
       versions {
         id
         title

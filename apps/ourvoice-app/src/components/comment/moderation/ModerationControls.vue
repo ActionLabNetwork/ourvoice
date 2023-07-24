@@ -47,7 +47,7 @@
                 leave-to-class="opacity-0"
               >
                 <ListboxOptions
-                  class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                  class="absolute -top-40 sm:-top-14 sm:right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
                 >
                   <ListboxOption
                     as="template"
@@ -97,13 +97,13 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-comment-validator'
-import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
+import { useCommentModerationStore } from '@/stores/comment-moderation'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
 
-const moderationCommentsStore = useModerationCommentsStore()
+const commentModerationStore = useCommentModerationStore()
 
 const actions = MODERATION_ACTIONS
 const action = ref(actions[0])
@@ -122,7 +122,7 @@ function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
 let moderationReasonField = useVeeValidateField<string>('moderationReason', action.value.validate)
 
 const isValidForm = computed(() => {
-  const modifyFormHasNoErrors = moderationCommentsStore.versionInModification.isValid
+  const modifyFormHasNoErrors = commentModerationStore.versionInModification.isValid
   const reasonFieldHasNoErrors =
     moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null
 

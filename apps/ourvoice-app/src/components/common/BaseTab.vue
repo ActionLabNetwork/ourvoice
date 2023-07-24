@@ -10,15 +10,31 @@
           {{ tab.name }}
         </option>
       </select>
+      <transition name="fade">
+        <div v-if="props.loading" class="h-[80vh]">
+          <Loading>Loading...</Loading>
+        </div>
+      </transition>
+      <transition name="fade">
+        <div v-if="!props.loading">
+          <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
+        </div>
+      </transition>
     </div>
     <div class="hidden sm:block">
       <nav class="isolate flex divide-x divide-gray-200 rounded-lg shadow">
-        <a
-        v-for="(tab, tabIdx) in tabs"
-        :key="tab.name"
-        :data-cy="`${tab.name.toLowerCase()}-tab`"
-        @click.prevent="switchTab(tab)"
-        :class="[tab.current ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700', tabIdx === 0 ? 'rounded-l-lg' : '', tabIdx === tabs.length - 1 ? 'rounded-r-lg' : '', 'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 focus:z-10']">
+        <div
+          v-for="(tab, tabIdx) in tabs"
+          :key="tab.name"
+          :data-cy="`${tab.name.toLowerCase()}-tab`"
+          @click.prevent="switchTab(tab)"
+          :class="[
+            tab.current ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700',
+            tabIdx === 0 ? 'rounded-l-lg' : '',
+            tabIdx === tabs.length - 1 ? 'rounded-r-lg' : '',
+            'group relative min-w-0 flex-1 overflow-hidden bg-white py-4 px-4 text-center text-sm font-medium hover:bg-gray-50 hover:cursor-pointer focus:z-10'
+          ]"
+        >
           <span>{{ tab.name }}</span>
           <span
             :class="[
@@ -26,22 +42,32 @@
               'absolute inset-x-0 bottom-0 h-0.5'
             ]"
           />
-        </a>
+        </div>
       </nav>
-      <div>
-        <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
-      </div>
+      <transition name="fade">
+        <div v-if="props.loading" class="h-[80vh]">
+          <Loading>Loading...</Loading>
+        </div>
+      </transition>
+      <transition name="fade">
+        <div v-if="!props.loading">
+          <slot :name="currentTab.name.toLowerCase().replace(' ', '-')"></slot>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Loading from './Loading.vue'
+
 import type { Tab } from '@/types'
 import { type PropType, ref, watchEffect } from 'vue'
 
 const props = defineProps({
   tabs: { type: Array as PropType<Tab[]>, required: true },
-  initialTab: { type: Object as PropType<Tab>, required: true }
+  initialTab: { type: Object as PropType<Tab>, required: true },
+  loading: { type: Boolean, required: true }
 })
 
 const emit = defineEmits(['tab-switched'])
@@ -60,3 +86,14 @@ const switchTab = (selectedTab: Tab) => {
   emit('tab-switched', selectedTab)
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

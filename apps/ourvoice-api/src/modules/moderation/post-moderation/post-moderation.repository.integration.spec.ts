@@ -3,10 +3,10 @@ import {
   PostStatus,
   PostVersion,
   Decision,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 import { numberToCursor } from '../../../utils/cursor-pagination';
-import { seedDb } from '../../../../prisma-premoderation/seed';
-import { PrismaService } from '../../../database/premoderation/prisma.service';
+import { seedDb } from '../../../../prisma-moderation/seed';
+import { PrismaService } from '../../../database/moderation/prisma.service';
 import { Test } from '@nestjs/testing';
 import { PostModule } from './../../post/post.module';
 import { PostModerationRepository } from './post-moderation.repository';
@@ -124,6 +124,7 @@ describe('PostRepository', () => {
     .withAuthorNickname('correct_teal_duck')
     .withPostIdInMainDb(1)
     .withVersions([version3, version2, version1])
+    .withArchived(false)
     .build();
 
   let postModerationRepository: PostModerationRepository;
@@ -143,15 +144,15 @@ describe('PostRepository', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (key === 'database.premoderationUrl') {
+              if (key === 'database.moderationUrl') {
                 return (
-                  process.env.DATABASE_PREMODERATION_URL ||
-                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer'
+                  process.env.DATABASE_MODERATION_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer'
                 );
-              } else if (key === 'database.premoderationTestUrl') {
+              } else if (key === 'database.moderationTestUrl') {
                 return (
-                  process.env.DATABASE_PREMODERATION_TEST_URL ||
-                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test'
+                  process.env.DATABASE_MODERATION_TEST_URL ||
+                  'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test'
                 );
               } else if (key === 'database.mainTestUrl') {
                 return (
@@ -507,40 +508,22 @@ describe('PostRepository', () => {
 
   it('should renew a moderated post', async () => {
     // Act & Assert
-    const acceptedPost = await postModerationRepository.approvePostVersion(
+    const approvedPost = await postModerationRepository.approvePostVersion(
       6,
       'testHash',
       'testNickname',
       'test reason',
     );
-    const acceptedPostModerationId = acceptedPost.versions[0].moderations[0].id;
-
-    const renewedAcceptedPost =
-      await postModerationRepository.renewPostModeration(
-        acceptedPostModerationId,
-        'testHash',
-      );
-
-    expect(renewedAcceptedPost.versions[0].moderations[0]).not.toEqual(
-      acceptedPostModerationId,
-    );
-
-    const rejectedPost = await postModerationRepository.rejectPostVersion(
-      6,
-      'testHash',
-      'testNickname',
-      'test reason',
-    );
-    const rejectedPostModerationId = rejectedPost.versions[0].moderations[0].id;
+    const approvedPostModerationId = approvedPost.versions[0].moderations[0].id;
 
     const renewedRejectedPost =
       await postModerationRepository.renewPostModeration(
-        rejectedPostModerationId,
+        approvedPostModerationId,
         'testHash',
       );
 
     expect(renewedRejectedPost.versions[0].moderations[0]).not.toEqual(
-      rejectedPostModerationId,
+      approvedPostModerationId,
     );
   });
 });

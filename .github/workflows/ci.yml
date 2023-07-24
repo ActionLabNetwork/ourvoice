@@ -22,9 +22,9 @@ env:
   DB_TEST_MAIN_DATABASE: ourvoice_db_test
   DB_TEST_MAIN_USERNAME: your_db_user
   DB_TEST_MAIN_PASSWORD: your_db_password
-  # DB_TEST_PREMOD_DATABASE: ourvoice_db_test_premod
-  # DB_TEST_PREMOD_USERNAME: your_db_user
-  # DB_TEST_PREMOD_PASSWORD: your_db_password!
+  # DB_TEST_MOD_DATABASE: ourvoice_db_test_mod
+  # DB_TEST_MOD_USERNAME: your_db_user
+  # DB_TEST_MOD_PASSWORD: your_db_password!
 
 jobs:
   lint:
@@ -67,10 +67,11 @@ jobs:
       DB_TEST_APP_API_DB_MAIN_DRIVER: postgres
       DB_TEST_APP_API_DB_MAIN_HOST: localhost
       DB_TEST_APP_API_DB_MAIN_PORT: 5436
-      DB_TEST_APP_API_DB_PREMOD_DRIVER: postgres
-      DB_TEST_APP_API_DB_PREMOD_HOST: localhost
-      DB_TEST_APP_API_DB_PREMOD_PORT: 5437
+      DB_TEST_APP_API_DB_MOD_DRIVER: postgres
+      DB_TEST_APP_API_DB_MOD_HOST: localhost
+      DB_TEST_APP_API_DB_MOD_PORT: 5437
       NODE_ENV: test
+      NODE_PATH: apps/ourvoice-api/node_modules
 
     strategy:
       matrix:
@@ -84,7 +85,7 @@ jobs:
           POSTGRES_USER: your_db_user
           POSTGRES_PASSWORD: your_db_password
           POSTGRES_DB: ourvoice_db_test
-          # POSTGRES_DB_PREMODERATION: ourvoice_db_pre
+          # POSTGRES_DB_MODERATION: ourvoice_db_mod
           options: >-
             --health-cmd pg_isready
             --health-interval 10s
@@ -92,13 +93,13 @@ jobs:
             --health-retries 5
         ports:
           - 5436:5432
-      postgres-app-db-premoderation:
+      postgres-app-db-moderation:
         image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_USER: your_db_user
           POSTGRES_PASSWORD: your_db_password
           POSTGRES_DB: ourvoice_db_test
-          POSTGRES_DB_PREMODERATION: ourvoice_db_test_pre
+          POSTGRES_DB_MODERATION: ourvoice_db_test_mod
           options: >-
             --health-cmd pg_isready
             --health-interval 10s
@@ -179,6 +180,38 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
+        postgres-version: [15]
+
+    services:
+      postgres-app-db-main:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+        ports:
+          - 5433:5432
+
+      postgres-app-db-mod:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: your_db_user
+          POSTGRES_PASSWORD: your_db_password
+          POSTGRES_DB: ourvoice_db_mod
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
+        ports:
+          - 5435:5432
 
     steps:
       - name: Repository checkout
@@ -195,19 +228,29 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
+      - run: echo "The node modules directory is located at:" $PATH
+
       - name: Install dependencies
         env:
           RUN_POST: ${{ env.RUN_POST}}
           DOCKER_BUILD: ${{ env.DOCKER_BUILD}}
         run: pnpm install
 
+      - name: Prisma Migration API main DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:main
+
+      - name: Prisma Migration API mod DB
+        working-directory: apps/ourvoice-api
+        run: pnpm prisma:migrate:moderation
+
       - name: Prisma Generate API main DB
         working-directory: apps/ourvoice-api
         run: pnpm prisma:generate:main
 
-      - name: Prisma Generate API premod DB
+      - name: Prisma Generate API mod DB
         working-directory: apps/ourvoice-api
-        run: pnpm prisma:generate:premoderation
+        run: pnpm prisma:generate:moderation
 
       - name: Prisma Generate API contactform DB
         working-directory: apps/ourvoice-api
@@ -252,7 +295,7 @@ jobs:
   #     statuses: write
   #     actions: write
   #     checks: read
-    
+
   #   env:
   #     APPS_PORTAL_APP: portal
   #     APPS_ADMIN_APP: admin
@@ -264,21 +307,20 @@ jobs:
   #     DOCKER_BUILD: true
   #     IMG_NAME: ${{ github.repository }}
 
-  #   steps: 
-      
+  #   steps:
+
   #     - name: Repository checkout
   #       uses: actions/checkout@v3.5.3
 
   #     - name: Info
   #       run: echo "Parameters. ${{ github.event.base_ref }}, ${{ github.ref_type }}, ${{ github.ref }}"
-      
+
   #     - name: Automatic Tagging of Releases
   #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && github.ref_type != 'tag'
   #       id: increment-git-tag
   #       run: |
   #         echo "Incrementing git tag"
   #         # bash ./deployment/build-docker/git_tag_update.sh -v patch
-
 
   #     # Building docker containers
   #     - name: Docker metadata
@@ -290,7 +332,7 @@ jobs:
   #         tags: |
   #           type=semver,pattern={{version}}
   #           type=semver,pattern={{major}}.{{minor}}
-  #           type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }} 
+  #           type=raw,value=dev-{{date 'YYYYMMDDhhmm'}}.{{sha}},enable=${{ github.ref_type != 'tag' }}
 
   #     - name: Set up Docker Buildx
   #       if: startsWith(github.ref, 'refs/heads/dev') && github.event_name != 'pull_request' && steps.increment-git-tag.conclusion == 'success'
@@ -365,7 +407,7 @@ jobs:
     #     ports:
     #       - 5433:5432
 
-    #   postgres-app-db-premod:
+    #   postgres-app-db-mod:
     #     image: postgres:${{ matrix.postgres-version }}
     #     env:
     #       POSTGRES_USER: your_db_user
@@ -405,17 +447,17 @@ jobs:
       #   working-directory: apps/ourvoice-api
       #   run: pnpm prisma:migrate:main
 
-      # - name: Prisma Migration API premod DB
+      # - name: Prisma Migration API mod DB
       #   working-directory: apps/ourvoice-api
-      #   run: pnpm prisma:migrate:premoderation
+      #   run: pnpm prisma:migrate:moderation
 
       # - name: Prisma Generate API main DB
       #   working-directory: apps/ourvoice-api
       #   run: pnpm prisma:generate:main
 
-      # - name: Prisma Generate API premod DB
+      # - name: Prisma Generate API mod DB
       #   working-directory: apps/ourvoice-api
-      #   run: pnpm prisma:generate:premoderation
+      #   run: pnpm prisma:generate:moderation
 
       # - name: Prisma Generate API contactform DB
       #   working-directory: apps/ourvoice-api

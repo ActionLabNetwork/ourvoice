@@ -1,6 +1,8 @@
+export type ModerationStatus = 'Pending' | 'Approved' | 'Rejected'
 export type ModerationVersionStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type ModerationVersionDecision = 'ACCEPTED' | 'REJECTED'
 export type ModerationVersionDecisionHistory = ModerationVersionDecision | 'MODIFIED'
+export type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 export interface ModeratedPostNicknames {
   author: {
     nickname: string
@@ -28,3 +30,6 @@ export interface Moderation {
   moderatorHash: any
   moderatorNickname: any
 }
+
+export type ModerationListTab = { name: ModerationStatus; current: boolean }
+export type ModerationListTabs = ModerationListTab[]

@@ -5,7 +5,12 @@
   >
     <!-- Self moderation indicator -->
     <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
-      <div :class="[props.decisionIcon?.indicatorClass, 'flex gap-2 items-center rounded-full p-1 px-2']">
+      <div
+        :class="[
+          props.decisionIcon?.indicatorClass,
+          'flex gap-2 items-center rounded-full p-1 px-2'
+        ]"
+      >
         <div class="h-2 w-2 rounded-full bg-current" />
         <p>{{ props.decisionIcon?.text }} by you</p>
       </div>
@@ -21,17 +26,17 @@
     />
 
     <!-- Title -->
-    <h3 class="text-2xl font-extrabold text-black-700 mb-3">
+    <h3 class="text-xl sm:text-2xl font-extrabold text-black-700 mb-3">
       {{ version.title }}
     </h3>
 
     <!-- Content -->
-    <p class="text-gray-700 text-lg leading-relaxed mb-3">
+    <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">
       {{ version.content }}
     </p>
 
     <!-- Categories -->
-    <div class="flex flex-wrap">
+    <div class="flex flex-col flex-wrap sm:flex-row w-fit mx-auto sm:mx-0 text-center">
       <div
         v-for="{ id, name } in version.categories"
         :key="id"
@@ -53,30 +58,38 @@
     </div>
 
     <!-- Moderation decisions count -->
-    <div v-if="props.version?.moderations?.length && props.version.moderations.length > 0" class="flex gap-3 justify-around" data-cy="moderation-decisions-count">
+    <div
+      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
+      class="flex flex-col sm:flex-row gap-3 justify-center mx-auto sm:mx-0 sm:justify-around"
+      data-cy="moderation-decisions-count"
+    >
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
         <p class="text-xs text-gray-600">{{ decision }}: {{ count }}</p>
       </div>
     </div>
 
     <!-- Moderate button -->
-    <div class="mt-4" v-if="!preview && post.status === 'PENDING'">
-      <CustomButton :visibilityPredicate="() => !!(post && post.id)"
-        :to="{ name: 'moderate-post', params: { id: post.id } }" data-cy="moderate-button" label="Moderate" />
+    <div class="mt-4 mx-auto sm:mx-0" v-if="!preview && post.status === 'PENDING'">
+      <CustomButton
+        :visibilityPredicate="() => !!(post && post.id)"
+        :to="{ name: 'moderate-post', params: { id: post.id } }"
+        data-cy="moderate-button"
+        label="Moderate"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { formatTimestampToReadableDate } from '@/utils';
-import AttachmentBadge from '@/components/common/AttachmentBadge.vue';
-import type { ModerationVersionDecision } from '@/types/moderation';
-import { getGroupsByProperty } from '@/utils/groupByProperty';
-import AuthorBadge from '@/components/common/AuthorBadge.vue';
-import CustomButton from '@/components/common/CustomButton.vue';
+import { computed } from 'vue'
+import { formatTimestampToReadableDate } from '@/utils'
+import AttachmentBadge from '@/components/common/AttachmentBadge.vue'
+import type { ModerationVersionDecision } from '@/types/moderation'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts';
+import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts'
 import type { ModerationPost as CModerationPost } from '@/stores/moderation-comments'
 import type { PropType } from 'vue'
 
@@ -151,7 +164,7 @@ const moderationResultGroups = computed(() => {
   }
 
   if (groups) {
-    ; (Object.keys(groups) as Array<keyof typeof groups>).forEach(
+    ;(Object.keys(groups) as Array<keyof typeof groups>).forEach(
       (key: ModerationVersionDecision) => {
         groupsCount[key] = groups[key].length
       }

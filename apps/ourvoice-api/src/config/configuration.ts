@@ -16,6 +16,9 @@ export default () => ({
   api: {
     url: process.env.VITE_APP_API_URL || 'http://api.ourvoice.test',
     port: parseInt(process.env.API_PORT, 10) || 3000,
+    globalPepper:
+      process.env.GLOBAL_PEPPER ||
+      'Are7pNzysGMRjfgF4eKhp8sHtgCFF9Cjft6ut9RVLcdSZPVkYU46xfb9Eqjwft2zkUP9KBGDkg3UpnCfh8C3zhCsKDDxa5u8xUyC43cQM4cwRw7TpMnb5KYRbuGQwnGfWf28Kf3HPhBuzf7ujzZzVvkTrk2h9NjwN8Kpe8aZfd8HuYHwqVscG8WdbdDwGFhH9G8cbqBVaQAQd5GBzSKRwwV5WdLWX2CEqm2FRtYBYz3W9Yq6yG7R4RwWBvWcmqCE',
   },
   app: {
     domain: process.env.VITE_APP_APP_DOMAIN || 'ourvoice.test',
@@ -64,26 +67,26 @@ export default () => ({
     hostTest: process.env.POSTGRES_DB_TEST_HOST || '127.0.0.1',
     portTest: parseInt(process.env.POSTGRES_DB_TEST_PORT, 10) || 5436,
     dbTest: process.env.POSTGRES_DB_TEST || 'ourvoice_db_test',
-    hostPre: process.env.POSTGRES_DB_PREMODERATION_HOST || '127.0.0.1',
-    portPre: parseInt(process.env.POSTGRES_DB_PREMODERATION_PORT, 10) || 5435,
-    dbPre: process.env.POSTGRES_DB_PREMODERATION || 'ourvoice_db_pre',
-    hostPreTest: process.env.POSTGRES_DB_PREMODERATION_TEST_HOST || '127.0.0.1',
+    hostPre: process.env.POSTGRES_DB_MODERATION_HOST || '127.0.0.1',
+    portPre: parseInt(process.env.POSTGRES_DB_MODERATION_PORT, 10) || 5435,
+    dbPre: process.env.POSTGRES_DB_MODERATION || 'ourvoice_db_mod',
+    hostPreTest: process.env.POSTGRES_DB_MODERATION_TEST_HOST || '127.0.0.1',
     portPreTest:
-      parseInt(process.env.POSTGRES_DB_PREMODERATION_TEST_PORT, 10) || 5437,
+      parseInt(process.env.POSTGRES_DB_MODERATION_TEST_PORT, 10) || 5437,
     dbPreTest:
-      process.env.POSTGRES_DB_PREMODERATION_TEST || 'ourvoice_db_pre_test',
+      process.env.POSTGRES_DB_MODERATION_TEST || 'ourvoice_db_mod_test',
     mainUrl:
       process.env.DATABASE_MAIN_URL ||
       'postgresql://your_db_user:your_db_password@127.0.0.1:5433/ourvoice_db?schema=ourvoice&sslmode=prefer',
-    premoderationUrl:
-      process.env.DATABASE_PREMODERATION_URL ||
-      'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_pre?schema=ourvoice&sslmode=prefer',
+    moderationUrl:
+      process.env.DATABASE_MODERATION_URL ||
+      'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer',
     mainTestUrl:
       process.env.DATABASE_MAIN_TEST_URL ||
       'postgresql://your_db_user:your_db_password@127.0.0.1:5436/ourvoice_db_test',
-    premoderationTestUrl:
-      process.env.DATABASE_PREMODERATION_TEST_URL ||
-      'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_pre_test',
+    moderationTestUrl:
+      process.env.DATABASE_MODERATION_TEST_URL ||
+      'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test',
   },
   // testing
   testMode: process.env.TEST_MODE || false,

@@ -1,6 +1,6 @@
 generator contactformClient {
   provider = "prisma-client-js"
-  output   = "../node_modules/@internal/prisma/contactform"
+  output   = "../node_modules/@prisma-contactform-db/client"
 }
 
 datasource contactformdb {

@@ -25,8 +25,6 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     isLoggedIn: async () => {
-      // const response = await authService.getSessionInfo()
-      // return response.status === 200 && response.data.userId
       return await Session.doesSessionExist()
     },
     nicknameInParts: (state) => {

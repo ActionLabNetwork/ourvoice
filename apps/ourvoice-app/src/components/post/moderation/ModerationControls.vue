@@ -47,7 +47,7 @@
                 leave-to-class="opacity-0"
               >
                 <ListboxOptions
-                  class="absolute -top-14 right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                  class="absolute -top-40 sm:-top-14 sm:right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
                 >
                   <ListboxOption
                     as="template"
@@ -103,12 +103,12 @@ import {
 } from '@headlessui/vue'
 import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-post-validator'
-import { useModerationPostsStore } from '@/stores/moderation-posts'
+import { usePostModerationStore } from '@/stores/post-moderation'
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
-const moderationPostsStore = useModerationPostsStore()
+const moderationPostsStore = usePostModerationStore()
 
 const actions = MODERATION_ACTIONS
 const action = ref(actions[0])

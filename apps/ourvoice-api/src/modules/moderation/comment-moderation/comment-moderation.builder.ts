@@ -7,7 +7,7 @@ import {
   Post,
   PostVersion,
   PostModeration,
-} from '../../../../node_modules/@internal/prisma/client';
+} from '@prisma-moderation-db/client';
 
 class CommentBuilder {
   private comment: Partial<
@@ -83,6 +83,11 @@ class CommentBuilder {
 
   withParentId(parentId: number | null): CommentBuilder {
     this.comment.parentId = parentId;
+    return this;
+  }
+
+  withArchived(archived: boolean): CommentBuilder {
+    this.comment.archived = archived;
     return this;
   }
 
@@ -167,7 +172,11 @@ class CommentVersionBuilder {
 
 class CommentModerationBuilder {
   private moderation: Partial<
-    CommentModeration & { commentVersion: Partial<CommentVersion> }
+    CommentModeration & {
+      commentVersion: Partial<CommentVersion> & {
+        comment: Partial<Comment> | undefined;
+      };
+    }
   > = {};
 
   constructor(moderation?: CommentModeration) {
@@ -179,7 +188,14 @@ class CommentModerationBuilder {
     return this;
   }
 
-  withCommentVersion(commentVersion: CommentVersion): CommentModerationBuilder {
+  withComment(comment: Comment): CommentModerationBuilder {
+    this.moderation.commentVersion.comment = comment;
+    return this;
+  }
+
+  withCommentVersion(
+    commentVersion: CommentVersion & { comment: Partial<Comment> | undefined },
+  ): CommentModerationBuilder {
     this.moderation.commentVersion = commentVersion;
     return this;
   }

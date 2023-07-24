@@ -1,8 +1,10 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { ContactFormEntryCreateInput } from '../../graphql';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { ContactFormService } from './contactform.service';
+import { AuthGuard } from '../../auth/auth.guard';
 
+@UseGuards(new AuthGuard())
 @Resolver('ContactForm')
 @Injectable()
 export class ContactFormResolver {
