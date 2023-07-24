@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-col w-full">
     <Navbar />
+    <ConsentModal />
     <Suspense>
       <RouterView />
     </Suspense>
@@ -9,6 +10,7 @@
 
 <script setup lang="ts">
 import Navbar from './components/common/Navbar.vue'
+import ConsentModal from './components/common/ConsentModal.vue'
 </script>
 <style>
 @import '@/assets/main.css';
