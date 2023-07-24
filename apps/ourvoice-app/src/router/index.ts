@@ -69,13 +69,6 @@ const router = createRouter({
       component: CreatePostView,
       meta: { requiresAuth: true }
     },
-    // TODO: this route is not used
-    // {
-    //   path: '/comment',
-    //   name: 'create-comment',
-    //   component: CreateCommentView,
-    //   meta: { requiresAuth: true }
-    // },
     {
       path: '/polls',
       name: 'polls',
