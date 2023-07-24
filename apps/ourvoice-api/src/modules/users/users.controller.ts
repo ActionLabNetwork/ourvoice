@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -137,8 +138,19 @@ export class UserController {
         return [];
       }
     });
+    const invitedModerators =
+      (await this.metadataService.getModeratorAllowlist()).metadata.allowList ||
+      [];
+    const moderators = (await Promise.all([...deploymentUsers])).flat();
+    const allModerators = invitedModerators.reduce(
+      (acc, val) =>
+        moderators.find((e) => e.email === val)
+          ? acc
+          : acc.concat({ id: null, email: val, roles: [] }),
+      [],
+    );
     return {
-      users: (await Promise.all([...deploymentUsers])).flat(),
+      users: [...allModerators, ...moderators],
     };
   }
   // assign role to specific user
@@ -189,7 +201,23 @@ export class UserController {
       add.moderators,
     );
     if (status === 'OK')
-      return { message: 'successfully added moderator emails' };
+      return { message: 'successfully updated moderator email list' };
+  }
+
+  @Get('allowed')
+  @UseGuards(new AuthGuard())
+  async getAllowed(
+    @Session() session: SessionContainer,
+  ): Promise<{ users: any }> {
+    // check if has admin rights
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status, metadata } = await this.metadataService.getAllowlist();
+    if (status === 'OK')
+      return {
+        users: metadata.allowList || [],
+      };
   }
 
   // assign allowed emails
@@ -209,6 +237,27 @@ export class UserController {
     const { status } = await this.metadataService.addEmailsToAllowlist(
       add.emails,
     );
-    if (status === 'OK') return { message: 'successfully updated user emails' };
+    if (status === 'OK')
+      return { message: 'successfully updated email allow list' };
+  }
+  // assign allowed emails
+  @Delete('allowed')
+  @UseGuards(new AuthGuard())
+  async removeAllowedEmail(
+    @Session() session: SessionContainer,
+    @Body()
+    remove: {
+      email: string;
+    },
+  ): Promise<{ message: string }> {
+    // check of admin
+    await this.userService.isAdmin(session);
+    // user is an admin or super admin
+    // TODO: error handling
+    const { status } = await this.metadataService.removeEmailFromAllowlist(
+      remove.email,
+    );
+    if (status === 'OK')
+      return { message: 'successfully updated email allow list' };
   }
 }

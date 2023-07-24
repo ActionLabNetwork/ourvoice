@@ -2,7 +2,7 @@
   <!-- Consent Modal -->
   <div
     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-    id="my-modal"
+    id="consent-modal"
     v-show="isConsentModalVisible"
   >
     <!-- consent modal content-->
@@ -70,6 +70,8 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
-
-function ref(arg0: boolean) { throw new Error("Function not implemented."); }
+<style>
+#consent-modal {
+  z-index: 9999999999;
+}
+</style>
