@@ -211,25 +211,8 @@ export class SupertokensService {
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/createCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/CreateCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L62
-                const {
-                  preAuthSessionId,
-                  codeId,
-                  deviceId,
-                  userInputCode,
-                  linkCode,
-                } = config.authBypassTest.createCode;
-                const code: SuperTokenAuthBypass['createCode'] = isTestMode
-                  ? {
-                      status: 'OK',
-                      preAuthSessionId,
-                      codeId,
-                      deviceId,
-                      userInputCode,
-                      linkCode,
-                      timeCreated: Date.now(),
-                      codeLifetime: 900000,
-                    }
-                  : await originalImplementation.createCode(input);
+                const code: SuperTokenAuthBypass['createCode'] =
+                  await originalImplementation.createCode(input);
 
                 return code;
               },
@@ -240,22 +223,11 @@ export class SupertokensService {
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/consumeCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/ConsumeCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L165
-                const { email, id, timeJoined } =
-                  config.authBypassTest.consumeCode;
-                const testResponse: SuperTokenAuthBypass['consumeCode'] = {
-                  status: 'OK',
-                  createdNewUser: false,
-                  user: {
-                    email,
-                    id,
-                    timeJoined,
-                  },
-                };
                 const response = await originalImplementation.consumeCode(
                   input,
                 );
 
-                return isTestMode ? testResponse : response;
+                return response;
               },
             };
           },
