@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full h-screen">
     <div
       class="sticky top-0 z-30 transition-transform duration-500 ease-in-out"
       :class="{ '-translate-y-full': isNavbarHidden, 'translate-y-0': !isNavbarHidden }"
@@ -8,7 +8,7 @@
         <Navbar />
       </div>
     </div>
-    <div class="z-20">
+    <div class="z-20 flex-grow">
       <Suspense>
         <RouterView />
       </Suspense>

@@ -25,6 +25,7 @@ const PostModerationListView = () => import('../views/PostModerationListView.vue
 const PostModerationView = () => import('../views/PostModerationView.vue')
 const CommentModerationListView = () => import('../views/CommentModerationListView.vue')
 const CommentModerationView = () => import('../views/CommentModerationView.vue')
+const PollView = () => import('../views/PollView.vue')
 
 const authBaseURL = config.authURL
 const authURL = `${authBaseURL}/signinWithoutPassword?d=${getCurrentDeploymentDomain().deployment}`
@@ -75,7 +76,8 @@ const router = createRouter({
     {
       path: '/polls',
       name: 'polls',
-      component: PollViewVue
+      component: PollView,
+      meta: { requiresAuth: true }
     },
     {
       path: '/moderation/posts',

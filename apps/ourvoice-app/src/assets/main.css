@@ -85,3 +85,28 @@
     background-color: hsl(200, 20%, 95%);
   }
 }
+
+
+h4 {
+  @apply text-[28px] font-medium;
+  color: var(--headings, #1A1A1A);
+  line-height: 120%;
+}
+
+h6 {
+  @apply text-[18px] font-normal;
+  color: var(--headings, #1A1A1A);
+  line-height: 130%;
+}
+
+@media only screen and (min-width: 1024px) {
+  h4 {
+    @apply text-[28px];
+  }
+  
+  h6 {
+    @apply text-[20px];
+  }
+}
+
+
