@@ -187,6 +187,54 @@ export class ModerationPostModifyInput {
     files?: Nullable<Nullable<string>[]>;
 }
 
+export class PollPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
+export class PollFilterInput {
+    question?: Nullable<string>;
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresBefore?: Nullable<DateTime>;
+    expiresAfter?: Nullable<DateTime>;
+    expiresExcludeNull?: Nullable<boolean>;
+    createdBefore?: Nullable<DateTime>;
+    createdAfter?: Nullable<DateTime>;
+}
+
+export class PollCreateInput {
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    expiresAt?: Nullable<DateTime>;
+    question: string;
+    options: PollOptionCreateInput[];
+}
+
+export class PollUpdateInput {
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresAt?: Nullable<DateTime>;
+    question?: Nullable<string>;
+    options?: Nullable<PollOptionCreateInput[]>;
+}
+
+export class PollOptionCreateInput {
+    option: string;
+}
+
+export class VoteInput {
+    voterHash: string;
+    pollId: number;
+    optionId: number;
+}
+
 export class PostUpdateInput {
     title?: Nullable<string>;
     content?: Nullable<string>;
@@ -248,6 +296,22 @@ export class VotesFilterInput {
     commentId?: Nullable<number>;
 }
 
+export interface BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+}
+
+export interface BasePollOption {
+    id: number;
+    option: string;
+}
+
 export abstract class IQuery {
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
@@ -274,6 +338,12 @@ export abstract class IQuery {
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
 
     abstract postVersion(id: number): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
+
+    abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
+
+    abstract votedPolls(userHash: string, pagination: PollPaginationInput): PollWithStatsConnection | Promise<PollWithStatsConnection>;
+
+    abstract pollsWithResult(moderatorHash: string, filter: PollFilterInput, pagination: PollPaginationInput): PollWithResultConnection | Promise<PollWithResultConnection>;
 
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
@@ -336,6 +406,14 @@ export abstract class IMutation {
     abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+
+    abstract createPoll(data: PollCreateInput): Poll | Promise<Poll>;
+
+    abstract updatePoll(pollId: number, data: PollUpdateInput): Poll | Promise<Poll>;
+
+    abstract removePoll(pollId: number): number | Promise<number>;
+
+    abstract votePoll(voteInput?: Nullable<VoteInput>): VoteResponse | Promise<VoteResponse>;
 
     abstract deletePost(id: number): Post | Promise<Post>;
 
@@ -537,6 +615,93 @@ export class ModerationPostPageInfo {
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
     hasPreviousPage?: Nullable<boolean>;
+}
+
+export class PollOption implements BasePollOption {
+    id: number;
+    option: string;
+}
+
+export class Poll implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+}
+
+export class PollPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
+}
+
+export class PollOptionWithResult implements BasePollOption {
+    id: number;
+    option: string;
+    numVotes: number;
+}
+
+export class PollWithResult implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOptionWithResult[];
+}
+
+export class PollWithResultEdge {
+    node: PollWithResult;
+    cursor: string;
+}
+
+export class PollWithResultConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: PollPageInfo;
+    edges: PollWithResultEdge[];
+}
+
+export class VoteResponse {
+    pollId: number;
+    optionId: number;
+    stats?: Nullable<PollOptionStat[]>;
+}
+
+export class PollOptionStat {
+    optionId: number;
+    proportion: number;
+}
+
+export class PollWithStats implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+    stats?: Nullable<PollOptionStat[]>;
+}
+
+export class PollWithStatsEdge {
+    node: PollWithStats;
+    cursor: string;
+}
+
+export class PollWithStatsConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: PollPageInfo;
+    edges: PollWithStatsEdge[];
 }
 
 export class Post {

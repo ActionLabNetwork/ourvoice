@@ -1,0 +1,170 @@
+type Query {
+  availablePolls(userHash: String!): [Poll!]!
+  votedPolls(
+    userHash: String!
+    pagination: PollPaginationInput!
+  ): PollWithStatsConnection!
+  pollsWithResult(
+    moderatorHash: String!
+    filter: PollFilterInput!
+    pagination: PollPaginationInput!
+  ): PollWithResultConnection!
+}
+
+type Mutation {
+  createPoll(data: PollCreateInput!): Poll!
+  updatePoll(pollId: Int!, data: PollUpdateInput!): Poll!
+  removePoll(pollId: Int!): Int!
+  votePoll(voteInput: VoteInput): VoteResponse!
+}
+
+input PollPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+interface BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+}
+
+interface BasePollOption {
+  id: Int!
+  option: String!
+}
+
+type PollOption implements BasePollOption {
+  id: Int!
+  option: String!
+}
+
+type Poll implements BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  options: [PollOption!]!
+}
+
+input PollFilterInput {
+  question: String
+  published: Boolean
+  active: Boolean
+  postLink: String
+  weight: Int
+  expiresBefore: DateTime
+  expiresAfter: DateTime
+  expiresExcludeNull: Boolean
+  createdBefore: DateTime
+  createdAfter: DateTime
+}
+
+type PollPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean
+}
+
+type PollOptionWithResult implements BasePollOption {
+  id: Int!
+  option: String!
+  numVotes: Int!
+}
+
+type PollWithResult implements BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  options: [PollOptionWithResult!]!
+}
+
+type PollWithResultEdge {
+  node: PollWithResult!
+  cursor: String!
+}
+
+type PollWithResultConnection {
+  totalCount: Int
+  pageInfo: PollPageInfo!
+  edges: [PollWithResultEdge!]!
+}
+
+input PollCreateInput {
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  expiresAt: DateTime
+  question: String!
+  options: [PollOptionCreateInput!]!
+}
+
+input PollUpdateInput {
+  published: Boolean
+  active: Boolean
+  postLink: String
+  weight: Int
+  expiresAt: DateTime
+  question: String
+  options: [PollOptionCreateInput!]
+}
+
+input PollOptionCreateInput {
+  option: String!
+}
+
+input VoteInput {
+  voterHash: String!
+  pollId: Int!
+  optionId: Int!
+}
+
+type VoteResponse {
+  pollId: Int!
+  optionId: Int!
+  stats: [PollOptionStat!]
+}
+
+type PollOptionStat {
+  optionId: Int!
+  proportion: Float!
+}
+
+type PollWithStats implements BasePoll {
+  id: Int!
+  question: String!
+  published: Boolean!
+  active: Boolean!
+  postLink: String
+  weight: Int!
+  createdAt: DateTime!
+  expiresAt: DateTime
+  options: [PollOption!]!
+  stats: [PollOptionStat!]
+}
+
+type PollWithStatsEdge {
+  node: PollWithStats!
+  cursor: String!
+}
+
+type PollWithStatsConnection {
+  totalCount: Int
+  pageInfo: PollPageInfo!
+  edges: [PollWithStatsEdge!]!
+}
