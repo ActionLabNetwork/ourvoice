@@ -600,6 +600,29 @@ export class CommentModerationRepository {
         this.logger.log(
           `Finished approving comment with comment id ${commentId}`,
         );
+        const newCommentInMainDb = await this.commentService.createComment({
+          content: comment.versions[0].content,
+          authorHash: comment.versions[0].authorHash,
+          authorNickname: comment.versions[0].authorNickname,
+          postId: comment.post.postIdInMainDb,
+          parentId: comment.parent?.commentIdInMainDb,
+        });
+
+        this.logger.log(
+          'Created new comment in main db with id',
+          newCommentInMainDb.id,
+        );
+
+        await tx.comment.update({
+          where: { id: comment.id },
+          data: { commentIdInMainDb: newCommentInMainDb.id },
+        });
+        this.logger.log(
+          'Updated comment with id',
+          comment.id,
+          ' to have main db id',
+          newCommentInMainDb.id,
+        );
       }
     });
   }
