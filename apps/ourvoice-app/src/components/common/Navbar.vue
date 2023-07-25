@@ -18,7 +18,8 @@
       <div class="w-fit justify-self-center col-span-full sm:col-span-1" v-if="currentPathIsReady">
         <Toggle
           :items="toggleItems"
-          :start-left="currentPath === '/posts'"
+          v-if="navBarSwitchState"
+          :start-left="navBarSwitchState === 'post'"
           @on-toggle="handleToggle"
         />
       </div>
@@ -338,6 +339,7 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const currentPath = computed(() => route.fullPath)
+const navBarSwitchState = computed(() => route.meta.navBarSwitchState as string | undefined)
 
 const hasElevatedPermissions = computed(
   () => !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin

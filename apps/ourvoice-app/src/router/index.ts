@@ -72,55 +72,55 @@ const router = createRouter({
       path: '/post',
       name: 'create-post',
       component: CreatePostView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, navBarSwitchState: 'post' }
     },
     {
       path: '/polls',
       name: 'polls',
       component: PollView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, navBarSwitchState: 'polls' }
     },
     {
       path: '/moderation/polls',
       name: 'moderation-polls-list',
       component: PollModerationView,
-      meta: {requiresAuth: true, requiresModeration: true}
+      meta: {requiresAuth: true, requiresModeration: true, navBarSwitchState: 'polls'}
     },
     {
       path: '/moderation/posts',
       name: 'moderate-post-list',
       component: PostModerationListView,
-      meta: { requiresAuth: true, requiresModerator: true }
+      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
     },
     {
       path: '/moderation/post/:id',
       name: 'moderate-post',
       component: PostModerationView,
-      meta: { requiresAuth: true, requiresModerator: true }
+      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
     },
     {
       path: '/moderation/comments',
       name: 'moderate-comment-list',
       component: CommentModerationListView,
-      meta: { requiresAuth: true, requiresModerator: true }
+      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
     },
     {
       path: '/moderation/comment/:id',
       name: 'moderate-comment',
       component: CommentModerationView,
-      meta: { requiresAuth: true, requiresModerator: true }
+      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
     },
     {
       path: '/posts',
       name: 'posts',
       component: PostsView,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, navBarSwitchState: 'post' }
     },
     {
       path: '/posts/:id(\\d+)',
       name: 'postpage',
       component: PostPage,
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, navBarSwitchState: 'post' }
     }
   ]
 })
