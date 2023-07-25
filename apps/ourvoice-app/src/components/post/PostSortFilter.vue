@@ -119,8 +119,6 @@ import { useToggle } from '@vueuse/core'
 import { computed, ref, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
-// import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
-// import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
 

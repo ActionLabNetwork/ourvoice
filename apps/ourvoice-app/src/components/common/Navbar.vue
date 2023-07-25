@@ -18,9 +18,8 @@
       <div class="w-fit justify-self-center col-span-full sm:col-span-1" v-if="currentPathIsReady">
         <Toggle
           :items="toggleItems"
-          @on-toggle="handleToggle"
           :start-left="currentPath === '/posts'"
-          :current-path="currentPath"
+          @on-toggle="handleToggle"
         />
       </div>
 
@@ -310,7 +309,7 @@ import {
   PopoverPanel
 } from '@headlessui/vue'
 import { useUserStore } from '@/stores/user'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useDeploymentStore } from '@/stores/deployment'
 import Session from 'supertokens-web-js/recipe/session'
 
@@ -318,7 +317,6 @@ import ThreadsIcon from '@/assets/icons/threads.svg'
 import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
 import PollsIcon from '@/assets/icons/polls.svg'
 import PollsIconDark from '@/assets/icons/polls-dark.svg'
-import router from '@/router'
 
 const toggleItems = {
   left: {
@@ -338,6 +336,7 @@ let currentPathIsReady = ref(false)
 
 const userStore = useUserStore()
 const route = useRoute()
+const router = useRouter()
 const currentPath = computed(() => route.fullPath)
 
 const hasElevatedPermissions = computed(
@@ -345,9 +344,13 @@ const hasElevatedPermissions = computed(
 )
 
 onMounted(async () => {
-  await router.isReady()
   console.log('Current path: ', currentPath.value)
   console.log('Deployment', useDeploymentStore().deployment)
+})
+
+router.afterEach(async () => {
+  currentPathIsReady.value = false
+  await router.isReady()
   currentPathIsReady.value = true
 })
 

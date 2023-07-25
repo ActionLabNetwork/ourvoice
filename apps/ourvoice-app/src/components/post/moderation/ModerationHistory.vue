@@ -42,8 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { usePostModerationStore } from '@/stores/post-moderation'
-import type { PostVersion } from '@/stores/moderation-posts'
+import { usePostModerationStore, type ModerationPostVersion } from '@/stores/post-moderation'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
@@ -52,7 +51,7 @@ import type { Moderation, ModerationVersionDecisionHistory } from '@/types/moder
 interface History {
   id: number
   decision: ModerationVersionDecisionHistory
-  reason: string
+  reason?: string | null
   timestamp: string
   moderatorHash: string
   moderatorNickname: string
@@ -78,7 +77,7 @@ const moderations = computed(() => {
     )
   }
 
-  const getModifyModerations = (version: PostVersion): History[] =>
+  const getModifyModerations = (version: ModerationPostVersion): History[] =>
     version.version > 1
       ? [
           {

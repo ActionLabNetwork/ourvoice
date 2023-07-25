@@ -1,4 +1,3 @@
-import gql from 'graphql-tag'
 import { graphql } from '../generated'
 
 export const GET_CATEGORIES_QUERY = graphql(`

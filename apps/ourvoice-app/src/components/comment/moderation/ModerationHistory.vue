@@ -45,13 +45,13 @@
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
-import type { ModerationVersionDecisionHistory } from '@/types/moderation'
 import { useCommentModerationStore } from '@/stores/comment-moderation'
+import type { ModerationVersionDecisionHistory } from '@/types/moderation'
 
 interface History {
   id: number
   decision: ModerationVersionDecisionHistory
-  reason: string
+  reason: string | null
   timestamp: string
   moderatorHash: string
   moderatorNickname: string

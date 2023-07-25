@@ -45,7 +45,7 @@ export interface Moderation {
   decision: 'ACCEPTED' | 'REJECTED'
   moderatorHash: string
   moderatorNickname: string
-  reason: string
+  reason: string | null
   timestamp: string
 }
 

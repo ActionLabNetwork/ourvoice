@@ -43,4 +43,14 @@ const { isElementHidden: isNavbarHidden } = useScrollHide()
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Fade Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

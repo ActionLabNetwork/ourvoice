@@ -58,7 +58,7 @@ export type PageChangePayload = {
   page: number
 }
 
-const props = defineProps<{
+defineProps<{
   hasNextPage: boolean
 }>()
 const emit = defineEmits<{

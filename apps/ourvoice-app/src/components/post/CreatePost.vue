@@ -1,6 +1,11 @@
 <template>
   <div class="max-h-screen">
-    <div class="container mx-auto p-4">
+    <transition name="fade">
+      <div class="h-[80vh]" v-if="loading">
+        <Loading>Submitting form to moderation...</Loading>
+      </div>
+    </transition>
+    <div class="container mx-auto p-4" v-if="!loading">
       <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto">
         <!-- Form for creating new post -->
         <form @submit="onSubmit" class="space-y-6">
@@ -187,7 +192,6 @@ import { useCategoriesStore } from '@/stores/categories'
 import AttachmentList from '../inputs/AttachmentList.vue'
 import {
   createPostContentCharacterLimit,
- 
   postFilesPresignedUrlTTL,
   inputPlaceholders
 } from '@/constants/post'
@@ -201,6 +205,8 @@ import {
   validateTitle
 } from '@/validators'
 import { useUserStore } from '@/stores/user'
+import Loading from '../common/Loading.vue'
+import router from '@/router'
 
 interface PresignedUrlResponse {
   key: string
@@ -236,6 +242,8 @@ onMounted(async () => {
 const { handleSubmit, resetForm, errors } = useForm({
   validationSchema: createPostValidationSchema
 })
+
+const loading = ref(false)
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -283,10 +291,7 @@ const updateAttachments = async (event: Event) => {
   )
 
   try {
-    const response = await postsStore.getPresignedUrls(
-      keys,
-      postFilesPresignedUrlTTL
-    )
+    const response = await postsStore.getPresignedUrls(keys, postFilesPresignedUrlTTL)
     presignedUrls.value = (response as { key: string; url: string }[]) ?? []
   } catch (error) {
     console.error('Error getting presigned URLs:', error)
@@ -299,11 +304,9 @@ const requiredFields = [titleField, contentField, categoriesField]
 const allRequiredFieldsValidated = computed(() => {
   return requiredFields.every((field) => field.meta.validated)
 })
-
 const formHasNoErrors = computed(() => {
   return Object.keys(errors.value).length === 0
 })
-
 // Check if form is valid
 const isValidForm = computed(() => {
   return allRequiredFieldsValidated.value && formHasNoErrors.value
@@ -311,6 +314,7 @@ const isValidForm = computed(() => {
 
 // Handle Form submission
 const onSubmit = handleSubmit(async (values) => {
+  loading.value = true
   // Upload files to S3 using the presigned URLs
   if (values.attachments && presignedUrls.value.length > 0) {
     try {
@@ -336,6 +340,8 @@ const onSubmit = handleSubmit(async (values) => {
 
   // After successfully submitting the form, reset the form fields
   resetFormFields()
+  loading.value = false
+  router.replace({ path: '/posts' })
 })
 
 const resetFormFields = () => {

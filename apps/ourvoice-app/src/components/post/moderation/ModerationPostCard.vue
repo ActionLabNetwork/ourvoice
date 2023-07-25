@@ -1,37 +1,53 @@
 <template>
   <div
     v-if="post && version"
-    class="bg-white shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
+    class="bg-white drop-shadow-md border border-gray-200 p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
+    :class="[props.preview ? 'rounded-t-2xl' : 'rounded-2xl']"
   >
-    <!-- Self moderation indicator -->
-    <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
-      <div
-        :class="[
-          props.decisionIcon?.indicatorClass,
-          'flex gap-2 items-center rounded-full p-1 px-2'
-        ]"
-      >
-        <div class="h-2 w-2 rounded-full bg-current" />
-        <p>{{ props.decisionIcon?.text }} by you</p>
+    <div class="flex justify-between items-center">
+      <!-- Author -->
+      <AuthorBadge
+        v-if="nickname.author.nickname"
+        :authorName="nickname.author.nickname"
+        :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
+        :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
+        :modifierName="nickname.moderator.nickname"
+      />
+
+      <div>
+        <!-- Moderated Count -->
+        <div
+          class="w-28 h-8 px-4 py-2 bg-ourvoice-util-pink rounded-3xl justify-center items-center gap-2 inline-flex"
+        >
+          <div
+            class="text-center text-ourvoice-black text-xs font-medium leading-none tracking-tight"
+          >
+            {{ `${moderationCount}/${post.requiredModerations}` }} Moderated
+          </div>
+        </div>
+
+        <!-- Self moderation indicator -->
+        <div v-if="props.decisionIcon" data-cy="self-moderation-indicator">
+          <div
+            :class="[
+              props.decisionIcon?.indicatorClass,
+              'flex gap-2 items-center rounded-full p-1 px-2'
+            ]"
+          >
+            <div class="h-2 w-2 rounded-full bg-current" />
+            <p>{{ props.decisionIcon?.text }} by you</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Author -->
-    <AuthorBadge
-      v-if="nickname.author.nickname"
-      :authorName="nickname.author.nickname"
-      :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formattedDate(version)"
-      :modifierName="nickname.moderator.nickname"
-    />
-
     <!-- Title -->
-    <h3 class="text-xl sm:text-2xl font-extrabold text-black-700 mb-3">
+    <h3 class="text-xl sm:text-2xl font-extrabold text-ourvoice-black mb-3">
       {{ version.title }}
     </h3>
 
     <!-- Content -->
-    <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">
+    <p class="text-ourvoice-neutral-body text-md sm:text-lg leading-relaxed mb-3">
       {{ version.content }}
     </p>
 
@@ -89,8 +105,8 @@ import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, ModerationPost, PostVersion } from '@/stores/moderation-posts'
-import type { ModerationPost as CModerationPost } from '@/stores/moderation-comments'
+import type { Moderation } from '@/stores/moderation-posts'
+import type { ModerationPost, ModerationPostVersion } from '@/stores/post-moderation'
 import type { PropType } from 'vue'
 
 interface DecisionIcon {
@@ -100,11 +116,11 @@ interface DecisionIcon {
 
 const props = defineProps({
   post: {
-    type: Object as PropType<ModerationPost | CModerationPost>,
+    type: Object as PropType<ModerationPost>,
     required: true
   },
   version: {
-    type: Object as PropType<PostVersion>,
+    type: Object as PropType<ModerationPostVersion>,
     required: false
   },
   preview: {
@@ -150,6 +166,8 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
+  if (!version.value?.moderations) return { ACCEPTED: 0, REJECTED: 0 }
+
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
     version.value?.moderations.reduce(
       (acc, moderation) => {
@@ -174,5 +192,7 @@ const moderationResultGroups = computed(() => {
   return groupsCount
 })
 
-const formattedDate = (version: PostVersion) => formatTimestampToReadableDate(+version.timestamp)
+const moderationCount = computed(() => {
+  return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
+})
 </script>

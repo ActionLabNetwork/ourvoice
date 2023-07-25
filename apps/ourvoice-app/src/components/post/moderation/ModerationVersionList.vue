@@ -16,7 +16,11 @@
           </div>
           <div class="hidden sm:flex sm:flex-col sm:items-start space-y-2">
             <p
-              v-if="version.moderations.length > 0 && version.moderations[0].timestamp"
+              v-if="
+                version.moderations &&
+                version.moderations.length > 0 &&
+                version.moderations[0].timestamp
+              "
               class="mt-1 text-xs leading-5 text-gray-500"
             >
               Last moderated <br />
@@ -51,24 +55,24 @@
 </template>
 
 <script setup lang="ts">
-import type { PostVersion } from '@/stores/moderation-posts'
 import { computed, onMounted, ref } from 'vue'
 import type { PropType } from 'vue'
 
 import { formatTimestampToReadableDate } from '@/utils'
+import type { ModerationPostVersion } from '@/stores/post-moderation'
 
 const props = defineProps({
   versions: {
-    type: Array as PropType<PostVersion[]>,
+    type: Array as PropType<ModerationPostVersion[]>,
     required: true
   }
 })
 
 const emit = defineEmits(['versionClicked'])
 
-const selected = ref<PostVersion | null>(null)
+const selected = ref<ModerationPostVersion | null>(null)
 const isSelected = computed(() => {
-  return (postVersion: PostVersion) => postVersion === selected.value
+  return (postVersion: ModerationPostVersion) => postVersion === selected.value
 })
 const originalPostVersion = ref(props.versions[props.versions.length - 1])
 
@@ -76,7 +80,7 @@ onMounted(() => {
   selected.value = props.versions[0]
 })
 
-const handleVersionClick = (version: PostVersion) => {
+const handleVersionClick = (version: ModerationPostVersion) => {
   selected.value = version
   emit('versionClicked', version)
 }

@@ -1,47 +1,46 @@
 <template>
-  <button class="mx-5 py-1 bg-white rounded-full" @click="toggle">
-    <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-56">
+  <button
+    :class="twMerge('mx-5 py-1 bg-white rounded-full h-fit', props.className)"
+    @click="toggle"
+  >
+    <div class="grid grid-cols-2 gap-2 justify-center text-center px-2 relative w-[18.7rem]">
+      <!-- Left element -->
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
           :class="[isOnTheLeft ? 'invisible' : 'visible']"
         >
-          <span>
-            <img
-              :src="isOnTheLeft ? props.items.right.iconLight : props.items.left.iconLight"
-              alt="icon"
-            />
+          <span :v-if="!!props.items.left.iconLight">
+            <img :src="props.items.left.iconLight" alt="icon" />
           </span>
-          <span>{{ isOnTheLeft ? props.items.right.label : props.items.left.label }}</span>
+          <span>{{ props.items.left.label }}</span>
         </div>
       </div>
+      <!-- Right Element -->
       <div class="rounded-full px-3 py-3 transition duration-300 ease-in-out">
         <div
           class="flex items-center justify-center gap-2 min-w-24 transition-opacity duration-300"
           :class="[!isOnTheLeft ? 'invisible' : 'visible']"
         >
-          <span>
-            <img
-              :src="isOnTheLeft ? props.items.right.iconLight : props.items.left.iconLight"
-              alt="icon"
-            />
+          <span :v-if="!!props.items.right.iconLight">
+            <img :src="props.items.right.iconLight" alt="icon" />
           </span>
           <span>
-            {{ isOnTheLeft ? props.items.right.label : props.items.left.label }}
+            {{ props.items.right.label }}
           </span>
           <span v-if="isOnTheLeft ? props.items.right.hasUpdates : props.items.left.hasUpdates">
-            <div class="h-2 w-2 rounded-full bg-current text-[#FFBE00]" />
+            <div class="h-2 w-2 rounded-full bg-current text-ourvoice-accent-1" />
           </span>
         </div>
       </div>
 
       <!-- This is the element that's moving -->
       <div
-        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5"
-        :class="[isOnTheLeft ? '' : 'translate-x-[6.5rem]']"
+        class="border rounded-full px-5 py-3 bg-black transition duration-200 ease-in-out absolute left-1 -top-0.5 w-[9.7rem]"
+        :class="[isOnTheLeft ? '' : `translate-x-[8.5rem]`]"
       >
         <div class="flex gap-2 min-w-24 justify-center">
-          <span>
+          <span :v-if="props.items.right.iconDark && props.items.left.iconDark">
             <img
               :src="!isOnTheLeft ? props.items.right.iconDark : props.items.left.iconDark"
               alt="icon"
@@ -58,18 +57,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { twMerge } from 'tailwind-merge'
 
-type ToggleItems = {
-  [K in 'left' | 'right']: {
-    label: string
-    iconLight: string
-    iconDark: string
-    hasUpdates: boolean
-  }
-}
+import type { ToggleItems } from '@/types'
 
 type Events = {
-  onToggle: { (e: 'onToggle', direction: 'left' | 'right'): void }
+  onToggle: (e: 'onToggle', direction: 'left' | 'right') => void
 }
 
 const props = defineProps({
@@ -81,12 +74,16 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  currentPath: { type: String, required: false }
+  className: {
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits<Events['onToggle']>()
 
 const isOnTheLeft = ref(props.startLeft)
+console.log({ left: isOnTheLeft.value })
 
 const toggle = () => {
   isOnTheLeft.value = !isOnTheLeft.value

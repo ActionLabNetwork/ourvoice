@@ -1,22 +1,29 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
-      <!-- Side pane button -->
-      <div
-        @click="toggleSidePane"
-        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
-        data-cy="moderation-history-button"
-      >
-        <p>
-          Moderation History
-          <span>
-            <font-awesome-icon :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']" />
-          </span>
-        </p>
+    <div class="flex justify-between items-center">
+      <div>
+        <BackButton />
       </div>
-      <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
-        <ModerationHistory />
-      </SidePane>
+      <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
+        <!-- Side pane button -->
+        <div
+          @click="toggleSidePane"
+          class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
+          data-cy="moderation-history-button"
+        >
+          <p>
+            Moderation History
+            <span>
+              <font-awesome-icon
+                :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
+              />
+            </span>
+          </p>
+        </div>
+        <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
+          <ModerationHistory />
+        </SidePane>
+      </div>
     </div>
     <div class="grid grid-cols-4 gap-2">
       <!-- Versioning -->
@@ -99,7 +106,6 @@
 </template>
 
 <script setup lang="ts">
-import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -110,8 +116,13 @@ import ModerationHistory from '@/components/comment/moderation/ModerationHistory
 import ModerationVersionList from '@/components/comment/moderation/ModerationVersionList.vue'
 import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
+import BackButton from '@/components/common/BackButton.vue'
 import { storeToRefs } from 'pinia'
-import { useCommentModerationStore } from '@/stores/comment-moderation'
+import {
+  useCommentModerationStore,
+  type ModerationCommentVersion
+} from '@/stores/comment-moderation'
+import type { CommentModeration } from '@/graphql/generated/graphql'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -134,7 +145,7 @@ const {
   hasErrors
 } = storeToRefs(commentModerationStore)
 
-const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
+const selfModeration = ref<CommentModeration['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
@@ -203,7 +214,7 @@ function handleSidePaneToggle(open: boolean) {
   showSidePane.value = open
 }
 
-async function handleVersionChange(newVersion: CommentVersion) {
+async function handleVersionChange(newVersion: ModerationCommentVersion) {
   commentModerationStore.versionInModeration = newVersion
   await refreshVersion()
 }
@@ -236,7 +247,7 @@ function handleModifyFormUpdate({
   version: editedVersion,
   isValid
 }: {
-  version: CommentVersion
+  version: ModerationCommentVersion
   isValid: boolean
 }) {
   if (!isValid) return
