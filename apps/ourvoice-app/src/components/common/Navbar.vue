@@ -375,6 +375,12 @@ const moderation = ref([
     name: 'Comments',
     href: '/moderation/comments',
     current: currentPath.value === '/moderation/comments'
+  },
+  {
+    id: 3,
+    name: 'Polls',
+    href: '/moderation/polls',
+    current: currentPath.value === '/moderation/polls'
   }
 ])
 
@@ -433,7 +439,13 @@ watchEffect(() => {
       name: 'Comments',
       href: '/moderation/comments',
       current: currentPath.value === '/moderation/comments'
-    }
+    },
+  {
+    id: 3,
+    name: 'Polls',
+    href: '/moderation/polls',
+    current: currentPath.value === '/moderation/polls'
+  }
   ]
 })
 </script>
