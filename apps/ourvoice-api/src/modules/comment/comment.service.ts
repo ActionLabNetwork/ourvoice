@@ -64,7 +64,7 @@ export class CommentService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: comments.length < totalCount,
+      hasNextPage: comments.length === (pagination?.limit ?? 10),
     };
 
     return { totalCount, edges, pageInfo };

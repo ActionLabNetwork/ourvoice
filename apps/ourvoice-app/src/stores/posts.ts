@@ -165,7 +165,7 @@ export const usePostsStore = defineStore('posts', {
               categoryIds,
               files,
               authorHash,
-              authorNickname,
+              authorNickname
             }
           }
         })
@@ -206,7 +206,7 @@ export const usePostsStore = defineStore('posts', {
     }) {
       try {
         //sync votesUp/votesDown state with the post table
-        const storedPost = {...this.data.find((post) => post.id === postId)!}
+        const storedPost = { ...this.data.find((post) => post.id === postId)! }
         evictItem(storedPost)
         storedPost.votesUp = votesUp
         storedPost.votesDown = votesDown
@@ -221,13 +221,13 @@ export const usePostsStore = defineStore('posts', {
               if (vote.authorHash !== authorHash) {
                 return vote
               }
-              return {...vote, voteType}
+              return { ...vote, voteType }
             })
           }
         } else {
           storedPost.votes = [...storedPost.votes, { authorHash, voteType }]
         }
-        this.data = this.data.map((post) =>  post.id === postId ? storedPost : post)
+        this.data = this.data.map((post) => (post.id === postId ? storedPost : post))
       } catch (error) {
         if (error instanceof Error) {
           this.error = error

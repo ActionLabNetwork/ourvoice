@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col overflow-y-auto relative p-10" ref="scrollContainer">
+  <div class="flex flex-col overflow-y-auto relative p-10">
     <PostSortFilter />
     <div class="max-w-5xl w-full mx-auto space-y-3">
       <PostCard
@@ -9,6 +9,13 @@
         class="card card-outline card-hover"
       />
       <EmptyState v-if="posts.length <= 0">No posts to display...</EmptyState>
+      <button
+        class="mx-auto block"
+        v-if="postStore.pageInfo?.hasNextPage"
+        @click="postStore.loadMorePosts()"
+      >
+        Load More
+      </button>
     </div>
     <div v-if="state == 'loading-initial'" class="max-w-5xl w-full mx-auto space-y-3">
       <div v-for="i in 3" :key="i" class="h-[300px] card skeleton" />
@@ -18,23 +25,13 @@
 <script lang="ts" setup>
 import PostSortFilter from '@/components/post/PostSortFilter.vue'
 import PostCard from '@/components/post/PostCard.vue'
-import { useScroll } from '@vueuse/core'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
-import { ref, watchEffect } from 'vue'
 import EmptyState from '../components/comment/EmptyState.vue'
 const postStore = usePostsStore()
 const { data: posts, state } = storeToRefs(postStore)
-const scrollContainer = ref(null)
-const { arrivedState } = useScroll(scrollContainer)
 
 if (state.value == 'initial') {
   postStore.fetchPosts()
 }
-
-watchEffect(() => {
-  if (arrivedState.bottom && state.value == 'loaded') {
-    postStore.loadMorePosts()
-  }
-})
 </script>

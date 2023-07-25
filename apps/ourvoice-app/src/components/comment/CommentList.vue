@@ -10,6 +10,13 @@
         :index-in-list="comment.id"
         :comment-id="comment.id"
       />
+      <button
+        v-if="commentsStore.pageInfo?.hasNextPage"
+        class="mx-auto block"
+        @click="commentsStore.loadMoreComments(postId)"
+      >
+        Load More
+      </button>
     </div>
   </div>
   <EmptyState v-else>No comments to display...</EmptyState>
