@@ -1,7 +1,7 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
-      class="mx-auto grid grid-cols-3 grid-flow-row-dense max-w-7xl items-center justify-between p-6 lg:px-8 gap-y-5"
+      class="mx-auto grid grid-cols-3 grid-flow-row-dense items-center justify-between p-6 lg:px-8 gap-y-5"
       aria-label="Global"
     >
       <!-- Logo -->
@@ -9,7 +9,7 @@
         <a href="/" class="-m-1.5 p-1.5">
           <span class="sr-only">OurVoice</span>
           <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
-        </a>
+        </a>s
         <div class="hidden lg:flex lg:flex-none">
           <CreatePostNavButton class="hidden lg:inline-flex" v-if="route.path === '/posts'" />
         </div>
