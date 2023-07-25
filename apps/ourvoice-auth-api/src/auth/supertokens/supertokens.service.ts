@@ -181,33 +181,22 @@ export class SupertokensService {
       Passwordless: Passwordless.init({
         contactMethod: 'EMAIL',
         flowType: 'MAGIC_LINK',
-        emailDelivery: isTestMode
-          ? {
-              override: (originalImplementation) => {
-                return {
-                  ...originalImplementation,
-                  sendEmail: async function () {
-                    // Do nothing as we don't want to send emails in test mode
-                  },
-                };
+        emailDelivery: {
+          service: new SMTPService({
+            smtpSettings: {
+              host: smtpSettings.host,
+              authUsername: smtpSettings.user,
+              password: smtpSettings.password,
+              port: config.smtpSettings.port || 2525,
+              from: {
+                name: 'OurVoice',
+                // TODO: make configurable
+                email: 'no-reply@ourvoice.app',
               },
-            }
-          : {
-              service: new SMTPService({
-                smtpSettings: {
-                  host: smtpSettings.host,
-                  authUsername: smtpSettings.user,
-                  password: smtpSettings.password,
-                  port: config.smtpSettings.port || 2525,
-                  from: {
-                    name: 'OurVoice',
-                    // TODO: make configurable
-                    email: 'no-reply@ourvoice.app',
-                  },
-                  // secure: true,
-                },
-              }),
+              // secure: true,
             },
+          }),
+        },
         override: {
           functions: (originalImplementation) => {
             return {
