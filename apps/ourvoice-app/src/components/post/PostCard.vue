@@ -70,14 +70,13 @@
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
-import { postFilesPresignedUrlTTL } from '@/constants/post'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { usePostsStore } from '@/stores/posts'
 import { useUserStore } from '@/stores/user'
 import { timePassed } from '@/utils/index'
 import { useMutation } from '@vue/apollo-composable'
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CreateComment from '../comment/CreateComment.vue'
 import IconMessageCircle from '../icons/IconMessageCircle.vue'

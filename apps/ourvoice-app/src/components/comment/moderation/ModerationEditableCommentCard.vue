@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watchEffect, onMounted } from 'vue'
-import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
+import { type Moderation } from '@/stores/moderation-comments'
 import { formatTimestampToReadableDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categories'

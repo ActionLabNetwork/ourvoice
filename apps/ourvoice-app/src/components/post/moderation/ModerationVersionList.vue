@@ -55,7 +55,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PostVersion } from '@/stores/moderation-posts'
 import { computed, onMounted, ref } from 'vue'
 import type { PropType } from 'vue'
 

@@ -1,8 +1,4 @@
-import {
-  PostConnection,
-  PostPaginationInput,
-  PostSortingInput,
-} from './../../graphql';
+import { PostPaginationInput, PostSortingInput } from './../../graphql';
 import {
   BadRequestException,
   Injectable,

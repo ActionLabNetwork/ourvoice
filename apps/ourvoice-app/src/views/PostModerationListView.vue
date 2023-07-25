@@ -30,16 +30,16 @@ import { onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
-import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
+import { useModerationPostsStore } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
 import { storeToRefs } from 'pinia'
 import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
-import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import type { ModerationListTab, ModerationStatusLabels } from '@/types/moderation'
 import router from '@/router'
 import { ModerationPostStatus } from '@/graphql/generated/graphql'
 
-const tabToStatusMapping: Record<ModerationStatus, ModerationPostStatus> = {
+const tabToStatusMapping: Record<ModerationStatusLabels, ModerationPostStatus> = {
   Pending: ModerationPostStatus.Pending,
   Approved: ModerationPostStatus.Approved,
   Rejected: ModerationPostStatus.Rejected

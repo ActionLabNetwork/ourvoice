@@ -1,4 +1,3 @@
-import gql from 'graphql-tag'
 import { graphql } from '@/graphql/generated/gql'
 
 export const GET_MODERATION_POSTS_QUERY = graphql(`

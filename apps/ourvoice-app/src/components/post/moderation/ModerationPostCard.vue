@@ -105,15 +105,9 @@ import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, PostVersion } from '@/stores/moderation-posts'
+import type { Moderation } from '@/stores/moderation-posts'
 import type { ModerationPost, ModerationPostVersion } from '@/stores/post-moderation'
 import type { PropType } from 'vue'
-
-const isModerationPostVersion = (
-  version: ModerationPostVersion | PostVersion
-): version is ModerationPostVersion => {
-  return (version as ModerationPostVersion).categoryIds !== undefined
-}
 
 interface DecisionIcon {
   text: string
@@ -172,8 +166,6 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
-  if (version.value && !isModerationPostVersion(version.value)) return { ACCEPTED: 0, REJECTED: 0 }
-
   if (!version.value?.moderations) return { ACCEPTED: 0, REJECTED: 0 }
 
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =

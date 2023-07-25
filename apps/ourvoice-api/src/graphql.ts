@@ -503,6 +503,7 @@ export class ModerationPostVersion {
     categoryIds: number[];
     files?: Nullable<string[]>;
     version: number;
+    reason?: Nullable<string>;
     authorHash: string;
     authorNickname: string;
     latest: boolean;

@@ -1,5 +1,4 @@
 import { graphql } from '@/graphql/generated/gql'
-import gql from 'graphql-tag'
 
 export const GET_MODERATION_POST_BY_ID_QUERY = graphql(`
   query GetModerationPostById($moderationPostId: Int!) {
@@ -17,6 +16,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = graphql(`
         files
         timestamp
         version
+        reason
         authorHash
         authorNickname
         latest

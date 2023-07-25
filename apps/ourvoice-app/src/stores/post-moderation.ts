@@ -1,5 +1,4 @@
 import type {
-  ModerationPostVersion as GQLModerationPostVersion,
   GetModerationPostByIdQuery,
   GetPresignedDownloadUrlsQuery,
   ModerationDecision
@@ -79,6 +78,7 @@ export type ModerationPostVersion = {
   categories?: Array<Category>
   files: Array<string> | null
   timestamp: string
+  reason?: string | null
   version: number
   authorHash: string
   authorNickname: string

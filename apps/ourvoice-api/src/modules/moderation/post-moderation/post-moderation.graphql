@@ -51,6 +51,7 @@ type ModerationPostVersion {
   categoryIds: [Int!]!
   files: [String!]
   version: Int!
+  reason: String
   authorHash: String!
   authorNickname: String!
   latest: Boolean!

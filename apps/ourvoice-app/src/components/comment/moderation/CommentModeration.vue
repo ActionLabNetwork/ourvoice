@@ -106,7 +106,6 @@
 </template>
 
 <script setup lang="ts">
-import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -123,6 +122,7 @@ import {
   useCommentModerationStore,
   type ModerationCommentVersion
 } from '@/stores/comment-moderation'
+import type { CommentModeration } from '@/graphql/generated/graphql'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -145,7 +145,7 @@ const {
   hasErrors
 } = storeToRefs(commentModerationStore)
 
-const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
+const selfModeration = ref<CommentModeration['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
@@ -247,7 +247,7 @@ function handleModifyFormUpdate({
   version: editedVersion,
   isValid
 }: {
-  version: CommentVersion
+  version: ModerationCommentVersion
   isValid: boolean
 }) {
   if (!isValid) return

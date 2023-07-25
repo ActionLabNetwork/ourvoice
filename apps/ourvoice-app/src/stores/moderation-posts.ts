@@ -1,5 +1,4 @@
 import { getPostWithCategories } from './post-moderation'
-import type { ModerationDecision } from './../graphql/generated/graphql'
 import { MODERATION_LIST_POSTS_PER_PAGE } from './../constants/moderation'
 import { apolloClient } from './../graphql/client/index'
 import { GET_MODERATION_POSTS_QUERY } from './../graphql/queries/getModerationPosts'

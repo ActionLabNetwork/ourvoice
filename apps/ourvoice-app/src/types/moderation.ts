@@ -1,4 +1,4 @@
-export type ModerationStatus = 'Pending' | 'Approved' | 'Rejected'
+export type ModerationStatusLabels = 'Pending' | 'Approved' | 'Rejected'
 export type ModerationVersionStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type ModerationVersionDecision = 'ACCEPTED' | 'REJECTED'
 export type ModerationVersionDecisionHistory = ModerationVersionDecision | 'MODIFIED'
@@ -32,7 +32,7 @@ export interface Moderation {
 }
 
 export type ModerationListTab = {
-  name: ModerationStatus
+  name: ModerationStatusLabels
   current: boolean
   count?: number
 }
