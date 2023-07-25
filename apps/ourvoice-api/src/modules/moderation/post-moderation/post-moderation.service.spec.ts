@@ -1,4 +1,7 @@
-import { PostIncludesVersion } from './../../../types/moderation/post-moderation';
+import {
+  PostIncludesVersion,
+  PostIncludesVersionIncludesModerations,
+} from './../../../types/moderation/post-moderation';
 import { PostModifyDto } from './dto/post-modify.dto';
 import { ModerationPostStatus } from '../../../graphql';
 import {
@@ -219,7 +222,9 @@ describe('PostModerationService', () => {
     // Arrange
     postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
       totalCount: 1,
-      moderationPosts: [dummyPosts[0]] as PostIncludesVersion[],
+      moderationPosts: [
+        dummyPosts[0],
+      ] as PostIncludesVersionIncludesModerations[],
     });
 
     const filterData = { status: ModerationPostStatus.PENDING };
@@ -274,7 +279,7 @@ describe('PostModerationService', () => {
         dummyPost,
         new PostBuilder(dummyPost).withId(2).build(),
         new PostBuilder(dummyPost).withId(3).build(),
-      ] as PostIncludesVersion[],
+      ] as PostIncludesVersionIncludesModerations[],
     });
 
     const paginationData = { after: numberToCursor(1), limit: 2 };
@@ -325,7 +330,7 @@ describe('PostModerationService', () => {
     // Arrange
     postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
       totalCount: 6,
-      moderationPosts: [] as PostIncludesVersion[],
+      moderationPosts: [] as PostIncludesVersionIncludesModerations[],
     });
 
     const paginationData = { after: numberToCursor(1), limit: 2 };
@@ -357,7 +362,7 @@ describe('PostModerationService', () => {
         dummyPost,
         new PostBuilder(dummyPost).withId(2).build(),
         new PostBuilder(dummyPost).withId(3).build(),
-      ] as PostIncludesVersion[],
+      ] as PostIncludesVersionIncludesModerations[],
     });
 
     const paginationData = { before: numberToCursor(3), limit: 2 };
@@ -408,7 +413,7 @@ describe('PostModerationService', () => {
     // Arrange
     postModerationRepositoryMock.getModerationPosts.mockResolvedValue({
       totalCount: 6,
-      moderationPosts: [] as PostIncludesVersion[],
+      moderationPosts: [] as PostIncludesVersionIncludesModerations[],
     });
 
     const paginationData = { before: numberToCursor(1), limit: 2 };
