@@ -8,7 +8,7 @@
       v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formattedDate(version)"
+      :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
       :modifierName="nickname.moderator.nickname"
     />
 
@@ -141,8 +141,6 @@ const moderationResultGroups = computed(() => {
 
   return groupsCount
 })
-
-const formattedDate = (version: CommentVersion) => formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 let localVersion = reactive({

@@ -21,7 +21,7 @@
       v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formattedDate(version)"
+      :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
       :modifierName="nickname.moderator.nickname"
     />
 
@@ -30,7 +30,12 @@
 
     <!-- Moderation decisions count -->
     <div
-      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
+      v-if="
+        props.version &&
+        isModerationCommentVersion(props.version) &&
+        props.version?.moderations?.length &&
+        props.version.moderations.length > 0
+      "
       class="flex flex-col sm:flex-row gap-3 justify-center sm:justify-around mx-auto sm:mx-0"
       data-cy="comment-moderation-decisions-count"
     >
@@ -40,7 +45,10 @@
     </div>
 
     <!-- Moderate button -->
-    <div class="mt-4 mx-auto sm:mx-0" v-if="!preview && comment.status === 'PENDING'">
+    <div
+      class="mt-4 mx-auto sm:mx-0"
+      v-if="!preview && isModerationComment(comment) && comment.status === 'PENDING'"
+    >
       <CustomButton
         :visibility-predicate="() => !!(comment && comment.id)"
         :to="{ name: 'moderate-comment', params: { id: comment.id } }"
@@ -54,13 +62,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import { isModerationComment, isModerationCommentVersion } from '@/utils/types'
+
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments'
+import type { Moderation } from '@/stores/moderation-comments'
+import type {
+  ModerationComment,
+  ModerationCommentVersion,
+  ModerationCommentParent,
+  ModerationCommentParentVersion
+} from '@/stores/comment-moderation'
 import type { PropType } from 'vue'
 import type { ModerationVersionDecision } from '@/types/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
 
 interface DecisionIcon {
   text: string
@@ -69,11 +85,11 @@ interface DecisionIcon {
 
 const props = defineProps({
   comment: {
-    type: Object as PropType<ModerationComment>,
+    type: Object as PropType<ModerationComment | ModerationCommentParent>,
     required: true
   },
   version: {
-    type: Object as PropType<CommentVersion>,
+    type: Object as PropType<ModerationCommentVersion | ModerationCommentParentVersion>,
     required: false
   },
   preview: {
@@ -119,6 +135,8 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
+  if (!version.value || !isModerationCommentVersion(version.value)) return {}
+
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
     version.value?.moderations?.reduce(
       (acc, moderation) => {
@@ -137,6 +155,4 @@ const moderationResultGroups = computed(() => {
 
   return groupsCount
 })
-
-const formattedDate = (version: CommentVersion) => formatTimestampToReadableDate(+version.timestamp)
 </script>

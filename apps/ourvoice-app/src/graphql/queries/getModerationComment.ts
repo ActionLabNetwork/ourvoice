@@ -1,6 +1,6 @@
-import gql from 'graphql-tag'
+import { graphql } from '../generated/gql'
 
-export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
+export const GET_MODERATION_COMMENT_BY_ID_QUERY = graphql(`
   query GetModerationCommentById($moderationCommentId: Int!) {
     moderationComment(id: $moderationCommentId) {
       id
@@ -71,4 +71,4 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = gql`
       }
     }
   }
-`
+`)

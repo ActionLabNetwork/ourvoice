@@ -119,7 +119,10 @@ import ModerationControls from '@/components/comment/moderation/ModerationContro
 import SidePane from '@/components/common/SidePane.vue'
 import BackButton from '@/components/common/BackButton.vue'
 import { storeToRefs } from 'pinia'
-import { useCommentModerationStore } from '@/stores/comment-moderation'
+import {
+  useCommentModerationStore,
+  type ModerationCommentVersion
+} from '@/stores/comment-moderation'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 
@@ -211,7 +214,7 @@ function handleSidePaneToggle(open: boolean) {
   showSidePane.value = open
 }
 
-async function handleVersionChange(newVersion: CommentVersion) {
+async function handleVersionChange(newVersion: ModerationCommentVersion) {
   commentModerationStore.versionInModeration = newVersion
   await refreshVersion()
 }

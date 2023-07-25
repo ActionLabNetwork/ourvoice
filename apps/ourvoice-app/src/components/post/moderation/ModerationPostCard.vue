@@ -104,15 +104,10 @@ import type { ModerationVersionDecision } from '@/types/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
-import type { ModerationPost as CModerationPost } from '@/stores/comment-moderation'
 
 import type { Moderation, PostVersion } from '@/stores/moderation-posts'
 import type { ModerationPost, ModerationPostVersion } from '@/stores/post-moderation'
 import type { PropType } from 'vue'
-
-const isModerationPost = (post: ModerationPost | CModerationPost): post is ModerationPost => {
-  return (post as ModerationPost).versions[0].categoryIds !== undefined
-}
 
 const isModerationPostVersion = (
   version: ModerationPostVersion | PostVersion
@@ -127,11 +122,11 @@ interface DecisionIcon {
 
 const props = defineProps({
   post: {
-    type: Object as PropType<ModerationPost | CModerationPost>,
+    type: Object as PropType<ModerationPost>,
     required: true
   },
   version: {
-    type: Object as PropType<ModerationPostVersion | CModerationPost['versions'][0]>,
+    type: Object as PropType<ModerationPostVersion>,
     required: false
   },
   preview: {

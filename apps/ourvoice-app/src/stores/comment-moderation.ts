@@ -1,3 +1,4 @@
+import type { GetModerationCommentByIdQuery } from './../graphql/generated/graphql'
 import { useDeploymentStore } from './deployment'
 import { useUserStore } from './user'
 import { apolloClient } from './../graphql/client/index'
@@ -6,23 +7,14 @@ import { provideApolloClient } from '@vue/apollo-composable'
 
 import authService from '@/services/auth-service'
 import { GET_MODERATION_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getModerationComment'
-import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { APPROVE_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/approveModerationCommentVersion'
 import { REJECT_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/rejectModerationCommentVersion'
 import { MODIFY_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/modifyModerationComment'
 import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewCommentModeration'
-import type { PostVersion } from './moderation-posts'
+import type { ModerationDecision } from '@/graphql/generated/graphql'
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
-export interface ModerationPost {
-  id: number
-  authorHash: string
-  authorNickname: string
-  versions: PostVersion[]
-  requiredModerations: number
-  status: CommentStatus
-}
 export interface CommentVersion {
   id: number
   content: string
@@ -34,17 +26,6 @@ export interface CommentVersion {
   reason: string
   latest: boolean
   moderations: Moderation[]
-}
-
-export interface ModerationComment {
-  id: number
-  authorHash: string
-  authorNickname: string
-  requiredModerations: number
-  status: CommentStatus
-  post: ModerationPost
-  parent: ModerationComment | null
-  versions: CommentVersion[]
 }
 
 export interface Moderation {
@@ -62,11 +43,58 @@ export interface PageInfo {
   startCursor: string
 }
 
+// NOTE: Update this if gql schema of GetModerationCommentByIdQuery changes
+export type ModerationComment = GetModerationCommentByIdQuery['moderationComment']
+export type ModerationCommentVersion = {
+  id: number
+  content: string
+  timestamp: string
+  version: number
+  authorHash: string
+  authorNickname: string
+  reason: string | null
+  latest: boolean
+  moderations: Array<{
+    id: number
+    decision: ModerationDecision
+    moderatorHash: string
+    moderatorNickname: string
+    reason: string | null
+    timestamp: string
+  }>
+}
+export type ModerationCommentParent = {
+  id: number
+  authorHash: string
+  authorNickname: string
+  requiredModerations: number
+  versions: Array<{
+    id: number
+    content: string
+    timestamp: string
+    version: number
+    authorHash: string
+    authorNickname: string
+    reason: string | null
+    latest: boolean
+  }>
+}
+export type ModerationCommentParentVersion = {
+  id: number
+  content: string
+  timestamp: string
+  version: number
+  authorHash: string
+  authorNickname: string
+  reason: string | null
+  latest: boolean
+}
+
 export interface ModerationCommentsState {
   commentInModeration: ModerationComment | undefined
-  versionInModeration: CommentVersion | undefined
+  versionInModeration: ModerationCommentVersion | undefined
   versionInModification: {
-    version: Partial<CommentVersion> | undefined
+    version: Partial<ModerationCommentVersion> | undefined
     isValid: boolean
   }
   loading: boolean
@@ -78,7 +106,11 @@ interface CommentFields {
   content?: string
 }
 
-const findSelfModeration = async (version: CommentVersion, userId: string, deployment: string) => {
+const findSelfModeration = async (
+  version: ModerationCommentVersion,
+  userId: string,
+  deployment: string
+) => {
   const promises = version.moderations.map((moderation) => {
     return authService.verifyHash(userId, deployment, moderation.moderatorHash)
   })
@@ -131,7 +163,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
           fetchPolicy: 'no-cache'
         })
 
-        const comment = data.moderationComment as ModerationComment
+        const comment = data.moderationComment!
 
         // Set states to be used for moderation
         this.commentInModeration = comment
