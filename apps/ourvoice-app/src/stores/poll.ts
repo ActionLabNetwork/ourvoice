@@ -1,17 +1,15 @@
 import { apolloClient } from '@/graphql/client'
-import gql from 'graphql-tag'
-import { defineStore } from 'pinia'
-import { useUserStore } from './user'
-import { GET_VOTED_POLLS_QUERY } from '@/graphql/queries/getVotedPolls'
-import { GET_AVAILABLE_POLLS_QUERY } from '@/graphql/queries/getAvailablePolls'
-import { VOTE_POLL_QUERY } from '@/graphql/mutations/votePoll'
 import type {
-  Poll,
   PollPageInfo,
   PollWithStats,
   PollWithStatsConnection,
   VoteResponse
 } from '@/graphql/generated/graphql'
+import { VOTE_POLL_QUERY } from '@/graphql/mutations/votePoll'
+import { GET_AVAILABLE_POLLS_QUERY } from '@/graphql/queries/getAvailablePolls'
+import { GET_VOTED_POLLS_QUERY } from '@/graphql/queries/getVotedPolls'
+import { defineStore } from 'pinia'
+import { useUserStore } from './user'
 
 export interface AvailablePollState extends PollWithStats {
   pollState: 'NOT_VOTED' | 'NO_RESULT' | 'VOTED'
@@ -54,7 +52,7 @@ export const usePollStore = defineStore('poll', {
       try {
         await this.fetchVotedPolls(true)
         this.state = 'loaded'
-      } catch(e) {
+      } catch (e) {
         if (e instanceof Error) {
           this.error = e
         }
@@ -117,14 +115,10 @@ export const usePollStore = defineStore('poll', {
     },
     async getVoterHash() {
       const userStore = useUserStore()
-      // if (!await userStore.isLoggedIn) {
-      //   throw new Error("user session is invalid")
-      // }
-      // console.log("user hash is", userStore.sessionHash, userStore.isLoggedIn)
-      // const userHash = userStore.sessionHash
-      // TODO: get proper user hash
-      const userHash = 'TODO'
-      return userHash
+      if (!(await userStore.isLoggedIn)) {
+        throw new Error('user session is invalid')
+      }
+      return userStore.sessionHash
     }
   }
 })

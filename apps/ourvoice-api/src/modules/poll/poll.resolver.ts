@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { PollService } from './poll.service';
 import {
   Poll,
@@ -13,8 +13,13 @@ import {
   VoteInput,
   VoteResponse,
 } from '../../graphql';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { GqlSession } from 'src/auth/session.decorator';
+import { SessionContainer } from 'supertokens-node/recipe/session';
+import { validateUserPermission } from 'src/utils/auth';
 
 @Resolver('Poll')
+@UseGuards(new AuthGuard())
 @Injectable()
 export class PollResolver {
   constructor(private readonly pollService: PollService) {}
@@ -26,10 +31,12 @@ export class PollResolver {
 
   @Query()
   async pollsWithResult(
+    @GqlSession() session: SessionContainer,
     @Args('moderatorHash') moderatorHash: string,
     @Args('filter') filter?: PollFilterInput,
     @Args('pagination') pagination?: PollPaginationInput,
   ): Promise<PollWithResultConnection> {
+    await validateUserPermission(session);
     return await this.pollService.getPollsWithResult(
       moderatorHash,
       filter,
@@ -46,20 +53,30 @@ export class PollResolver {
   }
 
   @Mutation()
-  async createPoll(@Args('data') data: PollCreateInput): Promise<Poll> {
+  async createPoll(
+    @GqlSession() session: SessionContainer,
+    @Args('data') data: PollCreateInput,
+  ): Promise<Poll> {
+    await validateUserPermission(session);
     return await this.pollService.createPoll(data);
   }
 
   @Mutation()
   async updatePoll(
+    @GqlSession() session: SessionContainer,
     @Args('pollId') pollId: number,
     @Args('data') data: PollUpdateInput,
   ): Promise<Poll> {
+    await validateUserPermission(session);
     return await this.pollService.updatePoll(pollId, data);
   }
 
   @Mutation()
-  async removePoll(@Args('pollId') pollId: number): Promise<number> {
+  async removePoll(
+    @GqlSession() session: SessionContainer,
+    @Args('pollId') pollId: number,
+  ): Promise<number> {
+    await validateUserPermission(session);
     return await this.pollService.removePoll(pollId);
   }
 
