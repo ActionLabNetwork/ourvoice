@@ -83,6 +83,7 @@ const props = defineProps({
 const emit = defineEmits<Events['onToggle']>()
 
 const isOnTheLeft = ref(props.startLeft)
+console.log({ left: isOnTheLeft.value })
 
 const toggle = () => {
   isOnTheLeft.value = !isOnTheLeft.value
