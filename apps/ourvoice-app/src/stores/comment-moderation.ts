@@ -43,52 +43,10 @@ export interface PageInfo {
   startCursor: string
 }
 
-// NOTE: Update this if gql schema of GetModerationCommentByIdQuery changes
 export type ModerationComment = GetModerationCommentByIdQuery['moderationComment']
-export type ModerationCommentVersion = {
-  id: number
-  content: string
-  timestamp: string
-  version: number
-  authorHash: string
-  authorNickname: string
-  reason: string | null
-  latest: boolean
-  moderations: Array<{
-    id: number
-    decision: ModerationDecision
-    moderatorHash: string
-    moderatorNickname: string
-    reason: string | null
-    timestamp: string
-  }>
-}
-export type ModerationCommentParent = {
-  id: number
-  authorHash: string
-  authorNickname: string
-  requiredModerations: number
-  versions: Array<{
-    id: number
-    content: string
-    timestamp: string
-    version: number
-    authorHash: string
-    authorNickname: string
-    reason: string | null
-    latest: boolean
-  }>
-}
-export type ModerationCommentParentVersion = {
-  id: number
-  content: string
-  timestamp: string
-  version: number
-  authorHash: string
-  authorNickname: string
-  reason: string | null
-  latest: boolean
-}
+export type ModerationCommentVersion = NonNullable<ModerationComment>['versions'][0]
+export type ModerationCommentParent = NonNullable<ModerationComment>['parent']
+export type ModerationCommentParentVersion = NonNullable<ModerationCommentParent>['versions'][0]
 
 export interface ModerationCommentsState {
   commentInModeration: ModerationComment | undefined

@@ -327,11 +327,11 @@ export abstract class IQuery {
 
     abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): Nullable<CommentConnection> | Promise<Nullable<CommentConnection>>;
 
-    abstract moderationComment(id: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
-    abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
+    abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): ModerationCommentConnection | Promise<ModerationCommentConnection>;
 
-    abstract commentVersion(id: number): Nullable<ModerationCommentVersion> | Promise<Nullable<ModerationCommentVersion>>;
+    abstract commentVersion(id: number): ModerationCommentVersion | Promise<ModerationCommentVersion>;
 
     abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 

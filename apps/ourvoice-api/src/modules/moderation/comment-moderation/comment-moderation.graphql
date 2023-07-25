@@ -1,10 +1,10 @@
 type Query {
-  moderationComment(id: Int!): ModerationComment
+  moderationComment(id: Int!): ModerationComment!
   moderationComments(
     filter: ModerationCommentsFilterInput
     pagination: ModerationCommentPaginationInput
-  ): ModerationCommentConnection
-  commentVersion(id: Int!): ModerationCommentVersion
+  ): ModerationCommentConnection!
+  commentVersion(id: Int!): ModerationCommentVersion!
 }
 
 type Mutation {

@@ -29,6 +29,14 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             timestamp
             version
             latest
+            moderations {
+              id
+              decision
+              moderatorHash
+              moderatorNickname
+              reason
+              timestamp
+            }
           }
         }
       }

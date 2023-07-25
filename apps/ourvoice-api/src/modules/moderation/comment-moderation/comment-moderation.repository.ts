@@ -120,7 +120,14 @@ export class CommentModerationRepository {
 
     const moderationComments = await this.prisma.comment.findMany({
       where,
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: {
+            moderations: { orderBy: { timestamp: 'desc' } },
+          },
+        },
+      },
       skip: cursor ? 1 : undefined,
       cursor: cursor,
       take: (pagination?.limit ?? 10) * cursorDirection,

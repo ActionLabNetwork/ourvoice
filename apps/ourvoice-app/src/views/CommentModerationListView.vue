@@ -34,11 +34,11 @@ import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { storeToRefs } from 'pinia'
 import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
-import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import type { ModerationListTab, ModerationStatusLabels } from '@/types/moderation'
 import type { PostStatus } from '@/stores/moderation-posts'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
 
-const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+const tabToStatusMapping: Record<ModerationStatusLabels, PostStatus> = {
   Pending: 'PENDING',
   Approved: 'APPROVED',
   Rejected: 'REJECTED'
