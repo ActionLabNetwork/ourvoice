@@ -1,11 +1,8 @@
 <template>
-  <div class="px-6 my-10">
+  <div class="px-6 my-10" v-if="totalCount">
     <div class="mb-3 flex items-center tracking-wide">
-      <div v-if="totalCount" class="text-xs lg:text-sm text-gray-500 font-semibold">
-        {{ totalCount }} Comments
-      </div>
+      <div class="text-xs lg:text-sm text-gray-500 font-semibold">{{ totalCount }} Comments</div>
     </div>
-
     <div class="space-y-4">
       <CommentCard
         v-for="comment in comments"
@@ -15,6 +12,7 @@
       />
     </div>
   </div>
+  <EmptyState v-else>No comments to display...</EmptyState>
 </template>
 
 <script lang="ts" setup>
@@ -22,6 +20,7 @@ import { computed } from 'vue'
 import CommentCard from './CommentCard.vue'
 import { useCommentsStore } from '@/stores/comments'
 import { storeToRefs } from 'pinia'
+import EmptyState from './EmptyState.vue'
 
 const commentsStore = useCommentsStore()
 const props = defineProps({

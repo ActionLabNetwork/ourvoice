@@ -7,33 +7,36 @@
       <!-- <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span> -->
       <PostSortFilterCategoryButton
         :active="!sortFilter.selectedCategoryIds"
-        :count="3"
+        :count="postTotalCount"
         text="All"
         @select="selectCategory(null)"
       />
-      <PostSortFilterCategoryButton
-        v-for="category in categories"
-        :key="category.id"
-        :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
-        :count="category.numPosts"
-        :text="category.name"
-        @select="selectCategory(category.id)"
-      />
+      <template v-for="category in categories" :key="category.id">
+        <PostSortFilterCategoryButton
+          :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
+          :count="category.numPosts"
+          :text="category.name"
+          @select="selectCategory(category.id)"
+        />
+      </template>
       <div v-if="state == 'loading-initial'" class="flex flex-row space-x-5">
         <div v-for="i in 5" :key="i" class="w-28 h-10 shrink-0 rounded-full skeleton" />
       </div>
     </div>
     <!-- Categories Filter end -->
+
     <div class="flex text-center text-3xl font-semibold">
       Discuss your experience of balancing out your work and personal life in your organization, and
       any suggestions to improve matters.
     </div>
+
+    <!-- Time range and sorting start -->
     <div class="flex justify-between items-center">
-      <div class="flex text-base md:text-xl font-bold">
+      <div class="flex justify-between space-x-2 text-base md:text-xl font-bold">
         <button
           v-for="(option, index) in timeRangeOptions"
           :key="index"
-          class="hover:bg-gray-100 px-2 py-1 rounded-md"
+          class="hover:bg-gray-100 rounded-md"
           :class="{ 'text-gray-500 font-normal': option.label !== selectedTimeRangeOption.label }"
           @click="handleTimeRangeSelected(index)"
         >
@@ -95,6 +98,8 @@
         </button>
       </div>
     </div>
+    <!-- Time range and sorting end -->
+
     <!-- <div class="border-2">{{ selectedTimeRangeOption }}</div>
     <div class="border-2">{{ selectedSortOption }}</div>
     <div class="border-2">{{ sortAscending }}</div> -->
@@ -111,20 +116,20 @@ import {
 } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import { useToggle } from '@vueuse/core'
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
-import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
-import { apolloClient } from '@/graphql/client'
+// import { GET_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
+// import { apolloClient } from '@/graphql/client'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
 
-interface CategoryWithCount {
-  id: number
-  name: string
-  count: number
-  active: boolean
-}
+// interface CategoryWithCount {
+//   id: number
+//   name: string
+//   count: number
+//   active: boolean
+// }
 const categoriesStore = useCategoriesStore()
 const postsStore = usePostsStore()
 const sortAscending = ref(false)
@@ -138,7 +143,6 @@ const sortOptions = [
 ]
 const selectedSortOption = ref(sortOptions[0])
 watchEffect(async () => {
-  console.log(selectedSortOption.value.value, sortAscending.value ? 'asc' : 'desc')
   await postsStore.setSortOption(
     selectedSortOption.value.value,
     sortAscending.value ? 'asc' : 'desc'
@@ -175,4 +179,7 @@ const { sortFilter } = storeToRefs(postsStore)
 const selectCategory = (id: number | null) => {
   postsStore.setSelectedCategoryIds(id ? [id] : null)
 }
+const postTotalCount = computed(() => {
+  return postsStore.totalCount
+})
 </script>
