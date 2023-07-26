@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit" class="relative">
+  <form @submit.prevent="onSubmit" class="relative" v-if="isStoreLoaded">
     <div
       class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm"
       :class="{
@@ -24,59 +24,21 @@
     <div class="absolute inset-x-px bottom-0 bg-white rounded-b-lg">
       <div class="flex items-center border-t justify-between border-gray-200 px-2 py-2 sm:px-3">
         <div>
-          <Listbox as="div" v-model="action" class="flex-shrink-0">
-            <div class="relative">
-              <ListboxButton
-                class="relative inline-flex items-center whitespace-nowrap rounded-full bg-slate-100 px-2 py-2 text-sm font-medium text-gray-500 hover:bg-slate-200 sm:px-3 border border-gray-300"
-                data-cy="moderation-action-listbox-button"
+          <div class="flex gap-2">
+            <div v-for="a in actions" :key="a.name">
+              <CustomButton
+                :label="a.name"
+                :class-name="`w-28 ${action.name === a.name ? 'bg-ourvoice-base-light-300' : ''}`"
+                variant="outlined"
+                :on-click="() => (action = a)"
+                type="button"
               >
-                <font-awesome-icon :icon="['fas', action.icon]" />
-                <span
-                  :class="[
-                    action.name === null ? '' : 'text-gray-900',
-                    'hidden truncate sm:ml-2 sm:block'
-                  ]"
-                >
-                  {{ action.name }}
-                </span>
-              </ListboxButton>
-
-              <TransitionRoot
-                leave-active-class="transition ease-in duration-100"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
-              >
-                <ListboxOptions
-                  class="absolute -top-40 sm:-top-14 sm:right-28 z-10 mt-1 max-h-56 w-52 overflow-auto rounded-lg bg-white py-3 text-base shadow ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-                >
-                  <ListboxOption
-                    as="template"
-                    v-for="action in actions"
-                    :key="action.name"
-                    :value="action"
-                    v-slot="{ active }"
-                    data-cy="moderation-action-listbox"
-                  >
-                    <ul>
-                      <li
-                        :class="[
-                          active ? 'bg-gray-100' : 'bg-white',
-                          'relative cursor-default select-none px-3 py-2'
-                        ]"
-                      >
-                        <div class="flex items-center gap-2">
-                          <font-awesome-icon :icon="['fas', action.icon]" />
-                          <span class="block truncate font-medium">
-                            {{ action.name }}
-                          </span>
-                        </div>
-                      </li>
-                    </ul>
-                  </ListboxOption>
-                </ListboxOptions>
-              </TransitionRoot>
+                <template #icon-after-text>
+                  <font-awesome-icon :icon="['fas', a.icon]" />
+                </template>
+              </CustomButton>
             </div>
-          </Listbox>
+          </div>
         </div>
 
         <!-- Submit button -->
@@ -85,6 +47,8 @@
             data-cy="moderate-button"
             :disabled-predicate="() => !isValidForm"
             label="Submit Moderation"
+            class-name="bg-ourvoice-primary-3 text-white hover:bg-ourvoice-primary-3/80"
+            type="submit"
           />
         </div>
       </div>
@@ -93,29 +57,46 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  TransitionRoot
-} from '@headlessui/vue'
+import { computed, ref, watch, watchEffect, type PropType, onMounted } from 'vue'
 import { useField, useForm } from 'vee-validate'
 import { validateModerationReason } from '@/validators/moderation-post-validator'
-import { usePostModerationStore } from '@/stores/post-moderation'
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
 
+const props = defineProps({
+  threadType: {
+    type: String as PropType<'post' | 'comment'>,
+    required: true
+  }
+})
+
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
-const moderationPostsStore = usePostModerationStore()
+// const moderationPostsStore = usePostModerationStore()
+
+const loadStore = async () => {
+  let store
+  if (props.threadType === 'post') {
+    const { usePostModerationStore } = await import('@/stores/post-moderation')
+    store = usePostModerationStore()
+  } else {
+    const { useCommentModerationStore } = await import('@/stores/comment-moderation')
+    store = useCommentModerationStore()
+  }
+  return store
+}
 
 const actions = MODERATION_ACTIONS
 const action = ref(actions[0])
 const fieldPlaceholder = ref('')
+const isStoreLoaded = ref(false)
+let store: Awaited<ReturnType<typeof loadStore>> | undefined = undefined
 
 const { resetForm } = useForm()
 
+onMounted(async () => {
+  store = await loadStore()
+  if (store) isStoreLoaded.value = true
+})
 // VeeValidate Form Fields
 function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
   const { errorMessage, value, meta } = useField<T>(fieldName, (value) =>
@@ -127,7 +108,7 @@ function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
 let moderationReasonField = useVeeValidateField<string>('moderationReason', action.value.validate)
 
 const isValidForm = computed(() => {
-  const modifyFormHasNoErrors = moderationPostsStore.versionInModification.isValid
+  const modifyFormHasNoErrors = store?.versionInModification.isValid
   const reasonFieldHasNoErrors =
     moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null
 

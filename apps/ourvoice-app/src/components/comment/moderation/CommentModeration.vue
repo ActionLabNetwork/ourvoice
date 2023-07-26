@@ -76,6 +76,7 @@
           <!-- Moderation Controls -->
           <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
             <ModerationControls
+              thread-type="comment"
               @moderation-submit="handleModerationControlsSubmit"
               @moderation-action-change="handleModerationControlsActionChange"
             />
@@ -114,7 +115,8 @@ import ModerationCommentCard from '@/components/comment/moderation/ModerationCom
 import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue'
 import ModerationHistory from '@/components/comment/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/comment/moderation/ModerationVersionList.vue'
-import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
+// import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
+import ModerationControls from '@/components/common/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import BackButton from '@/components/common/BackButton.vue'
 import { storeToRefs } from 'pinia'

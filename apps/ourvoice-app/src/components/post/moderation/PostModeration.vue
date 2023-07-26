@@ -56,6 +56,7 @@
               <!-- Moderation Controls -->
               <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
                 <ModerationControls
+                  thread-type="post"
                   @moderation-submit="handleModerationControlsSubmit"
                   @moderation-action-change="handleModerationControlsActionChange"
                 />
@@ -100,7 +101,8 @@ import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue'
 import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
-import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
+// import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
+import ModerationControls from '@/components/common/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import BackButton from '@/components/common/BackButton.vue'
 import Loading from '@/components/common/Loading.vue'
