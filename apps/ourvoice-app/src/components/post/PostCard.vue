@@ -36,7 +36,7 @@
         <button
           @click.stop="voteForPost('UPVOTE')"
           type="button"
-          class="btn-outline btn-rounded font-medium text-sm"
+          class="btn-outlined btn-rounded font-medium text-sm"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
@@ -47,7 +47,7 @@
         <button
           @click.stop="voteForPost('DOWNVOTE')"
           type="button"
-          class="btn-outline btn-rounded font-medium text-sm"
+          class="btn-outlined btn-rounded font-medium text-sm"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}

@@ -29,7 +29,7 @@
           <button
             @click.stop="voteForComment('UPVOTE')"
             type="button"
-            class="btn-outline btn-rounded font-medium text-sm"
+            class="btn-outlined btn-rounded font-medium text-sm"
           >
             <span class="inline-flex items-center gap-2">
               {{ comment?.votesUp }}
@@ -40,7 +40,7 @@
           <button
             @click.stop="voteForComment('DOWNVOTE')"
             type="button"
-            class="btn-outline btn-rounded font-medium text-sm"
+            class="btn-outlined btn-rounded font-medium text-sm"
           >
             <span class="inline-flex items-center gap-1">
               {{ comment?.votesDown }}
