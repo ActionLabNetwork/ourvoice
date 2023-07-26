@@ -6,7 +6,27 @@
       </div>
     </transition>
     <div class="container mx-auto p-4" v-if="!loading">
-      <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto">
+      <div class="mx-auto" v-if="showAlert">
+        <Alert title="Post Submitted for Moderation">
+          <div class="space-y-5">
+            <p>
+              Your post has been successfully submitted and is now pending review by our moderation
+              team.
+            </p>
+            <p>
+              This is a standard process to ensure our discussions remains safe and welcoming for
+              everyone. Please allow up to 24 hours for the review process. Once your post has been
+              reviewed and approved, it will be visible to other community members.
+            </p>
+            <p>
+              In the meantime, feel free to explore other discussions and engage with our community.
+              We appreciate your patience and understanding.
+            </p>
+            <p>Thank you for being part of our community!</p>
+          </div>
+        </Alert>
+      </div>
+      <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto" v-if="!showAlert">
         <!-- Form for creating new post -->
         <form @submit="onSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
@@ -156,14 +176,14 @@
 
           <!-- Submit button -->
           <div v-if="!categoriesStore.loading" class="flex justify-end gap-2">
-            <button
+            <!-- <button
               type="button"
               class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
               data-cy="reset-form-button"
               @click="resetFormFields"
             >
               Reset Form
-            </button>
+            </button> -->
             <button
               type="submit"
               :disabled="!isValidForm"
@@ -206,7 +226,7 @@ import {
 } from '@/validators'
 import { useUserStore } from '@/stores/user'
 import Loading from '../common/Loading.vue'
-import router from '@/router'
+import Alert from '../common/Alert.vue'
 
 interface PresignedUrlResponse {
   key: string
@@ -244,6 +264,7 @@ const { handleSubmit, resetForm, errors } = useForm({
 })
 
 const loading = ref(false)
+const showAlert = ref(false)
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -341,7 +362,7 @@ const onSubmit = handleSubmit(async (values) => {
   // After successfully submitting the form, reset the form fields
   resetFormFields()
   loading.value = false
-  router.replace({ path: '/posts' })
+  showAlert.value = true
 })
 
 const resetFormFields = () => {
