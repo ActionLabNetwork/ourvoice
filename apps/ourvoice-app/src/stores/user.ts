@@ -63,7 +63,6 @@ export const useUserStore = defineStore('user', {
       const userDeployment = payload?.deployment || ''
       this.userRoles = userRoles
       this.userDeployment = userDeployment
-      console.log(payload.consent)
       this.consentDate = new Date(payload.consent)
 
       const nickname = uniqueNamesGenerator({
