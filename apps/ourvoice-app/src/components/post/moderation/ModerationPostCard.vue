@@ -17,7 +17,7 @@
       <div>
         <!-- Moderated Count -->
         <div
-          class="w-28 h-8 px-4 py-2 bg-ourvoice-util-pink rounded-3xl justify-center items-center gap-2 inline-flex"
+          class="h-8 px-4 py-2 bg-ourvoice-util-pink rounded-3xl justify-center items-center gap-2 inline-flex"
         >
           <div
             class="text-center text-ourvoice-black text-xs font-medium leading-none tracking-tight"

@@ -3,27 +3,45 @@
     v-if="comment && version"
     class="bg-slate-100 shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
   >
-    <!-- Self moderation indicator -->
-    <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
-      <div
-        :class="[
-          props.decisionIcon?.indicatorClass,
-          'flex gap-2 items-center rounded-full p-1 px-2'
-        ]"
-      >
-        <div class="h-2 w-2 rounded-full bg-current" />
-        <p>{{ props.decisionIcon?.text }} by you</p>
+    <div class="flex items-center justify-between">
+      <!-- Author -->
+      <AuthorBadge
+        v-if="nickname.author.nickname"
+        :authorName="nickname.author.nickname"
+        :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
+        :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
+        :modifierName="nickname.moderator.nickname"
+      />
+      <div>
+        <!-- Moderated Count -->
+        <div
+          class="h-8 px-4 py-2 bg-ourvoice-util-pink rounded-3xl justify-center items-center gap-2 inline-flex"
+        >
+          <div
+            class="text-center text-ourvoice-black text-xs font-medium leading-none tracking-tight"
+          >
+            {{ `${moderationCount}/${comment.requiredModerations}` }} Moderated
+          </div>
+        </div>
+
+        <!-- Self moderation indicator -->
+        <div
+          class="absolute right-10"
+          v-if="props.decisionIcon"
+          data-cy="self-moderation-indicator"
+        >
+          <div
+            :class="[
+              props.decisionIcon?.indicatorClass,
+              'flex gap-2 items-center rounded-full p-1 px-2'
+            ]"
+          >
+            <div class="h-2 w-2 rounded-full bg-current" />
+            <p>{{ props.decisionIcon?.text }} by you</p>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Author -->
-    <AuthorBadge
-      v-if="nickname.author.nickname"
-      :authorName="nickname.author.nickname"
-      :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
-      :modifierName="nickname.moderator.nickname"
-    />
 
     <!-- Content -->
     <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">{{ version.content }}</p>
@@ -136,7 +154,8 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
-  if (!version.value || !isModerationCommentVersion(version.value)) return {}
+  if (!version.value || !isModerationCommentVersion(version.value))
+    return { ACCEPTED: 0, REJECTED: 0 }
 
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
     version.value?.moderations?.reduce(
@@ -155,5 +174,9 @@ const moderationResultGroups = computed(() => {
   }
 
   return groupsCount
+})
+
+const moderationCount = computed(() => {
+  return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
 })
 </script>
