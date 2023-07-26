@@ -1,7 +1,7 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
-      class="mx-auto grid grid-cols-3 grid-flow-row-dense items-center justify-between p-6 lg:px-8 gap-y-5"
+      class="mx-auto grid grid-cols-3 grid-flow-row-dense p-6 lg:px-8 gap-y-5"
       aria-label="Global"
     >
       <!-- Logo -->
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Create Post Button & Mobile Menu MD -->
-      <div class="hidden md:flex lg:hidden place-self-end gap-10">
+      <div class="hidden md:flex lg:hidden justify-self-end gap-10">
         <CreatePostNavButton class="inline-flex" v-if="route.path === '/posts'" />
         <!-- Mobile Menu Icon -->
         <button
@@ -151,7 +151,7 @@
                 leave-to-class="opacity-0 translate-y-1"
               >
                 <PopoverPanel
-                  class="absolute -left-14 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+                  class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
                 >
                   <div class="p-4">
                     <div

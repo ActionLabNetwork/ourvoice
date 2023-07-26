@@ -91,6 +91,7 @@
         :to="{ name: 'moderate-post', params: { id: post.id } }"
         data-cy="moderate-button"
         label="Moderate"
+        class-name="bg-ourvoice-primary-3 text-white hover:bg-ourvoice-primary-3/80"
       />
     </div>
   </div>
