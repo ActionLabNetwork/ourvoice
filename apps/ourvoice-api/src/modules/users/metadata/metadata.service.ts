@@ -34,6 +34,10 @@ export class MetadataService {
     return false;
   }
 
+  async getAllowlist() {
+    return await UserMetadata.getUserMetadata('emailAllowList');
+  }
+
   async addEmailToAllowlist(email: string) {
     const existingData = await UserMetadata.getUserMetadata('emailAllowList');
     let allowList: string[] = existingData.metadata.allowList || [];
@@ -51,6 +55,14 @@ export class MetadataService {
       allowList,
     });
   }
+  async removeEmailFromAllowlist(email: string) {
+    const existingData = await UserMetadata.getUserMetadata('emailAllowList');
+    let allowList: string[] = existingData.metadata.allowList || [];
+    allowList = allowList.filter((e) => e != email);
+    return await UserMetadata.updateUserMetadata('emailAllowList', {
+      allowList,
+    });
+  }
 
   async clearEmailAllowList() {
     return await UserMetadata.clearUserMetadata('emailAllowList');
@@ -61,6 +73,10 @@ export class MetadataService {
     const allowList: string[] = existingData.metadata.allowList || [];
     // NOTE: if allowlist is empty then this feature is disabled
     return allowList.includes(email) || allowList.length === 0;
+  }
+
+  async getModeratorAllowlist() {
+    return await UserMetadata.getUserMetadata('phoneNumberAllowList');
   }
 
   // NOTE: using phoneNumberAllowList as a storage for storing moderators list in supertokens
