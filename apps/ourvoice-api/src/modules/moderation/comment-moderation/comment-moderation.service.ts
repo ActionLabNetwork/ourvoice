@@ -34,6 +34,12 @@ export class CommentModerationService {
     return moderationComment;
   }
 
+  async getHistoryOfModerationCommentById(id: number) {
+    return this.moderationCommentRepository.getHistoryofModerationCommentById(
+      id,
+    );
+  }
+
   async getModerationComments(
     filter?: ModerationCommentsFilterInput,
     pagination?: ModerationCommentPaginationInput,

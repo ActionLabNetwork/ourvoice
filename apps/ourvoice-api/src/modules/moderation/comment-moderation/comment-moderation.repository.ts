@@ -2,6 +2,7 @@ import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
   CommentIncludesVersionIncludesModerationsIncludesPost,
+  CommentWithAllItsRelations,
   ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
@@ -58,9 +59,7 @@ export class CommentModerationRepository {
     private readonly commentService: CommentService,
   ) {}
 
-  async getModerationCommentById(
-    id: number,
-  ): Promise<CommentIncludesVersionIncludesModerationsIncludesPost> {
+  async getModerationCommentById(id: number) {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
@@ -89,6 +88,18 @@ export class CommentModerationRepository {
         },
       },
     });
+  }
+
+  async getHistoryofModerationCommentById(id: number) {
+    const comments = [];
+
+    let comment = await this.getModerationCommentById(id);
+    while (comment.parent) {
+      comments.push(comment.parent);
+      comment = await this.getModerationCommentById(comment.parent.id);
+    }
+
+    return comments;
   }
 
   async getModerationComments(
@@ -492,8 +503,12 @@ export class CommentModerationRepository {
             orderBy: { version: 'desc' },
             take: 1,
           },
+          parent: { select: { commentIdInMainDb: true } },
+          post: { select: { postIdInMainDb: true } },
         },
       });
+
+      console.log({ comment });
 
       if (!comment) {
         throw new Error(
@@ -511,6 +526,8 @@ export class CommentModerationRepository {
         content: comment.versions[0].content,
         authorHash: comment.versions[0].authorHash,
         authorNickname: comment.versions[0].authorNickname,
+        postId: comment.post?.postIdInMainDb,
+        parentId: comment.parent?.commentIdInMainDb,
       });
 
       this.logger.debug(
@@ -607,29 +624,6 @@ export class CommentModerationRepository {
         this.logger.log(
           `Finished approving comment with comment id ${commentId}`,
         );
-        const newCommentInMainDb = await this.commentService.createComment({
-          content: comment.versions[0].content,
-          authorHash: comment.versions[0].authorHash,
-          authorNickname: comment.versions[0].authorNickname,
-          postId: comment.post.postIdInMainDb,
-          parentId: comment.parent?.commentIdInMainDb,
-        });
-
-        this.logger.log(
-          'Created new comment in main db with id',
-          newCommentInMainDb.id,
-        );
-
-        await tx.comment.update({
-          where: { id: comment.id },
-          data: { commentIdInMainDb: newCommentInMainDb.id },
-        });
-        this.logger.log(
-          'Updated comment with id',
-          comment.id,
-          ' to have main db id',
-          newCommentInMainDb.id,
-        );
       }
     });
   }
@@ -691,6 +685,7 @@ export class CommentModerationRepository {
 
     const tasks = comments.map((comment) => {
       if (comment.status === 'APPROVED') {
+        console.log(`Approving comment ${comment.id}`);
         return this.publishComment(comment.id)
           .then(() => {
             publishedCount++;

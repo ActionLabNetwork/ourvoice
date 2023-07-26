@@ -178,7 +178,7 @@ async function main() {
 
 export async function seedDb() {
   await clearDatabase();
-  await main();
+  // await main();
 }
 
 // seedDb();

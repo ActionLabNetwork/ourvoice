@@ -31,6 +31,16 @@ export class CommentModerationResolver {
     await validateUserPermission(session);
     return await this.commentModerationService.getModerationCommentById(id);
   }
+  @Query()
+  async moderationCommentsHistory(
+    @GqlSession() session: SessionContainer,
+    @Args('id') id: number,
+  ) {
+    await validateUserPermission(session);
+    return await this.commentModerationService.getHistoryOfModerationCommentById(
+      id,
+    );
+  }
 
   @Query()
   async moderationComments(

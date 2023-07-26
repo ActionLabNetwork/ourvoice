@@ -17,7 +17,7 @@ import { CommentCreateDto } from './dto/comment-create.dto';
 export class CommentService {
   constructor(private readonly commentRepository: CommentRepository) {}
 
-  async createComment(data: CommentCreateDto): Promise<Comment> {
+  async createComment(data: CommentCreateDto) {
     // Validate data
     const commentCreateDto = plainToClass(CommentCreateDto, data);
     const errors = await validate(commentCreateDto);

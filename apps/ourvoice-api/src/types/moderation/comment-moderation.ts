@@ -5,6 +5,7 @@ import {
   CommentModeration,
 } from '@prisma-moderation-db/client';
 import { GetManyResponse } from '../general';
+import { PostIncludesVersion } from './post-moderation';
 
 export type ModerationCommentsResponse = GetManyResponse<Comment>;
 
@@ -27,6 +28,12 @@ export type CommentIncludesVersionIncludesModerations =
 
 export type CommentIncludesVersionIncludesModerationsIncludesPost =
   WithIncluded<CommentIncludesVersionIncludesModerations, 'post', Post>;
+
+export type CommentWithAllItsRelations = WithIncluded<
+  CommentIncludesVersionIncludesModerationsIncludesPost,
+  'parent',
+  Partial<PostIncludesVersion>
+>;
 
 export type ModerationIncludesVersion = WithIncluded<
   CommentModeration,

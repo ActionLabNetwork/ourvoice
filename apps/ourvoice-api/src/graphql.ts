@@ -329,6 +329,8 @@ export abstract class IQuery {
 
     abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
+    abstract moderationCommentsHistory(id: number): ModerationComment[] | Promise<ModerationComment[]>;
+
     abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): ModerationCommentConnection | Promise<ModerationCommentConnection>;
 
     abstract commentVersion(id: number): ModerationCommentVersion | Promise<ModerationCommentVersion>;
