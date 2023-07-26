@@ -1,21 +1,18 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-    <nav
-      class="mx-auto grid grid-cols-3 grid-flow-row-dense p-6 lg:px-8 gap-y-5"
-      aria-label="Global"
-    >
+    <nav class="mx-auto grid grid-cols-5 grid-flow-row-dense p-6 gap-y-5" aria-label="Global">
       <!-- Logo -->
       <div class="flex items-center justify-between">
         <a href="/" class="-m-1.5 p-1.5">
           <span class="sr-only">OurVoice</span>
-          <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
+          <img class="h-8 w-auto" src="@/../public/ourvoice_logo_new.png" alt="OurVoice Logo" />
         </a>
-        <div class="hidden lg:flex lg:flex-none">
-          <CreatePostNavButton class="hidden lg:inline-flex" v-if="route.path === '/posts'" />
-        </div>
       </div>
       <!-- Toggle -->
-      <div class="w-fit justify-self-center col-span-full sm:col-span-1" v-if="currentPathIsReady">
+      <div
+        class="w-fit justify-self-center col-span-full lg:col-start-3 lg:col-span-1"
+        v-if="currentPathIsReady"
+      >
         <Toggle
           :items="toggleItems"
           v-if="navBarSwitchState"
@@ -25,8 +22,8 @@
       </div>
 
       <!-- Create Post Button & Mobile Menu MD -->
-      <div class="hidden md:flex lg:hidden justify-self-end gap-10">
-        <CreatePostNavButton class="inline-flex" v-if="route.path === '/posts'" />
+      <div class="hidden md:flex lg:hidden justify-self-end col-start-5 gap-10">
+        <CreatePostNavButton class="inline-flex" />
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -40,12 +37,9 @@
 
       <!-- Create Post Button & Mobile Menu SM -->
       <div class="grid md:hidden col-span-full">
-        <CreatePostNavButton
-          class="inline-flex mx-auto text-center"
-          v-if="route.path === '/posts'"
-        />
+        <CreatePostNavButton class="inline-flex mx-auto text-center" />
       </div>
-      <div class="grid col-start-3 md:hidden justify-self-end">
+      <div class="grid col-start-5 md:hidden justify-self-end">
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -57,7 +51,7 @@
         </button>
       </div>
       <!-- Desktop Menu -->
-      <div class="hidden lg:flex lg:gap-x-10 justify-center justify-self-end">
+      <div class="hidden xl:flex lg:gap-x-10 xl:col-start-4 justify-center justify-self-center">
         <!-- Nav Items -->
         <PopoverGroup class="flex gap-5 items-center">
           <router-link
@@ -123,59 +117,71 @@
               </PopoverPanel>
             </TransitionRoot>
           </Popover>
-          <!-- User Settings -->
-          <div>
-            <Popover class="relative" v-slot="{ open }">
-              <PopoverButton
-                class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
-              >
-                <div class="flex-shrink-0 mr-0">
-                  <img
-                    class="inline-block h-9 w-9 rounded-full"
-                    :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
-                    alt="PseudoNickname"
-                  />
-                </div>
-                <font-awesome-icon
-                  :icon="['fas', 'fa-chevron-down']"
-                  class="transition-transform"
-                  :class="{ 'rotate-180': open }"
+        </PopoverGroup>
+      </div>
+      <!-- Create Post Button MD and above -->
+      <div
+        class="hidden md:inline-flex lg:hidden md:col-start-3 lg:col-start-4 justify-self-center"
+      >
+        <CreatePostNavButton class="hidden md:inline-flex" />
+      </div>
+      <div class="hidden lg:inline-flex items-center gap-5 lg:col-start-5 justify-self-end">
+        <!-- Create Post Button LG and above -->
+        <div>
+          <CreatePostNavButton class="hidden md:inline-flex" />
+        </div>
+        <!-- User Settings -->
+        <div>
+          <Popover class="relative" v-slot="{ open }">
+            <PopoverButton
+              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
+            >
+              <div class="flex-shrink-0 mr-0">
+                <img
+                  class="inline-block h-9 w-9 rounded-full"
+                  :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
+                  alt="PseudoNickname"
                 />
-              </PopoverButton>
-              <TransitionRoot
-                enter-active-class="transition ease-out duration-200"
-                enter-from-class="opacity-0 translate-y-1"
-                enter-to-class="opacity-100 translate-y-0"
-                leave-active-class="transition ease-in duration-150"
-                leave-from-class="opacity-100 translate-y-0"
-                leave-to-class="opacity-0 translate-y-1"
+              </div>
+              <font-awesome-icon
+                :icon="['fas', 'fa-chevron-down']"
+                class="transition-transform"
+                :class="{ 'rotate-180': open }"
+              />
+            </PopoverButton>
+            <TransitionRoot
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="opacity-0 translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-1"
+            >
+              <PopoverPanel
+                class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
               >
-                <PopoverPanel
-                  class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
-                >
-                  <div class="p-4">
-                    <div
-                      class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
-                    >
-                      <div class="flex-auto">
-                        <div
-                          v-on:click="signOut"
-                          class="block font-semibold text-white cursor-pointer"
-                        >
-                          Sign Out
-                          <span class="absolute inset-0" />
-                        </div>
-                        <p class="text-white inline-block my-auto underline underline-offset-4">
-                          {{ userStore.nickname }}
-                        </p>
+                <div class="p-4">
+                  <div
+                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                  >
+                    <div class="flex-auto">
+                      <div
+                        v-on:click="signOut"
+                        class="block font-semibold text-white cursor-pointer"
+                      >
+                        Sign Out
+                        <span class="absolute inset-0" />
                       </div>
+                      <p class="text-white inline-block my-auto underline underline-offset-4">
+                        {{ userStore.nickname }}
+                      </p>
                     </div>
                   </div>
-                </PopoverPanel>
-              </TransitionRoot>
-            </Popover>
-          </div>
-        </PopoverGroup>
+                </div>
+              </PopoverPanel>
+            </TransitionRoot>
+          </Popover>
+        </div>
       </div>
     </nav>
 
@@ -188,7 +194,7 @@
         <div class="flex items-center justify-between">
           <a href="#" class="-m-1.5 p-1.5">
             <span class="sr-only">OurVoice</span>
-            <img class="h-8 w-auto" src="@/assets/ourvoice_logo_new.png" alt="OurVoice Logo" />
+            <img class="h-8 w-auto" src="@/../public/ourvoice_logo_new.png" alt="OurVoice Logo" />
           </a>
           <button
             type="button"
@@ -445,12 +451,12 @@ watchEffect(() => {
       href: '/moderation/comments',
       current: currentPath.value === '/moderation/comments'
     },
-  {
-    id: 3,
-    name: 'Polls',
-    href: '/moderation/polls',
-    current: currentPath.value === '/moderation/polls'
-  }
+    {
+      id: 3,
+      name: 'Polls',
+      href: '/moderation/polls',
+      current: currentPath.value === '/moderation/polls'
+    }
   ]
 })
 </script>

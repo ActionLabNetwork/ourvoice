@@ -1,6 +1,6 @@
 <template>
   <div ref="createPostNavLink">
-    <CustomButton label="Create Post" :disabledPredicate="() => false" :to="'/post'">
+    <CustomButton label="Create Post" :to="'/post'" class-name="rounded-3xl w-36 h-12 px-4 py-3">
       <template #icon-after-text>
         <IconMessageStripeCircle v-if="isHovered" />
         <IconMessagePlusCircle v-else />

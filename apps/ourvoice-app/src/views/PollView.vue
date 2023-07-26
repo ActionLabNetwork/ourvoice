@@ -15,7 +15,7 @@
       >
         <img
           class="lg:mb-4 w-full max-w-[232px] lg:max-w-[400px]"
-          src="@/assets/polls_no_active.png"
+          src="@/../public/polls_no_active.png"
           alt=""
         />
         <div class="mb-10 text-[14px] lg:text-[28px] text-[#444] font-Roboto font-semibold">
