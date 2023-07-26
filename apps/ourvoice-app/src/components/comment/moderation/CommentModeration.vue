@@ -115,7 +115,6 @@ import ModerationCommentCard from '@/components/comment/moderation/ModerationCom
 import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue'
 import ModerationHistory from '@/components/comment/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/comment/moderation/ModerationVersionList.vue'
-// import ModerationControls from '@/components/comment/moderation/ModerationControls.vue'
 import ModerationControls from '@/components/common/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import BackButton from '@/components/common/BackButton.vue'

@@ -15,7 +15,7 @@
 import { type PropType } from 'vue'
 import type { ModerationComment } from '@/stores/moderation-comments'
 import ModerationCommentCard from './ModerationCommentCard.vue'
-import EmptyState from '../EmptyState.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const props = defineProps({
   comments: { type: Array as PropType<ModerationComment[]>, required: true }

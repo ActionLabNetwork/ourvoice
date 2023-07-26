@@ -27,7 +27,7 @@ import { computed } from 'vue'
 import CommentCard from './CommentCard.vue'
 import { useCommentsStore } from '@/stores/comments'
 import { storeToRefs } from 'pinia'
-import EmptyState from './EmptyState.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const commentsStore = useCommentsStore()
 const props = defineProps({

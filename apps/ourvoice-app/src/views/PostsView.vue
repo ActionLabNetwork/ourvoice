@@ -27,7 +27,7 @@ import PostSortFilter from '@/components/post/PostSortFilter.vue'
 import PostCard from '@/components/post/PostCard.vue'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
-import EmptyState from '../components/comment/EmptyState.vue'
+import EmptyState from '../components/common/EmptyState.vue'
 const postStore = usePostsStore()
 const { data: posts, state } = storeToRefs(postStore)
 

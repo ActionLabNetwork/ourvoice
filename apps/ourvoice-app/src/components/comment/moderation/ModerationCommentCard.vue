@@ -50,7 +50,7 @@
       v-if="!preview && isModerationComment(comment) && comment.status === 'PENDING'"
     >
       <CustomButton
-        :visibility-predicate="() => !!(comment && comment.id)"
+        :show="!!(comment && comment.id)"
         :to="{ name: 'moderate-comment', params: { id: comment.id } }"
         data-cy="moderate-button"
         label="Moderate"

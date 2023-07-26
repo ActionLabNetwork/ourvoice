@@ -87,7 +87,7 @@
     <!-- Moderate button -->
     <div class="mt-4 mx-auto sm:mx-0" v-if="!preview && post.status === 'PENDING'">
       <CustomButton
-        :visibilityPredicate="() => !!(post && post.id)"
+        :show="!!(post && post.id)"
         :to="{ name: 'moderate-post', params: { id: post.id } }"
         data-cy="moderate-button"
         label="Moderate"

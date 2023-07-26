@@ -71,7 +71,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['moderation-action-change', 'moderation-submit'])
-// const moderationPostsStore = usePostModerationStore()
 
 const loadStore = async () => {
   let store

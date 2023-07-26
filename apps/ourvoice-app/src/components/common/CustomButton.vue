@@ -1,12 +1,12 @@
 <template>
   <template v-if="!props.to">
     <button
-      v-if="isVisible"
+      v-if="show"
       :class="
         twMerge(props.variant === 'outlined' ? 'btn-outlined' : 'btn-filled', props.className)
       "
       :data-cy="props.dataCy"
-      :disabled="isDisabled"
+      :disabled="disabled"
       @click="props.onClick"
       :type="props.type"
     >
@@ -17,7 +17,7 @@
   </template>
   <template v-else>
     <router-link
-      v-if="isVisible"
+      v-if="show"
       :to="props.to"
       :class="
         twMerge(props.variant === 'outlined' ? 'btn-outlined' : 'btn-filled', props.className)
@@ -31,17 +31,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type ButtonHTMLAttributes, type PropType } from 'vue'
+import { type ButtonHTMLAttributes, type PropType } from 'vue'
 import { twMerge } from 'tailwind-merge'
 
 const props = defineProps({
-  visibilityPredicate: {
-    type: Function as PropType<() => boolean>,
-    default: () => true
+  show: {
+    type: Boolean,
+    default: true
   },
-  disabledPredicate: {
-    type: Function as PropType<() => boolean>,
-    default: () => false
+  disabled: {
+    type: Boolean as PropType<ButtonHTMLAttributes['disabled']>,
+    default: false
   },
   to: {
     type: [Object, String] as PropType<{ name: string; params: { id: number } } | string>,
@@ -72,7 +72,4 @@ const props = defineProps({
     default: 'button'
   }
 })
-
-const isVisible = computed(() => props.visibilityPredicate())
-const isDisabled = computed(() => props.disabledPredicate())
 </script>
