@@ -1,7 +1,32 @@
 <template>
   <div class="max-h-screen">
-    <div class="container mx-auto p-4">
-      <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto">
+    <transition name="fade">
+      <div class="h-[80vh]" v-if="loading">
+        <Loading>Submitting form to moderation...</Loading>
+      </div>
+    </transition>
+    <div class="container mx-auto p-4" v-if="!loading">
+      <div class="mx-auto" v-if="showAlert">
+        <Alert title="Post Submitted for Moderation">
+          <div class="space-y-5">
+            <p>
+              Your post has been successfully submitted and is now pending review by our moderation
+              team.
+            </p>
+            <p>
+              This is a standard process to ensure our discussions remains safe and welcoming for
+              everyone. Please allow up to 24 hours for the review process. Once your post has been
+              reviewed and approved, it will be visible to other community members.
+            </p>
+            <p>
+              In the meantime, feel free to explore other discussions and engage with our community.
+              We appreciate your patience and understanding.
+            </p>
+            <p>Thank you for being part of our community!</p>
+          </div>
+        </Alert>
+      </div>
+      <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto" v-if="!showAlert">
         <!-- Form for creating new post -->
         <form @submit="onSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
@@ -151,21 +176,22 @@
 
           <!-- Submit button -->
           <div v-if="!categoriesStore.loading" class="flex justify-end gap-2">
-            <button
+            <!-- <button
               type="button"
-              class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+              class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
               data-cy="reset-form-button"
               @click="resetFormFields"
             >
               Reset Form
-            </button>
+            </button> -->
             <button
               type="submit"
               :disabled="!isValidForm"
-              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+              class="btn-primary hover:bg-ourvoice-primary/70 px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
               data-cy="create-post-submit-button"
             >
               Create Post
+              <IconArrowLeft class="w-4 h-4 ml-2 rotate-180" />
             </button>
           </div>
           <div v-else>
@@ -178,17 +204,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
-import Multiselect from '@vueform/multiselect';
+import IconArrowLeft from '../icons/IconArrowLeft.vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import Multiselect from '@vueform/multiselect'
 import FormInput from '@/components/inputs/FormInput.vue'
-import { useCategoriesStore } from '@/stores/categories';
-import AttachmentList from '../inputs/AttachmentList.vue';
-import { createPostContentCharacterLimit, postFilesBucket, postFilesPresignedUrlTTL, inputPlaceholders } from '@/constants/post';
-import { usePostsStore } from '@/stores/posts';
-import { generateUniqueKey, uploadFileUsingPresignedUrl } from '@/services/s3-service';
-import { useForm, useField } from 'vee-validate';
-import { validateAttachments, validateCategories, validateContent, validateTitle } from '@/validators';
-import { useUserStore } from '@/stores/user';
+import { useCategoriesStore } from '@/stores/categories'
+import AttachmentList from '../inputs/AttachmentList.vue'
+import {
+  createPostContentCharacterLimit,
+  postFilesPresignedUrlTTL,
+  inputPlaceholders
+} from '@/constants/post'
+import { usePostsStore } from '@/stores/posts'
+import { generateUniqueKey, uploadFileUsingPresignedUrl } from '@/services/s3-service'
+import { useForm, useField } from 'vee-validate'
+import {
+  validateAttachments,
+  validateCategories,
+  validateContent,
+  validateTitle
+} from '@/validators'
+import { useUserStore } from '@/stores/user'
+import Loading from '../common/Loading.vue'
+import Alert from '../common/Alert.vue'
 
 interface PresignedUrlResponse {
   key: string
@@ -221,7 +259,12 @@ onMounted(async () => {
   await categoriesStore.fetchCategories()
 })
 
-const { handleSubmit, resetForm, errors } = useForm({ validationSchema: createPostValidationSchema })
+const { handleSubmit, resetForm, errors } = useForm({
+  validationSchema: createPostValidationSchema
+})
+
+const loading = ref(false)
+const showAlert = ref(false)
 
 // Form fields
 const selectedCategories = ref<string[]>([])
@@ -264,14 +307,12 @@ const updateAttachments = async (event: Event) => {
   attachmentsField.value.value = files
 
   // Generate unique keys for each attachment
-  const keys = Array.from(files).map((file, index) => generateUniqueKey(userStore.sessionHash, file, index));
+  const keys = Array.from(files).map((file, index) =>
+    generateUniqueKey(userStore.sessionHash, file, index)
+  )
 
   try {
-    const response = await postsStore.getPresignedUrls(
-      postFilesBucket,
-      keys,
-      postFilesPresignedUrlTTL
-    )
+    const response = await postsStore.getPresignedUrls(keys, postFilesPresignedUrlTTL)
     presignedUrls.value = (response as { key: string; url: string }[]) ?? []
   } catch (error) {
     console.error('Error getting presigned URLs:', error)
@@ -284,11 +325,9 @@ const requiredFields = [titleField, contentField, categoriesField]
 const allRequiredFieldsValidated = computed(() => {
   return requiredFields.every((field) => field.meta.validated)
 })
-
 const formHasNoErrors = computed(() => {
   return Object.keys(errors.value).length === 0
 })
-
 // Check if form is valid
 const isValidForm = computed(() => {
   return allRequiredFieldsValidated.value && formHasNoErrors.value
@@ -296,6 +335,7 @@ const isValidForm = computed(() => {
 
 // Handle Form submission
 const onSubmit = handleSubmit(async (values) => {
+  loading.value = true
   // Upload files to S3 using the presigned URLs
   if (values.attachments && presignedUrls.value.length > 0) {
     try {
@@ -313,11 +353,16 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   await postsStore.createPost({
-    title: values.title, content: values.content, categoryIds: values.categories, files: presignedUrls.value.map(({ key }) => key)
+    title: values.title,
+    content: values.content,
+    categoryIds: values.categories,
+    files: presignedUrls.value.map(({ key }) => key)
   })
 
   // After successfully submitting the form, reset the form fields
   resetFormFields()
+  loading.value = false
+  showAlert.value = true
 })
 
 const resetFormFields = () => {
@@ -347,8 +392,7 @@ watch(selectedCategories, async () => {
 })
 </script>
 
-<style src="@vueform/multiselect/themes/default.css">
-</style>
+<style src="@vueform/multiselect/themes/default.css"></style>
 <style>
 :root {
   --form-brand-blue: #2196f3;

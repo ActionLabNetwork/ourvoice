@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { apolloClient } from './../graphql/client/index'
-// import { CREATE_COMMENT_MUTATION } from '@/graphql/mutations/createComment'
 import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
-
-import { GET_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getCommentById'
+// import type { GetCommentsQuery } from '@/graphql/generated/graphql'
+// import { GET_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getCommentById'
 import { provideApolloClient } from '@vue/apollo-composable'
+import type { ApolloError } from '@apollo/client/errors'
 export interface Comment {
   id: number
   content: string
@@ -34,6 +34,10 @@ export interface pageInfo {
   hasNextPage: boolean
   startCursor: string
 }
+
+// type Unpacked<T> = T extends (infer U)[] ? U : T
+// type CommentsEdge = Unpacked<GetCommentsQuery['comments']['edges']>
+
 export interface CommentsState {
   data: Comment[]
   loading: boolean
@@ -60,7 +64,7 @@ export const useCommentsStore = defineStore('comments', {
     }
   },
   actions: {
-    async fetchComments(postId: number | null) {
+    async fetchComments(postId: number | null, loadMore = false) {
       try {
         this.loading = true
         const { data } = await apolloClient.query({
@@ -71,12 +75,12 @@ export const useCommentsStore = defineStore('comments', {
             },
             pagination: {
               limit: null,
-              cursor: null
+              cursor: loadMore && this.pageInfo ? this.pageInfo.endCursor : null
             }
           }
         })
 
-        this.data = data.comments.edges.map((comment: any) => ({
+        const newComments = data.comments.edges.map((comment: any) => ({
           id: comment.node.id,
           content: comment.node.content,
           votesDown: comment.node.votesDown,
@@ -94,16 +98,29 @@ export const useCommentsStore = defineStore('comments', {
               }
             : null
         }))
+        this.data = loadMore ? [...this.data, ...newComments] : newComments
         this.pageInfo = data.comments.pageInfo
         this.totalCount = data.comments.totalCount
         this.loading = false
       } catch (error) {
+        this.error = error as ApolloError
+        this.errorMessage = 'Failed to load comements. Please try again.'
+        this.loading = false
+      }
+    },
+
+    async loadMoreComments(postId: number | null) {
+      try {
+        if (this.pageInfo?.hasNextPage) {
+          this.fetchComments(postId, true)
+          console.log('fetching more comments')
+        }
+      } catch (error) {
         if (error instanceof Error) {
           this.error = error
         }
-
         if (error) {
-          this.errorMessage = 'Failed to load comments. Please try again.'
+          this.errorMessage = 'Failed to load more comments. Please try again.'
         }
       }
     },
@@ -122,13 +139,6 @@ export const useCommentsStore = defineStore('comments', {
       authorNickname: string
     }) {
       try {
-        // console.log({
-        //   content,
-        //   parentId,
-        //   postId,
-        //   authorHash,
-        //   authorNickname
-        // })
         const { data } = await apolloClient.mutate({
           mutation: CREATE_MODERATION_COMMENT_MUTATION,
           variables: {
@@ -137,8 +147,7 @@ export const useCommentsStore = defineStore('comments', {
               authorNickname,
               content,
               parentId: parentId ?? null,
-              postId: postId ?? null,
-              requiredModerations: 0
+              postId: postId ?? null
             }
           }
         })
@@ -200,27 +209,40 @@ export const useCommentsStore = defineStore('comments', {
       }
     },
 
-    async syncVotesForCommentById(commentId: number) {
+    async syncVotesForCommentById({
+      commentId,
+      votesUp,
+      votesDown,
+      authorHash,
+      voteType
+    }: {
+      commentId: number
+      votesUp: number
+      votesDown: number
+      authorHash: string
+      voteType: string
+    }) {
       try {
-        const { data } = await apolloClient.query({
-          query: GET_COMMENT_BY_ID_QUERY,
-          variables: {
-            commentId
-          },
-          fetchPolicy: 'no-cache'
-        })
-        const comment = this.data.find((comment) => comment.id === commentId)
-        if (comment) {
-          comment.votesDown = data.comment.votesDown
-          comment.votesUp = data.comment.votesUp
-        }
-        console.log(`refetching commentId: ${commentId}`, data)
+        //sync votesUp/votesDown state with the comment table
+        const storedComment = this.data.find((comment) => comment.id === commentId)!
+        storedComment.votesUp = votesUp
+        storedComment.votesDown = votesDown
+        // TODO: sync votes in comments store once the vote mutation is implemented
+        // const userVoteForStoredComment = storedComment.votes.find(
+        //   (vote) => vote.authorHash === authorHash
+        // )
+        // if (userVoteForStoredComment) {
+        //   if (userVoteForStoredComment.voteType === voteType) {
+        //     storedComment.votes = storedComment.votes.filter((vote) => vote.authorHash !== authorHash)
+        //   } else {
+        //     userVoteForStoredComment.voteType = voteType
+        //   }
+        // } else {
+        //   storedComment.votes.push({ authorHash, voteType })
+        // }
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
-        }
-        if (error) {
-          this.errorMessage = `Failed to load vote for comments: ${commentId}. Please try again.`
         }
       }
     }

@@ -1,11 +1,10 @@
 <template>
   <div class="moderation-page py-5">
-    <div v-for="comment in props.comments" :key="comment.id" class="py-3">
-      <div v-if="props.comments.length === 0">
-        <p class="text-lg text-gray-600">No comments to display...</p>
-      </div>
-
-      <div v-else>
+    <div v-if="props.comments.length <= 0">
+      <EmptyState>No comments to display...</EmptyState>
+    </div>
+    <div v-else>
+      <div v-for="comment in props.comments" :key="comment.id" class="py-3">
         <ModerationCommentCard :comment="comment" :version="comment.versions[0]" />
       </div>
     </div>
@@ -14,8 +13,9 @@
 
 <script setup lang="ts">
 import { type PropType } from 'vue'
-import ModerationCommentCard from './ModerationCommentCard.vue'
 import type { ModerationComment } from '@/stores/moderation-comments'
+import ModerationCommentCard from './ModerationCommentCard.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const props = defineProps({
   comments: { type: Array as PropType<ModerationComment[]>, required: true }

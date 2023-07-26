@@ -1,7 +1,10 @@
-import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_POST_BY_ID_QUERY = gql`
-  query Post($postId: Int!) {
+export const GET_POST_BY_ID_QUERY = graphql(`
+  query Post(
+    $postId: Int!
+    $presignedUrlExpiresIn: Int!  
+  ) {
     post(id: $postId) {
       authorHash
       authorNickname
@@ -16,7 +19,6 @@ export const GET_POST_BY_ID_QUERY = gql`
       content
       createdAt
       disabledAt
-      files
       id
       moderated
       moderatedAt
@@ -25,6 +27,14 @@ export const GET_POST_BY_ID_QUERY = gql`
       title
       votesDown
       votesUp
+      votes {
+        authorHash
+        voteType
+      }
+      presignedDownloadUrls(expiresIn: $presignedUrlExpiresIn) {
+        key
+        url
+      }
     }
   }
-`
+`)

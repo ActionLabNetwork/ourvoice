@@ -25,6 +25,9 @@ describe('PostService', () => {
     published: false,
     votesDown: 0,
     votesUp: 0,
+    comments: undefined,
+    votes: undefined,
+    categories: undefined,
   };
 
   const dummyCategories = [

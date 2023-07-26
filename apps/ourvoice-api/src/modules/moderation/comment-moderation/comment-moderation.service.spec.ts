@@ -1,4 +1,7 @@
-import { CommentIncludesVersion } from './../../../types/moderation/comment-moderation';
+import {
+  CommentIncludesVersion,
+  CommentIncludesVersionIncludesModerationsIncludesPost,
+} from './../../../types/moderation/comment-moderation';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { ModerationCommentStatus } from '../../../graphql';
 import {
@@ -119,7 +122,6 @@ describe('CommentModerationService', () => {
       content: '',
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
-      requiredModerations: 1,
     };
 
     // Act & Assert
@@ -134,7 +136,6 @@ describe('CommentModerationService', () => {
       content: 'Test Content',
       authorHash: null,
       authorNickname: null,
-      requiredModerations: 1,
     };
 
     // Act & Assert
@@ -147,9 +148,7 @@ describe('CommentModerationService', () => {
     // Arrange
     const commentId = 1;
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as Comment & {
-        versions: (CommentVersion & { moderations: CommentModeration[] })[];
-      },
+      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
     );
 
     // Act
@@ -408,9 +407,7 @@ describe('CommentModerationService', () => {
     const reason = 'Test Reason';
 
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as Comment & {
-        versions: (CommentVersion & { moderations: CommentModeration[] })[];
-      },
+      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
     );
 
     commentModerationRepositoryMock.approveCommentVersion.mockResolvedValue(
@@ -488,9 +485,7 @@ describe('CommentModerationService', () => {
     const reason = 'Test Reason';
 
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as Comment & {
-        versions: (CommentVersion & { moderations: CommentModeration[] })[];
-      },
+      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
     );
 
     commentModerationRepositoryMock.rejectCommentVersion.mockResolvedValue(

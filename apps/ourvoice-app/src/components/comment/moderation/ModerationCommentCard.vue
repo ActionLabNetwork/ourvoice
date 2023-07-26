@@ -3,34 +3,57 @@
     v-if="comment && version"
     class="bg-slate-100 shadow-lg border border-gray-200 rounded-t-lg p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
   >
-    <!-- Self moderation indicator -->
-    <div class="absolute right-10" v-if="props.decisionIcon" data-cy="self-moderation-indicator">
-      <div
-        :class="[
-          props.decisionIcon?.indicatorClass,
-          'flex gap-2 items-center rounded-full p-1 px-2'
-        ]"
-      >
-        <div class="h-2 w-2 rounded-full bg-current" />
-        <p>{{ props.decisionIcon?.text }} by you</p>
+    <div class="flex items-center justify-between">
+      <!-- Author -->
+      <AuthorBadge
+        v-if="nickname.author.nickname"
+        :authorName="nickname.author.nickname"
+        :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
+        :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
+        :modifierName="nickname.moderator.nickname"
+      />
+      <div>
+        <!-- Moderated Count -->
+        <div
+          class="h-8 px-4 py-2 bg-ourvoice-util-pink rounded-3xl justify-center items-center gap-2 inline-flex"
+        >
+          <div
+            class="text-center text-ourvoice-black text-xs font-medium leading-none tracking-tight"
+          >
+            {{ `${moderationCount}/${comment.requiredModerations}` }} Moderated
+          </div>
+        </div>
+
+        <!-- Self moderation indicator -->
+        <div
+          class="absolute right-10"
+          v-if="props.decisionIcon"
+          data-cy="self-moderation-indicator"
+        >
+          <div
+            :class="[
+              props.decisionIcon?.indicatorClass,
+              'flex gap-2 items-center rounded-full p-1 px-2'
+            ]"
+          >
+            <div class="h-2 w-2 rounded-full bg-current" />
+            <p>{{ props.decisionIcon?.text }} by you</p>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Author -->
-    <AuthorBadge
-      v-if="nickname.author.nickname"
-      :authorName="nickname.author.nickname"
-      :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formattedDate(version)"
-      :modifierName="nickname.moderator.nickname"
-    />
 
     <!-- Content -->
     <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">{{ version.content }}</p>
 
     <!-- Moderation decisions count -->
     <div
-      v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
+      v-if="
+        props.version &&
+        isModerationCommentVersion(props.version) &&
+        props.version?.moderations?.length &&
+        props.version.moderations.length > 0
+      "
       class="flex flex-col sm:flex-row gap-3 justify-center sm:justify-around mx-auto sm:mx-0"
       data-cy="comment-moderation-decisions-count"
     >
@@ -40,12 +63,16 @@
     </div>
 
     <!-- Moderate button -->
-    <div class="mt-4 mx-auto sm:mx-0" v-if="!preview && comment.status === 'PENDING'">
+    <div
+      class="mt-4 mx-auto sm:mx-0"
+      v-if="!preview && isModerationComment(comment) && comment.status === 'PENDING'"
+    >
       <CustomButton
-        :visibility-predicate="() => !!(comment && comment.id)"
+        :show="!!(comment && comment.id)"
         :to="{ name: 'moderate-comment', params: { id: comment.id } }"
         data-cy="moderate-button"
         label="Moderate"
+        class-name="bg-ourvoice-primary-3 text-white hover:bg-ourvoice-primary-3/80"
       />
     </div>
   </div>
@@ -54,13 +81,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
+import { getGroupsByProperty } from '@/utils/groupByProperty'
+import { isModerationComment, isModerationCommentVersion } from '@/utils/types'
+
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
 
-import type { Moderation, ModerationComment, CommentVersion } from '@/stores/moderation-comments'
+import type { Moderation } from '@/stores/moderation-comments'
+import type {
+  ModerationComment,
+  ModerationCommentVersion,
+  ModerationCommentParent,
+  ModerationCommentParentVersion
+} from '@/stores/comment-moderation'
 import type { PropType } from 'vue'
 import type { ModerationVersionDecision } from '@/types/moderation'
-import { getGroupsByProperty } from '@/utils/groupByProperty'
 
 interface DecisionIcon {
   text: string
@@ -69,11 +104,11 @@ interface DecisionIcon {
 
 const props = defineProps({
   comment: {
-    type: Object as PropType<ModerationComment>,
+    type: Object as PropType<ModerationComment | ModerationCommentParent>,
     required: true
   },
   version: {
-    type: Object as PropType<CommentVersion>,
+    type: Object as PropType<ModerationCommentVersion | ModerationCommentParentVersion>,
     required: false
   },
   preview: {
@@ -119,6 +154,9 @@ const nickname = computed(() => {
 })
 
 const moderationResultGroups = computed(() => {
+  if (!version.value || !isModerationCommentVersion(version.value))
+    return { ACCEPTED: 0, REJECTED: 0 }
+
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
     version.value?.moderations?.reduce(
       (acc, moderation) => {
@@ -138,5 +176,7 @@ const moderationResultGroups = computed(() => {
   return groupsCount
 })
 
-const formattedDate = (version: CommentVersion) => formatTimestampToReadableDate(+version.timestamp)
+const moderationCount = computed(() => {
+  return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
+})
 </script>

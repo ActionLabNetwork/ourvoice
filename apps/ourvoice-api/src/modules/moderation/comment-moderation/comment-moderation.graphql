@@ -1,10 +1,11 @@
 type Query {
-  moderationComment(id: Int!): ModerationComment
+  moderationComment(id: Int!): ModerationComment!
+  moderationCommentsHistory(id: Int!): [ModerationComment!]!
   moderationComments(
     filter: ModerationCommentsFilterInput
     pagination: ModerationCommentPaginationInput
-  ): ModerationCommentConnection
-  commentVersion(id: Int!): ModerationCommentVersion
+  ): ModerationCommentConnection!
+  commentVersion(id: Int!): ModerationCommentVersion!
 }
 
 type Mutation {
@@ -61,7 +62,7 @@ type ModerationCommentVersion {
   latest: Boolean!
   timestamp: String!
   comment: ModerationComment!
-  moderations: [CommentModeration!]!
+  moderations: [CommentModeration!]
 }
 
 type CommentModeration {
@@ -91,11 +92,12 @@ input ModerationCommentCreateInput {
   parentId: Int
   authorHash: String!
   authorNickname: String!
-  requiredModerations: Int!
 }
 
 input ModerationCommentsFilterInput {
   status: ModerationCommentStatus
+  published: Boolean
+  archived: Boolean
 }
 
 input ModerationCommentPaginationInput {

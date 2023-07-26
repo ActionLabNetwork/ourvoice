@@ -18,7 +18,10 @@ model Post {
   status              PostStatus    @default(PENDING)
   versions            PostVersion[]
   requiredModerations Int           @default(1)
-  archived       Boolean   @default(false)
+  archived            Boolean       @default(false)
+  archivedAt          DateTime?
+  published           Boolean       @default(false)
+  publishedAt         DateTime?
 
   // Relations
   comments       Comment[]
@@ -53,7 +56,10 @@ model Comment {
   status              PostStatus       @default(PENDING)
   versions            CommentVersion[]
   requiredModerations Int              @default(1)
-  archived          Boolean   @default(false)
+  archived            Boolean          @default(false)
+  archivedAt          DateTime?
+  published           Boolean          @default(false)
+  publishedAt         DateTime?
 
   // Relations
   authorHash        String
@@ -117,4 +123,18 @@ enum PostStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model PollVoterVoted {
+  id Int @id @default(autoincrement())
+  pollId Int
+  voterHash String
+}
+
+model PollVote {
+  pollId Int
+  optionId Int
+  numVotes Int
+
+  @@id([pollId, optionId])
 }

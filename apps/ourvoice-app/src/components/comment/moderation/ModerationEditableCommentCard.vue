@@ -8,7 +8,7 @@
       v-if="nickname.author.nickname"
       :authorName="nickname.author.nickname"
       :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
-      :modificationDate="formattedDate(version)"
+      :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
       :modifierName="nickname.moderator.nickname"
     />
 
@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watchEffect, onMounted } from 'vue'
-import { type Moderation, type CommentVersion } from '@/stores/moderation-comments'
+import { type Moderation } from '@/stores/moderation-comments'
 import { formatTimestampToReadableDate } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categories'
@@ -141,8 +141,6 @@ const moderationResultGroups = computed(() => {
 
   return groupsCount
 })
-
-const formattedDate = (version: CommentVersion) => formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 let localVersion = reactive({

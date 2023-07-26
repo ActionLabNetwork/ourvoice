@@ -1,3 +1,4 @@
+import { PostIncludesVersionIncludesModerations } from './../../../types/moderation/post-moderation';
 import {
   Injectable,
   BadRequestException,
@@ -38,7 +39,7 @@ export class PostModerationService {
     pagination?: ModerationPostPaginationInput,
   ): Promise<{
     totalCount: number;
-    edges: { node: Post; cursor: string }[];
+    edges: { node: PostIncludesVersionIncludesModerations; cursor: string }[];
     pageInfo: {
       startCursor: string;
       endCursor: string;

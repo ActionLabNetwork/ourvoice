@@ -14,8 +14,8 @@
 <script setup lang="ts">
 import { type PropType } from 'vue'
 import ModerationPostCard from './ModerationPostCard.vue'
-import type { ModerationPost } from '@/stores/moderation-posts'
-import EmptyState from '@/components/comment/EmptyState.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
+import type { ModerationPost } from '@/stores/post-moderation'
 
 const props = defineProps({
   posts: { type: Array as PropType<ModerationPost[]>, required: true }

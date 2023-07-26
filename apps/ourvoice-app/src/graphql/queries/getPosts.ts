@@ -1,10 +1,12 @@
 import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_POSTS_QUERY = gql`
+export const GET_POSTS_QUERY = graphql(`
   query GetPosts(
     $sort: PostSortingInput
     $pagination: PostPaginationInput
     $filter: PostsFilterInput
+    $presignedUrlExpiresIn: Int!
   ) {
     posts(sort: $sort, pagination: $pagination, filter: $filter) {
       edges {
@@ -12,7 +14,6 @@ export const GET_POSTS_QUERY = gql`
           id
           title
           content
-          files
           categories {
             id
             name
@@ -30,6 +31,14 @@ export const GET_POSTS_QUERY = gql`
           }
           votesUp
           votesDown
+          votes {
+            authorHash
+            voteType
+          }
+          presignedDownloadUrls(expiresIn: $presignedUrlExpiresIn) {
+            key
+            url
+          }
         }
       }
       totalCount
@@ -40,15 +49,11 @@ export const GET_POSTS_QUERY = gql`
       }
     }
   }
-`
+`)
 
-export const GET_POST_COUNT_BY_CATEGORY_QUERY = gql`
-  query Posts(
-    $filter: PostsFilterInput
-    $pagination: PostPaginationInput
-    $sort: PostSortingInput
-  ) {
-    posts(filter: $filter, pagination: $pagination, sort: $sort) {
+export const GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY = gql`
+  query GetTotalPostCount {
+    posts {
       totalCount
     }
   }

@@ -1,18 +1,12 @@
 <template>
-  <div
-    class="overflow-hidden border-2 mx-auto my-6 px-6 py-4 bg-white rounded-xl break-all max-w-4xl hover:shadow-lg transition duration-500 ease-in-out"
-  >
-    <!-- {{ post }} -->
-    <!-- <pre>{{ votes }}</pre> -->
-    <!-- {{ hasUpvote }} -->
-    <!-- {{ hasDownvote }} -->
+  <div class="break-all">
     <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
       {{ post?.title }}
       <div>
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300"
+          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
           ># {{ cat?.name }}
         </span>
       </div>
@@ -28,8 +22,8 @@
     </p>
     <div id="fileUrlsWrapper" class="text-right">
       <a
-        class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline"
-        v-for="url in presignedUrls"
+        class="font-medium text-sm text-blue-600 hover:underline"
+        v-for="url in post?.presignedDownloadUrls.map((url) => url.url)"
         :key="url"
         :href="url"
         target="_blank"
@@ -37,56 +31,58 @@
         file
       </a>
     </div>
-    <div class="flex justify-between items-center">
-      <div class="flex">
+    <div class="mt-6 flex justify-between items-center">
+      <div class="flex gap-2">
         <button
           @click.stop="voteForPost('UPVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+          class="btn-outlined btn-rounded font-medium text-sm"
         >
-          <span :class="{ 'text-ourvoice-purple': hasUpvote }">
+          <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
-            <font-awesome-icon icon="fa-solid fa-thumbs-up" />
+            <IconThumb :fill="hasUpvote" :thumbup="true" />
           </span>
         </button>
 
         <button
           @click.stop="voteForPost('DOWNVOTE')"
           type="button"
-          class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-full text-sm px-5 py-1 mr-2 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-gray-600"
+          class="btn-outlined btn-rounded font-medium text-sm"
         >
-          <span :class="{ 'text-ourvoice-purple': hasDownvote }">
+          <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}
-            <font-awesome-icon icon="fa-solid fa-thumbs-down" />
+            <IconThumb :fill="hasDownvote" :thumbup="false" />
           </span>
         </button>
       </div>
       <div>
         <slot>
           <!-- default slot -->
-          <button
-            @click.stop="handleCommentBtnClicked"
-            class="underline hover:bg-gray-200 px-1 rounded-md transition duration-300 ease-in-out"
-          >
-            COMMENTS({{ post?.comments?.length ?? 0 }})
+          <button @click.stop="handleCommentBtnClicked" class="inline-flex items-center gap-1">
+            {{ post?.comments?.length ?? 0 }} <IconMessageCircle />
           </button>
         </slot>
       </div>
     </div>
+    <div class="h-px my-5 border border-stone-300 border-opacity-50"></div>
+    <CreateComment :postId="post?.id" />
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { timePassed } from '@/utils/index'
-import { usePostsStore } from '@/stores/posts'
+import IconThumb from '@/components/icons/IconThumb.vue'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
-import { useQuery, useMutation } from '@vue/apollo-composable'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { usePostsStore } from '@/stores/posts'
 import { useUserStore } from '@/stores/user'
+import { timePassed } from '@/utils/index'
+import { useMutation } from '@vue/apollo-composable'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import CreateComment from '../comment/CreateComment.vue'
+import IconMessageCircle from '../icons/IconMessageCircle.vue'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
+const { sessionHash } = storeToRefs(userStore)
 const router = useRouter()
 
 const props = defineProps({
@@ -108,62 +104,17 @@ const handleCommentBtnClicked = () => {
   })
 }
 
-const getPresignedUrls = (keys: string[]) => {
-  return postsStore.getPresignedUrls(postFilesBucket, keys, postFilesPresignedUrlTTL)
-}
-
-const presignedUrls = ref<string[]>([])
-const res = await getPresignedUrls(post.value?.files ?? [])
-presignedUrls.value = res.map((item: any) => item.url) ?? []
-
-const votes = ref<Vote[]>([])
-const hasUpvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
-const hasDownvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
-
-const { mutate: createVoteForPost } = useMutation(VOTE_MUTATION)
-const { onResult, refetch } = useQuery(
-  GET_VOTES_QUERY,
-  {
-    filter: {
-      postId: props.postId,
-      voteType: null,
-      authorHash: null,
-      authorNickname: null,
-      commentId: null
-    }
-  },
-  {
-    fetchPolicy: 'network-only'
-  }
+const userVote = computed(() =>
+  post.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
 )
-onResult(({ data, loading }) => {
-  if (loading) return
-  votes.value = data.votes
-    .filter((vote: any) => !vote.comment)
-    .map((vote: any) => ({
-      id: vote.id,
-      voteType: vote.voteType,
-      authorHash: vote.authorHash,
-      authorNickname: vote.authorNickname,
-      post: {
-        id: vote.post.id
-      },
-      comment: null
-    }))
-  // console.log(`votes for post:${props.postId}`, votes.value)
-})
+const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
+const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
+
+const { mutate: createOrDeleteVoteForPost } = useMutation(VOTE_MUTATION)
 
 const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   try {
-    await createVoteForPost({
+    const res = await createOrDeleteVoteForPost({
       data: {
         commentId: null,
         postId: props.postId,
@@ -172,9 +123,15 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    await refetch()
-    console.log('refetched votes for post:', props.postId)
-    postsStore.syncVotesForPostById(props.postId)
+    // console.log({ res })
+    if (res?.data)
+      postsStore.syncVotesForPostById({
+        postId: props.postId,
+        votesUp: res.data.createVote.post.votesUp,
+        votesDown: res.data.createVote.post.votesDown,
+        authorHash: userStore.sessionHash,
+        voteType: res.data.createVote.voteType
+      })
   } catch (error) {
     console.log(error)
   }

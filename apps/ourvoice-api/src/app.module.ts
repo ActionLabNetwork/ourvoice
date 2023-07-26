@@ -10,14 +10,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
-import { ApolloDriver } from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheControl';
 
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { UsersModule } from './modules/users/users.module';
+import { PollModule } from './modules/poll/poll.module';
 
 import deployment from './config/deployment';
 import configuration from './config/configuration';
@@ -56,10 +58,13 @@ import { SMTPConfig } from './auth/config.interface';
         };
       },
     }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins: [
+        ApolloServerPluginLandingPageLocalDefault(),
+        ApolloServerPluginCacheControl(),
+      ],
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
@@ -92,6 +97,8 @@ import { SMTPConfig } from './auth/config.interface';
         };
       },
     }),
+    VoteModule,
+    PollModule,
     VoteModule,
     ModerationModule,
     ScheduleModule.forRoot(),

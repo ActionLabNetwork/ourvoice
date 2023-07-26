@@ -1,3 +1,4 @@
+import type { GetModerationCommentByIdQuery } from './../graphql/generated/graphql'
 import { useDeploymentStore } from './deployment'
 import { useUserStore } from './user'
 import { apolloClient } from './../graphql/client/index'
@@ -6,23 +7,14 @@ import { provideApolloClient } from '@vue/apollo-composable'
 
 import authService from '@/services/auth-service'
 import { GET_MODERATION_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getModerationComment'
-import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { APPROVE_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/approveModerationCommentVersion'
 import { REJECT_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/rejectModerationCommentVersion'
 import { MODIFY_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/modifyModerationComment'
 import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewCommentModeration'
-import type { PostVersion } from './moderation-posts'
+import { GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY } from '@/graphql/queries/getModerationCommentHistory'
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
-export interface ModerationPost {
-  id: number
-  authorHash: string
-  authorNickname: string
-  versions: PostVersion[]
-  requiredModerations: number
-  status: CommentStatus
-}
 export interface CommentVersion {
   id: number
   content: string
@@ -34,17 +26,6 @@ export interface CommentVersion {
   reason: string
   latest: boolean
   moderations: Moderation[]
-}
-
-export interface ModerationComment {
-  id: number
-  authorHash: string
-  authorNickname: string
-  requiredModerations: number
-  status: CommentStatus
-  post: ModerationPost
-  parent: ModerationComment | null
-  versions: CommentVersion[]
 }
 
 export interface Moderation {
@@ -62,13 +43,19 @@ export interface PageInfo {
   startCursor: string
 }
 
+export type ModerationComment = GetModerationCommentByIdQuery['moderationComment']
+export type ModerationCommentVersion = NonNullable<ModerationComment>['versions'][0]
+export type ModerationCommentParent = NonNullable<ModerationComment>['parent']
+export type ModerationCommentParentVersion = NonNullable<ModerationCommentParent>['versions'][0]
+
 export interface ModerationCommentsState {
   commentInModeration: ModerationComment | undefined
-  versionInModeration: CommentVersion | undefined
+  versionInModeration: ModerationCommentVersion | undefined
   versionInModification: {
-    version: Partial<CommentVersion> | undefined
+    version: Partial<ModerationCommentVersion> | undefined
     isValid: boolean
   }
+  history: ModerationComment[] | undefined
   loading: boolean
   userHasModeratedComment: boolean
   hasErrors: boolean
@@ -78,7 +65,11 @@ interface CommentFields {
   content?: string
 }
 
-const findSelfModeration = async (version: CommentVersion, userId: string, deployment: string) => {
+const findSelfModeration = async (
+  version: ModerationCommentVersion,
+  userId: string,
+  deployment: string
+) => {
   const promises = version.moderations.map((moderation) => {
     return authService.verifyHash(userId, deployment, moderation.moderatorHash)
   })
@@ -96,6 +87,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       version: undefined,
       isValid: false
     },
+    history: undefined,
     loading: false,
     userHasModeratedComment: false,
     hasErrors: false
@@ -131,7 +123,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
           fetchPolicy: 'no-cache'
         })
 
-        const comment = data.moderationComment as ModerationComment
+        const comment = data.moderationComment!
 
         // Set states to be used for moderation
         this.commentInModeration = comment
@@ -142,46 +134,28 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       }
       this.loading = false
     },
-    // async createComment({
-    //   content,
-    //   postId,
-    //   parentId
-    // }: {
-    //   content: string
-    //   postId: number | undefined
-    //   parentId: number | undefined
-    // }) {
-    //   // Check for valid deployment and user session
-    //   const userStore = useUserStore()
 
-    //   // Check if we can access the session and generate a user hash for storing in the db
-    //   if (!(await userStore.isLoggedIn)) {
-    //     // TODO: Set up a proper error handling module
-    //     throw new Error('User session is invalid')
-    //   }
+    async fetchCommentHistoryById(id: number) {
+      this.loading = true
+      this.hasErrors = false
 
-    //   const authorHash = userStore.sessionHash
-    //   const authorNickname = userStore.nickname
-    //   const requiredModerations = 1
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY,
+          variables: { moderationCommentHistoryId: id },
+          fetchPolicy: 'no-cache'
+        })
 
-    //   try {
-    //     const { data } = await apolloClient.mutate({
-    //       mutation: CREATE_MODERATION_COMMENT_MUTATION,
-    //       variables: {
-    //         data: {
-    //           content,
-    //           postId: postId,
-    //           parentId: parentId,
-    //           authorHash,
-    //           authorNickname,
-    //           requiredModerations
-    //         }
-    //       }
-    //     })
-    //   } catch (error) {
-    //     console.error(error)
-    //   }
-    // },
+        const history = data.moderationCommentsHistory!
+
+        // Set states to be used for moderation
+        this.history = history
+      } catch (error) {
+        console.error(`Failed to load comment history with ID ${id}. Please try again.`, error)
+        this.hasErrors = true
+      }
+      this.loading = false
+    },
 
     // Moderation actions
     async checkIfUserHasModerated(userId: string) {

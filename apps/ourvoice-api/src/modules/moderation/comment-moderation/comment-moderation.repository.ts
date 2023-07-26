@@ -1,7 +1,8 @@
 import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
-  ModerationIncludesVersion,
+  CommentIncludesVersionIncludesModerationsIncludesPost,
+  CommentWithAllItsRelations,
   ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
@@ -21,6 +22,7 @@ import {
 import { cursorToNumber } from '../../../utils/cursor-pagination';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentService } from '../../../modules/comment/comment.service';
+import getDeploymentConfig from '../../../config/deployment';
 
 function countCommentVersionModerationDecisions(
   version: CommentVersion & {
@@ -50,15 +52,14 @@ function countCommentVersionModerationDecisions(
 @Injectable()
 export class CommentModerationRepository {
   private readonly logger = new Logger(CommentModerationRepository.name);
+  private readonly config = getDeploymentConfig();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly commentService: CommentService,
   ) {}
 
-  async getModerationCommentById(
-    id: number,
-  ): Promise<CommentIncludesVersionIncludesModerations> {
+  async getModerationCommentById(id: number) {
     return await this.prisma.comment.findUnique({
       where: { id },
       include: {
@@ -89,16 +90,30 @@ export class CommentModerationRepository {
     });
   }
 
+  async getHistoryofModerationCommentById(id: number) {
+    const comments = [];
+
+    let comment = await this.getModerationCommentById(id);
+    while (comment.parent) {
+      comments.unshift(comment.parent);
+      comment = await this.getModerationCommentById(comment.parent.id);
+    }
+
+    return comments;
+  }
+
   async getModerationComments(
     filter?: ModerationCommentsFilterInput,
     pagination?: ModerationCommentPaginationInput,
   ): Promise<
     GetManyRepositoryResponse<'moderationComments', CommentIncludesVersion>
   > {
-    const { status } = filter ?? {};
+    const { status, published, archived } = filter ?? {};
 
     const where: Prisma.CommentWhereInput = {
       status: status ?? undefined,
+      published: published ?? undefined,
+      archived: archived ?? undefined,
     };
 
     const totalCount = await this.prisma.comment.count({ where });
@@ -116,7 +131,14 @@ export class CommentModerationRepository {
 
     const moderationComments = await this.prisma.comment.findMany({
       where,
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          orderBy: { version: 'desc' },
+          include: {
+            moderations: { orderBy: { timestamp: 'desc' } },
+          },
+        },
+      },
       skip: cursor ? 1 : undefined,
       cursor: cursor,
       take: (pagination?.limit ?? 10) * cursorDirection,
@@ -179,6 +201,7 @@ export class CommentModerationRepository {
             version: 1,
           },
         },
+        requiredModerations: this.config.moderatorCount,
       },
       include: { versions: { orderBy: { version: 'desc' } } },
     });
@@ -480,8 +503,12 @@ export class CommentModerationRepository {
             orderBy: { version: 'desc' },
             take: 1,
           },
+          parent: { select: { commentIdInMainDb: true } },
+          post: { select: { postIdInMainDb: true } },
         },
       });
+
+      console.log({ comment });
 
       if (!comment) {
         throw new Error(
@@ -499,6 +526,8 @@ export class CommentModerationRepository {
         content: comment.versions[0].content,
         authorHash: comment.versions[0].authorHash,
         authorNickname: comment.versions[0].authorNickname,
+        postId: comment.post?.postIdInMainDb,
+        parentId: comment.parent?.commentIdInMainDb,
       });
 
       this.logger.debug(
@@ -508,7 +537,11 @@ export class CommentModerationRepository {
 
       await tx.comment.update({
         where: { id: comment.id },
-        data: { commentIdInMainDb: newCommentInMainDb.id },
+        data: {
+          commentIdInMainDb: newCommentInMainDb.id,
+          published: true,
+          publishedAt: new Date(),
+        },
       });
 
       this.logger.log(
@@ -545,7 +578,7 @@ export class CommentModerationRepository {
 
       await tx.comment.update({
         where: { id: commentId },
-        data: { archived: true },
+        data: { archived: true, archivedAt: new Date() },
       });
 
       this.logger.debug(`Archived comment with id ${comment.id}`);
@@ -652,6 +685,7 @@ export class CommentModerationRepository {
 
     const tasks = comments.map((comment) => {
       if (comment.status === 'APPROVED') {
+        console.log(`Approving comment ${comment.id}`);
         return this.publishComment(comment.id)
           .then(() => {
             publishedCount++;

@@ -29,7 +29,6 @@ export const MODIFY_MODERATION_POST_MUTATION = gql`
         version
         authorHash
         authorNickname
-        reason
         latest
         moderations {
           id

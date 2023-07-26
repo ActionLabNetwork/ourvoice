@@ -1,48 +1,75 @@
 <template>
   <template v-if="!props.to">
-    <button v-if="isVisible" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed"
-    :data-cy="props.dataCy" :disabled="isDisabled" >
-      {{ label }}
+    <button
+      v-if="show"
+      :class="
+        twMerge(props.variant === 'outlined' ? 'btn-outlined' : 'btn-filled', props.className)
+      "
+      :data-cy="props.dataCy"
+      :disabled="disabled"
+      @click="props.onClick"
+      :type="props.type"
+    >
+      <slot name="icon-before-text"></slot>
+      <p class="mx-auto">{{ label }}</p>
+      <slot name="icon-after-text"></slot>
     </button>
   </template>
   <template v-else>
     <router-link
-      v-if="isVisible"
+      v-if="show"
       :to="props.to"
-      class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+      :class="
+        twMerge(props.variant === 'outlined' ? 'btn-outlined' : 'btn-filled', props.className)
+      "
       :data-cy="props.dataCy"
-    >
-      {{ label }}
+      ><slot name="icon-before-text"></slot>
+      <p class="mx-auto">{{ label }}</p>
+      <slot name="icon-after-text"></slot>
     </router-link>
   </template>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from 'vue';
+import { type ButtonHTMLAttributes, type PropType } from 'vue'
+import { twMerge } from 'tailwind-merge'
 
 const props = defineProps({
-  visibilityPredicate: {
-    type: Function as PropType<() => boolean>,
-    default: () => true
+  show: {
+    type: Boolean,
+    default: true
   },
-  disabledPredicate: {
-    type: Function as PropType<() => boolean>,
-    default: () => true
+  disabled: {
+    type: Boolean as PropType<ButtonHTMLAttributes['disabled']>,
+    default: false
   },
   to: {
-    type: Object as PropType<{ name: string; params: { id: number; }; }>,
+    type: [Object, String] as PropType<{ name: string; params: { id: number } } | string>,
     required: false
   },
   dataCy: {
     type: String,
     required: false
   },
+  onClick: {
+    type: Function as PropType<() => void>,
+    required: false
+  },
   label: {
     type: String,
     required: true
   },
+  className: {
+    type: String,
+    required: false
+  },
+  variant: {
+    type: String as PropType<'filled' | 'outlined'>,
+    default: 'filled'
+  },
+  type: {
+    type: String as PropType<ButtonHTMLAttributes['type']>,
+    default: 'button'
+  }
 })
-
-const isVisible = computed(() => props.visibilityPredicate())
-const isDisabled = computed(() => props.disabledPredicate())
 </script>
