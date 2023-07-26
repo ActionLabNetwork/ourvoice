@@ -51,6 +51,7 @@ export class SupertokensService {
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
                     deployment: metadata.deployment || '',
+                    consent: metadata.consent || '',
                   };
 
                   return originalImplementation.createNewSession(input);

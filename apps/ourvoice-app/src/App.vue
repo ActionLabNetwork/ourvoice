@@ -7,6 +7,7 @@
       <div>
         <Navbar />
       </div>
+      <ConsentModal />
     </div>
     <div class="z-20 flex-grow">
       <Suspense>
@@ -18,6 +19,7 @@
 
 <script setup lang="ts">
 import Navbar from '@/components/common/Navbar.vue'
+import ConsentModal from './components/common/ConsentModal.vue'
 import { useScrollHide } from '@/composables/useScrollHide'
 
 const { isElementHidden: isNavbarHidden } = useScrollHide()

@@ -1,8 +1,5 @@
 <template>
   <div class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28 fill">
-    <!-- <div v-if="session" class="top-bar">
-      <div class="sign-out" v-on:click="signOut">SIGN OUT</div>
-    </div> -->
     <!-- Content -->
     <div class="flex fill flex-1 flex-col items-center lg:items-start">
       <h1 class="text-btn-secondary-1 text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
@@ -51,8 +48,10 @@ import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
 import Information from '../../../../config/content/information.md'
 
-import { useDeploymentStore } from '@/stores/deployment'
-import config from '@/config'
+import { useDeploymentStore } from '../stores/deployment'
+import config from '../config'
+import { mapStores } from 'pinia'
+import { useUserStore } from '../stores/user'
 
 const apiURL = config.apiURL
 const authBaseURL = config.authURL + '/signinWithoutPassword'
@@ -61,6 +60,7 @@ export default defineComponent({
   components: {
     Description,
     Information
+    // Consent
   },
   props: ['deployment'],
   data() {
@@ -73,21 +73,17 @@ export default defineComponent({
       deploymentStore: useDeploymentStore()
     }
   },
+  computed: {
+    ...mapStores(useUserStore)
+  },
   methods: {
     // TODO: this list might be coming from the database later
     getConfig(option: string) {
       return YamlContent[option]
     },
-    // signOut: async function () {
-    //   await Session.signOut()
-    //   window.location.assign('/')
-    // },
-
     checkForSession: async function () {
       if (!(await Session.doesSessionExist())) return
       let validationErrors = await Session.validateClaims()
-      // let payload = await Session.getAccessTokenPayloadSecurely()
-      // console.log(payload)
 
       if (validationErrors.length === 0) {
         // user has verified their email address
@@ -121,8 +117,6 @@ export default defineComponent({
   },
 
   async mounted() {
-    // this function checks if a session exists, and if not,
-    // it will redirect to the login screen.
     await this.checkForSession()
   }
 })

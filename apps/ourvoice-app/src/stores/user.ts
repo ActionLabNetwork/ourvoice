@@ -11,6 +11,7 @@ export interface UserState {
   nickname: string
   userRoles: string[]
   userDeployment: string
+  consentDate: Date | null
 }
 
 export const useUserStore = defineStore('user', {
@@ -19,7 +20,8 @@ export const useUserStore = defineStore('user', {
     sessionHash: '',
     nickname: '',
     userRoles: [],
-    userDeployment: ''
+    userDeployment: '',
+    consentDate: null
   }),
   getters: {
     isLoggedIn: async () => {
@@ -37,6 +39,10 @@ export const useUserStore = defineStore('user', {
     },
     isSuperAdmin: (state) => {
       return state.userRoles.includes('super')
+    },
+    getConsent: async () => {
+      const payload = await getSessionPayload()
+      return payload.consent
     }
   },
   actions: {
@@ -57,6 +63,8 @@ export const useUserStore = defineStore('user', {
       const userDeployment = payload?.deployment || ''
       this.userRoles = userRoles
       this.userDeployment = userDeployment
+      console.log(payload.consent)
+      this.consentDate = new Date(payload.consent)
 
       const nickname = uniqueNamesGenerator({
         dictionaries: [adjectives, colors, animals],

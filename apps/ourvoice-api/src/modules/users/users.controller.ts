@@ -70,13 +70,18 @@ export class UserController {
     @Session() session: SessionContainer,
   ): Promise<{ message: string }> {
     const userId = session.getUserId();
-
+    const now = new Date().toISOString();
     const { status } = await this.metadataService.update(userId, {
-      consent: new Date().toISOString(),
+      consent: now,
     });
     // TODO: error handling
-    if (status === 'OK')
+    if (status === 'OK') {
+      // update session payload
+      await session.mergeIntoAccessTokenPayload({
+        consent: now,
+      });
       return { message: 'successfully updated user consent' };
+    }
   }
   //   Probably not needed as an endpoint
   @Post('consent/check')
