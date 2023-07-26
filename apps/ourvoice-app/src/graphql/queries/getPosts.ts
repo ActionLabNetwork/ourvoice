@@ -51,13 +51,9 @@ export const GET_POSTS_QUERY = graphql(`
   }
 `)
 
-export const GET_POST_COUNT_BY_CATEGORY_QUERY = gql`
-  query Posts(
-    $filter: PostsFilterInput
-    $pagination: PostPaginationInput
-    $sort: PostSortingInput
-  ) {
-    posts(filter: $filter, pagination: $pagination, sort: $sort) {
+export const GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY = gql`
+  query GetTotalPostCount {
+    posts {
       totalCount
     }
   }

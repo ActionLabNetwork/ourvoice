@@ -6,13 +6,15 @@
     >
       <!-- <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span> -->
       <PostSortFilterCategoryButton
+        v-if="result?.posts?.totalCount"
+        :count="result.posts.totalCount"
         :active="!sortFilter.selectedCategoryIds"
-        :count="postTotalCount"
         text="All"
         @select="selectCategory(null)"
       />
       <template v-for="category in categories" :key="category.id">
         <PostSortFilterCategoryButton
+          v-if="category.numPosts > 0"
           :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
           :count="category.numPosts"
           :text="category.name"
@@ -116,12 +118,15 @@ import {
 } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import { useToggle } from '@vueuse/core'
-import { computed, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
 import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
-
+import { startOfDay } from 'date-fns'
+import { GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
+import { useQuery } from '@vue/apollo-composable'
+const { result } = useQuery(GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY)
 // interface CategoryWithCount {
 //   id: number
 //   name: string
@@ -159,7 +164,7 @@ const timeRangeOptions = [
 const selectedTimeRangeOption = ref(timeRangeOptions[0])
 watchEffect(async () => {
   if (selectedTimeRangeOption.value.label === 'Latest 3 Days') {
-    postsStore.setCreatedAfter(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000))
+    postsStore.setCreatedAfter(startOfDay(Date.now() - 3 * 24 * 60 * 60 * 1000))
   } else {
     postsStore.setCreatedAfter(null)
   }
@@ -177,7 +182,4 @@ const { sortFilter } = storeToRefs(postsStore)
 const selectCategory = (id: number | null) => {
   postsStore.setSelectedCategoryIds(id ? [id] : null)
 }
-const postTotalCount = computed(() => {
-  return postsStore.totalCount
-})
 </script>

@@ -138,7 +138,6 @@ const showReply = ref(false)
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
 const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
   if (!comment.value) {
-    console.log('no comment')
     return
   }
   try {
@@ -151,7 +150,7 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    // console.log(res)
+
     if (res?.data)
       commentStore.syncVotesForCommentById({
         commentId: props.commentId,
