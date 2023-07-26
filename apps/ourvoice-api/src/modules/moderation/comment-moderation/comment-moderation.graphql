@@ -62,7 +62,7 @@ type ModerationCommentVersion {
   latest: Boolean!
   timestamp: String!
   comment: ModerationComment!
-  moderations: [CommentModeration!]!
+  moderations: [CommentModeration!]
 }
 
 type CommentModeration {

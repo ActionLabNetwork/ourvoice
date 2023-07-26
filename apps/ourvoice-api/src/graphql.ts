@@ -536,7 +536,7 @@ export class ModerationCommentVersion {
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
-    moderations: CommentModeration[];
+    moderations?: Nullable<CommentModeration[]>;
 }
 
 export class CommentModeration {

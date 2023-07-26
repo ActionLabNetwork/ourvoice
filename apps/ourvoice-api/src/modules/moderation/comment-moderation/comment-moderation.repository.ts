@@ -95,7 +95,7 @@ export class CommentModerationRepository {
 
     let comment = await this.getModerationCommentById(id);
     while (comment.parent) {
-      comments.push(comment.parent);
+      comments.unshift(comment.parent);
       comment = await this.getModerationCommentById(comment.parent.id);
     }
 

@@ -1,108 +1,110 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div class="flex justify-between items-center">
-      <div>
-        <BackButton />
-      </div>
-      <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
-        <!-- Side pane button -->
-        <div
-          @click="toggleSidePane"
-          class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
-          data-cy="moderation-history-button"
-        >
-          <p>
-            Moderation History
-            <span>
-              <font-awesome-icon
-                :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
-              />
-            </span>
-          </p>
-        </div>
-        <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
-          <ModerationHistory />
-        </SidePane>
-      </div>
+    <div class="h-[80vh]" v-if="loading">
+      <Loading>Loading Comment...</Loading>
     </div>
-    <div class="grid grid-cols-4 gap-2">
-      <!-- Versioning -->
-      <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="comment">
-        <ModerationVersionList
-          @versionClicked="handleVersionChange"
-          :versions="comment?.versions ?? []"
-        />
-      </div>
-
-      <!-- Post Context Preview -->
-      <div
-        v-if="comment && comment.post && comment.post.versions"
-        class="col-span-full sm:col-span-3 px-4 sm:px-0"
-      >
-        <ModerationPostCard
-          :post="comment.post"
-          :version="comment.post.versions[0]"
-          :preview="true"
-        />
-      </div>
-
-      <!-- Parent Comment Context Preview -->
-      <div
-        v-if="comment && comment.parent && comment.parent.versions"
-        class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10"
-      >
-        <ModerationCommentCard
-          :comment="comment.parent"
-          :version="comment.parent.versions[0]"
-          :preview="true"
-        />
-      </div>
-
-      <!-- Comment Preview -->
-      <div
-        v-if="comment && version"
-        class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
-      >
-        <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
-        <ModerationCommentCard
-          v-else
-          :comment="comment"
-          :version="version"
-          :preview="true"
-          :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
-        />
-
-        <div class="grid grid-cols-4">
-          <!-- Moderation Controls -->
-          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
-            <ModerationControls
-              thread-type="comment"
-              @moderation-submit="handleModerationControlsSubmit"
-              @moderation-action-change="handleModerationControlsActionChange"
+    <transition name="fade">
+      <div>
+        <div class="flex justify-between items-center my-10" v-if="!loading">
+          <div>
+            <BackButton />
+          </div>
+          <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
+            <!-- Side pane button -->
+            <div
+              @click="toggleSidePane"
+              class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
+              data-cy="moderation-history-button"
+            >
+              <p>
+                Moderation History
+                <span>
+                  <font-awesome-icon
+                    :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
+                  />
+                </span>
+              </p>
+            </div>
+            <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
+              <ModerationHistory />
+            </SidePane>
+          </div>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <!-- Versioning -->
+          <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="comment">
+            <ModerationVersionList
+              @versionClicked="handleVersionChange"
+              :versions="comment?.versions ?? []"
             />
           </div>
-          <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
-            <!-- Renew button -->
-            <div class="mt-4 flex justify-end" v-if="comment.status === 'PENDING'">
-              <div>
-                <button
-                  @click="handleRenewModeration"
-                  class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
-                  data-cy="renew-button"
-                >
-                  Renew Moderation
-                  <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>
-                </button>
+
+          <!-- Post Context Preview -->
+          <div
+            v-if="comment && comment.post && comment.post.versions"
+            class="col-span-full sm:col-span-3 px-4 sm:px-0"
+          >
+            <ModerationPostCard
+              :post="comment.post"
+              :version="comment.post.versions[0]"
+              :preview="true"
+            />
+          </div>
+
+          <!-- Parent Comment Context Preview -->
+          <div v-if="history" class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10">
+            <div v-for="c in history" :key="c.id">
+              <ModerationCommentCard :comment="c" :version="c.versions[0]" :preview="true" />
+            </div>
+          </div>
+
+          <!-- Comment Preview -->
+          <div
+            v-if="comment && version"
+            class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
+          >
+            <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
+            <ModerationCommentCard
+              v-else
+              :comment="comment"
+              :version="version"
+              :preview="true"
+              :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+            />
+
+            <div class="grid grid-cols-4">
+              <!-- Moderation Controls -->
+              <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
+                <ModerationControls
+                  thread-type="comment"
+                  @moderation-submit="handleModerationControlsSubmit"
+                  @moderation-action-change="handleModerationControlsActionChange"
+                />
+              </div>
+              <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
+                <!-- Renew button -->
+                <div class="mt-4 flex justify-end" v-if="comment.status === 'PENDING'">
+                  <div>
+                    <button
+                      @click="handleRenewModeration"
+                      class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
+                      data-cy="renew-button"
+                    >
+                      Renew Moderation
+                      <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+          <div v-else>
+            <p>Comment not found</p>
+          </div>
         </div>
       </div>
-
-      <div v-else>
-        <p>Comment not found</p>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -119,6 +121,7 @@ import ModerationControls from '@/components/common/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
 import BackButton from '@/components/common/BackButton.vue'
 import { storeToRefs } from 'pinia'
+import Loading from '@/components/common/Loading.vue'
 import {
   useCommentModerationStore,
   type ModerationCommentVersion
@@ -143,6 +146,7 @@ const commentModerationStore = useCommentModerationStore()
 const {
   commentInModeration: comment,
   versionInModeration: version,
+  history,
   hasErrors
 } = storeToRefs(commentModerationStore)
 
@@ -150,6 +154,7 @@ const selfModeration = ref<CommentModeration['decision'] | undefined>(undefined)
 const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
+const loading = ref(false)
 
 const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
@@ -174,7 +179,9 @@ const decisionIcon = {
 }
 
 onMounted(async () => {
+  loading.value = true
   await initializeCommentModeration()
+  loading.value = false
 })
 
 watchEffect(() => {
@@ -194,6 +201,7 @@ async function initializeCommentModeration() {
 
   commentModerationStore.$reset()
   await commentModerationStore.fetchCommentById(+route.params.id)
+  await commentModerationStore.fetchCommentHistoryById(+route.params.id)
 
   if (version.value) {
     await refreshVersion()

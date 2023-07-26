@@ -11,7 +11,7 @@ import { APPROVE_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations
 import { REJECT_MODERATION_COMMENT_VERSION_MUTATION } from '@/graphql/mutations/rejectModerationCommentVersion'
 import { MODIFY_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/modifyModerationComment'
 import { RENEW_COMMENT_MODERATION_MUTATION } from '@/graphql/mutations/renewCommentModeration'
-import type { ModerationDecision } from '@/graphql/generated/graphql'
+import { GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY } from '@/graphql/queries/getModerationCommentHistory'
 
 type CommentStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -55,6 +55,7 @@ export interface ModerationCommentsState {
     version: Partial<ModerationCommentVersion> | undefined
     isValid: boolean
   }
+  history: ModerationComment[] | undefined
   loading: boolean
   userHasModeratedComment: boolean
   hasErrors: boolean
@@ -86,6 +87,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       version: undefined,
       isValid: false
     },
+    history: undefined,
     loading: false,
     userHasModeratedComment: false,
     hasErrors: false
@@ -128,6 +130,28 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
         this.versionInModeration = comment.versions[0]
       } catch (error) {
         console.error(`Failed to load comment with ID ${id}. Please try again.`, error)
+        this.hasErrors = true
+      }
+      this.loading = false
+    },
+
+    async fetchCommentHistoryById(id: number) {
+      this.loading = true
+      this.hasErrors = false
+
+      try {
+        const { data } = await apolloClient.query({
+          query: GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY,
+          variables: { moderationCommentHistoryId: id },
+          fetchPolicy: 'no-cache'
+        })
+
+        const history = data.moderationCommentsHistory!
+
+        // Set states to be used for moderation
+        this.history = history
+      } catch (error) {
+        console.error(`Failed to load comment history with ID ${id}. Please try again.`, error)
         this.hasErrors = true
       }
       this.loading = false
