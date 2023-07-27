@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { constants, copyFileSync, existsSync, readdirSync } from 'fs'
+import { constants, copyFileSync, cpSync, existsSync, readdirSync } from 'fs'
 
 const appDir = './apps/'
 const envTemplateName = '.env.template'
@@ -32,4 +32,9 @@ if (process.env.RUN_POST !== 'false') {
     './config/config.yml',
     './apps/ourvoice-auth-api/config/config.yml'
   )
+
+  // copy logo and favicon to ourvoice-app assets folder
+  cpSync('./config/brand/default/assets', './apps/ourvoice-app/src/assets', {
+    recursive: true,
+  })
 }
