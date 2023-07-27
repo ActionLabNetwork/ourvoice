@@ -9,7 +9,7 @@ import {
   PollFilterInput,
   PollPaginationInput,
   PollWithResultConnection,
-  PollWithStatsConnection,
+  PollWithStats,
   VoteInput,
   VoteResponse,
 } from '../../graphql';
@@ -30,6 +30,7 @@ export class PollService {
     const { polls: allActivePolls } = await this.pollRepository.getPolls({
       expiresAfter: new Date(),
       active: true,
+      published: true,
     });
 
     const pollsUserVotedFor =
@@ -40,45 +41,23 @@ export class PollService {
     return allActivePolls.filter((poll) => !pollsUserVotedForIds.has(poll.id));
   }
 
-  async getVotedPolls(
-    userHash: string,
-    pagination?: PollPaginationInput,
-  ): Promise<PollWithStatsConnection> {
-    const pollsVoterVoted =
+  async getVotedPolls(userHash: string): Promise<PollWithStats[]> {
+    const activePolls = await this.pollRepository.getPolls({ active: true });
+    const pollIdsVoted = (
       await this.pollModerationRepository.getPollsVoterVoted(
         userHash,
-        pagination,
-      );
-    const totalCount = await this.pollModerationRepository.countPollsVoterVoted(
-      userHash,
+        activePolls.polls.map((poll) => poll.id),
+      )
+    ).map((pollVoted) => pollVoted.pollId);
+    const activePollsVoted = activePolls.polls.filter((poll) =>
+      pollIdsVoted.includes(poll.id),
     );
-    const polls = await this.pollRepository.getPollsByIds(
-      pollsVoterVoted.map((pollVoterVoted) => pollVoterVoted.pollId),
-    );
-    const idToPolls = new Map();
-    for (const poll of polls) {
-      idToPolls.set(poll.id, poll);
-    }
-    const pollsSorted = pollsVoterVoted.map((pollVoterVoted) =>
-      idToPolls.get(pollVoterVoted.pollId),
-    );
-    const pollsWithStats = pollsSorted.map(async (poll) => ({
+
+    const pollsWithStats = activePollsVoted.map(async (poll) => ({
       ...poll,
       stats: await this.getStatsOfPoll(poll.id),
     }));
-    const edges = (await Promise.all(pollsWithStats)).map((poll) => ({
-      node: poll,
-      cursor: numberToCursor(poll.id),
-    }));
-    return {
-      totalCount,
-      edges,
-      pageInfo: {
-        startCursor: edges.length > 0 ? edges[0].cursor : null,
-        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-        hasNextPage: edges.length < totalCount,
-      },
-    };
+    return Promise.all(pollsWithStats);
   }
 
   async getPollsWithResult(
@@ -190,7 +169,7 @@ export class PollService {
     if (poll === null) {
       throw new NotFoundException('Non existent poll');
     }
-    if (!poll.active) {
+    if (!poll.published) {
       throw new BadRequestException('Poll is not active');
     }
     if (poll.expiresAt !== null && new Date() >= poll.expiresAt) {

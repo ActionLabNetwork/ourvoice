@@ -2,8 +2,7 @@ type Query {
   availablePolls(userHash: String!): [Poll!]!
   votedPolls(
     userHash: String!
-    pagination: PollPaginationInput!
-  ): PollWithStatsConnection!
+  ): [PollWithStats!]!
   pollsWithResult(
     moderatorHash: String!
     filter: PollFilterInput!
@@ -156,15 +155,4 @@ type PollWithStats implements BasePoll {
   expiresAt: DateTime
   options: [PollOption!]!
   stats: [PollOptionStat!]
-}
-
-type PollWithStatsEdge {
-  node: PollWithStats!
-  cursor: String!
-}
-
-type PollWithStatsConnection {
-  totalCount: Int
-  pageInfo: PollPageInfo!
-  edges: [PollWithStatsEdge!]!
 }

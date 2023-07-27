@@ -1,35 +1,24 @@
-import gql from 'graphql-tag'
+import { graphql } from '../generated'
 
-export const GET_VOTED_POLLS_QUERY = gql`
-  query VotedPolls($userHash: String!, $pagination: PollPaginationInput!) {
-    votedPolls(userHash: $userHash, pagination: $pagination) {
-      edges {
-        cursor
-        node {
-          active
-          createdAt
-          expiresAt
-          id
-          options {
-            id
-            option
-          }
-          postLink
-          published
-          stats {
-            optionId
-            proportion
-          }
-          question
-          weight
-        }
+export const GET_VOTED_POLLS_QUERY = graphql(`
+  query VotedPolls($userHash: String!) {
+    votedPolls(userHash: $userHash) {
+      active
+      createdAt
+      expiresAt
+      id
+      options {
+        id
+        option
       }
-      pageInfo {
-        startCursor
-        hasNextPage
-        endCursor
+      postLink
+      published
+      stats {
+        optionId
+        proportion
       }
-      totalCount
+      question
+      weight
     }
   }
-`
+`)

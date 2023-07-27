@@ -255,7 +255,7 @@ export type ModerationCommentVersion = {
   content: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   latest: Scalars['Boolean']['output'];
-  moderations: Array<CommentModeration>;
+  moderations: Maybe<Array<CommentModeration>>;
   reason: Maybe<Scalars['String']['output']>;
   timestamp: Scalars['String']['output'];
   version: Scalars['Int']['output'];
@@ -664,17 +664,6 @@ export type PollWithStats = BasePoll & {
   weight: Scalars['Int']['output'];
 };
 
-export type PollWithStatsConnection = {
-  edges: Array<PollWithStatsEdge>;
-  pageInfo: PollPageInfo;
-  totalCount: Maybe<Scalars['Int']['output']>;
-};
-
-export type PollWithStatsEdge = {
-  cursor: Scalars['String']['output'];
-  node: PollWithStats;
-};
-
 export type Post = {
   authorHash: Maybe<Scalars['String']['output']>;
   authorNickname: Maybe<Scalars['String']['output']>;
@@ -801,7 +790,7 @@ export type Query = {
   user: Maybe<User>;
   users: Array<User>;
   vote: Maybe<Vote>;
-  votedPolls: PollWithStatsConnection;
+  votedPolls: Array<PollWithStats>;
   votes: Array<Vote>;
 };
 
@@ -919,7 +908,6 @@ export type QueryVoteArgs = {
 
 
 export type QueryVotedPollsArgs = {
-  pagination: PollPaginationInput;
   userHash: Scalars['String']['input'];
 };
 
@@ -1022,7 +1010,7 @@ export type ApproveModerationCommentVersionMutationVariables = Exact<{
 }>;
 
 
-export type ApproveModerationCommentVersionMutation = { approveModerationCommentVersion: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } | null };
+export type ApproveModerationCommentVersionMutation = { approveModerationCommentVersion: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null };
 
 export type ApproveModerationPostVersionMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -1085,7 +1073,7 @@ export type ModifyModerationCommentVersionMutationMutationVariables = Exact<{
 }>;
 
 
-export type ModifyModerationCommentVersionMutationMutation = { modifyModerationComment: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } | null };
+export type ModifyModerationCommentVersionMutationMutation = { modifyModerationComment: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null };
 
 export type ModifyModerationPostVersionMutationMutationVariables = Exact<{
   postId: Scalars['Int']['input'];
@@ -1106,7 +1094,7 @@ export type RejectModerationCommentVersionMutationMutationVariables = Exact<{
 }>;
 
 
-export type RejectModerationCommentVersionMutationMutation = { rejectModerationCommentVersion: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } | null };
+export type RejectModerationCommentVersionMutationMutation = { rejectModerationCommentVersion: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null };
 
 export type RejectModerationPostVersionMutationMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -1131,7 +1119,7 @@ export type RenewCommentModerationMutationMutationVariables = Exact<{
 }>;
 
 
-export type RenewCommentModerationMutationMutation = { renewCommentModeration: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } | null };
+export type RenewCommentModerationMutationMutation = { renewCommentModeration: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null };
 
 export type RenewPostModerationMutationMutationVariables = Exact<{
   postModerationId: Scalars['Int']['input'];
@@ -1198,14 +1186,14 @@ export type GetModerationCommentByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetModerationCommentByIdQuery = { moderationComment: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, post: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationPostStatus, versions: Array<{ id: number, title: string, content: string, categoryIds: Array<number>, files: Array<string> | null, timestamp: string, version: number, authorHash: string, authorNickname: string, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null, parent: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean }> } | null, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } };
+export type GetModerationCommentByIdQuery = { moderationComment: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, post: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationPostStatus, versions: Array<{ id: number, title: string, content: string, categoryIds: Array<number>, files: Array<string> | null, timestamp: string, version: number, authorHash: string, authorNickname: string, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null, parent: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean }> } | null, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } };
 
 export type GetModerationCommentHistoryByIdQueryVariables = Exact<{
   moderationCommentHistoryId: Scalars['Int']['input'];
 }>;
 
 
-export type GetModerationCommentHistoryByIdQuery = { moderationCommentsHistory: Array<{ id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, post: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationPostStatus, versions: Array<{ id: number, title: string, content: string, categoryIds: Array<number>, files: Array<string> | null, timestamp: string, version: number, authorHash: string, authorNickname: string, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null, parent: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean }> } | null, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> }> };
+export type GetModerationCommentHistoryByIdQuery = { moderationCommentsHistory: Array<{ id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, post: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationPostStatus, versions: Array<{ id: number, title: string, content: string, categoryIds: Array<number>, files: Array<string> | null, timestamp: string, version: number, authorHash: string, authorNickname: string, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } | null, parent: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean }> } | null, versions: Array<{ id: number, content: string, timestamp: string, version: number, authorHash: string, authorNickname: string, reason: string | null, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> }> };
 
 export type GetModerationCommentsQueryVariables = Exact<{
   before?: InputMaybe<Scalars['String']['input']>;
@@ -1217,7 +1205,7 @@ export type GetModerationCommentsQueryVariables = Exact<{
 }>;
 
 
-export type GetModerationCommentsQuery = { moderationComments: { totalCount: number | null, edges: Array<{ cursor: string, node: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, versions: Array<{ id: number, content: string, authorHash: string, authorNickname: string, timestamp: string, version: number, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> }> } } | null> | null, pageInfo: { startCursor: string | null, endCursor: string | null, hasNextPage: boolean | null, hasPreviousPage: boolean | null } } };
+export type GetModerationCommentsQuery = { moderationComments: { totalCount: number | null, edges: Array<{ cursor: string, node: { id: number, authorHash: string, authorNickname: string, requiredModerations: number, status: ModerationCommentStatus, versions: Array<{ id: number, content: string, authorHash: string, authorNickname: string, timestamp: string, version: number, latest: boolean, moderations: Array<{ id: number, decision: ModerationDecision, moderatorHash: string, moderatorNickname: string, reason: string | null, timestamp: string }> | null }> } } | null> | null, pageInfo: { startCursor: string | null, endCursor: string | null, hasNextPage: boolean | null, hasPreviousPage: boolean | null } } };
 
 export type GetModerationPostByIdQueryVariables = Exact<{
   moderationPostId: Scalars['Int']['input'];
@@ -1288,11 +1276,10 @@ export type GetPresignedUrlsQuery = { getPresignedUrls: Array<{ key: string, url
 
 export type VotedPollsQueryVariables = Exact<{
   userHash: Scalars['String']['input'];
-  pagination: PollPaginationInput;
 }>;
 
 
-export type VotedPollsQuery = { votedPolls: { totalCount: number | null, edges: Array<{ cursor: string, node: { active: boolean, createdAt: any, expiresAt: any | null, id: number, postLink: string | null, published: boolean, question: string, weight: number, options: Array<{ id: number, option: string }>, stats: Array<{ optionId: number, proportion: number }> | null } }>, pageInfo: { startCursor: string | null, hasNextPage: boolean | null, endCursor: string | null } } };
+export type VotedPollsQuery = { votedPolls: Array<{ active: boolean, createdAt: any, expiresAt: any | null, id: number, postLink: string | null, published: boolean, question: string, weight: number, options: Array<{ id: number, option: string }>, stats: Array<{ optionId: number, proportion: number }> | null }> };
 
 export type VotesQueryVariables = Exact<{
   filter?: InputMaybe<VotesFilterInput>;
@@ -1335,5 +1322,5 @@ export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"Opera
 export const GetTotalPostCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTotalPostCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<GetTotalPostCountQuery, GetTotalPostCountQueryVariables>;
 export const GetPresignedDownloadUrlsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPresignedDownloadUrls"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"keys"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"expiresIn"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPresignedDownloadUrls"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"keys"},"value":{"kind":"Variable","name":{"kind":"Name","value":"keys"}}},{"kind":"Argument","name":{"kind":"Name","value":"expiresIn"},"value":{"kind":"Variable","name":{"kind":"Name","value":"expiresIn"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]}}]} as unknown as DocumentNode<GetPresignedDownloadUrlsQuery, GetPresignedDownloadUrlsQueryVariables>;
 export const GetPresignedUrlsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPresignedUrls"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"keys"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"expiresIn"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPresignedUrls"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"keys"},"value":{"kind":"Variable","name":{"kind":"Name","value":"keys"}}},{"kind":"Argument","name":{"kind":"Name","value":"expiresIn"},"value":{"kind":"Variable","name":{"kind":"Name","value":"expiresIn"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]}}]} as unknown as DocumentNode<GetPresignedUrlsQuery, GetPresignedUrlsQueryVariables>;
-export const VotedPollsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VotedPolls"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userHash"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PollPaginationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"votedPolls"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userHash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userHash"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"option"}}]}},{"kind":"Field","name":{"kind":"Name","value":"postLink"}},{"kind":"Field","name":{"kind":"Name","value":"published"}},{"kind":"Field","name":{"kind":"Name","value":"stats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"optionId"}},{"kind":"Field","name":{"kind":"Name","value":"proportion"}}]}},{"kind":"Field","name":{"kind":"Name","value":"question"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}}]} as unknown as DocumentNode<VotedPollsQuery, VotedPollsQueryVariables>;
+export const VotedPollsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VotedPolls"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userHash"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"votedPolls"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userHash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userHash"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"options"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"option"}}]}},{"kind":"Field","name":{"kind":"Name","value":"postLink"}},{"kind":"Field","name":{"kind":"Name","value":"published"}},{"kind":"Field","name":{"kind":"Name","value":"stats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"optionId"}},{"kind":"Field","name":{"kind":"Name","value":"proportion"}}]}},{"kind":"Field","name":{"kind":"Name","value":"question"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}}]}}]}}]} as unknown as DocumentNode<VotedPollsQuery, VotedPollsQueryVariables>;
 export const VotesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Votes"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VotesFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"votes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"voteType"}},{"kind":"Field","name":{"kind":"Name","value":"authorHash"}},{"kind":"Field","name":{"kind":"Name","value":"authorNickname"}},{"kind":"Field","name":{"kind":"Name","value":"comment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"votesUp"}},{"kind":"Field","name":{"kind":"Name","value":"votesDown"}}]}},{"kind":"Field","name":{"kind":"Name","value":"post"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"votesUp"}},{"kind":"Field","name":{"kind":"Name","value":"votesDown"}}]}}]}}]}}]} as unknown as DocumentNode<VotesQuery, VotesQueryVariables>;

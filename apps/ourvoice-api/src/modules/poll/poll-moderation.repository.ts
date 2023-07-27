@@ -11,17 +11,14 @@ export class PollModerationRepository {
 
   async getPollsVoterVoted(
     voterHash: string,
-    pagination?: PollPaginationInput,
-  ): Promise<PollVoterVoted[]> {
+    pollIds?: number[],
+  ): Promise<{ pollId: number }[]> {
     return this.prisma.pollVoterVoted.findMany({
+      select: { pollId: true },
       where: {
         voterHash: voterHash,
+        pollId: pollIds ? { in: pollIds } : undefined,
       },
-      skip: pagination?.cursor ? 1 : undefined,
-      cursor: pagination?.cursor
-        ? { id: cursorToNumber(pagination.cursor) }
-        : undefined,
-      take: pagination?.limit,
     });
   }
 

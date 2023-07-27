@@ -278,10 +278,10 @@ describe('PollService', () => {
     );
   });
 
-  it('should not let user to vote if poll is inactive', async () => {
+  it('should not let user to vote if poll is not published', async () => {
     const createdPoll = await pollService.createPoll({
       ...testPoll,
-      active: false,
+      published: false,
     });
 
     await expect(async () => {
@@ -330,7 +330,7 @@ describe('PollService', () => {
     },
   );
 
-  it('should display a poll that a user has previously voted', async () => {
+  it('should display a poll that a user has previously voted depending on active status', async () => {
     const createdPoll1 = await pollService.createPoll(testPoll);
     const createdPoll2 = await pollService.createPoll(testPoll);
 
@@ -340,9 +340,13 @@ describe('PollService', () => {
       voterHash: 'user',
     });
 
-    const votedPolls = await pollService.getVotedPolls('user');
-    expect(votedPolls.edges.length).toEqual(1);
-    expect(votedPolls.edges[0].node).toEqual({ ...createdPoll1, stats: null });
+    let votedPolls = await pollService.getVotedPolls('user');
+    expect(votedPolls.length).toEqual(1);
+    expect(votedPolls[0]).toEqual({ ...createdPoll1, stats: null });
+
+    await pollService.updatePoll(createdPoll1.id, { active: false });
+    votedPolls = await pollService.getVotedPolls('user');
+    expect(votedPolls.length).toEqual(0);
   });
 
   it('should not display to the user a voted poll', async () => {

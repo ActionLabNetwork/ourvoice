@@ -2,7 +2,6 @@ import { apolloClient } from '@/graphql/client'
 import type {
   PollPageInfo,
   PollWithStats,
-  PollWithStatsConnection,
   VoteResponse
 } from '@/graphql/generated/graphql'
 import { VOTE_POLL_QUERY } from '@/graphql/mutations/votePoll'
@@ -20,7 +19,7 @@ export interface PollState {
   votedPolls: PollWithStats[]
   pageInfo: PollPageInfo | undefined | null
   totalCount: number | undefined | null
-  state: 'initial' | 'loading-initial' | 'loaded' | 'loading-more' | 'error'
+  state: 'initial' | 'loading-initial' | 'loaded' | 'error'
   error: Error | null
 }
 
@@ -47,18 +46,6 @@ export const usePollStore = defineStore('poll', {
         this.state = 'error'
       }
     },
-    async loadMore() {
-      this.state = 'loading-more'
-      try {
-        await this.fetchVotedPolls(true)
-        this.state = 'loaded'
-      } catch (e) {
-        if (e instanceof Error) {
-          this.error = e
-        }
-        this.state = 'error'
-      }
-    },
     async fetchAvailablePolls() {
       const userHash = await this.getVoterHash()
       const { data, errors } = await apolloClient.query({
@@ -72,23 +59,15 @@ export const usePollStore = defineStore('poll', {
       }))
     },
 
-    async fetchVotedPolls(loadMore: boolean = false) {
+    async fetchVotedPolls() {
       const userHash = await this.getVoterHash()
       const { data } = await apolloClient.query({
         query: GET_VOTED_POLLS_QUERY,
         variables: {
-          userHash: userHash,
-          pagination: {
-            cursor: loadMore ? this.pageInfo?.endCursor : null,
-            limit: 10
-          }
+          userHash: userHash
         }
       })
-      const connection = data.votedPolls as PollWithStatsConnection
-      const newPolls = connection.edges.map((edge) => edge.node)
-      this.votedPolls = loadMore ? [...this.votedPolls, ...newPolls] : newPolls
-      this.pageInfo = connection.pageInfo
-      this.totalCount = connection.totalCount
+      this.votedPolls = data.votedPolls
     },
     async votePoll(optionId: number, pollId: number) {
       try {

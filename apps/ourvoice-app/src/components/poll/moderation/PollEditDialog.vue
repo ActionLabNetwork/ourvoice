@@ -63,11 +63,11 @@
         />
       </div>
       <div class="py-2 flex flex-row">
-        <div class="flex-grow">Published</div>
+        <div class="flex-grow">Published (user can vote on the poll)</div>
         <input type="checkbox" v-model="fields.published" />
       </div>
       <div class="py-2 flex flex-row">
-        <div class="flex-grow">Active</div>
+        <div class="flex-grow">Active (poll is visible to the user)</div>
         <input type="checkbox" v-model="fields.active" />
       </div>
       <div class="mt-4 flex flex-row justify-between gap-2">

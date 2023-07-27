@@ -343,7 +343,7 @@ export abstract class IQuery {
 
     abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
 
-    abstract votedPolls(userHash: string, pagination: PollPaginationInput): PollWithStatsConnection | Promise<PollWithStatsConnection>;
+    abstract votedPolls(userHash: string): PollWithStats[] | Promise<PollWithStats[]>;
 
     abstract pollsWithResult(moderatorHash: string, filter: PollFilterInput, pagination: PollPaginationInput): PollWithResultConnection | Promise<PollWithResultConnection>;
 
@@ -693,17 +693,6 @@ export class PollWithStats implements BasePoll {
     expiresAt?: Nullable<DateTime>;
     options: PollOption[];
     stats?: Nullable<PollOptionStat[]>;
-}
-
-export class PollWithStatsEdge {
-    node: PollWithStats;
-    cursor: string;
-}
-
-export class PollWithStatsConnection {
-    totalCount?: Nullable<number>;
-    pageInfo: PollPageInfo;
-    edges: PollWithStatsEdge[];
 }
 
 export class Post {
