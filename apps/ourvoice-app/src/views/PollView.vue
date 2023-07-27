@@ -23,6 +23,7 @@
         </div>
         <button
           class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary font-Roboto text-[18px] font-medium"
+          @click="$router.push({name: 'posts'})"
         >
           Go Back to Q/A
         </button>
