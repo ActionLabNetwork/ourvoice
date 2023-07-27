@@ -62,7 +62,7 @@
       <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
     <div class="hidden md:inline-flex">
-      <img class="h-[100vh] w-full" :src="getConfig('logo')" alt="OurVoice interface" />
+      <img class="h-[100vh] w-full" :src="getConfig('heroImage')" alt="OurVoice interface" />
     </div>
   </div>
 </template>
