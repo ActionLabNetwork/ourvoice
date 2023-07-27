@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-full md:grid-cols-2">
+  <div class="grid grid-cols-full md:grid-cols-2 h-full">
     <!-- Content -->
     <div
       class="flex flex-col justify-center items-center md:items-start px-16 h-full translate-y-[25vh] md:translate-y-0"
@@ -61,8 +61,8 @@
       <!-- Deployment info -->
       <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
-    <div class="hidden md:inline-flex">
-      <img class="h-[90vh] w-full" :src="getConfig('heroImage')" alt="OurVoice interface" />
+    <div class="hidden md:inline-flex h-full">
+      <img class="h-[90vh] w-full h-full" :src="getConfig('heroImage')" alt="OurVoice interface" />
     </div>
   </div>
 </template>
