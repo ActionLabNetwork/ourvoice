@@ -65,7 +65,7 @@ const moderations = computed(() => {
   if (!version.value) return []
 
   const acceptOrRejectModerations: History[] =
-    version.value?.moderations.map(
+    version.value?.moderations?.map(
       ({ id, decision, reason, timestamp, moderatorHash, moderatorNickname }) => ({
         id,
         decision,

@@ -16,7 +16,7 @@
           </div>
           <div class="hidden sm:flex sm:flex-col sm:items-start space-y-2">
             <p
-              v-if="version.moderations.length > 0 && version.moderations[0].timestamp"
+              v-if="version.moderations !== null && version.moderations.length > 0 && version.moderations[0].timestamp"
               class="mt-1 text-xs leading-5 text-gray-500"
             >
               Last moderated <br />

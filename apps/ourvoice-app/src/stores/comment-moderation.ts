@@ -70,6 +70,7 @@ const findSelfModeration = async (
   userId: string,
   deployment: string
 ) => {
+  if (!version.moderations) return undefined
   const promises = version.moderations.map((moderation) => {
     return authService.verifyHash(userId, deployment, moderation.moderatorHash)
   })
@@ -160,7 +161,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
     // Moderation actions
     async checkIfUserHasModerated(userId: string) {
       const version = this.versionInModeration
-      if (!version) return
+      if (!version || version.moderations === null) return
 
       this.loading = true
 

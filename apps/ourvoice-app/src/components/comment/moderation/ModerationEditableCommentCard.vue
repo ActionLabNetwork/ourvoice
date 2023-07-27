@@ -124,7 +124,7 @@ const formWasUpdated = computed(() => {
 // Counts the number of accepted/rejected moderations by past moderators
 const moderationResultGroups = computed(() => {
   const groups: Record<ModerationVersionDecision, Moderation[]> | undefined =
-    version.value?.moderations.reduce(
+    version.value?.moderations?.reduce(
       (acc, moderation) => {
         return getGroupsByProperty('decision', acc, moderation)
       },
