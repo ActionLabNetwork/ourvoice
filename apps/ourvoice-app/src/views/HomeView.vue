@@ -2,7 +2,7 @@
   <div class="grid grid-cols-full md:grid-cols-2 h-full">
     <!-- Content -->
     <div
-      class="flex flex-col justify-center items-center md:items-start px-16 h-full translate-y-[25vh] md:translate-y-0"
+      class="flex flex-col justify-center items-center md:items-start px-16 h-full md:translate-y-0"
     >
       <div v-if="!session">
         <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
@@ -61,8 +61,8 @@
       <!-- Deployment info -->
       <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
-    <div class="hidden md:inline-flex h-full">
-      <img class="h-[90vh] w-full h-full" :src="getConfig('heroImage')" alt="OurVoice interface" />
+    <div class="hidden md:inline-flex">
+      <img class="w-full h-[90vh] object-cover" :src="getConfig('heroImage')" alt="OurVoice interface" />
     </div>
   </div>
 </template>
