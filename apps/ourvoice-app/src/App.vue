@@ -7,8 +7,8 @@
       <div>
         <Navbar />
       </div>
-      <ConsentModal />
     </div>
+    <ConsentModal />
     <div class="z-20 flex-grow">
       <Suspense>
         <RouterView />
