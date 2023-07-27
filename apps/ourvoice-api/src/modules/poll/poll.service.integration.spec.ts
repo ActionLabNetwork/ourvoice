@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PrismaService as MainPrismaService } from '../../database/main/prisma.service';
-import { PrismaService as PremoderationPrismaService } from '../../database/premoderation/prisma.service';
+import { PrismaService as ModerationPrismaService } from '../../database/moderation/prisma.service';
 import { PollCreateDto } from './dto/poll-create.dto';
 import { PollModerationRepository } from './poll-moderation.repository';
 import { PollRepository } from './poll.repository';
@@ -11,11 +11,11 @@ describe('PollService', () => {
   let pollService: PollService;
 
   let mainPrisma: MainPrismaService;
-  let premoderationPrisma: PremoderationPrismaService;
+  let moderationPrisma: ModerationPrismaService;
 
-  const testDateBeforeExpiry = new Date(2023, 5, 1, 0, 0, 0, 0);
-  const testDateAfterExpiry = new Date(2023, 7, 1, 0, 0, 0, 0);
-  const testDateExpiry = new Date(2023, 6, 1, 0, 0, 0, 0);
+  const testDateBeforeExpiry = new Date(2023, 5, 1, 0, 0, 0, 0).toISOString();
+  const testDateAfterExpiry = new Date(2023, 7, 1, 0, 0, 0, 0).toISOString();
+  const testDateExpiry = new Date(2023, 6, 1, 0, 0, 0, 0).toISOString();
   const testPoll: PollCreateDto = {
     question: 'test question',
     published: true,
@@ -44,7 +44,7 @@ describe('PollService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         MainPrismaService,
-        PremoderationPrismaService,
+        ModerationPrismaService,
         PollRepository,
         PollModerationRepository,
         PollService,
@@ -52,31 +52,31 @@ describe('PollService', () => {
     }).compile();
     pollService = moduleRef.get(PollService);
     mainPrisma = moduleRef.get(MainPrismaService);
-    premoderationPrisma = moduleRef.get(PremoderationPrismaService);
+    moderationPrisma = moduleRef.get(ModerationPrismaService);
 
     await mainPrisma.$connect();
-    await premoderationPrisma.$connect();
+    await moderationPrisma.$connect();
   });
 
   afterAll(async () => {
     await mainPrisma.$disconnect();
-    await premoderationPrisma.$disconnect();
+    await moderationPrisma.$disconnect();
   });
 
   beforeEach(async () => {
     await mainPrisma.poll.deleteMany({});
     await mainPrisma.pollOption.deleteMany({});
-    await premoderationPrisma.pollVote.deleteMany({});
-    await premoderationPrisma.pollVoterVoted.deleteMany({});
+    await moderationPrisma.pollVote.deleteMany({});
+    await moderationPrisma.pollVoterVoted.deleteMany({});
   });
 
   afterEach(async () => {
     jest.useRealTimers();
   });
 
-  function setDate(date: Date) {
+  function setDate(date: string) {
     // for "nextTick" see https://github.com/prisma/prisma/issues/7424
-    jest.useFakeTimers({ now: date, doNotFake: ['nextTick'] });
+    jest.useFakeTimers({ now: new Date(date), doNotFake: ['nextTick'] });
   }
 
   async function expectOnlyOnePoll() {
@@ -124,7 +124,7 @@ describe('PollService', () => {
 
     await pollService.updatePoll(createdPoll.id, { expiresAt: undefined });
     const poll = await expectOnlyOnePoll();
-    expect(poll.expiresAt).toEqual(testDateExpiry);
+    expect(poll.expiresAt.toISOString()).toEqual(testDateExpiry);
   });
 
   it('should update question', async () => {
