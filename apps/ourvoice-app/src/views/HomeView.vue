@@ -1,40 +1,68 @@
 <template>
-  <div class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28 fill">
+  <div class="grid grid-cols-full md:grid-cols-2">
     <!-- Content -->
-    <div class="flex fill flex-1 flex-col items-center lg:items-start">
-      <h1 class="text-btn-secondary-1 text-5xl md:text-6 lg:text-6xl text-center lg:text-left mb-6">
-        <span class="text-ourvoice-primary-2">OurVoice</span> {{ deployment.toUpperCase() }} App
-      </h1>
-      <!-- Deployment description -->
-      <Description class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
+    <div
+      class="flex flex-col justify-center items-center md:items-start px-16 h-full translate-y-[25vh] md:translate-y-0"
+    >
+      <div v-if="!session">
+        <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
+          <div>
+            <a href="#" class="">
+              <span class="sr-only">OurVoice</span>
+              <img
+                class="h-11"
+                src="@/assets/logo/ourvoice_logo_primary_dark.svg"
+                alt="OurVoice Logo"
+              />
+            </a>
+          </div>
+          <div>
+            <a href="#" class="">
+              <span class="sr-only">OurVoice</span>
+              <img
+                class="h-11 ml-6 rounded-md"
+                :src="getConfig('deploymentLogo')"
+                alt="Deployment Logo"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
       <!-- Deployment slogan -->
-      <p class="text-ourvoice-grey text-lg text-center lg:text-left mb-6">
+      <p
+        class="text-center md:text-left mb-6 text-4xl lg:text-5xl text-ourvoice-black leading-20 font-bold"
+      >
         {{ getConfig('slogan') }}
       </p>
-      <div v-if="!session" class="flex justify-center flex-wrap gap-6">
-        <a :href="authURL"
-          ><button type="button" class="btn-rounded btn-primary btn-hover">Get Started</button></a
-        >
-      </div>
-      <div v-else class="flex justify-center flex-wrap gap-6">
-        <a href="/posts"
-          ><button type="button" class="btn-rounded btn-primary btn-hover">Get Started</button></a
-        >
+      <!-- Deployment description -->
+      <Description class="description-text text-lg text-left mb-6" />
+      <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
+        <CustomButton
+          v-if="!session"
+          label="Get Started"
+          class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+          variant="filled"
+          @click="redirectToAuthPage"
+        />
+        <CustomButton
+          v-else
+          :to="'/posts'"
+          label="Get Started"
+          class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+          variant="filled"
+        />
+        <CustomButton
+          to="/about"
+          label="FAQ"
+          class-name="w-52 h-14 px-2 py-4 rounded-full border-2  border-ourvoice-secondary"
+          variant="outlined"
+        />
       </div>
       <!-- Deployment info -->
-      <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" />
-      <a class="btn-flat white-text waves-effect waves-light btn-large blue darken-3" href="/about"
-        ><button type="button" class="btn-rounded btn-primary btn-hover">Learn More</button></a
-      >
+      <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
-
-    <!-- Deployment image -->
-    <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
-      <img
-        class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
-        :src="getConfig('logo')"
-        alt="OurVoice interface"
-      />
+    <div class="hidden md:inline-flex">
+      <img class="h-[100vh] w-full" :src="getConfig('heroImage')" alt="OurVoice interface" />
     </div>
   </div>
 </template>
@@ -46,20 +74,22 @@ import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverificat
 
 import YamlContent from '../../../../config/config.yml'
 import Description from '../../../../config/content/description.md'
-import Information from '../../../../config/content/information.md'
+// import Information from '../../../../config/content/information.md'
 
 import { useDeploymentStore } from '../stores/deployment'
 import config from '../config'
 import { mapStores } from 'pinia'
 import { useUserStore } from '../stores/user'
+import CustomButton from '@/components/common/CustomButton.vue'
 
 const apiURL = config.apiURL
 const authBaseURL = config.authURL + '/signinWithoutPassword'
 
 export default defineComponent({
   components: {
-    Description,
-    Information
+    CustomButton,
+    Description
+    // Information
     // Consent
   },
   props: ['deployment'],
@@ -113,6 +143,9 @@ export default defineComponent({
       const json = await response.json()
 
       window.alert('Session Information:\n' + JSON.stringify(json, null, 2))
+    },
+    redirectToAuthPage: function () {
+      window.location.href = this.authURL
     }
   },
 
@@ -152,5 +185,35 @@ export default defineComponent({
   justify-content: center;
   color: white;
   font-weight: bold;
+}
+.description-text {
+  align-self: stretch;
+  color: var(--body-text, #3d3d3d);
+  /* Desktop/Caption_Regular */
+  font-family: Roboto;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%; /* 16.8px */
+}
+.ourvoice-button-active {
+  display: flex;
+  width: 212px;
+  padding: 16px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 96px;
+}
+.ourvoice-button {
+  display: flex;
+  width: 212px;
+  padding: 16px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 96px;
+  border: 2px solid var(--headings, #1a1a1a);
+  background: #fff;
 }
 </style>

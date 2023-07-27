@@ -8,6 +8,17 @@
   /* body {
     @apply font-roboto;
   } */
+
+  /* Using these for markdown files */
+  h1 {
+    @apply text-4xl font-bold leading-[7rem] text-center;
+  }
+  h2 {
+    @apply text-2xl font-semibold leading-[5rem];
+  }
+  h3 {
+    @apply text-2xl font-medium;
+  }
 }
 @layer components {
   .btn-primary {
