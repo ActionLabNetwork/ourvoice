@@ -38,7 +38,15 @@
       <Description class="description-text text-lg text-left mb-6" />
       <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
         <CustomButton
-          :to="!session ? authURL : '/posts'"
+          v-if="!session"
+          label="Get Started"
+          class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+          variant="filled"
+          @click="redirectToAuthPage"
+        />
+        <CustomButton
+          v-else
+          :to="'/posts'"
           label="Get Started"
           class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
           variant="filled"
@@ -135,6 +143,9 @@ export default defineComponent({
       const json = await response.json()
 
       window.alert('Session Information:\n' + JSON.stringify(json, null, 2))
+    },
+    redirectToAuthPage: function () {
+      window.location.href = this.authURL
     }
   },
 
