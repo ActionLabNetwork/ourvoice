@@ -93,7 +93,7 @@ export const usePostsStore = defineStore('posts', {
 
         this.data = loadMore ? [...this.data, ...newPosts] : newPosts
         this.totalCount = data.posts.totalCount ?? 0
-        this.pageInfo = data.posts.pageInfo ?? 0
+        this.pageInfo = data.posts.pageInfo ?? undefined
         this.state = 'loaded'
       } catch (error) {
         this.error = error as ApolloError

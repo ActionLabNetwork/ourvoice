@@ -325,7 +325,7 @@ export abstract class IQuery {
 
     abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
 
-    abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): Nullable<CommentConnection> | Promise<Nullable<CommentConnection>>;
+    abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): CommentConnection | Promise<CommentConnection>;
 
     abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
@@ -479,8 +479,8 @@ export class CategoryPageInfo {
 export class Comment {
     id: number;
     content: string;
-    votesDown?: Nullable<number>;
-    votesUp?: Nullable<number>;
+    votesDown: number;
+    votesUp: number;
     moderated: boolean;
     published: boolean;
     createdAt?: Nullable<DateTime>;
@@ -501,9 +501,9 @@ export class CommentEdge {
 }
 
 export class CommentConnection {
-    totalCount?: Nullable<number>;
+    totalCount: number;
     pageInfo: CommentPageInfo;
-    edges?: Nullable<Nullable<CommentEdge>[]>;
+    edges: CommentEdge[];
 }
 
 export class CommentPageInfo {

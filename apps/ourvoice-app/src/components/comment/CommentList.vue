@@ -4,12 +4,9 @@
       <div class="text-xs lg:text-sm text-gray-500 font-semibold">{{ totalCount }} Comments</div>
     </div>
     <div class="space-y-4">
-      <CommentCard
-        v-for="comment in comments"
-        :key="comment.id"
-        :index-in-list="comment.id"
-        :comment-id="comment.id"
-      />
+      <template v-for="(comment, i) in commentsStore.data" :key="comment.id">
+        <CommentCard :comment-id="comment.id" :index-in-list="i" />
+      </template>
       <button
         v-if="commentsStore.pageInfo?.hasNextPage"
         class="mx-auto block"
@@ -23,7 +20,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
 import CommentCard from './CommentCard.vue'
 import { useCommentsStore } from '@/stores/comments'
 import { storeToRefs } from 'pinia'
@@ -37,7 +33,6 @@ const props = defineProps({
   }
 })
 
-commentsStore.fetchComments(props.postId ?? null)
-const { data, totalCount } = storeToRefs(commentsStore)
-const comments = computed(() => data.value.filter((comment) => comment.post.id === props.postId))
+commentsStore.fetchComments(props.postId)
+const { totalCount } = storeToRefs(commentsStore)
 </script>

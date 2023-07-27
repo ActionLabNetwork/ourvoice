@@ -1,8 +1,4 @@
 <template>
-  <!-- {{ comment }} -->
-  <!-- {{ votes }} -->
-  <!-- {{ hasUpvote }} -->
-  <!-- {{ hasDownvote }} -->
   <div class="flex gap-2">
     <div class="flex-none w-12">
       <span
@@ -21,7 +17,7 @@
         <p class="break-all">
           <font-awesome-icon :icon="faQuoteLeft" />
           {{ comment?.content }}
-          <font-awesome-icon icon="faQuoteRight" />
+          <font-awesome-icon :icon="faQuoteRight" />
         </p>
       </div>
       <div class="flex justify-between">
@@ -58,7 +54,7 @@
           </button>
         </div>
       </div>
-      <CreateComment v-if="showReply" :commentId="comment?.id" :postId="comment?.post.id" />
+      <CreateComment v-if="showReply" :commentId="comment?.id" :postId="comment?.post?.id" />
     </div>
   </div>
 </template>
@@ -71,11 +67,12 @@ import CreateComment from '@/components/comment/CreateComment.vue'
 import IconThumb from '@/components/icons/IconThumb.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
-import { useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { useUserStore } from '@/stores/user'
 import { indexToColor } from '@/utils'
-import {faQuoteLeft, faQuoteRight} from '@fortawesome/free-solid-svg-icons'
+const userStore = useUserStore()
+const { sessionHash } = storeToRefs(userStore)
+import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
 const props = defineProps({
   commentId: {
     type: Number,
@@ -83,75 +80,39 @@ const props = defineProps({
   },
   indexInList: {
     type: Number,
-    required: false
+    required: true
   }
 })
 
-const votes = ref<Vote[]>([])
-const hasUpvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'UPVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
-const hasDownvote = computed(() => {
-  return votes.value.some(
-    (vote) => vote.voteType === 'DOWNVOTE' && vote.authorHash === userStore.sessionHash
-  )
-})
-const { onResult, refetch } = useQuery(
-  GET_VOTES_QUERY,
-  {
-    filter: {
-      commentId: props.commentId
-    }
-  },
-  {
-    fetchPolicy: 'no-cache'
-  }
-)
-onResult(({ data, loading }) => {
-  if (loading) return
-
-  votes.value = data.votes.map((vote: Vote) => ({
-    id: vote.id,
-    authorHash: vote.authorHash,
-    authorNickname: vote.authorNickname,
-    voteType: vote.voteType,
-    post: {
-      id: vote.post.id
-    },
-    comment: {
-      id: vote.comment.id
-    }
-  }))
-})
 const bgclass = computed(() => {
   return indexToColor(props.indexInList ?? 0)
 })
 
 const commentStore = useCommentsStore()
-const userStore = useUserStore()
-const { data } = storeToRefs(commentStore)
-const comment = computed(() => data.value.find((comment) => comment.id === props.commentId))
+
+const comment = computed(() => commentStore.getCommentById(props.commentId))
+
+const userVote = computed(() =>
+  comment.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
+)
+const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
+const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
 
 const showReply = ref(false)
 
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
 const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
-  if (!comment.value) {
-    return
-  }
   try {
     const res = await createVoteForComemnt({
       data: {
         commentId: props.commentId,
-        postId: comment.value.post.id,
+        postId: comment.value?.post?.id,
         authorHash: userStore.sessionHash,
         authorNickname: userStore.nickname,
         voteType: voteType
       }
     })
-
+    // console.log(res?.data.createVote)
     if (res?.data)
       commentStore.syncVotesForCommentById({
         commentId: props.commentId,
@@ -160,7 +121,6 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         authorHash: userStore.sessionHash,
         voteType: res.data.createVote.voteType
       })
-    await refetch()
   } catch (error) {
     console.log(error)
   }

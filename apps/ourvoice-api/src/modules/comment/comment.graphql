@@ -3,7 +3,7 @@ type Query {
   comments(
     filter: CommentsFilterInput
     pagination: CommentPaginationInput
-  ): CommentConnection
+  ): CommentConnection!
 }
 
 type Mutation {
@@ -15,8 +15,8 @@ type Mutation {
 type Comment @cacheControl(maxAge: 600) {
   id: Int!
   content: String!
-  votesDown: Int
-  votesUp: Int
+  votesDown: Int!
+  votesUp: Int!
   moderated: Boolean!
   published: Boolean!
   createdAt: DateTime
@@ -78,9 +78,9 @@ type CommentEdge @cacheControl(inheritMaxAge: true) {
 }
 
 type CommentConnection @cacheControl(maxAge: 600) {
-  totalCount: Int
+  totalCount: Int!
   pageInfo: CommentPageInfo!
-  edges: [CommentEdge]
+  edges: [CommentEdge!]!
 }
 
 type CommentPageInfo @cacheControl(inheritMaxAge: true) {

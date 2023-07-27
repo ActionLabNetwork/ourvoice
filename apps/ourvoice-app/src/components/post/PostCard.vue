@@ -67,6 +67,7 @@
     <div class="h-px my-5 border border-stone-300 border-opacity-50"></div>
     <CreateComment :postId="post?.id" />
   </div>
+  <!-- <pre class="border-2">{{ post }}</pre> -->
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
@@ -124,7 +125,7 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    // console.log({ res })
+    // console.log(res?.data.createVote)
     if (res?.data)
       postsStore.syncVotesForPostById({
         postId: props.postId,

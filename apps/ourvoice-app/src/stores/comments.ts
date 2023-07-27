@@ -1,45 +1,24 @@
 import { defineStore } from 'pinia'
-import { apolloClient } from './../graphql/client/index'
+import { apolloClient, evictItem } from './../graphql/client/index'
 import { CREATE_MODERATION_COMMENT_MUTATION } from '@/graphql/mutations/createModerationComment'
 import { DELETE_COMMENT_MUTATION } from '@/graphql/mutations/deleteComment'
 import { UPDATE_COMMENT_MUTATION } from '@/graphql/mutations/updateComment'
 import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
-// import type { GetCommentsQuery } from '@/graphql/generated/graphql'
-// import { GET_COMMENT_BY_ID_QUERY } from '@/graphql/queries/getCommentById'
+import type { GetCommentsQuery } from '@/graphql/generated/graphql'
 import { provideApolloClient } from '@vue/apollo-composable'
 import type { ApolloError } from '@apollo/client/errors'
-export interface Comment {
-  id: number
-  content: string
-  votesDown: number
-  votesUp: number
-  moderated: boolean
-  published: boolean
-  createdAt: string
-  moderatedAt: string
-  publishedAt: string
-  disabledAt: string
-  authorHash: string
-  authorNickname: string
-  post: {
-    id: number
-  }
-  parent: {
-    id: number
-    authorNickname: string
-  }
-}
+
 export interface pageInfo {
-  endCursor: string
-  hasNextPage: boolean
-  startCursor: string
+  endCursor: string | null
+  hasNextPage: boolean | null
+  startCursor: string | null
 }
 
-// type Unpacked<T> = T extends (infer U)[] ? U : T
-// type CommentsEdge = Unpacked<GetCommentsQuery['comments']['edges']>
+type Unpacked<T> = T extends (infer U)[] ? U : T
+type CommentsEdge = Unpacked<GetCommentsQuery['comments']['edges']>
 
 export interface CommentsState {
-  data: Comment[]
+  data: Array<CommentsEdge['node']>
   loading: boolean
   error: Error | undefined
   errorMessage: string | undefined
@@ -80,31 +59,23 @@ export const useCommentsStore = defineStore('comments', {
           }
         })
 
-        const newComments = data.comments.edges.map((comment: any) => ({
-          id: comment.node.id,
-          content: comment.node.content,
-          votesDown: comment.node.votesDown,
-          votesUp: comment.node.votesUp,
-          createdAt: comment.node.createdAt,
-          authorHash: comment.node.authorHash ?? null,
-          authorNickname: comment.node.authorNickname ?? null,
-          post: {
-            id: comment.node.post.id
-          },
-          parent: comment.node.parent?.id
-            ? {
-                id: comment.node.parent.id,
-                authorNickname: comment.node.parent.authorNickname
-              }
-            : null
-        }))
+        if (!data) {
+          throw Error('data is null')
+        }
+        const comments = data?.comments
+        if (!comments) {
+          throw Error('comments is null')
+        }
+
+        const newComments = comments.edges.map((edge) => edge.node)
+
         this.data = loadMore ? [...this.data, ...newComments] : newComments
-        this.pageInfo = data.comments.pageInfo
+        this.pageInfo = data.comments.pageInfo ?? undefined
         this.totalCount = data.comments.totalCount
         this.loading = false
       } catch (error) {
         this.error = error as ApolloError
-        this.errorMessage = 'Failed to load comements. Please try again.'
+        this.errorMessage = 'Failed to load comments. Please try again.'
         this.loading = false
       }
     },
@@ -224,23 +195,32 @@ export const useCommentsStore = defineStore('comments', {
     }) {
       try {
         //sync votesUp/votesDown state with the comment table
-        const storedComment = this.data.find((comment) => comment.id === commentId)!
+        const storedComment = { ...this.data.find((comment) => comment.id === commentId)! }
+        evictItem(storedComment)
         storedComment.votesUp = votesUp
         storedComment.votesDown = votesDown
-        // TODO: sync votes in comments store once the vote mutation is implemented
-        // const userVoteForStoredComment = storedComment.votes.find(
-        //   (vote) => vote.authorHash === authorHash
-        // )
-        // if (userVoteForStoredComment) {
-        //   if (userVoteForStoredComment.voteType === voteType) {
-        //     storedComment.votes = storedComment.votes.filter((vote) => vote.authorHash !== authorHash)
-        //   } else {
-        //     userVoteForStoredComment.voteType = voteType
-        //   }
-        // } else {
-        //   storedComment.votes.push({ authorHash, voteType })
-        // }
+        const userVoteForStoredComment = storedComment.votes.find(
+          (vote) => vote.authorHash === authorHash
+        )
+        if (userVoteForStoredComment) {
+          if (userVoteForStoredComment.voteType === voteType) {
+            storedComment.votes = storedComment.votes.filter(
+              (vote) => vote.authorHash !== authorHash
+            )
+          } else {
+            storedComment.votes = storedComment.votes.map((vote) => {
+              if (vote.authorHash !== authorHash) {
+                return vote
+              }
+              return { ...vote, voteType }
+            })
+          }
+        } else {
+          storedComment.votes = [...storedComment.votes, { authorHash, voteType }]
+        }
+        this.data = this.data.map((comment) => (comment.id === commentId ? storedComment : comment))
       } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
           this.error = error
         }
