@@ -352,7 +352,7 @@ const toggleItems = {
   left: {
     iconLight: ThreadsIcon,
     iconDark: ThreadsIconDark,
-    label: 'Q/A',
+    label: 'Discussion',
     hasUpdates: false
   },
   right: {
@@ -457,7 +457,7 @@ const isModerationPage = computed(() => {
 watchEffect(() => {
   // Single level nav items
   navItems.value = [
-    { id: 1, name: 'Q/A', href: '/posts', current: currentPath.value === '/posts' },
+    { id: 1, name: 'Discussion', href: '/posts', current: currentPath.value === '/posts' },
     { id: 2, name: 'Polls', href: '/polls', current: currentPath.value === '/polls' },
     { id: 3, name: 'FAQ', href: '/about', current: currentPath.value === '/about' }
   ]

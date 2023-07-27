@@ -17,7 +17,7 @@
               type="button"
               to="/posts"
               class-name="rounded-md hover:bg-ourvoice-success-dark/80 px-2 py-1.5 text-sm font-medium bg-ourvoice-success-dark text-white"
-              label="Back to Q/A page"
+              label="Back to Discussion page"
             />
           </div>
         </div>
