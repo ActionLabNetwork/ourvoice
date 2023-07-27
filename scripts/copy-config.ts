@@ -33,8 +33,12 @@ if (process.env.RUN_POST !== 'false') {
     './apps/ourvoice-auth-api/config/config.yml'
   )
 
-  // copy logo and favicon to ourvoice-app assets folder
+  // copy logo to ourvoice-app assets folder
   cpSync('./config/brand/default/assets', './apps/ourvoice-app/src/assets', {
+    recursive: true,
+  })
+  // copy favicon to ourvoice-app public folder
+  cpSync('./config/brand/default/public', './apps/ourvoice-app/public', {
     recursive: true,
   })
 }
