@@ -19,7 +19,7 @@
           role="radio"
           :aria-checked="checked"
           @click="selectOption(option.id)"
-          class="w-4 h-4 border-2 border-[#3D3D3D] rounded-[4px]"
+          class="w-4 h-4 flex-shrink-0 flex-grow-0 border-2 border-[#3D3D3D] rounded-[4px]"
           :class="{ 'bg-ourvoice-primary': checked }"
         />
         {{ option.option }}
@@ -29,8 +29,8 @@
     <button
       @click="state = 'confirmation'"
       :disabled="selectedOptionId === undefined"
-      class="w-[200px] flex-grow-0 flex-shrink-0 px-6 py-4 rounded-lg"
-      :class="selectedOptionId === undefined ? 'bg-gray-200' : 'bg-ourvoice-primary'"
+      class="w-[200px] flex-grow-0 flex-shrink-0 px-6 py-4 rounded-lg hover:bg-opacity-70"
+      :class="selectedOptionId === undefined ? 'bg-ourvoice-base-light-200' : 'btn-primary'"
     >
       Vote
     </button>
@@ -44,13 +44,13 @@
     <div class="px-4 py-6 flex flex-row gap-4">
       <button
         @click="state = 'choice'"
-        class="flex-grow px-2 py-4 rounded-lg border-black border-2"
+        class="flex-grow px-2 py-4 rounded-lg border-black border-2 hover:bg-ourvoice-base-light-300"
       >
         No
       </button>
       <button
         @click="vote(selectedOptionId)"
-        class="flex-grow px-2 py-4 rounded-lg bg-ourvoice-primary"
+        class="flex-grow px-2 py-4 rounded-lg bg-ourvoice-primary hover:bg-opacity-70"
       >
         Yes
       </button>
