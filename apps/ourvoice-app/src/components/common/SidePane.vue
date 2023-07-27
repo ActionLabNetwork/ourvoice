@@ -20,7 +20,7 @@
                         @click="open = false"
                         data-cy="side-pane-close-button"
                       >
-                        <font-awesome-icon class="h-6 w-6" :icon="['fas', 'fa-xmark']" />
+                        <font-awesome-icon class="h-6 w-6" :icon="faXmark" />
                       </button>
                     </div>
                   </div>
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionRoot } from '@headlessui/vue'
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const emit = defineEmits(['side-pane-toggle'])
 const open = ref(true)

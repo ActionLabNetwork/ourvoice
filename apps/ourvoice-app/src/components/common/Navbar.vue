@@ -38,7 +38,7 @@
           @click="mobileMenuOpen = true"
         >
           <span class="sr-only">Open main menu</span>
-          <font-awesome-icon class="w-5 h-5" :icon="['fas', 'fa-bars']" />
+          <font-awesome-icon class="w-5 h-5" :icon="faBars" />
         </button>
       </div>
 
@@ -56,7 +56,7 @@
           @click="mobileMenuOpen = true"
         >
           <span class="sr-only">Open main menu</span>
-          <font-awesome-icon class="w-5 h-5" :icon="['fas', 'fa-bars']" />
+          <font-awesome-icon class="w-5 h-5" :icon="faBars" />
         </button>
       </div>
       <!-- Desktop Menu -->
@@ -90,7 +90,7 @@
             >
               Moderation
               <font-awesome-icon
-                :icon="['fas', 'fa-chevron-down']"
+                :icon="faChevronDown"
                 class="transition-transform"
                 :class="{ 'rotate-180': open }"
               />
@@ -150,7 +150,7 @@
                 />
               </div>
               <font-awesome-icon
-                :icon="['fas', 'fa-chevron-down']"
+                :icon="faChevronDown"
                 class="transition-transform"
                 :class="{ 'rotate-180': open }"
               />
@@ -212,7 +212,7 @@
             @click="mobileMenuOpen = false"
           >
             <span class="sr-only">Close menu</span>
-            <font-awesome-icon :icon="['fas', 'fa-xmark']" class="h-6 w-6 bg-white rounded-md" />
+            <font-awesome-icon :icon="faXmark" class="h-6 w-6 bg-white rounded-md" />
           </button>
         </div>
         <div class="mt-6 flow-root">
@@ -244,7 +244,7 @@
                 >
                   Moderation
                   <font-awesome-icon
-                    :icon="['fas', 'fa-chevron-down']"
+                    :icon="faChevronDown"
                     class="h-5 w-5 flex-none"
                     :class="{ 'rotate-180': open }"
                   />
@@ -286,7 +286,7 @@
                     {{ userStore.nickname }}
                   </p>
                   <font-awesome-icon
-                    :icon="['fas', 'fa-chevron-down']"
+                    :icon="faChevronDown"
                     class="h-5 w-5 flex-none"
                     :class="{ 'rotate-180': open }"
                   />
@@ -334,6 +334,7 @@ import ThreadsIcon from '@/assets/icons/threads.svg'
 import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
 import PollsIcon from '@/assets/icons/polls.svg'
 import PollsIconDark from '@/assets/icons/polls-dark.svg'
+import { faBars, faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 const toggleItems = {
   left: {

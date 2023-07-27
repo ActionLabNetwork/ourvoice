@@ -6,11 +6,11 @@
       @click="modifyMode ? removeFile(file) : downloadFile(file.url)"
       class="inline-flex items-center rounded-md bg-gray-50 hover:bg-gray-100 hover:cursor-pointer px-1.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
       <span class="mr-1">
-        <font-awesome-icon :icon="['fas', 'fa-paperclip']" />
+        <font-awesome-icon :icon="faPaperclip" />
       </span>
       {{ file.name }}
       <span v-if="modifyMode" class="ml-1">
-        <font-awesome-icon :icon="['fas', 'fa-xmark']" />
+        <font-awesome-icon :icon="faXmark" />
       </span>
     </div>
   </div>
@@ -20,6 +20,7 @@
 import { computed } from 'vue'
 import type { PropType } from 'vue';
 import { getFileNameFromKey } from '@/services/s3-service';
+import { faPaperclip, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 interface File {
   key: string;

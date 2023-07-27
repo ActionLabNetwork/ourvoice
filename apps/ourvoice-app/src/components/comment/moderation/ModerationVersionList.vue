@@ -43,7 +43,7 @@
           </div>
         </div>
         <div>
-          <font-awesome-icon :icon="['fas', 'fa-chevron-right']" />
+          <font-awesome-icon :icon="faChevronRight" />
         </div>
       </li>
     </ul>
@@ -56,6 +56,7 @@ import type { PropType } from 'vue'
 
 import { formatTimestampToReadableDate } from '@/utils'
 import type { ModerationCommentVersion } from '@/stores/comment-moderation'
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const props = defineProps({
   versions: {

@@ -94,8 +94,8 @@
           </div>
         </Listbox>
         <button class="w-20 text-sm lg:text-md hover:text-gray-500" @click="toggleSortOrder()">
-          <font-awesome-icon icon="fa-solid fa-arrow-down-short-wide" v-if="sortAscending" />
-          <font-awesome-icon icon="fa-solid fa-arrow-up-wide-short" v-else />
+          <font-awesome-icon :icon="faArrowDownWideShort" v-if="sortAscending" />
+          <font-awesome-icon :icon="faArrowUpWideShort" v-else />
           {{ sortAscending ? 'asc' : 'desc' }}
         </button>
       </div>
@@ -126,6 +126,7 @@ import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCatego
 import { startOfDay } from 'date-fns'
 import { GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { useQuery } from '@vue/apollo-composable'
+import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 const { result } = useQuery(GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY)
 // interface CategoryWithCount {
 //   id: number

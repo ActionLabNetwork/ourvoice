@@ -35,7 +35,7 @@
             placeholder="no option"
           />
           <button v-if="!locked" :disabled="locked" class="p-2 rounded-full" @click="addOption(i)">
-            <font-awesome-icon :icon="['fas', 'plus']" />
+            <font-awesome-icon :icon="faPlus" />
           </button>
           <button
             v-if="!locked"
@@ -43,7 +43,7 @@
             class="p-2 rounded-full"
             @click="removeOption(i)"
           >
-            <font-awesome-icon :icon="['fas', 'minus']" />
+            <font-awesome-icon :icon="faMinus" />
           </button>
         </div>
         <div
@@ -79,9 +79,10 @@
 </template>
 
 <script setup lang="ts">
-import type { PollCreateInput } from '@/graphql/generated/graphql'
-import { DialogPanel, DialogTitle } from '@headlessui/vue'
-import { reactive, type PropType, computed } from 'vue'
+import type { PollCreateInput } from '@/graphql/generated/graphql';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { DialogPanel, DialogTitle } from '@headlessui/vue';
+import { computed, reactive, type PropType } from 'vue';
 
 const props = defineProps({
   poll: {

@@ -20,7 +20,7 @@
                 Moderation History
                 <span>
                   <font-awesome-icon
-                    :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
+                    :icon="showSidePane ? faArrowLeft : faArrowRight"
                   />
                 </span>
               </p>
@@ -91,7 +91,7 @@
                       data-cy="renew-button"
                     >
                       Renew Moderation
-                      <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>
+                      <span><font-awesome-icon :icon="faRotateLeft" /></span>
                     </button>
                   </div>
                 </div>
@@ -127,6 +127,7 @@ import {
   type ModerationCommentVersion
 } from '@/stores/comment-moderation'
 import type { CommentModeration } from '@/graphql/generated/graphql'
+import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 type ModerationActions = 'Accept' | 'Modify' | 'Reject'
 

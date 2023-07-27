@@ -34,7 +34,7 @@
                 type="button"
               >
                 <template #icon-after-text>
-                  <font-awesome-icon :icon="['fas', a.icon]" />
+                  <font-awesome-icon :icon="a.icon" />
                 </template>
               </CustomButton>
             </div>

@@ -28,7 +28,7 @@
         Edit
       </button>
       <button v-if="!locked" class="btn-outline btn-rounded" @click="removePoll">
-        <font-awesome-icon :icon="['fas', 'trash']" alt="Delete Poll" class="text-gray-600"/>
+        <font-awesome-icon :icon="faTrash" alt="Delete Poll" class="text-gray-600"/>
       </button>
     </div>
     <Dialog :open="isEditing" @close="isEditing = false" class="relative z-50">
@@ -51,6 +51,7 @@ import { ref, type PropType, computed } from 'vue'
 import PollEditDialog from './PollEditDialog.vue'
 import { formatTimestampToReadableDate } from '@/utils'
 import { Dialog, DialogPanel } from '@headlessui/vue'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const props = defineProps({
   poll: {

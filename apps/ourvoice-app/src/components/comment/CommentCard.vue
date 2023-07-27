@@ -19,9 +19,9 @@
       <div class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</div>
       <div class="text-sm md:text-md py-2">
         <p class="break-all">
-          <font-awesome-icon icon="fa-solid fa-quote-left" />
+          <font-awesome-icon :icon="faQuoteLeft" />
           {{ comment?.content }}
-          <font-awesome-icon icon="fa-solid fa-quote-right" />
+          <font-awesome-icon icon="faQuoteRight" />
         </p>
       </div>
       <div class="flex justify-between">
@@ -75,6 +75,7 @@ import { GET_VOTES_QUERY, type Vote } from '@/graphql/queries/getVotes'
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { useUserStore } from '@/stores/user'
 import { indexToColor } from '@/utils'
+import {faQuoteLeft, faQuoteRight} from '@fortawesome/free-solid-svg-icons'
 const props = defineProps({
   commentId: {
     type: Number,

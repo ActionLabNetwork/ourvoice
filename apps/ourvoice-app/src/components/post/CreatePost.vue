@@ -48,7 +48,7 @@
                   'border-red-500 :border-red-500 focus:ring-red-500': titleField.errorMessage.value
                 }"
               >
-                <font-awesome-icon :icon="['fas', 'heading']" class="icon-color" />
+                <font-awesome-icon :icon="faHeading" class="icon-color" />
               </span>
             </template>
             <input
@@ -149,7 +149,7 @@
                     attachmentsField.errorMessage.value
                 }"
               >
-                <font-awesome-icon :icon="['fas', 'paperclip']" class="icon-color" />
+                <font-awesome-icon :icon="faPaperclip" class="icon-color" />
               </span>
             </template>
             <input
@@ -227,6 +227,7 @@ import {
 import { useUserStore } from '@/stores/user'
 import Loading from '../common/Loading.vue'
 import Alert from '../common/Alert.vue'
+import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
 
 interface PresignedUrlResponse {
   key: string

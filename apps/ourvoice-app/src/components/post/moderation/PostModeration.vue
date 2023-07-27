@@ -21,7 +21,7 @@
                 Moderation History
                 <span>
                   <font-awesome-icon
-                    :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']"
+                    :icon="showSidePane ? faArrowLeft : faArrowRight"
                   />
                 </span>
               </p>
@@ -71,7 +71,7 @@
                       data-cy="renew-button"
                     >
                       Renew Moderation
-                      <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>
+                      <span><font-awesome-icon :icon="faRotateLeft" /></span>
                     </button>
                   </div>
                 </div>
@@ -109,6 +109,7 @@ import Loading from '@/components/common/Loading.vue'
 import { storeToRefs } from 'pinia'
 import { postFilesPresignedUrlTTL } from '@/constants/post'
 import type { ModerationActions } from '@/types/moderation'
+import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface PostFields {
   title?: string

@@ -16,9 +16,9 @@
       <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
     </h2>
     <p class="text-sm my-2">
-      <font-awesome-icon icon="fa-solid fa-quote-left" />
+      <font-awesome-icon :icon="faQuoteLeft" />
       {{ post?.content }}
-      <font-awesome-icon icon="fa-solid fa-quote-right" />
+      <font-awesome-icon :icon="faQuoteRight" />
     </p>
     <div id="fileUrlsWrapper" class="text-right">
       <a
@@ -80,6 +80,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CreateComment from '../comment/CreateComment.vue'
 import IconMessageCircle from '../icons/IconMessageCircle.vue'
+import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const { sessionHash } = storeToRefs(userStore)
