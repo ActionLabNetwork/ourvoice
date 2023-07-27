@@ -10,14 +10,17 @@
   } */
 
   /* Using these for markdown files */
-  h1 {
-    @apply text-4xl font-bold leading-[7rem] text-center;
+  .faq-md h1 {
+    @apply text-xl md:text-4xl font-semibold text-center mb-8;
   }
-  h2 {
-    @apply text-2xl font-semibold leading-[5rem];
+  .faq-md h2 {
+    @apply text-lg md:text-2xl font-medium font-bold mb-4;
   }
-  h3 {
-    @apply text-2xl font-medium;
+  .faq-md h3 {
+    @apply text-lg md:text-2xl font-medium mb-4;
+  }
+  .faq-md p {
+    @apply text-sm mb-4 text-justify;
   }
 }
 @layer components {
