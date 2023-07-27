@@ -12,7 +12,7 @@
       <BackButton />
       <div class="mt-4 md:mt-0 col-span-3 justify-self-center">
         <h1
-          class="text-btn-secondary-1 text-4xl md:text-6 lg:text-6xl text-center lg:text-left mb-6"
+          class="text-btn-secondary-1 text-4xl md:text-6xl text-center lg:text-left mb-6"
         >
           <span class="text-ourvoice-primary-2">OurVoice</span> App
         </h1>

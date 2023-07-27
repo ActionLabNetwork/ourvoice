@@ -20,7 +20,7 @@
     @apply text-lg md:text-2xl font-medium mb-4;
   }
   .faq-md p {
-    @apply text-sm mb-4 text-justify;
+    @apply text-sm mb-4;
   }
 }
 @layer components {
