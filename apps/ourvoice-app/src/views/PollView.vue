@@ -30,17 +30,14 @@
       </div>
     </div>
     <!-- past polls -->
-    <div class="w-full py-8 lg:py-12 flex flex-col items-center bg-ourvoice-primary">
+    <div v-if="votedPolls.length !== 0" class="w-full py-8 lg:py-12 flex flex-col items-center bg-ourvoice-primary">
       <div
         class="px-4 w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch justify-items-stretch"
       >
-        <h4 class="mb-4 px-4 col-span-full">Past poll statistics</h4>
+        <h4 class="mb-4 px-4 col-span-full">Polls you have voted on</h4>
         <div v-for="poll in votedPolls" :key="poll.id" class="w-ful h-full">
           <PollResultCard :poll="poll" />
         </div>
-      </div>
-      <div v-if="votedPolls.length === 0" class="px-4">
-        You have not participated in any previous polls.
       </div>
     </div>
   </div>
