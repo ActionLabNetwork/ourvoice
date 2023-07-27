@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsBoolean,
   IsDate,
   IsDateString,
@@ -10,6 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PollOptionCreateDto } from './option-create.dto';
+import { PollCreateDto } from './poll-create.dto';
 
 export class PollUpdateDto {
   @IsOptional()
@@ -40,6 +43,8 @@ export class PollUpdateDto {
   question?: string;
 
   @IsOptional()
+  @ArrayMinSize(2)
+  @ArrayMaxSize(PollCreateDto.MAX_NUM_OPTIONS)
   @ValidateNested()
   // easier to force the user to recreate the poll
   options?: PollOptionCreateDto[];

@@ -1,4 +1,6 @@
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsBoolean,
   IsDate,
   IsDateString,
@@ -12,6 +14,8 @@ import {
 import { PollOptionCreateDto } from './option-create.dto';
 
 export class PollCreateDto {
+  static readonly MAX_NUM_OPTIONS = 6;
+
   @IsString()
   @Length(1, 200)
   question: string;
@@ -36,5 +40,7 @@ export class PollCreateDto {
   expiresAt?: string | null | Date;
 
   @ValidateNested()
+  @ArrayMinSize(2)
+  @ArrayMaxSize(PollCreateDto.MAX_NUM_OPTIONS)
   options: PollOptionCreateDto[];
 }
