@@ -1,6 +1,7 @@
 ---
 name: Login Information
 deployment: OURVOICE.APP
+organisation: ORGANISATION
 ---
 
-This is the login information text for {{frontmatter.deployment}} from _login.md_ file
+Before using {{frontmatter.deployment}} read the FAQ and the Code of Conduct. Only sessional tutors and lecturers within the Faculty of Information Technology at {{frontmatter.organisation}} have access to {{frontmatter.deployment}}.

@@ -1,105 +1,108 @@
 <template>
-  <div class="auth-container">
-    <div v-if="processing" class="auth-form-container">
-      <div class="spinner">
-        <svg version="1.1" viewBox="25 25 50 50">
-          <circle
-            cx="50"
-            cy="50"
-            r="20"
-            fill="none"
-            strokeWidth="20"
-            stroke="rgb(255, 155, 51)"
-            strokeLinecap="round"
-            strokeDashoffset="0"
-            strokeDasharray="200, 200"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="rotate"
-              from="0 50 50"
-              to="360 50 50"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-dashoffset"
-              values="0;-30;-124"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-dasharray"
-              values="0,200;110,200;110,200"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-        </svg>
+  <div class="auth-container container flex lg:flex-row items-center gap-12 mt-14 lg:mt-28">
+    <!-- Content -->
+    <div class="flex basis-1/2 flex-col items-center lg:items-start">
+      <div class="">
+        <a href="#" class="-m-1.5 p-1.5">
+          <span class="sr-only">OurVoice</span>
+          <img class="h-8 w-auto" src="@/assets/ourvoice_logo_black.png" alt="OurVoice Logo" />
+        </a>
       </div>
-    </div>
-    <div v-else class="auth-form-container">
-      <div v-if="!needsVerifying" class="auth-form-content-container">
-        <div class="form-title">Sign In or Sign Up</div>
-
-        <div class="divider-container">
-          <div class="divider" />
+      <div v-if="processing" class="auth-form-container flex-col items-center lg:items-start">
+        <div class="spinner">
+          <svg version="1.1" viewBox="25 25 50 50">
+            <circle
+              cx="50"
+              cy="50"
+              r="20"
+              fill="none"
+              strokeWidth="20"
+              stroke="rgb(255, 155, 51)"
+              strokeLinecap="round"
+              strokeDashoffset="0"
+              strokeDasharray="200, 200"
+            >
+              <animateTransform
+                attributeName="transform"
+                attributeType="XML"
+                type="rotate"
+                from="0 50 50"
+                to="360 50 50"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="stroke-dashoffset"
+                values="0;-30;-124"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="stroke-dasharray"
+                values="0,200;110,200;110,200"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
         </div>
-        <!-- Deployment image -->
-        <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
-          <img
-            class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
-            :src="getConfig('logo')"
-            alt="OurVoice interface"
-          />
-        </div>
-        <Login />
+      </div>
+      <div v-else class="auth-form-container flex-col items-center lg:items-start">
+        <div v-if="!needsVerifying" class="auth-form-content-container">
+          <Login class="auth-form-content-container-text" />
 
-        <div v-if="error" class="error-container">
-          <div class="error-message">{{ errorMessage }}</div>
-        </div>
+          <div v-if="error" class="error-container">
+            <div class="error-message">{{ errorMessage }}</div>
+          </div>
 
-        <div class="divider-container"></div>
-        <form autocomplete="on" novalidate @submit="onSubmitPressed">
-          <div class="input-section-container" :class="emailError ? 'error' : ''">
-            <div class="input-label">Email</div>
-            <div class="input-container">
-              <div class="input-wrapper" :class="emailError ? 'error' : ''">
-                <input
-                  v-model="email"
-                  autocomplete="email"
-                  class="input"
-                  type="email"
-                  name="email"
-                  placeholder="Email address"
-                />
+          <div class="divider-container"></div>
+          <form autocomplete="on" novalidate @submit="onSubmitPressed">
+            <div class="input-section-container" :class="emailError ? 'error' : ''">
+              <div class="input-container">
+                <div class="input-wrapper" :class="emailError ? 'error' : ''">
+                  <input
+                    v-model="email"
+                    autocomplete="email"
+                    class="input"
+                    type="email"
+                    name="email"
+                    placeholder="Staff email"
+                  />
+                </div>
+              </div>
+              <div v-if="emailError" class="input-error">
+                {{ `${emailError}` }}
               </div>
             </div>
-            <div v-if="emailError" class="input-error">
-              {{ `${emailError}` }}
-            </div>
-          </div>
 
-          <div class="input-section-container">
-            <button type="submit" class="button">CONTINUE</button>
-          </div>
-        </form>
-      </div>
-      <div v-else class="auth-form-content-container">
-        <div class="conformation">
-          <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-          <div class="form-title">Link sent!</div>
-          <p v-html="verifyText" class="form-subtitle"></p>
-          <div>
-            <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-            <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
-          </div>
-          <div class="divider-container"></div>
-          <span v-on:click="reset" class="faded-link">Change email</span>
+            <div class="input-section-container">
+              <button type="submit" class="button">Send Link</button>
+            </div>
+          </form>
         </div>
-        <div style="margin-bottom: 10px" />
+        <div v-else class="auth-form-content-container">
+          <div class="conformation">
+            <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
+            <div class="form-title">Link sent!</div>
+            <p v-html="verifyText" class="form-subtitle"></p>
+            <div>
+              <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
+              <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+            </div>
+            <div class="divider-container"></div>
+            <span v-on:click="reset" class="faded-link">Change email</span>
+          </div>
+          <div style="margin-bottom: 10px" />
+        </div>
       </div>
+      <!-- Deployment image -->
+    </div>
+    <div class="basis-1/2">
+      <img
+        class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+        :src="getConfig('logo')"
+        alt="OurVoice interface"
+      />
     </div>
   </div>
 </template>
@@ -338,19 +341,21 @@ export default defineComponent({
 
 .auth-container {
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 100%;
 }
 
 .auth-form-container {
   margin: 26px auto;
-  width: 420px;
+  display: flex;
+  width: 560px;
+  padding: 16px;
+  gap: 48px;
+}
+
+.conformation {
+  justify-content: center;
   text-align: center;
-  border-radius: 8px;
-  box-shadow: rgb(0, 0, 0, 0.16) 1px 1px 10px;
-  background-color: white;
 }
 
 .resend-button {
@@ -376,10 +381,14 @@ export default defineComponent({
   margin-bottom: 10px;
 }
 
-.auth-form-content-container {
+.auth-form-content-container-text {
   margin: auto;
-  width: 76%;
-  padding-top: 40px;
+  color: #000;
+  font-family: Roboto;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 120%; /* 33.6px */
 }
 
 .emailIcon {
@@ -401,14 +410,6 @@ form {
   margin-top: 0em;
 }
 
-.input-label {
-  text-align: left;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
-  color: rgb(34, 34, 34);
-}
-
 .input-container {
   margin-top: 6px;
 }
@@ -423,6 +424,10 @@ form {
   height: 34px;
   border-radius: 6px;
   border: 1px solid rgb(224, 224, 224);
+}
+.input-wrapper input {
+  border-radius: 16px;
+  background: #f7f7f7;
 }
 
 .input-wrapper.error {
@@ -446,18 +451,20 @@ form {
 }
 
 .button {
-  width: 100%;
-  height: 34px;
-  background-color: rgb(255, 155, 51);
-  color: white;
-  font-weight: 700;
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgb(238, 141, 35);
-  border-radius: 6px;
-  background-position: center center;
-  transition: all 0.4s ease 0s;
-  cursor: pointer;
+  display: flex;
+  width: 212px;
+  padding: 16px 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 96px;
+  background: var(--primary, #ffcd29);
+  color: #000;
+  font-family: Roboto;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
 }
 
 .button:hover {
@@ -524,7 +531,6 @@ form {
     transform: translateY(0px);
   }
 }
-
 .spinner {
   width: 80px;
   height: auto;
