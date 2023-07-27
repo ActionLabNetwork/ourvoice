@@ -1,7 +1,7 @@
 <template>
   <!-- Consent Modal -->
   <div
-    class="fixed inset-0 backdrop-black overflow-y-auto h-full w-full"
+    class="fixed inset-0 backdrop-blur-lg overflow-y-auto h-full w-full"
     id="consent-modal"
     v-show="isConsentModalVisible"
   >
