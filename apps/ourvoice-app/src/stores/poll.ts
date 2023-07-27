@@ -49,7 +49,6 @@ export const usePollStore = defineStore('poll', {
           stats: null
         }))
         this.votedPolls = data.votedPolls
-        console.log(this.votedPolls)
         this.state = 'loaded'
       } catch (e) {
         console.error(e)
