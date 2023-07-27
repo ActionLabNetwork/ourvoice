@@ -7,7 +7,7 @@
       <!-- Logo -->
       <div class="grid grid-cols-2 divide-x-4 divide-ourvoice-base place-items-center">
         <div>
-          <a href="#" class="">
+          <a href="/">
             <span class="sr-only">OurVoice</span>
             <img
               class="h-11"
@@ -17,8 +17,8 @@
           </a>
         </div>
         <div>
-          <a href="#" class="">
-            <span class="sr-only">OurVoice</span>
+          <a href="/" class="">
+            <span class="sr-only">Diversity Council Australia</span>
             <img
               class="h-11 ml-6 rounded-md"
               src="@/assets/logo/dca_logo.png"
