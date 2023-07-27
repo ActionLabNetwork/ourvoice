@@ -1,22 +1,24 @@
 import { apolloClient } from '@/graphql/client'
-import type {
-  PollPageInfo,
-  PollWithStats,
-  VoteResponse
+import {
+  GetUserPollsDocument,
+  type GetUserPollsQuery,
+  type PollPageInfo,
+  type PollWithStats,
+  type VoteResponse
 } from '@/graphql/generated/graphql'
 import { VOTE_POLL_QUERY } from '@/graphql/mutations/votePoll'
-import { GET_AVAILABLE_POLLS_QUERY } from '@/graphql/queries/getAvailablePolls'
-import { GET_VOTED_POLLS_QUERY } from '@/graphql/queries/getVotedPolls'
 import { defineStore } from 'pinia'
 import { useUserStore } from './user'
+import { GET_USER_POLLS_QUERY } from '@/graphql/queries/getUserPolls'
 
-export interface AvailablePollState extends PollWithStats {
+export type PollWithStatsSub = GetUserPollsQuery['votedPolls'][number]
+export interface AvailablePollState extends PollWithStatsSub {
   pollState: 'NOT_VOTED' | 'NO_RESULT' | 'VOTED'
 }
 
 export interface PollState {
   availablePolls: AvailablePollState[]
-  votedPolls: PollWithStats[]
+  votedPolls: PollWithStatsSub[]
   pageInfo: PollPageInfo | undefined | null
   totalCount: number | undefined | null
   state: 'initial' | 'loading-initial' | 'loaded' | 'error'
@@ -36,42 +38,30 @@ export const usePollStore = defineStore('poll', {
     async initialLoad() {
       this.state = 'loading-initial'
       try {
-        await this.fetchAvailablePolls()
-        await this.fetchVotedPolls()
+        const userHash = await this.getUserHash()
+        const { data, errors } = await apolloClient.query({
+          query: GET_USER_POLLS_QUERY,
+          variables: {userHash}
+        })
+        this.availablePolls = data.availablePolls.map((poll) => ({
+          ...poll,
+          pollState: 'NOT_VOTED',
+          stats: null
+        }))
+        this.votedPolls = data.votedPolls
+        console.log(this.votedPolls)
         this.state = 'loaded'
       } catch (e) {
+        console.error(e)
         if (e instanceof Error) {
           this.error = e
         }
         this.state = 'error'
       }
     },
-    async fetchAvailablePolls() {
-      const userHash = await this.getVoterHash()
-      const { data, errors } = await apolloClient.query({
-        query: GET_AVAILABLE_POLLS_QUERY,
-        variables: { userHash: userHash }
-      })
-      this.availablePolls = data.availablePolls.map((poll) => ({
-        ...poll,
-        pollState: 'NOT_VOTED',
-        stats: null
-      }))
-    },
-
-    async fetchVotedPolls() {
-      const userHash = await this.getVoterHash()
-      const { data } = await apolloClient.query({
-        query: GET_VOTED_POLLS_QUERY,
-        variables: {
-          userHash: userHash
-        }
-      })
-      this.votedPolls = data.votedPolls
-    },
     async votePoll(optionId: number, pollId: number) {
       try {
-        const userHash = await this.getVoterHash()
+        const userHash = await this.getUserHash()
         const { data, errors } = await apolloClient.mutate({
           mutation: VOTE_POLL_QUERY,
           variables: { voteInput: { voterHash: userHash, optionId, pollId } }
@@ -92,7 +82,7 @@ export const usePollStore = defineStore('poll', {
         }
       }
     },
-    async getVoterHash() {
+    async getUserHash() {
       const userStore = useUserStore()
       if (!(await userStore.isLoggedIn)) {
         throw new Error('user session is invalid')

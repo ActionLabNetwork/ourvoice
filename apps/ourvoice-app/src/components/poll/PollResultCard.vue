@@ -23,12 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import type { PollWithStats } from '@/graphql/generated/graphql'
-import { computed, type PropType } from 'vue'
+import type { PollWithStatsSub } from '@/stores/poll';
+import { computed, type PropType } from 'vue';
 
 const props = defineProps({
   poll: {
-    type: Object as PropType<PollWithStats>,
+    type: Object as PropType<PollWithStatsSub>,
     required: true
   }
 })
