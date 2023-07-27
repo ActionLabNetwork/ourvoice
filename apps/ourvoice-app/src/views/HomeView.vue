@@ -1,35 +1,54 @@
 <template>
   <div class="grid grid-cols-full md:grid-cols-2">
     <!-- Content -->
-    <div class="flex flex-col justify-center items-start px-16 h-full">
+    <div
+      class="flex flex-col justify-center items-center md:items-start px-16 h-full translate-y-[25vh] md:translate-y-0"
+    >
       <div v-if="!session">
-        <a href="#" class="-m-1.5 p-1.5">
-          <span class="sr-only">OurVoice</span>
-          <img
-            class="h-8 w-auto mb-16"
-            src="@/assets/logo/ourvoice_logo_primary_dark.svg"
-            alt="OurVoice Logo"
-          />
-        </a>
+        <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
+          <div>
+            <a href="#" class="">
+              <span class="sr-only">OurVoice</span>
+              <img
+                class="h-11"
+                src="@/assets/logo/ourvoice_logo_primary_dark.svg"
+                alt="OurVoice Logo"
+              />
+            </a>
+          </div>
+          <div>
+            <a href="#" class="">
+              <span class="sr-only">OurVoice</span>
+              <img
+                class="h-11 ml-6 rounded-md"
+                :src="getConfig('deploymentLogo')"
+                alt="Deployment Logo"
+              />
+            </a>
+          </div>
+        </div>
       </div>
       <!-- Deployment slogan -->
-      <p class="text-center md:text-left mb-6 text-4xl lg:text-5xl text-ourvoice-black leading-20 font-bold">
+      <p
+        class="text-center md:text-left mb-6 text-4xl lg:text-5xl text-ourvoice-black leading-20 font-bold"
+      >
         {{ getConfig('slogan') }}
       </p>
       <!-- Deployment description -->
       <Description class="description-text text-lg text-left mb-6" />
       <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
-        <a v-if="!session" :href="authURL"
-          ><button type="button" class="ourvoice-button-active">Get Started</button></a
-        >
-        <a v-else href="/posts"
-          ><button type="button" class="ourvoice-button-active">Get Started</button></a
-        >
-        <a
-          class="btn-flat white-text waves-effect waves-light btn-large blue darken-3"
-          href="/about"
-          ><button type="button" class="ourvoice-button">FAQ</button></a
-        >
+        <CustomButton
+          :to="!session ? authURL : '/posts'"
+          label="Get Started"
+          class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+          variant="filled"
+        />
+        <CustomButton
+          to="/about"
+          label="FAQ"
+          class-name="w-52 h-14 px-2 py-4 rounded-full border-2  border-ourvoice-secondary"
+          variant="outlined"
+        />
       </div>
       <!-- Deployment info -->
       <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
@@ -53,12 +72,14 @@ import { useDeploymentStore } from '../stores/deployment'
 import config from '../config'
 import { mapStores } from 'pinia'
 import { useUserStore } from '../stores/user'
+import CustomButton from '@/components/common/CustomButton.vue'
 
 const apiURL = config.apiURL
 const authBaseURL = config.authURL + '/signinWithoutPassword'
 
 export default defineComponent({
   components: {
+    CustomButton,
     Description
     // Information
     // Consent
@@ -172,7 +193,6 @@ export default defineComponent({
   align-items: center;
   gap: 8px;
   border-radius: 96px;
-  background: var(--primary, #ffcd29);
 }
 .ourvoice-button {
   display: flex;
