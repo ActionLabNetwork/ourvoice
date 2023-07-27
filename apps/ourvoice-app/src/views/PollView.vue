@@ -18,11 +18,11 @@
           src="@/assets/polls_no_active.png"
           alt=""
         />
-        <div class="mb-10 text-[14px] lg:text-[28px] text-[#444] font-Roboto font-semibold">
+        <div class="mb-10 text-[14px] lg:text-[28px] text-[#444] font-semibold">
           No polls are running
         </div>
         <button
-          class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary font-Roboto text-[18px] font-medium"
+          class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary text-[18px] font-medium"
           @click="$router.push({name: 'posts'})"
         >
           Go Back to Q/A

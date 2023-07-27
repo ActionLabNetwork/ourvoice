@@ -1,14 +1,14 @@
 <template>
   <div class="h-full w-full flex flex-col justify-items-center w-full px-6 py-6 bg-white rounded-lg">
-    <p class="mb-6 text-[16px] font-Roboto font-medium">{{ props.poll.question }}</p>
+    <p class="mb-6 text-[16px] font-medium">{{ props.poll.question }}</p>
     <div v-if="mergedStats !== null" class="flex flex-col gap-4">
       <table class="table-auto">
         <div v-for="option in mergedStats" :key="option.id" class="flex flex-row gap-2">
-          <div class="w-fit font-normal text-12 font-Roboto min-w-[40px]" valign="top">
+          <div class="w-fit font-normal text-12 min-w-[40px]" valign="top">
             {{ (option.proportion * 100).toFixed(0).padStart(4, ' ') }}%
           </div>
           <div class="flex flex-col flex-grow mb-1">
-            <div class="font-normal text-14 font-Roboto mb-1">
+            <div class="font-normal text-14 mb-1">
               {{ option.option }}
             </div>
             <div class="h-2 w-full bg-black rounded-full" :style="option.style"></div>
