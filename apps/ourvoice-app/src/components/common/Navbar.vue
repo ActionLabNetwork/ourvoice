@@ -1,6 +1,9 @@
 <template>
   <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
-    <nav class="mx-auto grid grid-cols-5 grid-flow-row-dense p-6 gap-y-5" aria-label="Global">
+    <nav
+      class="mx-auto grid grid-cols-3 md:grid-cols-5 grid-flow-row-dense p-6 gap-y-5"
+      aria-label="Global"
+    >
       <!-- Logo -->
       <div class="flex items-center justify-between">
         <a href="/" class="-m-1.5 p-1.5">
@@ -11,7 +14,7 @@
       <!-- Toggle -->
       <div
         class="w-fit justify-self-center col-span-full lg:col-start-3 lg:col-span-1"
-        v-if="currentPathIsReady"
+        v-if="currentPathIsReady && !hasElevatedPermissions"
       >
         <Toggle
           :items="toggleItems"
@@ -36,10 +39,12 @@
       </div>
 
       <!-- Create Post Button & Mobile Menu SM -->
-      <div class="grid md:hidden col-span-full">
+      <div class="grid md:hidden col-start-2 md:col-start-3">
         <CreatePostNavButton class="inline-flex mx-auto text-center" />
       </div>
-      <div class="grid col-start-5 md:hidden justify-self-end">
+      <div
+        class="grid col-start-3 md:col-start-5 md:hidden justify-self-center md:justify-self-end"
+      >
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -51,7 +56,10 @@
         </button>
       </div>
       <!-- Desktop Menu -->
-      <div class="hidden xl:flex lg:gap-x-10 xl:col-start-4 justify-center justify-self-center">
+      <div
+        class="hidden lg:flex lg:gap-x-10 justify-center justify-self-end px-2"
+        :class="`${hasElevatedPermissions ? 'lg:col-start-3' : 'lg:col-start-4'}`"
+      >
         <!-- Nav Items -->
         <PopoverGroup class="flex gap-5 items-center">
           <router-link
@@ -67,7 +75,7 @@
           </router-link>
           <Popover
             :class="{
-              hidden: hasElevatedPermissions
+              hidden: !hasElevatedPermissions
             }"
             class="relative"
             v-slot="{ open, close }"
@@ -119,16 +127,10 @@
           </Popover>
         </PopoverGroup>
       </div>
-      <!-- Create Post Button MD and above -->
-      <div
-        class="hidden md:inline-flex lg:hidden md:col-start-3 lg:col-start-4 justify-self-center"
-      >
-        <CreatePostNavButton class="hidden md:inline-flex" />
-      </div>
       <div class="hidden lg:inline-flex items-center gap-5 lg:col-start-5 justify-self-end">
         <!-- Create Post Button LG and above -->
         <div>
-          <CreatePostNavButton class="hidden md:inline-flex" />
+          <CreatePostNavButton class="hidden lg:inline-flex" />
         </div>
         <!-- User Settings -->
         <div>
@@ -136,7 +138,7 @@
             <PopoverButton
               class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
             >
-              <div class="flex-shrink-0 mr-0">
+              <div class="flex-shrink-0 mr-0" v-if="userStore.nicknameInParts">
                 <img
                   class="inline-block h-9 w-9 rounded-full"
                   :src="`https://ui-avatars.com/api/?name=${userStore.nicknameInParts.first}+${userStore.nicknameInParts.last}`"
@@ -225,7 +227,7 @@
                 as="div"
                 class="-mx-3"
                 :class="{
-                  hidden: hasElevatedPermissions
+                  hidden: !hasElevatedPermissions
                 }"
                 v-slot="{ open }"
               >
@@ -348,7 +350,7 @@ const currentPath = computed(() => route.fullPath)
 const navBarSwitchState = computed(() => route.meta.navBarSwitchState as string | undefined)
 
 const hasElevatedPermissions = computed(
-  () => !userStore.isModerator && !userStore.isAdmin && !userStore.isSuperAdmin
+  () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
 )
 
 onMounted(async () => {
@@ -434,7 +436,9 @@ const isModerationPage = computed(() => {
 watchEffect(() => {
   // Single level nav items
   navItems.value = [
-    { id: 1, name: 'About', href: '/about', current: currentPath.value === '/about' }
+    { id: 1, name: 'Q/A', href: '/posts', current: currentPath.value === '/posts' },
+    { id: 2, name: 'Polls', href: '/polls', current: currentPath.value === '/polls' },
+    { id: 3, name: 'FAQ', href: '/about', current: currentPath.value === '/about' }
   ]
 
   // Multi level nav items
