@@ -147,7 +147,7 @@ describe('CommentService', () => {
     };
     const pagination: CommentPaginationInput = {
       cursor: '1',
-      limit: 1,
+      limit: 10,
     };
     const expectedResult = {
       totalCount: 1,
