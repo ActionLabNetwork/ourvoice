@@ -32,7 +32,8 @@
     "dev:authapi": "pnpm --filter ./apps/ourvoice-auth-api dev",
     "build:authapi": "pnpm --filter ./apps/ourvoice-auth-api build",
     "start:authapi": "pnpm --filter ./apps/ourvoice-auth-api start",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "pnpm --stream -r test",
+    "e2e": "pnpm -r test:e2e:cli",
     "test:api": "pnpm --filter ./apps/ourvoice-api test",
     "test:api:integration": "pnpm --filter ./apps/ourvoice-api test:integration",
     "test:e2e": "pnpm --filter ./apps/ourvoice-app test:e2e:cli",
@@ -54,7 +55,11 @@
     "seed:api:all": "pnpm seed:api:main && pnpm seed:api:moderation",
     "seed:api:main": "pnpm --filter ./apps/ourvoice-api prisma:seed:main",
     "seed:api:moderation": "pnpm --filter ./apps/ourvoice-api prisma:seed:moderation",
-    "postinstall": "pnpm tsx scripts/copy-config.ts"
+    "postinstall": "pnpm tsx scripts/copy-config.ts",
+    "update-packages": "pnpm i && pnpm prune && pnpm store prune",
+    "increment": "pnpm changeset && pnpm changeset version && pnpm changeset tag && pnpm i",
+    "ci:test": "pnpm -r --parallel --aggregate-output ci:test",
+    "ci:e2e": "pnpm -r ci:e2e"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
@@ -76,6 +81,7 @@
   },
   "homepage": "https://github.com/Our-Voice-Inc/ourvoice#readme",
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "@graphql-codegen/cli": "^4.0.1",
     "@graphql-codegen/client-preset": "^4.0.1",
     "@types/node": "^18.16.18",

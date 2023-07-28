@@ -81,6 +81,28 @@ Local ports and URL reference:
 
 > NOTE: currently only `demo` deployment is added via [config/config.yml](./config/config.yml). If more is added then they also need to be added to the `hosts` file described in [Prerequisites](####Prerequisites)
 
+### Before raising a pull request...
+
+```bash
+pnpm update-packages # Updates packages and checks versions are consistent
+pnpm lint:fix        # Runs lint fixes and prettier formatting
+pnpm test            # Runs unit tests on all apps and packages
+```
+
+## Incrementing version numbers
+
+Run the following command and select packages you have modified
+
+```
+pnpm increment
+```
+
+Please ensure all changed packages and apps are incremented based on semver principles before merging a pull request.
+
+1. MAJOR version when you make incompatible API changes (in apps, this means its contact with other services and affect them)
+2. MINOR version when you add functionality in a backwards compatible matter, and
+3. PATCH version when you make backwards compatible bug fixes.
+
 ## Configuration
 
 ### Runtime
