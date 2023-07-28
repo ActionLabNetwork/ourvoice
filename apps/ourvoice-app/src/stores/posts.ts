@@ -78,7 +78,6 @@ export const usePostsStore = defineStore('posts', {
             presignedUrlExpiresIn: postFilesPresignedUrlTTL
           }
         })
-
         if (!data) {
           throw Error('data is null')
         }
@@ -87,8 +86,6 @@ export const usePostsStore = defineStore('posts', {
           throw Error('posts is null')
         }
 
-        // console.log(posts.edges[0].node)
-
         const newPosts = posts.edges.map((edge) => edge.node)
 
         this.data = loadMore ? [...this.data, ...newPosts] : newPosts
@@ -96,6 +93,7 @@ export const usePostsStore = defineStore('posts', {
         this.pageInfo = data.posts.pageInfo ?? undefined
         this.state = 'loaded'
       } catch (error) {
+        this.data = [] // reset data
         this.error = error as ApolloError
         this.errorMessage = 'Failed to load posts. Please try again.'
         this.state = 'error'

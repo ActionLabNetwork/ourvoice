@@ -27,7 +27,7 @@
     </div>
     <!-- Categories Filter end -->
 
-    <div class="flex text-center text-3xl font-semibold">
+    <div class="flex text-center text-xl md:text-2xl lg:text-3xl font-semibold">
       Discuss your experience of balancing out your work and personal life in your organization, and
       any suggestions to improve matters.
     </div>
@@ -116,24 +116,18 @@ import {
   ListboxOptions,
   ListboxOption
 } from '@headlessui/vue'
+import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
+import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import { useToggle } from '@vueuse/core'
-import { ref, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
-import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
 import { startOfDay } from 'date-fns'
 import { GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { useQuery } from '@vue/apollo-composable'
-import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 const { result } = useQuery(GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY)
-// interface CategoryWithCount {
-//   id: number
-//   name: string
-//   count: number
-//   active: boolean
-// }
 const categoriesStore = useCategoriesStore()
 const postsStore = usePostsStore()
 const sortAscending = ref(false)
@@ -163,7 +157,7 @@ const timeRangeOptions = [
   }
 ]
 const selectedTimeRangeOption = ref(timeRangeOptions[0])
-watchEffect(async () => {
+watch(selectedTimeRangeOption, () => {
   if (selectedTimeRangeOption.value.label === 'Latest 3 Days') {
     postsStore.setCreatedAfter(startOfDay(Date.now() - 3 * 24 * 60 * 60 * 1000))
   } else {
