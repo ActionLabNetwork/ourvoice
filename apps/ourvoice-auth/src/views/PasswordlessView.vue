@@ -1,104 +1,246 @@
 <template>
-  <div class="auth-container">
-    <div v-if="processing" class="auth-form-container">
-      <div class="spinner">
-        <svg version="1.1" viewBox="25 25 50 50">
-          <circle
-            cx="50"
-            cy="50"
-            r="20"
-            fill="none"
-            strokeWidth="20"
-            stroke="rgb(255, 155, 51)"
-            strokeLinecap="round"
-            strokeDashoffset="0"
-            strokeDasharray="200, 200"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="rotate"
-              from="0 50 50"
-              to="360 50 50"
-              dur="4s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-dashoffset"
-              values="0;-30;-124"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="stroke-dasharray"
-              values="0,200;110,200;110,200"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-        </svg>
+  <div class="">
+    <div class="hidden">
+      <div class="auth-container hidden">
+        <div v-if="processing" class="auth-form-container">
+          <div class="spinner">
+            <svg version="1.1" viewBox="25 25 50 50">
+              <circle
+                cx="50"
+                cy="50"
+                r="20"
+                fill="none"
+                strokeWidth="20"
+                stroke="rgb(255, 155, 51)"
+                strokeLinecap="round"
+                strokeDashoffset="0"
+                strokeDasharray="200, 200"
+              >
+                <animateTransform
+                  attributeName="transform"
+                  attributeType="XML"
+                  type="rotate"
+                  from="0 50 50"
+                  to="360 50 50"
+                  dur="4s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="stroke-dashoffset"
+                  values="0;-30;-124"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="stroke-dasharray"
+                  values="0,200;110,200;110,200"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+            </svg>
+          </div>
+        </div>
+        <div v-else class="auth-form-container">
+          <div v-if="!needsVerifying" class="auth-form-content-container">
+            <div class="form-title">Sign In or Sign Up</div>
+
+            <div class="divider-container">
+              <div class="divider" />
+            </div>
+            <!-- Deployment image -->
+            <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
+              <img
+                class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+                :src="getConfig('deploymentLogo')"
+                alt="OurVoice interface"
+              />
+            </div>
+            <Login />
+
+            <div v-if="error" class="error-container">
+              <div class="error-message">{{ errorMessage }}</div>
+            </div>
+
+            <div class="divider-container"></div>
+            <form autocomplete="on" novalidate @submit="onSubmitPressed">
+              <div class="input-section-container" :class="emailError ? 'error' : ''">
+                <div class="input-label">Email</div>
+                <div class="input-container">
+                  <div class="input-wrapper" :class="emailError ? 'error' : ''">
+                    <input
+                      v-model="email"
+                      autocomplete="email"
+                      class="input"
+                      type="email"
+                      name="email"
+                      placeholder="Email address"
+                    />
+                  </div>
+                </div>
+                <div v-if="emailError" class="input-error">
+                  {{ `${emailError}` }}
+                </div>
+              </div>
+
+              <div class="input-section-container">
+                <button type="submit" class="button">CONTINUE</button>
+              </div>
+            </form>
+          </div>
+          <div v-else class="auth-form-content-container">
+            <div class="conformation">
+              <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
+              <div class="form-title">Link sent!</div>
+              <p v-html="verifyText" class="form-subtitle"></p>
+              <div>
+                <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
+                <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+              </div>
+              <div class="divider-container"></div>
+              <span v-on:click="reset" class="faded-link">Change email</span>
+            </div>
+            <div style="margin-bottom: 10px" />
+          </div>
+        </div>
       </div>
     </div>
-    <div v-else class="auth-form-container">
-      <div v-if="!needsVerifying" class="auth-form-content-container">
-        <div class="form-title">Sign In or Sign Up</div>
 
-        <div class="divider-container">
-          <div class="divider" />
+    <div class="grid grid-cols-full md:grid-cols-2 h-full">
+      <!-- Content -->
+      <div class="flex flex-col py-20 items-center md:items-start px-16 md:translate-y-0">
+        <div>
+          <div
+            class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8"
+          >
+            <div>
+              <a href="#" class="">
+                <span class="sr-only">OurVoice</span>
+                <img
+                  class="h-11"
+                  src="@/assets/logo/ourvoice_logo_primary_dark.svg"
+                  alt="OurVoice Logo"
+                />
+              </a>
+            </div>
+            <div>
+              <a href="#" class="">
+                <span class="sr-only">DCA</span>
+                <img
+                  class="h-11 ml-6 rounded-md"
+                  src="@/assets/logo/dca_logo.png"
+                  alt="Deployment Logo"
+                />
+              </a>
+            </div>
+          </div>
         </div>
-        <!-- Deployment image -->
-        <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
-          <img
-            class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
-            :src="getConfig('deploymentLogo')"
-            alt="OurVoice interface"
+        <!-- Deployment slogan -->
+        <p
+          class="text-center md:text-left mb-6 text-2xl md:text-3xl lg:text-5xl text-ourvoice-black leading-20 font-bold"
+        >
+          {{ getConfig('slogan') }}
+        </p>
+        <!-- Deployment description -->
+        <Description class="description-text text-lg text-left mb-6" />
+        <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
+          <CustomButton
+            label="Get Started"
+            class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+            variant="filled"
+          />
+          <CustomButton
+            to="/about"
+            label="FAQ"
+            class-name="w-52 h-14 px-2 py-4 rounded-full border-2  border-ourvoice-secondary"
+            variant="outlined"
           />
         </div>
-        <Login />
-
-        <div v-if="error" class="error-container">
-          <div class="error-message">{{ errorMessage }}</div>
-        </div>
-
-        <div class="divider-container"></div>
-        <form autocomplete="on" novalidate @submit="onSubmitPressed">
-          <div class="input-section-container" :class="emailError ? 'error' : ''">
-            <div class="input-label">Email</div>
-            <div class="input-container">
-              <div class="input-wrapper" :class="emailError ? 'error' : ''">
-                <input
-                  v-model="email"
-                  autocomplete="email"
-                  class="input"
-                  type="email"
-                  name="email"
-                  placeholder="Email address"
-                />
-              </div>
+        <!-- Passwordless input -->
+        <div class="flex flex-col gap-5">
+          <div v-if="error" class="error-container">
+            <div class="error-message">{{ errorMessage }}</div>
+          </div>
+          <div class="relative mt-2" :class="emailError ? 'error' : ''">
+            <input
+              v-model="email"
+              autocomplete="email"
+              type="email"
+              name="email"
+              placeholder="Staff email"
+              class="w-96 md:w-80 lg:w-96 h-12 p-4 bg-neutral-100 rounded-2xl justify-start items-center gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight /"
+            />
+            <div v-if="processing" class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
+              <!-- Loading spinner -->
+              <span class="inline-flex items-center px-1 font-sans text-xs text-gray-400">
+                <svg
+                  class="h-8 w-8 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </span>
+            </div>
+            <div
+              v-if="!processing && needsVerifying"
+              class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5"
+            >
+              <!-- Sent indicator -->
+              <span class="inline-flex items-center px-1 font-sans text-xs text-ourvoice-success">
+                Email sent
+                <span v-if="period >= 0 && !isVerify"> (00:{{ counter }})</span>
+              </span>
             </div>
             <div v-if="emailError" class="input-error">
               {{ `${emailError}` }}
             </div>
           </div>
-
-          <div class="input-section-container">
-            <button type="submit" class="button">CONTINUE</button>
+          <!-- Buttons -->
+          <div class="justify-start items-start gap-5 inline-flex mx-auto md:mx-0">
+            <button
+              v-if="!needsVerifying"
+              class="px-5 cursor-pointer py-3 bg-ourvoice-primary hover:bg-ourvoice-primary/80 rounded-full justify-center items-center gap-2 flex"
+              @click="onSubmitPressed"
+            >
+              <div class="text-black text-lg font-medium">Send Link</div>
+            </button>
+            <button
+              v-if="needsVerifying"
+              class="px-5 cursor-pointer py-3 bg-ourvoice-primary hover:bg-ourvoice-primary/80 rounded-full justify-center items-center gap-2 flex"
+              @click="resendMagicLink"
+            >
+              <div class="text-black text-lg font-medium">Resend Link</div>
+            </button>
+            <button
+              v-if="needsVerifying"
+              class="px-5 cursor-pointer py-3 bg-ourvoice-secondary hover:bg-ourvoice-secondary/80 rounded-full justify-center items-center gap-2 flex"
+              @click="reset"
+            >
+              <div class="text-black text-lg font-medium">Change Email</div>
+            </button>
           </div>
-        </form>
-      </div>
-      <div v-else class="auth-form-content-container">
-        <div class="conformation">
-          <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-          <div class="form-title">Link sent!</div>
-          <p v-html="verifyText" class="form-subtitle"></p>
-          <div>
-            <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-            <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
-          </div>
-          <div class="divider-container"></div>
-          <span v-on:click="reset" class="faded-link">Change email</span>
         </div>
-        <div style="margin-bottom: 10px" />
+      </div>
+      <div class="hidden md:inline-flex">
+        <img
+          class="w-full object-cover h-full"
+          :src="getConfig('heroImage')"
+          alt="OurVoice interface"
+        />
       </div>
     </div>
   </div>

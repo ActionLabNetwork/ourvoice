@@ -1,10 +1,8 @@
 <template>
   <div class="grid grid-cols-full md:grid-cols-2 h-full">
     <!-- Content -->
-    <div
-      class="flex flex-col justify-center items-center md:items-start px-16 h-full md:translate-y-0"
-    >
-      <div v-if="!session">
+    <div class="flex flex-col py-20 items-center md:items-start px-16 md:translate-y-0">
+      <div>
         <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
           <div>
             <a href="#" class="">
@@ -18,7 +16,7 @@
           </div>
           <div>
             <a href="#" class="">
-              <span class="sr-only">OurVoice</span>
+              <span class="sr-only">DCA</span>
               <img
                 class="h-11 ml-6 rounded-md"
                 :src="getConfig('deploymentLogo')"
@@ -63,8 +61,7 @@
     </div>
     <div class="hidden md:inline-flex">
       <img
-        class="w-full object-cover"
-        :class="session ? 'h-[90vh]' : 'h-[100vh]'"
+        class="w-full object-cover h-full"
         :src="getConfig('heroImage')"
         alt="OurVoice interface"
       />
@@ -161,36 +158,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.fill {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  width: 100%;
-}
-
-.top-bar {
-  display: flex;
-  height: 70px;
-  align-items: center;
-  justify-content: flex-end;
-  padding-left: 75px;
-  padding-right: 75px;
-  width: 100%;
-}
-
-.sign-out {
-  display: flex;
-  width: 116px;
-  height: 42px;
-  background-color: black;
-  border-radius: 10px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-}
 .description-text {
   align-self: stretch;
   color: var(--body-text, #3d3d3d);
@@ -200,25 +167,5 @@ export default defineComponent({
   font-style: normal;
   font-weight: 400;
   line-height: 140%; /* 16.8px */
-}
-.ourvoice-button-active {
-  display: flex;
-  width: 212px;
-  padding: 16px 8px;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border-radius: 96px;
-}
-.ourvoice-button {
-  display: flex;
-  width: 212px;
-  padding: 16px 8px;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  border-radius: 96px;
-  border: 2px solid var(--headings, #1a1a1a);
-  background: #fff;
 }
 </style>

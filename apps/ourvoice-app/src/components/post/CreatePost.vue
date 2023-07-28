@@ -30,7 +30,6 @@
         <!-- Form for creating new post -->
         <form @submit="onSubmit" class="space-y-6">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">Create Post</h2>
-
           <!-- Title input field -->
           <FormInput
             id="title"
@@ -139,6 +138,7 @@
             labelSpan="optional"
             :error-message="attachmentsField.errorMessage.value"
             :meta="attachmentsField.meta"
+            v-if="showAttachmentsInput"
           >
             <template #icon>
               <span
@@ -228,6 +228,7 @@ import { useUserStore } from '@/stores/user'
 import Loading from '../common/Loading.vue'
 import Alert from '../common/Alert.vue'
 import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
+import YamlContent from '../../../../../config/config.yml'
 
 interface PresignedUrlResponse {
   key: string
@@ -264,8 +265,13 @@ const { handleSubmit, resetForm, errors } = useForm({
   validationSchema: createPostValidationSchema
 })
 
+const getConfig = (option: string) => {
+  return YamlContent[option]
+}
+
 const loading = ref(false)
 const showAlert = ref(false)
+const showAttachmentsInput = false
 
 // Form fields
 const selectedCategories = ref<string[]>([])

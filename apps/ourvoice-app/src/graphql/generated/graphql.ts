@@ -113,14 +113,14 @@ export type Comment = {
   published: Scalars['Boolean']['output'];
   publishedAt: Maybe<Scalars['DateTime']['output']>;
   votes: Array<Vote>;
-  votesDown: Scalars['Int']['output'];
-  votesUp: Scalars['Int']['output'];
+  votesDown: Maybe<Scalars['Int']['output']>;
+  votesUp: Maybe<Scalars['Int']['output']>;
 };
 
 export type CommentConnection = {
-  edges: Array<CommentEdge>;
+  edges: Maybe<Array<Maybe<CommentEdge>>>;
   pageInfo: CommentPageInfo;
-  totalCount: Scalars['Int']['output'];
+  totalCount: Maybe<Scalars['Int']['output']>;
 };
 
 export type CommentCreateInput = {
@@ -774,7 +774,7 @@ export type Query = {
   category: Maybe<Category>;
   comment: Maybe<Comment>;
   commentVersion: ModerationCommentVersion;
-  comments: CommentConnection;
+  comments: Maybe<CommentConnection>;
   getPresignedDownloadUrls: Array<PresignedUrl>;
   getPresignedUrls: Array<PresignedUrl>;
   moderationComment: ModerationComment;
@@ -1048,7 +1048,7 @@ export type CreateOrDeleteVoteMutationVariables = Exact<{
 }>;
 
 
-export type CreateOrDeleteVoteMutation = { createVote: { id: number, voteType: string, authorHash: string, authorNickname: string, post: { id: number, votesUp: number, votesDown: number }, comment: { id: number, votesUp: number, votesDown: number } | null } };
+export type CreateOrDeleteVoteMutation = { createVote: { id: number, voteType: string, authorHash: string, authorNickname: string, post: { id: number, votesUp: number, votesDown: number }, comment: { id: number, votesUp: number | null, votesDown: number | null } | null } };
 
 export type CreatePollMutationVariables = Exact<{
   data: PollCreateInput;
@@ -1164,7 +1164,7 @@ export type CommentQueryVariables = Exact<{
 }>;
 
 
-export type CommentQuery = { comment: { id: number, votesDown: number, votesUp: number } | null };
+export type CommentQuery = { comment: { id: number, votesDown: number | null, votesUp: number | null } | null };
 
 export type GetCommentsQueryVariables = Exact<{
   filter?: InputMaybe<CommentsFilterInput>;
@@ -1172,7 +1172,7 @@ export type GetCommentsQueryVariables = Exact<{
 }>;
 
 
-export type GetCommentsQuery = { comments: { totalCount: number, edges: Array<{ node: { id: number, content: string, votesDown: number, votesUp: number, moderated: boolean, published: boolean, createdAt: any | null, moderatedAt: any | null, publishedAt: any | null, disabledAt: any | null, authorHash: string, authorNickname: string, votes: Array<{ authorHash: string, voteType: string }>, post: { id: number } | null, parent: { id: number, authorNickname: string } | null } }>, pageInfo: { endCursor: string | null, hasNextPage: boolean | null, startCursor: string | null } } };
+export type GetCommentsQuery = { comments: { totalCount: number | null, edges: Array<{ node: { id: number, content: string, votesDown: number | null, votesUp: number | null, moderated: boolean, published: boolean, createdAt: any | null, moderatedAt: any | null, publishedAt: any | null, disabledAt: any | null, authorHash: string, authorNickname: string, votes: Array<{ authorHash: string, voteType: string }>, post: { id: number } | null, parent: { id: number, authorNickname: string } | null } } | null> | null, pageInfo: { endCursor: string | null, hasNextPage: boolean | null, startCursor: string | null } } | null };
 
 export type GetModerationCommentByIdQueryVariables = Exact<{
   moderationCommentId: Scalars['Int']['input'];
@@ -1279,7 +1279,7 @@ export type VotesQueryVariables = Exact<{
 }>;
 
 
-export type VotesQuery = { votes: Array<{ id: number, voteType: string, authorHash: string, authorNickname: string, comment: { id: number, votesUp: number, votesDown: number } | null, post: { id: number, votesUp: number, votesDown: number } }> };
+export type VotesQuery = { votes: Array<{ id: number, voteType: string, authorHash: string, authorNickname: string, comment: { id: number, votesUp: number | null, votesDown: number | null } | null, post: { id: number, votesUp: number, votesDown: number } }> };
 
 
 export const ApproveModerationCommentVersionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ApproveModerationCommentVersion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"moderatorHash"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"moderatorNickname"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reason"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"approveModerationCommentVersion"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"moderatorHash"},"value":{"kind":"Variable","name":{"kind":"Name","value":"moderatorHash"}}},{"kind":"Argument","name":{"kind":"Name","value":"moderatorNickname"},"value":{"kind":"Variable","name":{"kind":"Name","value":"moderatorNickname"}}},{"kind":"Argument","name":{"kind":"Name","value":"reason"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reason"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"authorHash"}},{"kind":"Field","name":{"kind":"Name","value":"authorNickname"}},{"kind":"Field","name":{"kind":"Name","value":"requiredModerations"}},{"kind":"Field","name":{"kind":"Name","value":"versions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"version"}},{"kind":"Field","name":{"kind":"Name","value":"authorHash"}},{"kind":"Field","name":{"kind":"Name","value":"authorNickname"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"latest"}},{"kind":"Field","name":{"kind":"Name","value":"moderations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"decision"}},{"kind":"Field","name":{"kind":"Name","value":"moderatorHash"}},{"kind":"Field","name":{"kind":"Name","value":"moderatorNickname"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ApproveModerationCommentVersionMutation, ApproveModerationCommentVersionMutationVariables>;

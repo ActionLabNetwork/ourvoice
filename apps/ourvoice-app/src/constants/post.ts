@@ -1,5 +1,5 @@
-export const createPostTitleCharacterLimit = 100
-export const createPostContentCharacterLimit = 255
+export const createPostTitleCharacterLimit = 50000
+export const createPostContentCharacterLimit = 100000
 export const allowedFileTypes = [
   'application/pdf',
   'image/jpeg',
