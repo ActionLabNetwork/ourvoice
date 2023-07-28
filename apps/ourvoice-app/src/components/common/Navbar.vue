@@ -5,28 +5,27 @@
       aria-label="Global"
     >
       <!-- Logo -->
-      <div class="grid grid-cols-2 divide-x-4 divide-ourvoice-base place-items-center">
-        <div>
-          <a href="/">
-            <span class="sr-only">OurVoice</span>
-            <img
-              class="h-11"
-              src="@/assets/logo/ourvoice_logo_primary_light.svg"
-              alt="OurVoice Logo"
-            />
-          </a>
-        </div>
-        <div>
-          <a href="/" class="">
-            <span class="sr-only">Diversity Council Australia</span>
-            <img
-              class="h-11 ml-6 rounded-md"
-              src="@/assets/logo/dca_logo.png"
-              alt="Deployment Logo"
-            />
-          </a>
+      <div class="sm:col-span-1 place-self-center">
+        <div class="flex gap-3 place-items-center">
+          <div class="border-r-2 border-ourvoice-base px-2">
+            <a href="/">
+              <span class="sr-only">OurVoice</span>
+              <img
+                class="object-cover"
+                src="@/assets/logo/ourvoice_logo_primary_light.svg"
+                alt="OurVoice Logo"
+              />
+            </a>
+          </div>
+          <div>
+            <a href="/" class="">
+              <span class="sr-only">Diversity Council Australia</span>
+              <img class="w-24 rounded-md" src="@/assets/logo/dca_logo.png" alt="Deployment Logo" />
+            </a>
+          </div>
         </div>
       </div>
+
       <!-- Toggle -->
       <div
         class="w-fit justify-self-center col-span-full lg:col-start-3 lg:col-span-1"
@@ -41,8 +40,10 @@
       </div>
 
       <!-- Create Post Button & Mobile Menu MD -->
-      <div class="hidden md:flex lg:hidden justify-self-end col-start-5 gap-10">
+      <div class="col-start-3 place-self-center hidden md:flex lg:hidden">
         <CreatePostNavButton class="inline-flex" />
+      </div>
+      <div class="hidden md:flex lg:hidden justify-self-end col-start-5 gap-10">
         <!-- Mobile Menu Icon -->
         <button
           type="button"
@@ -55,7 +56,7 @@
       </div>
 
       <!-- Create Post Button & Mobile Menu SM -->
-      <div class="grid md:hidden col-start-2 md:col-start-3">
+      <div class="grid md:hidden md:col-span-1 col-start-2 md:col-start-3">
         <CreatePostNavButton class="inline-flex mx-auto text-center" />
       </div>
       <div
@@ -85,7 +86,7 @@
             class="text-sm font-semibold leading-6 text-white hover:bg-gray-700"
             @click.prevent="handleItemClick(item.id)"
           >
-            <span :class="{ 'border-b-2': item.current }">
+            <span class="xl:block" :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }">
               {{ item.name }}
             </span>
           </router-link>
@@ -374,11 +375,6 @@ const hasElevatedPermissions = computed(
   () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
 )
 
-onMounted(async () => {
-  console.log('Current path: ', currentPath.value)
-  console.log('Deployment', useDeploymentStore().deployment)
-})
-
 router.afterEach(async () => {
   currentPathIsReady.value = false
   await router.isReady()
@@ -392,7 +388,27 @@ const signOut = async () => {
 
 // Single level nav items
 const navItems = ref([
-  { id: 1, name: 'About', href: '/about', current: currentPath.value === '/about' }
+  {
+    id: 1,
+    name: 'Discussion',
+    href: '/posts',
+    current: currentPath.value === '/posts',
+    showOnSmallScreen: false
+  },
+  {
+    id: 2,
+    name: 'Polls',
+    href: '/polls',
+    current: currentPath.value === '/polls',
+    showOnSmallScreen: false
+  },
+  {
+    id: 3,
+    name: 'FAQ',
+    href: '/about',
+    current: currentPath.value === '/about',
+    showOnSmallScreen: true
+  }
 ])
 
 // Multi level nav items
@@ -457,9 +473,27 @@ const isModerationPage = computed(() => {
 watchEffect(() => {
   // Single level nav items
   navItems.value = [
-    { id: 1, name: 'Discussion', href: '/posts', current: currentPath.value === '/posts' },
-    { id: 2, name: 'Polls', href: '/polls', current: currentPath.value === '/polls' },
-    { id: 3, name: 'FAQ', href: '/about', current: currentPath.value === '/about' }
+    {
+      id: 1,
+      name: 'Discussion',
+      href: '/posts',
+      current: currentPath.value === '/posts',
+      showOnSmallScreen: false
+    },
+    {
+      id: 2,
+      name: 'Polls',
+      href: '/polls',
+      current: currentPath.value === '/polls',
+      showOnSmallScreen: false
+    },
+    {
+      id: 3,
+      name: 'FAQ',
+      href: '/about',
+      current: currentPath.value === '/about',
+      showOnSmallScreen: true
+    }
   ]
 
   // Multi level nav items

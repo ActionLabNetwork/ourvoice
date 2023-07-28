@@ -62,7 +62,12 @@
       <!-- <Information class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" /> -->
     </div>
     <div class="hidden md:inline-flex">
-      <img class="w-full h-[90vh] object-cover" :src="getConfig('heroImage')" alt="OurVoice interface" />
+      <img
+        class="w-full object-cover"
+        :class="session ? 'h-[90vh]' : 'h-[100vh]'"
+        :src="getConfig('heroImage')"
+        alt="OurVoice interface"
+      />
     </div>
   </div>
 </template>
