@@ -1,12 +1,16 @@
 <template>
   <button
     @click="$emit('select')"
-    class="px-4 h-10 items-center rounded-full border-2 border-gray-300"
-    :class="{ 'bg-black text-white': active }"
+    class="px-4 h-10 items-center rounded-full border-2 border-ourvoice-base-light-300"
+    :class="{ 'bg-ourvoice-primary-2 text-ourvoice-white': active }"
   >
     <span
       class="px-1 rounded-full items-center"
-      :class="active ? 'bg-white text-black' : 'bg-yellow-400 text-black'"
+      :class="
+        active
+          ? 'bg-ourvoice-white text-ourvoice-black'
+          : 'bg-ourvoice-secondary text-ourvoice-black'
+      "
     >
       {{ count }}
     </span>

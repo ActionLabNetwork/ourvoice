@@ -6,7 +6,7 @@
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+          class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
           ># {{ cat?.name }}
         </span>
       </div>
@@ -20,9 +20,10 @@
       {{ post?.content }}
       <font-awesome-icon :icon="faQuoteRight" />
     </p>
-    <div id="fileUrlsWrapper" class="text-right">
+    <!-- Hidden for this deployment start-->
+    <div id="fileUrlsWrapper" class="text-right" v-show="false">
       <a
-        class="font-medium text-sm text-blue-600 hover:underline"
+        class="font-medium text-sm text-ourvoice-info hover:underline"
         v-for="url in post?.presignedDownloadUrls.map((url) => url.url)"
         :key="url"
         :href="url"
@@ -31,6 +32,7 @@
         file
       </a>
     </div>
+    <!-- Hidden for this deployment end-->
     <div class="mt-6 flex justify-between items-center">
       <div class="flex gap-2">
         <button

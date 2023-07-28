@@ -9,7 +9,7 @@
     <div class="flex-1">
       <textarea
         v-model="input"
-        class="rounded-3xl px-4 py-3 bg-stone-300/25 resize-none w-full focus:outline-none max-h-40 hover:cursor-pointer focus:cursor-auto"
+        class="rounded-3xl px-4 py-3 bg-ourvoice-base resize-none w-full focus:outline-none max-h-40 hover:cursor-pointer focus:cursor-auto"
         :class="[{ 'placeholder:opacity-50': focused }]"
         @focus="handleFocus"
         maxlength="255"
@@ -17,16 +17,23 @@
         ref="textarea"
       />
       <div class="flex">
-        <span v-if="showErrorMessage" class="text-xs text-red-500"> Content cannot be empty </span>
+        <span v-if="showErrorMessage" class="text-xs text-ourvoice-error">
+          Content cannot be empty
+        </span>
         <span class="flex-1"></span>
-        <!-- <span v-if="focused || input" class="text-xs text-blue-500"
+        <!-- <span v-if="focused || input" class="text-xs text-ourvoice-info"
           >{{ input?.length ?? 0 }}/255</span
         > -->
       </div>
     </div>
 
     <div v-if="focused || input" class="flex-none">
-      <button class="btn-primary btn-rounded py-3 text-sm" @click="handleSubmit">Send</button>
+      <CustomButton
+        type="button"
+        label="Send"
+        :on-click="handleSubmit"
+        class-name="btn-rounded py-3 bg-ourvoice-secondary hover:bg-ourvoice-secondary-1/80"
+      />
     </div>
   </div>
   <div>
@@ -45,7 +52,7 @@ import { computed, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useCommentsStore } from '@/stores/comments'
 import { useTextareaAutosize } from '@vueuse/core'
-
+import CustomButton from '@/components/common/CustomButton.vue'
 const { textarea, input } = useTextareaAutosize()
 import { useFocusWithin } from '@vueuse/core'
 
@@ -103,13 +110,6 @@ const handleSubmit = async () => {
     toastMessage.value = 'Error creating comment'
     toastType.value = 'danger'
   }
-
-  // TODO remove this
-  console.log({
-    postId: props.postId,
-    parentId: props.commentId,
-    content: input.value
-  })
   input.value = ''
 }
 watch(showToast, (newValue) => {
