@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-black" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
+  <header class="bg-ourvoice-primary-2" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
     <nav
       class="mx-auto grid grid-cols-3 md:grid-cols-5 grid-flow-row-dense p-6 gap-y-5"
       aria-label="Global"
@@ -47,7 +47,7 @@
         <!-- Mobile Menu Icon -->
         <button
           type="button"
-          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
+          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-ourvoice-white"
           @click="mobileMenuOpen = true"
         >
           <span class="sr-only">Open main menu</span>
@@ -65,7 +65,7 @@
         <!-- Mobile Menu Icon -->
         <button
           type="button"
-          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
+          class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-ourvoice-white"
           @click="mobileMenuOpen = true"
         >
           <span class="sr-only">Open main menu</span>
@@ -83,10 +83,13 @@
             :to="item.href"
             v-for="item in navItems"
             :key="item.id"
-            class="text-sm font-semibold leading-6 text-white hover:bg-gray-700"
+            class="text-sm font-semibold leading-6 text-ourvoice-white hover:bg-ourvoice-primary-1"
             @click.prevent="handleItemClick(item.id)"
           >
-            <span class="xl:block" :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }">
+            <span
+              class="xl:block"
+              :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }"
+            >
               {{ item.name }}
             </span>
           </router-link>
@@ -98,7 +101,7 @@
             v-slot="{ open, close }"
           >
             <PopoverButton
-              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
+              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-ourvoice-white"
               :class="{ 'border-b-2': isModerationPage }"
             >
               Moderation
@@ -118,19 +121,19 @@
               leave-to-class="opacity-0 translate-y-1"
             >
               <PopoverPanel
-                class="absolute -left-8 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+                class="absolute -left-8 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-ourvoice-primary-2 shadow-lg ring-1 ring-gray-900/5"
                 static
               >
                 <div class="p-4" v-if="open">
                   <div
                     v-for="item in moderation"
                     :key="item.name"
-                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-ourvoice-primary-1"
                   >
                     <div class="flex-auto">
                       <router-link
                         :to="item.href"
-                        class="block font-semibold text-white"
+                        class="block font-semibold text-ourvoice-white"
                         @click.prevent="() => close()"
                       >
                         {{ item.name }}
@@ -153,7 +156,7 @@
         <div>
           <Popover class="relative" v-slot="{ open }">
             <PopoverButton
-              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white"
+              class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-ourvoice-white"
             >
               <div class="flex-shrink-0 mr-0" v-if="userStore.nicknameInParts">
                 <img
@@ -177,21 +180,23 @@
               leave-to-class="opacity-0 translate-y-1"
             >
               <PopoverPanel
-                class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-black shadow-lg ring-1 ring-gray-900/5"
+                class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-ourvoice-primary-2 shadow-lg ring-1 ring-gray-900/5"
               >
                 <div class="p-4">
                   <div
-                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                    class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-ourvoice-primary-1"
                   >
                     <div class="flex-auto">
                       <div
                         v-on:click="signOut"
-                        class="block font-semibold text-white cursor-pointer"
+                        class="block font-semibold text-ourvoice-white cursor-pointer"
                       >
                         Sign Out
                         <span class="absolute inset-0" />
                       </div>
-                      <p class="text-white inline-block my-auto underline underline-offset-4">
+                      <p
+                        class="text-ourvoice-white inline-block my-auto underline underline-offset-4"
+                      >
                         {{ userStore.nickname }}
                       </p>
                     </div>
@@ -208,7 +213,7 @@
     <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
       <div class="fixed inset-0 z-30" />
       <DialogPanel
-        class="fixed inset-y-0 right-0 z-30 w-full overflow-y-auto bg-black px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
+        class="fixed inset-y-0 right-0 z-30 w-full overflow-y-auto bg-ourvoice-primary-2 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
       >
         <div class="flex items-center justify-between">
           <a href="#" class="-m-1.5 p-1.5">
@@ -225,7 +230,7 @@
             @click="mobileMenuOpen = false"
           >
             <span class="sr-only">Close menu</span>
-            <font-awesome-icon :icon="faXmark" class="h-6 w-6 bg-white rounded-md" />
+            <font-awesome-icon :icon="faXmark" class="h-6 w-6 bg-ourvoice-white rounded-md" />
           </button>
         </div>
         <div class="mt-6 flow-root">
@@ -235,7 +240,7 @@
                 :to="item.href"
                 v-for="item in navItems"
                 :key="item.id"
-                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white"
+                class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ourvoice-white"
                 @click.prevent="handleItemClick(item.id)"
               >
                 <span :class="{ 'border-b-2': item.current }">
@@ -253,7 +258,7 @@
                 v-slot="{ open }"
               >
                 <DisclosureButton
-                  class="flex w-full items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                  class="flex w-full items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-ourvoice-white hover:bg-ourvoice-primary-1"
                 >
                   Moderation
                   <font-awesome-icon
@@ -267,11 +272,11 @@
                     v-for="item in [...moderation]"
                     :key="item.name"
                     as="div"
-                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-white"
+                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white"
                   >
                     <router-link
                       :to="item.href"
-                      class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white"
+                      class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-ourvoice-white"
                       @click.prevent="handleChildItemClick(item.id)"
                     >
                       <span :class="{ 'border-b-2': item.current }">
@@ -286,7 +291,7 @@
               <!-- User Settings Disclosure -->
               <Disclosure as="div" class="-mx-3" v-slot="{ open }">
                 <DisclosureButton
-                  class="flex w-full gap-3 items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-white hover:bg-gray-700"
+                  class="flex w-full gap-3 items-center justify-between py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-ourvoice-white hover:bg-ourvoice-primary-1"
                 >
                   <div class="flex-shrink-0 mr-0">
                     <img
@@ -295,7 +300,7 @@
                       alt="PseudoNickname"
                     />
                   </div>
-                  <p class="text-white inline-block my-auto underline underline-offset-4">
+                  <p class="text-ourvoice-white inline-block my-auto underline underline-offset-4">
                     {{ userStore.nickname }}
                   </p>
                   <font-awesome-icon
@@ -308,7 +313,7 @@
                 <DisclosurePanel class="mt-2 space-y-2">
                   <DisclosureButton
                     as="div"
-                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-white"
+                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white"
                     @click.prevent="signOut"
                   >
                     Sign Out

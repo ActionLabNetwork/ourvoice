@@ -3,10 +3,10 @@
     <CustomButton
       :label="smAndLarger ? 'Create Post' : ''"
       :to="'/post'"
-      class-name="rounded-3xl h-12 px-4 py-3 text-xs"
+      class-name="rounded-3xl px-4 py-3 text-xs space-x-1 text-ourvoice-white"
     >
       <template #icon-after-text>
-        <IconMessageStripeCircle v-if="isHovered" />
+        <IconMessageStripeCircle v-if="isHovered" class="" />
         <IconMessagePlusCircle v-else />
       </template>
     </CustomButton>

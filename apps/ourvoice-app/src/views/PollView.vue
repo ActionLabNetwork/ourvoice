@@ -22,15 +22,18 @@
           No polls are running
         </div>
         <button
-          class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary text-[18px] font-medium"
-          @click="$router.push({name: 'posts'})"
+          class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary text-ourvoice-white text-[18px] font-medium"
+          @click="$router.push({ name: 'posts' })"
         >
           Go Back to Discussion
         </button>
       </div>
     </div>
     <!-- past polls -->
-    <div v-if="votedPolls.length !== 0" class="w-full py-8 lg:py-12 flex flex-col items-center bg-ourvoice-primary">
+    <div
+      v-if="votedPolls.length !== 0"
+      class="w-full py-8 lg:py-12 flex flex-col items-center bg-ourvoice-primary"
+    >
       <div
         class="px-4 w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch justify-items-stretch"
       >
