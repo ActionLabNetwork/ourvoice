@@ -33,19 +33,22 @@
     </div>
 
     <!-- Time range and sorting start -->
-    <div class="flex justify-between items-center">
-      <div class="flex justify-between space-x-2 text-base md:text-xl font-bold">
+    <div class="flex flex-col-reverse md:flex-row justify-between">
+      <div class="flex justify-around space-x-2 text-base mt-5 md:text-xl md:mt-0 font-normal">
         <button
           v-for="(option, index) in timeRangeOptions"
           :key="index"
-          class="hover:bg-gray-100 rounded-md"
-          :class="{ 'text-gray-500 font-normal': option.label !== selectedTimeRangeOption.label }"
+          class="px-2 py-1"
+          :class="{
+            'font-semibold border-ourvoice-black border-b-4':
+              option.label === selectedTimeRangeOption.label
+          }"
           @click="handleTimeRangeSelected(index)"
         >
           {{ option.label }}
         </button>
       </div>
-      <div class="flex">
+      <div class="flex justify-between">
         <Listbox class="w-fit" v-model="selectedSortOption">
           <div class="relative mt-1">
             <ListboxButton
@@ -101,10 +104,6 @@
       </div>
     </div>
     <!-- Time range and sorting end -->
-
-    <!-- <div class="border-2">{{ selectedTimeRangeOption }}</div>
-    <div class="border-2">{{ selectedSortOption }}</div>
-    <div class="border-2">{{ sortAscending }}</div> -->
   </div>
 </template>
 

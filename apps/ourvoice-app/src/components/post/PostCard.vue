@@ -1,17 +1,19 @@
 <template>
   <div class="break-all">
-    <h1 class="text-lg lg:text-2xl font-semibold flex justify-between items-center">
-      {{ post?.title }}
-      <div>
+    <h1 class="text-lg lg:text-2xl font-semibold flex flex-col md:flex-row justify-between">
+      <div class="flex-none">
+        {{ post?.title }}
+      </div>
+      <div class="flex justify-end">
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded"
+          class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
           ># {{ cat?.name }}
         </span>
       </div>
     </h1>
-    <h2 class="text-xs lg:text-sm text-gray-500">
+    <h2 class="text-xs lg:text-sm text-ourvoice-gray">
       <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
       <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
     </h2>
@@ -20,7 +22,7 @@
       {{ post?.content }}
       <font-awesome-icon :icon="faQuoteRight" />
     </p>
-    <!-- Hidden for this deployment start-->
+    <!-- NOTICE: Hidden for this deployment start-->
     <div id="fileUrlsWrapper" class="text-right" v-show="false">
       <a
         class="font-medium text-sm text-ourvoice-info hover:underline"
@@ -32,7 +34,7 @@
         file
       </a>
     </div>
-    <!-- Hidden for this deployment end-->
+    <!-- NOTICE: Hidden for this deployment end-->
     <div class="mt-6 flex justify-between items-center">
       <div class="flex gap-2">
         <button
@@ -69,7 +71,6 @@
     <div class="h-px my-5 border border-stone-300 border-opacity-50"></div>
     <CreateComment :postId="post?.id" />
   </div>
-  <!-- <pre class="border-2">{{ post }}</pre> -->
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
@@ -127,7 +128,6 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         voteType: voteType
       }
     })
-    // console.log(res?.data.createVote)
     if (res?.data)
       postsStore.syncVotesForPostById({
         postId: props.postId,
