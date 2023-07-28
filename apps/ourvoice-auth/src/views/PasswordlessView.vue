@@ -109,6 +109,14 @@
     <div class="grid grid-cols-full md:grid-cols-2 h-full">
       <!-- Content -->
       <div class="flex flex-col py-20 items-center md:items-start px-16 md:translate-y-0">
+        <!-- Back Button -->
+        <button
+          @click="redirectToIndexPage"
+          class="inline-flex font-semibold items-center gap-2 transform duration-200 hover:gap-[13px] mb-10"
+        >
+          <IconArrowLeft />
+          Go Back
+        </button>
         <div>
           <div
             class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8"
@@ -255,6 +263,7 @@ import { ManageRedirectStateService } from '../utils/manage-redirect-state.servi
 import { defineComponent } from 'vue'
 
 import config from '@/config'
+import IconArrowLeft from '@/components/icons/IconArrowLeft.vue'
 
 import YamlContent from '../../../../config/config.yml'
 import Login from '../../../../config/content/login.md'
@@ -270,7 +279,8 @@ const organisation = YamlContent.organisation
 
 export default defineComponent({
   components: {
-    Login
+    Login,
+    IconArrowLeft
   },
   props: ['deployment'],
   data() {
@@ -467,6 +477,9 @@ export default defineComponent({
         // fallback redirect
         window.location.href = `http://demo${domain}`
       }
+    },
+    redirectToIndexPage: function () {
+      window.location.href = config.appURL
     }
   }
 })
