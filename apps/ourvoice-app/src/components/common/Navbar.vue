@@ -87,12 +87,22 @@
             @click.prevent="handleItemClick(item.id)"
           >
             <span
-              class="xl:block"
+              v-if="hasElevatedPermissions"
+              class="lg:block"
+              :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }"
+            >
+              {{ item.name }}
+            </span>
+            <span
+              v-else-if="item.href === '/about'"
+              class="lg:block"
               :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }"
             >
               {{ item.name }}
             </span>
           </router-link>
+
+          <!-- Moderation Dropdown start-->
           <Popover
             :class="{
               hidden: !hasElevatedPermissions
@@ -145,6 +155,7 @@
               </PopoverPanel>
             </TransitionRoot>
           </Popover>
+          <!-- Moderation Dropdown end-->
         </PopoverGroup>
       </div>
       <div class="hidden lg:inline-flex items-center gap-5 lg:col-start-5 justify-self-end">
