@@ -59,9 +59,7 @@
       <div class="grid md:hidden md:col-span-1 col-start-2 md:col-start-3">
         <CreatePostNavButton class="inline-flex mx-auto text-center" />
       </div>
-      <div
-        class="grid col-start-3 md:col-start-5 md:hidden justify-self-center md:justify-self-end"
-      >
+      <div class="grid col-start-3 md:col-start-5 md:hidden justify-self-end">
         <!-- Mobile Menu Icon -->
         <button
           type="button"
