@@ -122,6 +122,6 @@ custom:
       white: '#f7f7f7'
       black: '#1A1A1A'
   fontFamily:
-    default:
-      - Roboto
+    TTNorms:
+      - TT Norms
       - sans-serif
