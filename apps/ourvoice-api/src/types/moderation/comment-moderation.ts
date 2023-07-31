@@ -32,7 +32,7 @@ export type CommentIncludesVersionIncludesModerationsIncludesPost =
 export type CommentWithAllItsRelations = WithIncluded<
   CommentIncludesVersionIncludesModerationsIncludesPost,
   'parent',
-  Partial<PostIncludesVersion>
+  PostIncludesVersion
 >;
 
 export type ModerationIncludesVersion = WithIncluded<

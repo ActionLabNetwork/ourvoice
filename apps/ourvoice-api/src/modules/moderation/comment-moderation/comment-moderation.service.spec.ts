@@ -1,6 +1,7 @@
 import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerationsIncludesPost,
+  CommentWithAllItsRelations,
 } from './../../../types/moderation/comment-moderation';
 import { CommentModifyDto } from './dto/comment-modify.dto';
 import { ModerationCommentStatus } from '../../../graphql';
@@ -147,8 +148,11 @@ describe('CommentModerationService', () => {
   it('should get a comment by ID', async () => {
     // Arrange
     const commentId = 1;
+
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
+      dummyComment as unknown as ReturnType<
+        typeof commentModerationRepositoryMock.getModerationCommentById
+      >,
     );
 
     // Act
@@ -407,7 +411,9 @@ describe('CommentModerationService', () => {
     const reason = 'Test Reason';
 
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
+      dummyComment as unknown as ReturnType<
+        typeof commentModerationRepositoryMock.getModerationCommentById
+      >,
     );
 
     commentModerationRepositoryMock.approveCommentVersion.mockResolvedValue(
@@ -485,7 +491,9 @@ describe('CommentModerationService', () => {
     const reason = 'Test Reason';
 
     commentModerationRepositoryMock.getModerationCommentById.mockResolvedValue(
-      dummyComment as CommentIncludesVersionIncludesModerationsIncludesPost,
+      dummyComment as unknown as ReturnType<
+        typeof commentModerationRepositoryMock.getModerationCommentById
+      >,
     );
 
     commentModerationRepositoryMock.rejectCommentVersion.mockResolvedValue(
