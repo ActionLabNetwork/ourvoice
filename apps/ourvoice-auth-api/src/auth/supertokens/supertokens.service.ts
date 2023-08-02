@@ -237,18 +237,19 @@ export class SupertokensService {
               ...originalImplementation,
               createCodePOST: async function (input) {
                 if ('email' in input) {
-                  const existingUser = await Passwordless.getUserByEmail({
-                    email: input.email,
-                  });
-                  if (existingUser === undefined) {
-                    // this is sign up attempt
-                    if (!(await isEmailAllowed(input.email))) {
-                      return {
-                        status: 'GENERAL_ERROR',
-                        message: 'Sign up disabled. Please contact the admin.',
-                      };
-                    }
+                  // const existingUser = await Passwordless.getUserByEmail({
+                  //   email: input.email,
+                  // });
+                  // if (existingUser === undefined) {
+                  // this is sign up attempt
+                  // NOTE: check every time
+                  if (!(await isEmailAllowed(input.email))) {
+                    return {
+                      status: 'GENERAL_ERROR',
+                      message: 'Sign up disabled. Please contact the admin.',
+                    };
                   }
+                  // }
                 }
                 return await originalImplementation.createCodePOST?.(input);
               },
