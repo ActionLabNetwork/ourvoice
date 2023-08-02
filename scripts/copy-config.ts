@@ -41,4 +41,8 @@ if (process.env.RUN_POST !== 'false') {
   cpSync('./config/brand/default/public', './apps/ourvoice-app/public', {
     recursive: true,
   })
+  // copy favicon to ourvoice-app public folder
+  cpSync('./config/brand/default/public', './apps/ourvoice-auth/public', {
+    recursive: true,
+  })
 }
