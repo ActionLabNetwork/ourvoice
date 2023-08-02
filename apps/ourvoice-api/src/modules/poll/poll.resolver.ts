@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Injectable, UseGuards } from '@nestjs/common';
+import { Injectable, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PollService } from './poll.service';
 import {
   Poll,
@@ -17,10 +17,12 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { GqlSession } from 'src/auth/session.decorator';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 import { validateUserPermission } from 'src/utils/auth';
+import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @Resolver('Poll')
 @UseGuards(new AuthGuard())
 @Injectable()
+@UseInterceptors(AnalyticsInterceptor)
 export class PollResolver {
   constructor(private readonly pollService: PollService) {}
 

@@ -15,11 +15,13 @@ import {
   CategoryUpdateInput,
 } from './../../graphql';
 import { CategoryService } from './category.service';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
+import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @UseGuards(new AuthGuard())
 @Resolver('Category')
+@UseInterceptors(AnalyticsInterceptor)
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
 

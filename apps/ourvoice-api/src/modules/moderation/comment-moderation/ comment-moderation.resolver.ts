@@ -9,14 +9,16 @@ import {
 } from 'src/graphql';
 import { CommentModerationService } from './comment-moderation.service';
 import { Comment, CommentVersion } from '@prisma-moderation-db/client';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '../../../auth/auth.guard';
 import { GqlSession } from 'src/auth/session.decorator';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 import { validateUserPermission } from 'src/utils/auth';
+import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @UseGuards(new AuthGuard())
 @Resolver('ModerationComment')
+@UseInterceptors(AnalyticsInterceptor)
 export class CommentModerationResolver {
   constructor(
     private commentModerationService: CommentModerationService,

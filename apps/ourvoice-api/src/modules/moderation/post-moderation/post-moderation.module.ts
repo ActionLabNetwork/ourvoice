@@ -8,6 +8,7 @@ import { PostModerationResolver } from './post-moderation.resolver';
 import { PostModerationService } from './post-moderation.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SMTPConfig } from 'src/auth/config.interface';
+import { AnalyticsModule } from 'src/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SMTPConfig } from 'src/auth/config.interface';
         };
       },
     }),
+    AnalyticsModule,
   ],
   providers: [
     PostModerationRepository,

@@ -5,9 +5,10 @@ import { PollService } from './poll.service';
 import { PollResolver } from './poll.resolver';
 import { Module } from '@nestjs/common';
 import { PollModerationRepository } from './poll-moderation.repository';
+import { AnalyticsModule } from 'src/analytics/analytics.module';
 
 @Module({
-  imports: [MainPrismaModule, PremoderationPrismaModule],
+  imports: [MainPrismaModule, PremoderationPrismaModule, AnalyticsModule],
   providers: [
     PollRepository,
     PollModerationRepository,

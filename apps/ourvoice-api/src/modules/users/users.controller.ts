@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { SessionContainer } from 'supertokens-node/recipe/session';
@@ -16,8 +17,10 @@ import { UsersService } from './users.service';
 import { MetadataService } from './metadata/metadata.service';
 import { RolesService } from './roles/roles.service';
 import { UserRole } from './roles/roles.interface';
+import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @Controller('users')
+@UseInterceptors(AnalyticsInterceptor)
 export class UserController {
   constructor(
     private userService: UsersService,

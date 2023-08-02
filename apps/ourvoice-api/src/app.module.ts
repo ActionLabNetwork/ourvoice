@@ -2,7 +2,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
 import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -26,6 +26,7 @@ import configuration from './config/configuration';
 
 import { GraphQLError } from 'graphql/error';
 import { SMTPConfig } from './auth/config.interface';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SMTPConfig } from './auth/config.interface';
       load: [deployment, configuration],
       isGlobal: true,
     }),
+    AnalyticsModule,
     AuthModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -107,4 +109,8 @@ import { SMTPConfig } from './auth/config.interface';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    // consumer.apply(AnalyticsMiddleware).forRoutes('*');
+  }
+}
