@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply font-TTNorms;
+    @apply font-default;
   }
 
   /* Using these for markdown files */

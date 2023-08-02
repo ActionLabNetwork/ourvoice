@@ -162,7 +162,6 @@ export default defineComponent({
   align-self: stretch;
   color: var(--body-text, #3d3d3d);
   /* Desktop/Caption_Regular */
-  font-family: Roboto;
   font-size: 12px;
   font-style: normal;
   font-weight: 400;
