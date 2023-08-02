@@ -3,7 +3,7 @@
     <CustomButton
       :label="smAndLarger ? 'Create Post' : ''"
       :to="'/post'"
-      class-name="rounded-3xl px-4 py-3 text-xs space-x-1 text-ourvoice-white"
+      class-name="rounded-3xl text-xs md:p-3 md:space-x-1 text-ourvoice-white"
     >
       <template #icon-after-text>
         <IconMessageStripeCircle v-if="isHovered" class="" />

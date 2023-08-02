@@ -1,11 +1,7 @@
 <template>
   <div class="flex flex-col space-y-10 max-w-5xl w-full mx-auto mb-3">
     <!-- Categories Filter start -->
-    <!-- <div
-      class="flex md:flexx md:space-y-2 md:mx-auto flex-row space-x-5 items-center overflow-x-auto no-scrollbar md:overflow-hidden"
-    > -->
-    <div class="flex space-x-5 overflow-x-auto no-scrollbar md:block md:text-center">
-      <!-- <span class="hidden mr-5 md:inline-block font-semibold md:text-xl md:pl-10">Categories</span> -->
+    <div class="flex space-x-5 overflow-x-auto no-scrollbar md:block md:text-center -mx-10 md:mx-0">
       <PostSortFilterCategoryButton
         v-if="result?.posts?.totalCount"
         :count="result.posts.totalCount"
