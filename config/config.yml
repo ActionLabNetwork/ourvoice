@@ -37,7 +37,7 @@ authModules:
 heroImage: /hero-image.png
 logo: /ourvoice_logo_new.png
 deploymentLogo: dca_logo.png
-slogan: 'Are you ready to share experiences, ask questions and propose solutions with your colleagues?'
+slogan: 'Welcome to the RISE Aspiring Leaders OurVoice Community Platform'
 moderatorCount: 1
 postFrequency:
   unit: 'minutes'
