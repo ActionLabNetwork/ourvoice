@@ -40,7 +40,7 @@
     class="px-12 py-4 flex flex-col justify-center bg-[#F5F5F5]"
     :style="confirmationDialogStyle"
   >
-    <h4 class="mb-6">Are you sure you want to submit your pole?</h4>
+    <h4 class="mb-6">Are you sure you want to submit your poll?</h4>
     <div class="px-4 py-6 flex flex-row gap-4">
       <button
         @click="state = 'choice'"
