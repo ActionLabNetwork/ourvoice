@@ -6,6 +6,7 @@
         id="tabs"
         name="tabs"
         class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+        @change="switchTab(tabs[($event.target as HTMLSelectElement).selectedIndex ?? -1])"
       >
         <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">
           {{ tab.name }}
