@@ -108,7 +108,7 @@
 
     <div class="grid grid-cols-full md:grid-cols-2 h-full">
       <!-- Content -->
-      <div class="flex flex-col py-20 items-center md:items-start px-16 md:translate-y-0">
+      <div class="w-full flex flex-col px-4 md:px-16 py-20 items-center md:items-start md:translate-y-0">
         <!-- Back Button -->
         <button
           @click="redirectToIndexPage"
@@ -176,7 +176,7 @@
               type="email"
               name="email"
               placeholder="Staff email"
-              class="w-96 md:w-80 lg:w-96 h-12 p-4 bg-neutral-100 rounded-2xl justify-start items-center gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight /"
+              class="w-full max-w-[400px] h-12 p-4 bg-neutral-100 rounded-2xl justify-start items-center gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight /"
             />
             <div v-if="processing" class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <!-- Loading spinner -->
