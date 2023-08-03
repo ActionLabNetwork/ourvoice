@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full bg-white">
     <main>
-      <div class="px-10 py-10 bg-white">
+      <div class="px-4 lg:px-10 py-10 bg-white">
         <ModerationListHeaderAndToggle />
         <BaseTab
           :tabs="tabs"

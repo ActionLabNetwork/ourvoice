@@ -23,22 +23,31 @@
     <!-- Moderation actions -->
     <div class="absolute inset-x-px bottom-0 bg-white rounded-b-lg">
       <div class="flex items-center border-t justify-between border-gray-200 px-2 py-2 sm:px-3">
-        <div>
-          <div class="flex gap-2">
-            <div v-for="a in actions" :key="a.name">
-              <CustomButton
-                :label="a.name"
-                :class-name="`w-28 ${action.name === a.name ? 'bg-ourvoice-base-light-300' : ''}`"
-                variant="outlined"
-                :on-click="() => (action = a)"
-                type="button"
-              >
-                <template #icon-after-text>
-                  <font-awesome-icon :icon="a.icon" />
-                </template>
-              </CustomButton>
-            </div>
+        <div class="hidden md:flex gap-2">
+          <div v-for="a in actions" :key="a.name">
+            <CustomButton
+              :label="a.name"
+              :class-name="`w-28 ${action.name === a.name ? 'bg-ourvoice-base-light-300' : ''}`"
+              variant="outlined"
+              :on-click="() => (action = a)"
+              type="button"
+            >
+              <template #icon-after-text>
+                <font-awesome-icon :icon="a.icon" />
+              </template>
+            </CustomButton>
           </div>
+        </div>
+
+        <div class="md:hidden px-4 py-2 bg-ourvoice-base-light-200 border-1 border-ourvoice-base-light-300 rounded-full">
+          <select
+          class="bg-ourvoice-base-light-200"
+            @change="action = actions[($event.target as HTMLSelectElement).selectedIndex]"
+          >
+            <option v-for="a in actions" :key="a.name" :selected="action.name === a.name">
+              {{ a.name }}
+            </option>
+          </select>
         </div>
 
         <!-- Submit button -->

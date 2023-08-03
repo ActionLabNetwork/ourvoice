@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="post && version"
-    class="bg-white drop-shadow-md border border-gray-200 p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-3"
+    class="bg-white drop-shadow-md border border-gray-200 p-6 hover:shadow-xl transition-all duration-200 relative flex flex-col gap-2 md:gap-3"
     :class="[props.preview ? 'rounded-t-2xl' : 'rounded-2xl']"
   >
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col md:flex-row justify-between items-left md:items-center">
       <!-- Author -->
       <AuthorBadge
         v-if="nickname.author.nickname"
@@ -52,7 +52,7 @@
     </p>
 
     <!-- Categories -->
-    <div class="flex flex-col flex-wrap sm:flex-row w-fit mx-auto sm:mx-0 text-center">
+    <div class="flex flex-wrap flex-row text-center justify-start">
       <div
         v-for="{ id, name } in version.categories"
         :key="id"
@@ -76,7 +76,7 @@
     <!-- Moderation decisions count -->
     <div
       v-if="props.version?.moderations?.length && props.version.moderations.length > 0"
-      class="flex flex-col sm:flex-row gap-3 justify-center mx-auto sm:mx-0 sm:justify-around"
+      class="flex flex-row gap-3 justify-center mx-auto sm:mx-0 sm:justify-around"
       data-cy="moderation-decisions-count"
     >
       <div v-for="(count, decision) in moderationResultGroups" :key="decision">
