@@ -18,16 +18,25 @@ import { GqlSession } from 'src/auth/session.decorator';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 import { validateUserPermission } from 'src/utils/auth';
 import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
+import { AuthService } from 'src/auth/auth.service';
 
 @Resolver('Poll')
 @UseGuards(new AuthGuard())
 @Injectable()
 @UseInterceptors(AnalyticsInterceptor)
 export class PollResolver {
-  constructor(private readonly pollService: PollService) {}
+  constructor(
+    private readonly pollService: PollService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Query()
-  async availablePolls(@Args('userHash') userHash: string): Promise<Poll[]> {
+  async availablePolls(
+    @GqlSession() session: SessionContainer,
+    @Args('userHash') userHash: string,
+  ): Promise<Poll[]> {
+    this.authService.validateClaimedHash(session, userHash);
+
     return await this.pollService.getAvailablePolls(userHash);
   }
 
@@ -39,6 +48,8 @@ export class PollResolver {
     @Args('pagination') pagination?: PollPaginationInput,
   ): Promise<PollWithResultConnection> {
     await validateUserPermission(session);
+    this.authService.validateClaimedHash(session, moderatorHash);
+
     return await this.pollService.getPollsWithResult(
       moderatorHash,
       filter,
@@ -48,8 +59,11 @@ export class PollResolver {
 
   @Query()
   async votedPolls(
+    @GqlSession() session: SessionContainer,
     @Args('userHash') userHash: string,
   ): Promise<PollWithStats[]> {
+    await this.authService.validateClaimedHash(session, userHash);
+
     return await this.pollService.getVotedPolls(userHash);
   }
 
@@ -82,7 +96,12 @@ export class PollResolver {
   }
 
   @Mutation()
-  async votePoll(@Args('voteInput') vote: VoteInput): Promise<VoteResponse> {
+  async votePoll(
+    @GqlSession() session: SessionContainer,
+    @Args('voteInput') vote: VoteInput,
+  ): Promise<VoteResponse> {
+    await this.authService.validateClaimedHash(session, vote.voterHash);
+
     return await this.pollService.vote(vote);
   }
 }
