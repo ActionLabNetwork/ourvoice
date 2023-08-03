@@ -51,6 +51,7 @@
 
         <button
           @click.stop="voteForPost('DOWNVOTE')"
+          v-if="Config['allowDownvote']"
           type="button"
           class="btn-outlined btn-rounded font-medium text-sm"
         >
@@ -86,6 +87,7 @@ import { useRouter } from 'vue-router'
 import CreateComment from '../comment/CreateComment.vue'
 import IconMessageCircle from '../icons/IconMessageCircle.vue'
 import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
+import Config from "../../../../../config/config.yml"
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const { sessionHash } = storeToRefs(userStore)

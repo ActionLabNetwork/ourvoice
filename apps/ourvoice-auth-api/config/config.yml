@@ -44,3 +44,4 @@ postFrequency:
   value: 1
 persistNickNames: true
 attachmentBucket: test-bucket
+allowDownvote: true
