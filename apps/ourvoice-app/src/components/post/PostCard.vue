@@ -16,6 +16,7 @@
     <h2 class="text-xs lg:text-sm text-ourvoice-gray">
       <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
       <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
+      <span v-if="post?.moderated" class="text-ourvoice-accent-3"> (moderated by moderator)</span>
     </h2>
     <p class="text-sm my-2">
       <font-awesome-icon :icon="faQuoteLeft" />

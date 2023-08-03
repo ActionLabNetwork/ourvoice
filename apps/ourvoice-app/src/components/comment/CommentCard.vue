@@ -12,7 +12,10 @@
       <span class="text-ourvoice-sky text-sm hover:underline hover:cursor-pointer">
         @{{ comment?.parent?.authorNickname ?? 'original post' }}
       </span>
-      <div class="text-xs">{{ ' ' + timePassed(comment?.createdAt ?? '') }}</div>
+      <div class="text-xs">
+        {{ ' ' + timePassed(comment?.createdAt ?? '') }}
+        <span v-if="comment?.moderated"> (moderated by moderator)</span>
+      </div>
       <div class="text-sm md:text-md py-2">
         <p class="break-all">
           <font-awesome-icon :icon="faQuoteLeft" />

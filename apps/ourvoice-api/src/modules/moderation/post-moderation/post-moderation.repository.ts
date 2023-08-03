@@ -401,6 +401,14 @@ export class PostModerationRepository {
           },
         },
       });
+      const originalVersion = await tx.postVersion.findFirst({
+        where: { postId: postId },
+        orderBy: { version: 'asc' },
+      });
+      const latestVersion = post.versions[0];
+      const moderated =
+        originalVersion.title !== latestVersion.title ||
+        originalVersion.content !== latestVersion.content;
 
       if (!post) {
         throw new Error(
@@ -419,8 +427,9 @@ export class PostModerationRepository {
         content: post.versions[0].content,
         categoryIds: post.versions[0].categoryIds,
         files: (post.versions[0].files as string[]) ?? undefined,
-        authorHash: post.versions[0].authorHash,
-        authorNickname: post.versions[0].authorNickname,
+        authorHash: post.authorHash,
+        authorNickname: post.authorNickname,
+        moderated,
       });
 
       this.logger.debug(

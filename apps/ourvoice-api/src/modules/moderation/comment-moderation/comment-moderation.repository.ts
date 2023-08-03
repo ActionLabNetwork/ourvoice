@@ -507,8 +507,12 @@ export class CommentModerationRepository {
           post: { select: { postIdInMainDb: true } },
         },
       });
-
-      console.log({ comment });
+      const originalVersion = await tx.commentVersion.findFirst({
+        where: { commentId: commentId },
+        orderBy: { version: 'asc' },
+      });
+      const latestVersion = comment.versions[0];
+      const moderated = originalVersion.content !== latestVersion.content;
 
       if (!comment) {
         throw new Error(
@@ -524,10 +528,11 @@ export class CommentModerationRepository {
 
       const newCommentInMainDb = await this.commentService.createComment({
         content: comment.versions[0].content,
-        authorHash: comment.versions[0].authorHash,
-        authorNickname: comment.versions[0].authorNickname,
+        authorHash: comment.authorHash,
+        authorNickname: comment.authorNickname,
         postId: comment.post?.postIdInMainDb,
         parentId: comment.parent?.commentIdInMainDb,
+        moderated,
       });
 
       this.logger.debug(
