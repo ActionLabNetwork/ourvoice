@@ -1,11 +1,11 @@
 <template>
   <button
     @click="$emit('select')"
-    class="px-4 my-1 h-10 items-center rounded-full border-2 border-ourvoice-base-light-300"
+    class="px-4 my-1 h-8 md:h-10 items-center text-sm rounded-full border-2 border-ourvoice-base-light-300"
     :class="{ 'bg-ourvoice-primary-2 text-ourvoice-white': active }"
   >
     <span
-      class="px-1 rounded-full items-center"
+      class="shrink-0 h-full px-1 min-w-[24px] rounded-full items-center"
       :class="
         active
           ? 'bg-ourvoice-white text-ourvoice-black'

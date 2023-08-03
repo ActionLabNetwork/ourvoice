@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col overflow-y-auto relative p-10">
+  <div class="flex flex-col overflow-y-auto relative p-4 md:p-10">
     <PostSortFilter />
     <div class="max-w-5xl w-full mx-auto space-y-3">
       <PostCard

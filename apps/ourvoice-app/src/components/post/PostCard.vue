@@ -4,7 +4,7 @@
       <div class="flex-none">
         {{ post?.title }}
       </div>
-      <div class="flex justify-end">
+      <div class="flex justify-start md:justify-end">
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
