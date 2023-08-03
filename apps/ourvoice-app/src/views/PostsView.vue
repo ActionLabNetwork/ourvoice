@@ -8,7 +8,7 @@
         :postId="post.id"
         class="card card-outline card-hover"
       />
-      <EmptyState v-if="posts.length <= 0">No posts to display...</EmptyState>
+      <EmptyState v-if="posts.length <= 0 && state == 'loaded'">No posts to display...</EmptyState>
       <button
         class="mx-auto block"
         v-if="postStore.pageInfo?.hasNextPage"

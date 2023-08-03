@@ -18,8 +18,8 @@
           @select="selectCategory(category.id)"
         />
       </template>
-      <div v-if="state == 'loading-initial'" class="flex flex-row space-x-5">
-        <div v-for="i in 5" :key="i" class="w-28 h-10 shrink-0 rounded-full skeleton" />
+      <div v-if="state == 'loading-initial'" class="w-full flex flex-row justify-center space-x-5">
+        <div v-for="i in 5" :key="i" class="w-[150px] h-10 shrink-0 rounded-full skeleton" />
       </div>
     </div>
     <!-- Categories Filter end -->
