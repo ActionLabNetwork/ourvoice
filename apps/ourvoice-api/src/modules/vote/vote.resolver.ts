@@ -1,13 +1,11 @@
 import { VoteCreateInput, VotesFilterInput } from 'src/graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { VoteService } from 'src/modules/vote/vote.service';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
-import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @UseGuards(new AuthGuard())
 @Resolver('Vote')
-@UseInterceptors(AnalyticsInterceptor)
 export class VoteResolver {
   constructor(private readonly voteService: VoteService) {}
 

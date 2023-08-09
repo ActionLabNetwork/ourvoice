@@ -7,7 +7,6 @@ import { CommentModule } from 'src/modules/comment/comment.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { SMTPConfig } from 'src/auth/config.interface';
-import { AnalyticsModule } from 'src/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -38,7 +37,6 @@ import { AnalyticsModule } from 'src/analytics/analytics.module';
         };
       },
     }),
-    AnalyticsModule,
   ],
   providers: [
     CommentModerationRepository,

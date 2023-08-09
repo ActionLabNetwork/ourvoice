@@ -6,13 +6,11 @@ import {
 } from './../../graphql';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommentService } from '../../modules/comment/comment.service';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
-import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @Resolver('Comment')
 @UseGuards(new AuthGuard())
-@UseInterceptors(AnalyticsInterceptor)
 export class CommentResolver {
   constructor(private commentService: CommentService) {}
 

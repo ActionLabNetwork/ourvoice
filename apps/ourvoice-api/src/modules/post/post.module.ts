@@ -5,15 +5,9 @@ import { Module } from '@nestjs/common';
 import { PrismaModule as MainPrismaModule } from '../../database/main/prisma.module';
 import { PrismaModule as ModerationPrismaModule } from '../../database/moderation/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { AnalyticsModule } from 'src/analytics/analytics.module';
 
 @Module({
-  imports: [
-    MainPrismaModule,
-    ModerationPrismaModule,
-    ConfigModule,
-    AnalyticsModule,
-  ],
+  imports: [MainPrismaModule, ModerationPrismaModule, ConfigModule],
   providers: [PostRepository, PostService, PostResolver],
   exports: [PostService],
 })

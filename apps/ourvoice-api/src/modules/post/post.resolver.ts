@@ -20,13 +20,11 @@ import {
   generatePresignedDownloadUrl,
   generatePresignedUploadUrl,
 } from '../../services/s3-service';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
-import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @Resolver('Post')
 @UseGuards(new AuthGuard())
-@UseInterceptors(AnalyticsInterceptor)
 export class PostResolver {
   private readonly config = getDeploymentConfig();
 

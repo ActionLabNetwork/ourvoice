@@ -11,14 +11,12 @@ import {
 import { PostModerationService } from './post-moderation.service';
 import { Post, PostVersion } from '@prisma-moderation-db/client';
 import { SessionContainer } from 'supertokens-node/recipe/session';
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GqlSession } from 'src/auth/session.decorator';
-import { AnalyticsInterceptor } from 'src/analytics/analytics.interceptor';
 
 @UseGuards(new AuthGuard())
 @Resolver('ModerationPost')
-@UseInterceptors(AnalyticsInterceptor)
 export class PostModerationResolver {
   constructor(
     private postModerationService: PostModerationService,
