@@ -4,6 +4,7 @@ import VerifyEmailView from '../views/VerifyEmailView.vue'
 import EmailPasswordView from '../views/EmailPasswordView.vue'
 import PasswordlessView from '../views/PasswordlessView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
+import VerifyChangeEmailView from "../views/VerifyChangeEmailView.vue"
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { DeploymentService } from '../utils/deployment.service'
 
@@ -131,6 +132,11 @@ const router = createRouter({
       path: '/verify-email',
       name: 'verifyemail',
       component: VerifyEmailView
+    },
+    {
+      path: '/verify-change-email',
+      name: 'verifychangeemail',
+      component: VerifyChangeEmailView
     },
     // default route
     {

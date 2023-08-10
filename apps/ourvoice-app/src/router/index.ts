@@ -16,6 +16,7 @@ import { useDeploymentStore } from '@/stores/deployment'
 // const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 const HomeView = () => import('../views/HomeView.vue')
 const AboutView = () => import('../views/AboutView.vue')
+const SettingsView = () => import("../views/SettingsView.vue")
 const PollViewVue = () => import('@/views/PollView.vue')
 const PostsView = () => import('../views/PostsView.vue')
 const NoticeView = () => import('../views/NoticeView.vue')
@@ -67,6 +68,12 @@ const router = createRouter({
       props: () => {
         return getCurrentDeploymentDomain()
       }
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: SettingsView,
+
     },
     {
       path: '/post',

@@ -163,7 +163,7 @@
         </div>
         <!-- User Settings -->
         <div>
-          <Popover class="relative" v-slot="{ open }">
+          <Popover class="relative" v-slot="{ open, close }">
             <PopoverButton
               class="flex items-center gap-x-1 text-sm font-semibold leading-6 text-ourvoice-white"
             >
@@ -192,6 +192,18 @@
                 class="absolute -left-40 top-full z-10 mt-3 w-fit max-w-md overflow-hidden rounded-3xl bg-ourvoice-primary-2 shadow-lg ring-1 ring-gray-900/5"
               >
                 <div class="p-4">
+                  <div
+                    v-on:click="
+                      (() => {
+                        $router.push({ name: 'settings' })
+                        close()
+                      })
+                    "
+                    class="p-4 text-sm block font-semibold rounded-lg text-ourvoice-white cursor-pointer hover:bg-ourvoice-primary-1"
+                  >
+                    Preferences
+                    <span class="absolute inset-0" />
+                  </div>
                   <div
                     class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-ourvoice-primary-1"
                   >
