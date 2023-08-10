@@ -13,7 +13,7 @@ export const postFilesPresignedUrlTTL = 5 * 60 // 5 Minutes
 
 export const inputPlaceholders = {
   title: 'Share your thoughts anonymously',
-  content: 'I have an idea for improving...',
+  content: 'My experience is…',
   categories: 'Select categories'
 }
 export type sortOptions =
