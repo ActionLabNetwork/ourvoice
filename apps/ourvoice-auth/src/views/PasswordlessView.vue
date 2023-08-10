@@ -165,18 +165,18 @@
           />
         </div>
         <!-- Passwordless input -->
-        <div class="flex flex-col gap-5">
+        <div class="w-full flex flex-col gap-5 items-center md:items-start">
           <div v-if="error" class="error-container">
             <div class="error-message">{{ errorMessage }}</div>
           </div>
-          <div class="relative mt-2" :class="emailError ? 'error' : ''">
+          <div class="w-full relative mt-2" :class="emailError ? 'error' : ''">
             <input
               v-model="email"
               autocomplete="email"
               type="email"
               name="email"
               placeholder="Staff email"
-              class="w-full max-w-[400px] h-12 p-4 bg-neutral-100 rounded-2xl justify-start items-center gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight /"
+              class="w-full md:max-w-[400px] h-12 p-4 bg-neutral-100 rounded-2xl gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight"
             />
             <div v-if="processing" class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <!-- Loading spinner -->

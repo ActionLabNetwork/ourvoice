@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-full md:grid-cols-2 h-full">
     <!-- Content -->
-    <div class="flex flex-col py-20 items-center md:items-start px-16 md:translate-y-0">
+    <div class="flex flex-col py-20 items-center md:items-start mx-4 md:px-16 md:translate-y-0">
       <div>
         <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
           <div>
@@ -33,7 +33,7 @@
         {{ getConfig('slogan') }}
       </p>
       <!-- Deployment description -->
-      <Description class="description-text text-lg text-left mb-6" />
+      <Description class="description-text max-w-[600px] text-lg text-left mb-6 mx-auto" />
       <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
         <CustomButton
           v-if="!session"
