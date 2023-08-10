@@ -15,7 +15,9 @@
           <ErrorMessage class="block text-ourvoice-error text-sm" name="email" />
         </div>
         <button
-          :disabled="changeEmailState.loadingState !== 'idle' || emailField.errors.value.length !== 0"
+          :disabled="
+            changeEmailState.loadingState !== 'idle' || emailField.errors.value.length !== 0
+          "
           class="w-fit h-fit md:min-w-[100px] px-4 py-2 btn-primary rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="changeEmailState.loadingState === 'idle'">Send verification email</span>
@@ -55,6 +57,13 @@ const validateEmail = (value: string) => {
 async function onSubmit(values: any) {
   try {
     changeEmailState.loadingState = 'loading'
+    await fetch(import.meta.env.VITE_APP_API_URL + '/tracking', {
+      method: 'POST',
+      body: JSON.stringify({ operationName: 'RequestChangeUserEmail' }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     const response = await fetch(import.meta.env.VITE_APP_AUTH_API_URL + '/changeEmail', {
       method: 'POST',
       body: JSON.stringify({ newEmail: values.email }),
