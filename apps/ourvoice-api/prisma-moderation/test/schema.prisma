@@ -138,3 +138,12 @@ model PollVote {
 
   @@id([pollId, optionId])
 }
+
+model ApiCallRecord {
+  id Int @id @default(autoincrement())
+  timestamp DateTime @default(now())
+  userHash String
+  endpoint String
+  action String?
+  data Json
+}
