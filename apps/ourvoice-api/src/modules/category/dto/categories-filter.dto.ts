@@ -2,7 +2,7 @@ import {
   IsString,
   IsOptional,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsInt,
   IsArray,
 } from 'class-validator';
@@ -34,19 +34,19 @@ export class CategoriesFilterDto {
   @IsOptional()
   parentId: number;
 
-  @IsDateString()
+  @IsDate()
   @IsOptional()
   createdAfter: DateTime;
 
-  @IsDateString()
+  @IsDate()
   @IsOptional()
   createdBefore: DateTime;
 
-  @IsDateString()
+  @IsDate()
   @IsOptional()
   disabledAfter: DateTime;
 
-  @IsDateString()
+  @IsDate()
   @IsOptional()
   disabledBefore: DateTime;
 }

@@ -3,7 +3,6 @@ import {
   ArrayMinSize,
   IsBoolean,
   IsDate,
-  IsDateString,
   IsNumber,
   IsOptional,
   IsString,
@@ -36,8 +35,8 @@ export class PollCreateDto {
 
   @IsOptional()
   @ValidateIf((value) => value !== null)
-  @IsDateString()
-  expiresAt?: string | null | Date;
+  @IsDate()
+  expiresAt?: Date | null;
 
   @ValidateNested()
   @ArrayMinSize(2)

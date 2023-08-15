@@ -8,4 +8,7 @@ definitionsFactory.generate({
   path: join(process.cwd(), '../graphql.ts'),
   outputAs: 'class',
   watch: true,
+  customScalarTypeMapping: {
+    DateTime: 'Date',
+  },
 });

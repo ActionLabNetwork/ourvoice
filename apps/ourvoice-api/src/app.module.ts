@@ -27,6 +27,7 @@ import configuration from './config/configuration';
 import { GraphQLError } from 'graphql/error';
 import { SMTPConfig } from './auth/config.interface';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { DateTimeScalar } from './graphql/DatetimeScalar';
 
 @Module({
   imports: [
@@ -107,7 +108,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DateTimeScalar],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

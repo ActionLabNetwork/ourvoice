@@ -1,7 +1,7 @@
 import {
   IsInt,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsOptional,
   IsArray,
   IsString,
@@ -42,26 +42,26 @@ export class PostsFilterDto {
   categoryIds?: number[];
 
   @IsOptional()
-  @IsDateString()
-  createdAfter?: string;
+  @IsDate()
+  createdAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  createdBefore?: string;
+  @IsDate()
+  createdBefore?: Date;
 
   @IsOptional()
-  @IsDateString()
-  moderatedAfter?: string;
+  @IsDate()
+  moderatedAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  moderatedBefore?: string;
+  @IsDate()
+  moderatedBefore?: Date;
 
   @IsOptional()
-  @IsDateString()
-  publishedAfter?: string;
+  @IsDate()
+  publishedAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  publishedBefore?: string;
+  @IsDate()
+  publishedBefore?: Date;
 }
