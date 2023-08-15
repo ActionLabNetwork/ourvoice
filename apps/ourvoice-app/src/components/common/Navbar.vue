@@ -195,7 +195,7 @@
                   <div
                     v-on:click="
                       (() => {
-                        $router.push({ name: 'settings' })
+                        navigateToSettings()
                         close()
                       })
                     "
@@ -334,7 +334,19 @@
                 <DisclosurePanel class="mt-2 space-y-2">
                   <DisclosureButton
                     as="div"
-                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white"
+                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white hover:underline cursor-pointer"
+                    @click.prevent="
+                        () => {
+                          navigateToSettings()
+                          mobileMenuOpen = false
+                        }
+                    "
+                  >
+                    Preferences
+                  </DisclosureButton>
+                  <DisclosureButton
+                    as="div"
+                    class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white hover:underline cursor-pointer"
                     @click.prevent="signOut"
                   >
                     Sign Out
@@ -410,6 +422,10 @@ router.afterEach(async () => {
 const signOut = async () => {
   await Session.signOut()
   window.location.assign('/')
+}
+
+const navigateToSettings = async () => {
+  router.push({ name: 'settings' })
 }
 
 // Single level nav items
