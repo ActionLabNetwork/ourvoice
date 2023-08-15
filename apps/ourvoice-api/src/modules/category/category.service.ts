@@ -131,7 +131,12 @@ export class CategoryService {
     return this.categoryRepository.deleteCategory(id);
   }
 
-  async countNumPostsOfCategory(id: number): Promise<number> {
-    return this.categoryRepository.countNumPostsOfCategory(id);
+  async countNumPostsOfCategories(ids: number[]): Promise<number[]> {
+    const categoryList =
+      await this.categoryRepository.countNumPostsOfCategories(ids);
+    const categoryMap = new Map(
+      categoryList.map((category) => [category.id, category._count.posts]),
+    );
+    return ids.map((id) => categoryMap.get(id));
   }
 }

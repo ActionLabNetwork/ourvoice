@@ -82,9 +82,15 @@ export class CategoryRepository {
     });
   }
 
-  async countNumPostsOfCategory(id: number): Promise<number> {
-    return this.prisma.post.count({
-      where: { categories: { some: { id } } },
+  async countNumPostsOfCategories(ids: number[]) {
+    return this.prisma.category.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        _count: {
+          select: { posts: true },
+        },
+      },
     });
   }
 }

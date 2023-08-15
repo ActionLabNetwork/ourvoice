@@ -1,5 +1,7 @@
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
+  GqlExecutionContext,
   Int,
   Mutation,
   Parent,
@@ -8,6 +10,8 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { Category } from '@prisma-main-db/client';
+import { GqlContext, useDataloader } from 'src/utils/dataloader';
+import { AuthGuard } from '../../auth/auth.guard';
 import {
   CategoriesFilterInput,
   CategoryCreateInput,
@@ -15,8 +19,6 @@ import {
   CategoryUpdateInput,
 } from './../../graphql';
 import { CategoryService } from './category.service';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../auth/auth.guard';
 
 @UseGuards(new AuthGuard())
 @Resolver('Category')
@@ -40,9 +42,14 @@ export class CategoryResolver {
   }
 
   @ResolveField()
-  async numPosts(@Parent() category: Category): Promise<number> {
+  async numPosts(
+    @GqlContext() context: GqlExecutionContext,
+    @Parent() category: Category,
+  ): Promise<number> {
     const { id } = category;
-    return this.categoryService.countNumPostsOfCategory(id);
+    return useDataloader(context, 'Category.numPosts', (keys: number[]) =>
+      this.categoryService.countNumPostsOfCategories(keys),
+    ).load(id);
   }
 
   @Mutation()
