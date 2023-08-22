@@ -1,5 +1,5 @@
-import type { ModerationListTabs } from './../types/moderation'
-import {faCheck, faEdit, faXmark} from '@fortawesome/free-solid-svg-icons'
+import type { ModerationAction, ModerationListTabs } from './../types/moderation'
+import { faCheck, faEdit, faXmark, type IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export const LIST_TABS: ModerationListTabs = [
   { name: 'Pending', current: true },
@@ -7,7 +7,13 @@ export const LIST_TABS: ModerationListTabs = [
   { name: 'Rejected', current: false }
 ]
 
-export const MODERATION_ACTIONS = [
+type ModerationActionButton = {
+  name: ModerationAction
+  icon: IconDefinition
+  placeholder: `Moderation reason (${'optional' | 'required'})...`
+  validate: boolean
+}
+export const MODERATION_ACTIONS: readonly ModerationActionButton[] = [
   {
     name: 'Accept',
     icon: faCheck,
@@ -26,7 +32,7 @@ export const MODERATION_ACTIONS = [
     placeholder: 'Moderation reason (required)...',
     validate: true
   }
-]
+] as const
 
 export const MODERATION_LIST_POSTS_PER_PAGE = 10
 export const MODERATION_LIST_COMMENTS_PER_PAGE = 10

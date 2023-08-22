@@ -20,9 +20,7 @@
               <p>
                 Moderation History
                 <span>
-                  <font-awesome-icon
-                    :icon="showSidePane ? faArrowLeft : faArrowRight"
-                  />
+                  <font-awesome-icon :icon="showSidePane ? faArrowLeft : faArrowRight" />
                 </span>
               </p>
             </div>
@@ -50,6 +48,7 @@
               :version="version"
               :preview="true"
               :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+              :hasContentWarning="hasContentWarning"
             />
 
             <div class="grid grid-cols-4">
@@ -59,6 +58,7 @@
                   thread-type="post"
                   @moderation-submit="handleModerationControlsSubmit"
                   @moderation-action-change="handleModerationControlsActionChange"
+                  @content-warning-set="handleContentWarningSet"
                 />
               </div>
               <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
@@ -108,7 +108,7 @@ import Loading from '@/components/common/Loading.vue'
 
 import { storeToRefs } from 'pinia'
 import { postFilesPresignedUrlTTL } from '@/constants/post'
-import type { ModerationActions } from '@/types/moderation'
+import type { ModerationAction } from '@/types/moderation'
 import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface PostFields {
@@ -135,6 +135,7 @@ const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
+const hasContentWarning = ref<boolean>(false)
 
 const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
@@ -209,13 +210,8 @@ async function handleVersionChange(newVersion: ModerationPostVersion) {
   await refreshVersion(newVersion)
 }
 
-function handleModerationControlsSubmit({
-  action,
-  reason
-}: {
-  action: ModerationActions
-  reason: string
-}) {
+function handleModerationControlsSubmit(data: { action: ModerationAction; reason: string }) {
+  const { action, reason } = data
   const moderationHandlers = {
     Accept: acceptPost,
     Modify: modifyPost,
@@ -224,13 +220,17 @@ function handleModerationControlsSubmit({
   moderationHandlers[action](reason)
 }
 
-function handleModerationControlsActionChange(action: ModerationActions) {
+function handleModerationControlsActionChange(action: ModerationAction) {
   if (action === 'Modify') {
     postModerationStore.resetVersionInModification()
     showModifyForm.value = true
   } else {
     showModifyForm.value = false
   }
+}
+
+function handleContentWarningSet(value: boolean) {
+  hasContentWarning.value = value
 }
 
 function handleModifyFormUpdate({

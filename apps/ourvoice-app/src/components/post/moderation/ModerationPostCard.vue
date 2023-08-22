@@ -41,6 +41,39 @@
       </div>
     </div>
 
+    <!-- Content warning -->
+    <transition name="fade">
+      <div class="mb-5" v-if="hasContentWarning">
+        <Alert title="Content warning" class-name="bg-ourvoice-warning-light">
+          <template #icon>
+            <div class="flex-shrink-0">
+              <ExclamationTriangleIcon class="h-5 w-5 text-yellow-400" aria-hidden="true" />
+            </div>
+          </template>
+          <template #title>
+            <h3 class="text-sm font-medium text-yellow-800">Content warning</h3>
+          </template>
+          <template #content>
+            <div class="mt-2 text-sm text-yellow-700">
+              <p>
+                This post has been identified as containing sensitive content. Viewer discretion is
+                advised. If this post has raised any concerns for you, please visit
+                <span class="underline font-bold text-ourvoice-util-blue">
+                  <a
+                    href="https://itstopswithme.humanrights.gov.au/take-action/support-services"
+                    target="_blank"
+                  >
+                    It Stops With Me
+                  </a>
+                </span>
+                for a list of services that can provide support.
+              </p>
+            </div>
+          </template>
+        </Alert>
+      </div>
+    </transition>
+
     <!-- Title -->
     <h3 class="text-xl sm:text-2xl font-extrabold text-ourvoice-black mb-3">
       {{ version.title }}
@@ -105,6 +138,8 @@ import type { ModerationVersionDecision } from '@/types/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
+import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
+import Alert from '@/components/common/Alert.vue'
 
 import type { Moderation } from '@/stores/moderation-posts'
 import type { ModerationPost, ModerationPostVersion } from '@/stores/post-moderation'
@@ -131,6 +166,11 @@ const props = defineProps({
   decisionIcon: {
     type: Object as PropType<DecisionIcon>,
     required: false
+  },
+  hasContentWarning: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 
@@ -196,4 +236,6 @@ const moderationResultGroups = computed(() => {
 const moderationCount = computed(() => {
   return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
 })
+
+const handleContentWarningSet = () => {}
 </script>

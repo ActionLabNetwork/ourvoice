@@ -19,9 +19,7 @@
               <p>
                 Moderation History
                 <span>
-                  <font-awesome-icon
-                    :icon="showSidePane ? faArrowLeft : faArrowRight"
-                  />
+                  <font-awesome-icon :icon="showSidePane ? faArrowLeft : faArrowRight" />
                 </span>
               </p>
             </div>
@@ -128,8 +126,7 @@ import {
 } from '@/stores/comment-moderation'
 import type { CommentModeration } from '@/graphql/generated/graphql'
 import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
-
-type ModerationActions = 'Accept' | 'Modify' | 'Reject'
+import type { ModerationAction } from '@/types/moderation'
 
 interface CommentFields {
   title?: string
@@ -233,7 +230,7 @@ function handleModerationControlsSubmit({
   action,
   reason
 }: {
-  action: ModerationActions
+  action: ModerationAction
   reason: string
 }) {
   const moderationHandlers = {
@@ -244,7 +241,7 @@ function handleModerationControlsSubmit({
   moderationHandlers[action](reason)
 }
 
-function handleModerationControlsActionChange(action: ModerationActions) {
+function handleModerationControlsActionChange(action: ModerationAction) {
   if (action === 'Modify') {
     commentModerationStore.resetVersionInModification()
     showModifyForm.value = true
