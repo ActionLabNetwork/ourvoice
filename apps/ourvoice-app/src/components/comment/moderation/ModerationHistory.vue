@@ -45,13 +45,13 @@
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
-import type { ModerationVersionDecisionHistory } from '@/types/moderation'
 import { useCommentModerationStore } from '@/stores/comment-moderation'
+import type { ModerationVersionDecisionHistory } from '@/types/moderation'
 
 interface History {
   id: number
   decision: ModerationVersionDecisionHistory
-  reason: string
+  reason: string | null
   timestamp: string
   moderatorHash: string
   moderatorNickname: string
@@ -65,7 +65,7 @@ const moderations = computed(() => {
   if (!version.value) return []
 
   const acceptOrRejectModerations: History[] =
-    version.value?.moderations.map(
+    version.value?.moderations?.map(
       ({ id, decision, reason, timestamp, moderatorHash, moderatorNickname }) => ({
         id,
         decision,

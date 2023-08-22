@@ -30,7 +30,4 @@ export class PostCreateDto {
 
   @IsString()
   authorNickname: string;
-
-  @IsNumber()
-  requiredModerations: number;
 }

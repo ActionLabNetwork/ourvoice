@@ -5,11 +5,11 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { Error as STError } from 'supertokens-node';
 
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { VerifySessionOptions } from 'supertokens-node/recipe/session';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { getRequest, getResponse } from '../utils/executionContext';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,24 +17,10 @@ export class AuthGuard implements CanActivate {
 
   constructor(private readonly verifyOptions?: VerifySessionOptions) {}
 
-  getRequest(context: ExecutionContext) {
-    if (context.getType<ContextType | 'graphql'>() === 'graphql') {
-      return GqlExecutionContext.create(context).getContext().req;
-    }
-    return context.switchToHttp().getRequest();
-  }
-
-  getResponse(context: ExecutionContext) {
-    if (context.getType<ContextType | 'graphql'>() === 'graphql') {
-      return GqlExecutionContext.create(context).getContext().res;
-    }
-    return context.switchToHttp().getResponse();
-  }
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     let err = undefined;
-    const req = this.getRequest(context);
-    const resp = this.getResponse(context);
+    const req = getRequest(context);
+    const resp = getResponse(context);
 
     await verifySession(this.verifyOptions)(req, resp, (res) => {
       err = res;

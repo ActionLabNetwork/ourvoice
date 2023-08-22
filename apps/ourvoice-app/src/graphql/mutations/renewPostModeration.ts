@@ -17,7 +17,6 @@ export const RENEW_POST_MODERATION_MUTATION = gql`
         version
         authorHash
         authorNickname
-        reason
         latest
         moderations {
           id

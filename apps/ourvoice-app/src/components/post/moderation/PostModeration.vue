@@ -1,78 +1,99 @@
 <template>
   <div class="flex flex-col gap-5">
-    <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
-      <!-- Side pane button -->
-      <div
-        @click="toggleSidePane"
-        class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
-        data-cy="moderation-history-button"
-      >
-        <p>
-          Moderation History
-          <span>
-            <font-awesome-icon :icon="['fas', showSidePane ? 'fa-arrow-left' : 'fa-arrow-right']" />
-          </span>
-        </p>
-      </div>
-      <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
-        <ModerationHistory />
-      </SidePane>
+    <div class="h-[80vh]" v-if="loading">
+      <Loading>Loading Post...</Loading>
     </div>
-    <div class="grid grid-cols-4 gap-2">
-      <!-- Versioning -->
-      <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="post">
-        <ModerationVersionList
-          @versionClicked="handleVersionChange"
-          :versions="post?.versions ?? []"
-        />
-      </div>
 
-      <!-- Post Preview -->
-      <div v-if="post && version" class="col-span-full sm:col-span-3 px-4 sm:px-0">
-        <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
-        <ModerationPostCard
-          v-else
-          :post="post"
-          :version="version"
-          :preview="true"
-          :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
-        />
+    <transition name="fade">
+      <div v-if="!loading">
+        <div class="flex justify-between items-center">
+          <div class="my-10">
+            <BackButton />
+          </div>
+          <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
+            <!-- Side pane button -->
+            <div
+              @click="toggleSidePane"
+              class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
+              data-cy="moderation-history-button"
+            >
+              <p>
+                Moderation History
+                <span>
+                  <font-awesome-icon
+                    :icon="showSidePane ? faArrowLeft : faArrowRight"
+                  />
+                </span>
+              </p>
+            </div>
+            <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
+              <ModerationHistory />
+            </SidePane>
+          </div>
+        </div>
 
-        <div class="grid grid-cols-4">
-          <!-- Moderation Controls -->
-          <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
-            <ModerationControls
-              @moderation-submit="handleModerationControlsSubmit"
-              @moderation-action-change="handleModerationControlsActionChange"
+        <div class="grid grid-cols-4 gap-2">
+          <!-- Versioning -->
+          <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="post">
+            <ModerationVersionList
+              @versionClicked="handleVersionChange"
+              :versions="post?.versions ?? []"
             />
           </div>
-          <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
-            <!-- Renew button -->
-            <div class="mt-4 flex justify-end" v-if="post.status === 'PENDING'">
-              <div>
-                <button
-                  @click="handleRenewModeration"
-                  class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
-                  data-cy="renew-button"
-                >
-                  Renew Moderation
-                  <span><font-awesome-icon :icon="['fas', 'fa-rotate-left']" /></span>
-                </button>
+
+          <!-- Post Preview -->
+          <div v-if="post && version" class="col-span-full sm:col-span-3 px-4 sm:px-0">
+            <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
+            <ModerationPostCard
+              v-else
+              :post="post"
+              :version="version"
+              :preview="true"
+              :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+            />
+
+            <div class="grid grid-cols-4">
+              <!-- Moderation Controls -->
+              <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
+                <ModerationControls
+                  thread-type="post"
+                  @moderation-submit="handleModerationControlsSubmit"
+                  @moderation-action-change="handleModerationControlsActionChange"
+                />
+              </div>
+              <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
+                <!-- Renew button -->
+                <div class="mt-4 flex justify-end" v-if="post.status === 'PENDING'">
+                  <div>
+                    <button
+                      @click="handleRenewModeration"
+                      class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
+                      data-cy="renew-button"
+                    >
+                      Renew Moderation
+                      <span><font-awesome-icon :icon="faRotateLeft" /></span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+          <div v-else>
+            <p>Post not found</p>
+          </div>
         </div>
       </div>
-
-      <div v-else>
-        <p>Post not found</p>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePostModerationStore, type Moderation, type PostVersion } from '@/stores/post-moderation'
+import {
+  usePostModerationStore,
+  type Moderation,
+  type ModerationPostVersion
+} from '@/stores/post-moderation'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, type ComputedRef, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -80,11 +101,15 @@ import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue'
 import ModerationHistory from '@/components/post/moderation/ModerationHistory.vue'
 import ModerationVersionList from '@/components/post/moderation/ModerationVersionList.vue'
-import ModerationControls from '@/components/post/moderation/ModerationControls.vue'
+import ModerationControls from '@/components/common/ModerationControls.vue'
 import SidePane from '@/components/common/SidePane.vue'
+import BackButton from '@/components/common/BackButton.vue'
+import Loading from '@/components/common/Loading.vue'
+
 import { storeToRefs } from 'pinia'
-import { postFilesBucket, postFilesPresignedUrlTTL } from '@/constants/post'
+import { postFilesPresignedUrlTTL } from '@/constants/post'
 import type { ModerationActions } from '@/types/moderation'
+import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface PostFields {
   title?: string
@@ -105,6 +130,7 @@ const {
   hasErrors
 } = storeToRefs(postModerationStore)
 
+const loading = ref(true)
 const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
@@ -131,7 +157,9 @@ const decisionIcon = {
 }
 
 onMounted(async () => {
-  await initializeModerationPosts()
+  loading.value = true
+  await initializeModerationPost()
+  loading.value = false
 })
 
 watchEffect(async () => {
@@ -146,7 +174,7 @@ watchEffect(async () => {
   }
 })
 
-async function initializeModerationPosts() {
+async function initializeModerationPost() {
   await userStore.verifyUserSession()
 
   postModerationStore.$reset()
@@ -157,7 +185,7 @@ async function initializeModerationPosts() {
   }
 }
 
-async function refreshVersion(newVersion: PostVersion) {
+async function refreshVersion(newVersion: ModerationPostVersion) {
   // Check if user has moderated this version
   await postModerationStore.checkIfUserHasModerated(userStore.userId)
 
@@ -165,11 +193,7 @@ async function refreshVersion(newVersion: PostVersion) {
 
   // If there are files, request their download urls
   if (newVersion.files && newVersion.files.length > 0)
-    await postModerationStore.getPresignedDownloadUrls(
-      postFilesBucket,
-      newVersion.files,
-      postFilesPresignedUrlTTL
-    )
+    await postModerationStore.getPresignedDownloadUrls(newVersion.files, postFilesPresignedUrlTTL)
 }
 
 function toggleSidePane() {
@@ -180,7 +204,7 @@ function handleSidePaneToggle(open: boolean) {
   showSidePane.value = open
 }
 
-async function handleVersionChange(newVersion: PostVersion) {
+async function handleVersionChange(newVersion: ModerationPostVersion) {
   postModerationStore.versionInModeration = newVersion
   await refreshVersion(newVersion)
 }
@@ -213,7 +237,7 @@ function handleModifyFormUpdate({
   version: editedVersion,
   isValid
 }: {
-  version: PostVersion
+  version: ModerationPostVersion
   isValid: boolean
 }) {
   if (!isValid) return

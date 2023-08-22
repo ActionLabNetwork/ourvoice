@@ -20,6 +20,7 @@ import {
   PostIncludesVersion,
   ModerationIncludesVersion,
 } from '../../../types/moderation/post-moderation';
+import getDeploymentConfig from '../../../config/deployment';
 
 function countPostVersionModerationDecisions(
   version: PostVersion & {
@@ -49,6 +50,7 @@ function countPostVersionModerationDecisions(
 @Injectable()
 export class PostModerationRepository {
   private readonly logger = new Logger(PostModerationRepository.name);
+  private readonly config = getDeploymentConfig();
 
   constructor(
     @Inject(forwardRef(() => PrismaService))
@@ -74,12 +76,17 @@ export class PostModerationRepository {
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
   ): Promise<
-    GetManyRepositoryResponse<'moderationPosts', PostIncludesVersion>
+    GetManyRepositoryResponse<
+      'moderationPosts',
+      PostIncludesVersionIncludesModerations
+    >
   > {
-    const { status } = filter ?? {};
+    const { status, published, archived } = filter ?? {};
 
     const where: Prisma.PostWhereInput = {
       status: status ?? undefined,
+      published: published ?? undefined,
+      archived: archived ?? undefined,
     };
 
     const totalCount = await this.prisma.post.count({ where });
@@ -97,7 +104,12 @@ export class PostModerationRepository {
 
     const moderationPosts = await this.prisma.post.findMany({
       where,
-      include: { versions: { orderBy: { version: 'desc' } } },
+      include: {
+        versions: {
+          include: { moderations: { orderBy: { timestamp: 'desc' } } },
+          orderBy: { version: 'desc' },
+        },
+      },
       skip: cursor ? 1 : undefined,
       cursor: cursor,
       take: (pagination?.limit ?? 10) * cursorDirection,
@@ -135,6 +147,7 @@ export class PostModerationRepository {
             version: 1,
           },
         },
+        requiredModerations: this.config.moderatorCount,
       },
       include: { versions: true },
     });
@@ -388,6 +401,14 @@ export class PostModerationRepository {
           },
         },
       });
+      const originalVersion = await tx.postVersion.findFirst({
+        where: { postId: postId },
+        orderBy: { version: 'asc' },
+      });
+      const latestVersion = post.versions[0];
+      const moderated =
+        originalVersion.title !== latestVersion.title ||
+        originalVersion.content !== latestVersion.content;
 
       if (!post) {
         throw new Error(
@@ -406,8 +427,9 @@ export class PostModerationRepository {
         content: post.versions[0].content,
         categoryIds: post.versions[0].categoryIds,
         files: (post.versions[0].files as string[]) ?? undefined,
-        authorHash: post.versions[0].authorHash,
-        authorNickname: post.versions[0].authorNickname,
+        authorHash: post.authorHash,
+        authorNickname: post.authorNickname,
+        moderated,
       });
 
       this.logger.debug(
@@ -416,7 +438,11 @@ export class PostModerationRepository {
 
       await tx.post.update({
         where: { id: post.id },
-        data: { postIdInMainDb: newPostInMainDb.id },
+        data: {
+          postIdInMainDb: newPostInMainDb.id,
+          published: true,
+          publishedAt: new Date(),
+        },
       });
 
       this.logger.debug(
@@ -453,7 +479,7 @@ export class PostModerationRepository {
 
       await tx.post.update({
         where: { id: postId },
-        data: { archived: true },
+        data: { archived: true, archivedAt: new Date() },
       });
 
       this.logger.debug(`Archived post with id ${post.id}`);

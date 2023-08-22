@@ -31,3 +31,13 @@ export function timePassed(dateString: string) {
     addSuffix: true
   })
 }
+
+export function indexToColor(index: number) {
+  const colors = [
+    'bg-ourvoice-util-green',
+    'bg-ourvoice-util-yellow',
+    'bg-ourvoice-util-red',
+    'bg-ourvoice-util-blue'
+  ]
+  return colors[index % colors.length]
+}

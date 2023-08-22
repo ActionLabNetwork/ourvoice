@@ -2,7 +2,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
 import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -10,20 +10,24 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
-import { ApolloDriver } from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheControl';
 
 import { ContactFormModule } from './modules/contactform/contactform.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { UsersModule } from './modules/users/users.module';
+import { PollModule } from './modules/poll/poll.module';
 
 import deployment from './config/deployment';
 import configuration from './config/configuration';
 
 import { GraphQLError } from 'graphql/error';
 import { SMTPConfig } from './auth/config.interface';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { DateTimeScalar } from './graphql/DatetimeScalar';
 
 @Module({
   imports: [
@@ -31,6 +35,7 @@ import { SMTPConfig } from './auth/config.interface';
       load: [deployment, configuration],
       isGlobal: true,
     }),
+    AnalyticsModule,
     AuthModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -56,10 +61,13 @@ import { SMTPConfig } from './auth/config.interface';
         };
       },
     }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins: [
+        ApolloServerPluginLandingPageLocalDefault(),
+        ApolloServerPluginCacheControl(),
+      ],
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
@@ -93,11 +101,17 @@ import { SMTPConfig } from './auth/config.interface';
       },
     }),
     VoteModule,
+    PollModule,
+    VoteModule,
     ModerationModule,
     ScheduleModule.forRoot(),
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DateTimeScalar],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    // consumer.apply(AnalyticsMiddleware).forRoutes('*');
+  }
+}

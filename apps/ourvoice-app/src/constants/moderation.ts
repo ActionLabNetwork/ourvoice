@@ -1,4 +1,5 @@
 import type { ModerationListTabs } from './../types/moderation'
+import {faCheck, faEdit, faXmark} from '@fortawesome/free-solid-svg-icons'
 
 export const LIST_TABS: ModerationListTabs = [
   { name: 'Pending', current: true },
@@ -9,19 +10,19 @@ export const LIST_TABS: ModerationListTabs = [
 export const MODERATION_ACTIONS = [
   {
     name: 'Accept',
-    icon: 'fa-check',
+    icon: faCheck,
     placeholder: 'Moderation reason (optional)...',
     validate: false
   },
   {
     name: 'Modify',
-    icon: 'fa-edit',
+    icon: faEdit,
     placeholder: 'Moderation reason (required)...',
     validate: true
   },
   {
     name: 'Reject',
-    icon: 'fa-xmark',
+    icon: faXmark,
     placeholder: 'Moderation reason (required)...',
     validate: true
   }

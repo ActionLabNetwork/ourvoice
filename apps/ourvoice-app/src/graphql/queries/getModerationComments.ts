@@ -6,10 +6,12 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
     $after: String
     $limit: Int = 10
     $status: ModerationCommentStatus
+    $published: Boolean
+    $archived: Boolean
   ) {
     moderationComments(
       pagination: { before: $before, after: $after, limit: $limit }
-      filter: { status: $status }
+      filter: { status: $status, published: $published, archived: $archived }
     ) {
       edges {
         cursor
@@ -27,6 +29,14 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             timestamp
             version
             latest
+            moderations {
+              id
+              decision
+              moderatorHash
+              moderatorNickname
+              reason
+              timestamp
+            }
           }
         }
       }

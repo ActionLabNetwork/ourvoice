@@ -8,6 +8,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum CacheControlScope {
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE"
+}
+
 export enum ModerationDecision {
     ACCEPTED = "ACCEPTED",
     REJECTED = "REJECTED"
@@ -136,11 +141,12 @@ export class ModerationCommentCreateInput {
     parentId?: Nullable<number>;
     authorHash: string;
     authorNickname: string;
-    requiredModerations: number;
 }
 
 export class ModerationCommentsFilterInput {
     status?: Nullable<ModerationCommentStatus>;
+    published?: Nullable<boolean>;
+    archived?: Nullable<boolean>;
 }
 
 export class ModerationCommentPaginationInput {
@@ -160,11 +166,12 @@ export class ModerationPostCreateInput {
     files?: Nullable<Nullable<string>[]>;
     authorHash: string;
     authorNickname: string;
-    requiredModerations: number;
 }
 
 export class ModerationPostsFilterInput {
     status?: Nullable<ModerationPostStatus>;
+    published?: Nullable<boolean>;
+    archived?: Nullable<boolean>;
 }
 
 export class ModerationPostPaginationInput {
@@ -178,6 +185,54 @@ export class ModerationPostModifyInput {
     content?: Nullable<string>;
     categoryIds?: Nullable<number[]>;
     files?: Nullable<Nullable<string>[]>;
+}
+
+export class PollPaginationInput {
+    cursor?: Nullable<string>;
+    limit?: Nullable<number>;
+}
+
+export class PollFilterInput {
+    question?: Nullable<string>;
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresBefore?: Nullable<DateTime>;
+    expiresAfter?: Nullable<DateTime>;
+    expiresExcludeNull?: Nullable<boolean>;
+    createdBefore?: Nullable<DateTime>;
+    createdAfter?: Nullable<DateTime>;
+}
+
+export class PollCreateInput {
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    expiresAt?: Nullable<DateTime>;
+    question: string;
+    options: PollOptionCreateInput[];
+}
+
+export class PollUpdateInput {
+    published?: Nullable<boolean>;
+    active?: Nullable<boolean>;
+    postLink?: Nullable<string>;
+    weight?: Nullable<number>;
+    expiresAt?: Nullable<DateTime>;
+    question?: Nullable<string>;
+    options?: Nullable<PollOptionCreateInput[]>;
+}
+
+export class PollOptionCreateInput {
+    option: string;
+}
+
+export class VoteInput {
+    voterHash: string;
+    pollId: number;
+    optionId: number;
 }
 
 export class PostUpdateInput {
@@ -241,6 +296,22 @@ export class VotesFilterInput {
     commentId?: Nullable<number>;
 }
 
+export interface BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+}
+
+export interface BasePollOption {
+    id: number;
+    option: string;
+}
+
 export abstract class IQuery {
     abstract _empty(): Nullable<string> | Promise<Nullable<string>>;
 
@@ -254,13 +325,15 @@ export abstract class IQuery {
 
     abstract comment(id: number): Nullable<Comment> | Promise<Nullable<Comment>>;
 
-    abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): Nullable<CommentConnection> | Promise<Nullable<CommentConnection>>;
+    abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): CommentConnection | Promise<CommentConnection>;
 
-    abstract moderationComment(id: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
-    abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): Nullable<ModerationCommentConnection> | Promise<Nullable<ModerationCommentConnection>>;
+    abstract moderationCommentsHistory(id: number): ModerationComment[] | Promise<ModerationComment[]>;
 
-    abstract commentVersion(id: number): Nullable<ModerationCommentVersion> | Promise<Nullable<ModerationCommentVersion>>;
+    abstract moderationComments(filter?: Nullable<ModerationCommentsFilterInput>, pagination?: Nullable<ModerationCommentPaginationInput>): ModerationCommentConnection | Promise<ModerationCommentConnection>;
+
+    abstract commentVersion(id: number): ModerationCommentVersion | Promise<ModerationCommentVersion>;
 
     abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
@@ -268,15 +341,21 @@ export abstract class IQuery {
 
     abstract postVersion(id: number): Nullable<ModerationPostVersion> | Promise<Nullable<ModerationPostVersion>>;
 
+    abstract availablePolls(userHash: string): Poll[] | Promise<Poll[]>;
+
+    abstract votedPolls(userHash: string): PollWithStats[] | Promise<PollWithStats[]>;
+
+    abstract pollsWithResult(moderatorHash: string, filter: PollFilterInput, pagination: PollPaginationInput): PollWithResultConnection | Promise<PollWithResultConnection>;
+
     abstract post(id: number): Nullable<Post> | Promise<Nullable<Post>>;
 
-    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract posts(filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>, sort?: Nullable<PostSortingInput>): PostConnection | Promise<PostConnection>;
 
-    abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): Nullable<PostConnection> | Promise<Nullable<PostConnection>>;
+    abstract postsByCategories(categories: string[], filter?: Nullable<PostsFilterInput>, pagination?: Nullable<PostPaginationInput>): PostConnection | Promise<PostConnection>;
 
-    abstract getPresignedUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+    abstract getPresignedUrls(keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
-    abstract getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
+    abstract getPresignedDownloadUrls(keys: string[], expiresIn: number): PresignedUrl[] | Promise<PresignedUrl[]>;
 
     abstract vote(id: number): Nullable<Vote> | Promise<Nullable<Vote>>;
 
@@ -330,6 +409,14 @@ export abstract class IMutation {
 
     abstract renewPostModeration(postModerationId: number, moderatorHash: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
+    abstract createPoll(data: PollCreateInput): Poll | Promise<Poll>;
+
+    abstract updatePoll(pollId: number, data: PollUpdateInput): Poll | Promise<Poll>;
+
+    abstract removePoll(pollId: number): number | Promise<number>;
+
+    abstract votePoll(voteInput?: Nullable<VoteInput>): VoteResponse | Promise<VoteResponse>;
+
     abstract deletePost(id: number): Post | Promise<Post>;
 
     abstract createVote(data: VoteCreateInput): Vote | Promise<Vote>;
@@ -370,6 +457,7 @@ export class Category {
     parent?: Nullable<Category>;
     children?: Nullable<Category[]>;
     posts?: Nullable<Post[]>;
+    numPosts: number;
 }
 
 export class CategoryEdge {
@@ -391,8 +479,8 @@ export class CategoryPageInfo {
 export class Comment {
     id: number;
     content: string;
-    votesDown?: Nullable<number>;
-    votesUp?: Nullable<number>;
+    votesDown: number;
+    votesUp: number;
     moderated: boolean;
     published: boolean;
     createdAt?: Nullable<DateTime>;
@@ -413,9 +501,9 @@ export class CommentEdge {
 }
 
 export class CommentConnection {
-    totalCount?: Nullable<number>;
+    totalCount: number;
     pageInfo: CommentPageInfo;
-    edges?: Nullable<Nullable<CommentEdge>[]>;
+    edges: CommentEdge[];
 }
 
 export class CommentPageInfo {
@@ -448,7 +536,7 @@ export class ModerationCommentVersion {
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
-    moderations: CommentModeration[];
+    moderations?: Nullable<CommentModeration[]>;
 }
 
 export class CommentModeration {
@@ -484,7 +572,6 @@ export class ModerationPost {
     status: ModerationPostStatus;
     versions: ModerationPostVersion[];
     requiredModerations: number;
-    comments: ModerationComment[];
     authorHash: string;
     authorNickname: string;
 }
@@ -496,12 +583,11 @@ export class ModerationPostVersion {
     categoryIds: number[];
     files?: Nullable<string[]>;
     version: number;
+    reason?: Nullable<string>;
     authorHash: string;
     authorNickname: string;
-    reason?: Nullable<string>;
     latest: boolean;
     timestamp: string;
-    post: ModerationPost;
     moderations?: Nullable<PostModeration[]>;
 }
 
@@ -533,6 +619,82 @@ export class ModerationPostPageInfo {
     hasPreviousPage?: Nullable<boolean>;
 }
 
+export class PollOption implements BasePollOption {
+    id: number;
+    option: string;
+}
+
+export class Poll implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+}
+
+export class PollPageInfo {
+    startCursor?: Nullable<string>;
+    endCursor?: Nullable<string>;
+    hasNextPage?: Nullable<boolean>;
+}
+
+export class PollOptionWithResult implements BasePollOption {
+    id: number;
+    option: string;
+    numVotes: number;
+}
+
+export class PollWithResult implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOptionWithResult[];
+}
+
+export class PollWithResultEdge {
+    node: PollWithResult;
+    cursor: string;
+}
+
+export class PollWithResultConnection {
+    totalCount?: Nullable<number>;
+    pageInfo: PollPageInfo;
+    edges: PollWithResultEdge[];
+}
+
+export class VoteResponse {
+    pollId: number;
+    optionId: number;
+    stats?: Nullable<PollOptionStat[]>;
+}
+
+export class PollOptionStat {
+    optionId: number;
+    proportion: number;
+}
+
+export class PollWithStats implements BasePoll {
+    id: number;
+    question: string;
+    published: boolean;
+    active: boolean;
+    postLink?: Nullable<string>;
+    weight: number;
+    createdAt: DateTime;
+    expiresAt?: Nullable<DateTime>;
+    options: PollOption[];
+    stats?: Nullable<PollOptionStat[]>;
+}
+
 export class Post {
     id: number;
     title: string;
@@ -549,8 +711,9 @@ export class Post {
     authorHash?: Nullable<string>;
     authorNickname?: Nullable<string>;
     categories: Category[];
-    comments?: Nullable<Comment[]>;
-    votes?: Nullable<Vote[]>;
+    comments: Comment[];
+    votes: Vote[];
+    presignedDownloadUrls?: PresignedUrl[];
 }
 
 export class PresignedUrl {
@@ -564,15 +727,15 @@ export class PostEdge {
 }
 
 export class PostConnection {
-    totalCount?: Nullable<number>;
+    totalCount: number;
     pageInfo: PostPageInfo;
-    edges?: Nullable<Nullable<PostEdge>[]>;
+    edges: PostEdge[];
 }
 
 export class PostPageInfo {
-    startCursor?: Nullable<string>;
-    endCursor?: Nullable<string>;
-    hasNextPage?: Nullable<boolean>;
+    startCursor: string;
+    endCursor: string;
+    hasNextPage: boolean;
 }
 
 export class Vote {

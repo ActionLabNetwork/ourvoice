@@ -4,6 +4,7 @@ import VerifyEmailView from '../views/VerifyEmailView.vue'
 import EmailPasswordView from '../views/EmailPasswordView.vue'
 import PasswordlessView from '../views/PasswordlessView.vue'
 import ForgotPasswordView from '../views/ForgotPasswordView.vue'
+import VerifyChangeEmailView from "../views/VerifyChangeEmailView.vue"
 import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { DeploymentService } from '../utils/deployment.service'
 
@@ -57,7 +58,7 @@ const router = createRouter({
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
@@ -87,7 +88,7 @@ const router = createRouter({
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
           deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}`)
+          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
@@ -131,6 +132,11 @@ const router = createRouter({
       path: '/verify-email',
       name: 'verifyemail',
       component: VerifyEmailView
+    },
+    {
+      path: '/verify-change-email',
+      name: 'verifychangeemail',
+      component: VerifyChangeEmailView
     },
     // default route
     {

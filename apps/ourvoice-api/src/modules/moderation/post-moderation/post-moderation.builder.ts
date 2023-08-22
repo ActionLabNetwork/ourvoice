@@ -54,6 +54,21 @@ class PostBuilder {
     return this;
   }
 
+  withPublished(published: boolean): PostBuilder {
+    this.post.published = published;
+    return this;
+  }
+
+  withArchivedAt(archivedAt: Date): PostBuilder {
+    this.post.archivedAt = archivedAt;
+    return this;
+  }
+
+  withPublishedAt(publishedAt: Date): PostBuilder {
+    this.post.publishedAt = publishedAt;
+    return this;
+  }
+
   build(): Partial<Post> {
     return this.post;
   }

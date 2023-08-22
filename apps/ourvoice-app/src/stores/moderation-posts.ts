@@ -1,8 +1,11 @@
+import { getPostWithCategories } from './post-moderation'
 import { MODERATION_LIST_POSTS_PER_PAGE } from './../constants/moderation'
 import { apolloClient } from './../graphql/client/index'
 import { GET_MODERATION_POSTS_QUERY } from './../graphql/queries/getModerationPosts'
 import { defineStore } from 'pinia'
 import { provideApolloClient } from '@vue/apollo-composable'
+import type { InputMaybe, ModerationPostStatus } from '@/graphql/generated/graphql'
+import type { ModerationPost } from '@/stores/post-moderation'
 
 export type PostStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -34,15 +37,13 @@ export interface ModerationPostModel {
   status: PostStatus
   versions: PostVersionWithCategoryIds[]
 }
-export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
-  versions: PostVersion[]
-}
+
 export interface Moderation {
   id: number
   decision: 'ACCEPTED' | 'REJECTED'
   moderatorHash: string
   moderatorNickname: string
-  reason: string
+  reason: string | null
   timestamp: string
 }
 
@@ -67,11 +68,6 @@ export interface ModerationPostsState {
   loading: boolean
 }
 
-interface Edge<T> {
-  cursor: string
-  node: T
-}
-
 provideApolloClient(apolloClient)
 
 export const useModerationPostsStore = defineStore('moderation-posts', {
@@ -85,7 +81,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
   }),
   actions: {
     async fetchPostsByStatus(
-      status: PostStatus,
+      status: InputMaybe<ModerationPostStatus> | undefined,
       before: string | null = null,
       after: string | null = null
     ) {
@@ -97,6 +93,8 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           query: GET_MODERATION_POSTS_QUERY,
           variables: {
             status: status,
+            published: status === 'APPROVED' ? false : undefined,
+            archived: status === 'REJECTED' ? false : undefined,
             limit: MODERATION_LIST_POSTS_PER_PAGE,
             before: before,
             after: after
@@ -104,14 +102,15 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
           fetchPolicy: 'no-cache'
         })
 
-        const newPosts = data.moderationPosts.edges.map(
-          (edge: Edge<ModerationPostModel>) => edge.node
-        )
+        const promises =
+          data.moderationPosts?.edges?.map((edge) => edge?.node!).map(getPostWithCategories) ?? []
+
+        const newPosts = await Promise.all(promises)
 
         this.posts = newPosts
-        this.totalCount = data.moderationPosts.totalCount
-        this.startCursor = data.moderationPosts.pageInfo.startCursor
-        this.endCursor = data.moderationPosts.pageInfo.endCursor
+        this.totalCount = data.moderationPosts?.totalCount!
+        this.startCursor = data.moderationPosts?.pageInfo.startCursor!
+        this.endCursor = data.moderationPosts?.pageInfo.endCursor!
 
         const forwardPaginating =
           (before === null && after !== null) || (before === null && after === null)
@@ -122,7 +121,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         }
 
         if (forwardPaginating) {
-          this.hasNextPage = data.moderationPosts.pageInfo.hasNextPage
+          this.hasNextPage = data.moderationPosts?.pageInfo.hasNextPage!
         }
 
         this.loading = false
@@ -130,7 +129,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
         console.error(error)
       }
     },
-    async fetchPreviousPostsByStatus(status: PostStatus) {
+    async fetchPreviousPostsByStatus(status: ModerationPostStatus) {
       this.loading = true
       try {
         this.fetchPostsByStatus(status, this.startCursor, null)
@@ -139,7 +138,7 @@ export const useModerationPostsStore = defineStore('moderation-posts', {
       }
       this.loading = false
     },
-    async fetchNextPostsByStatus(status: PostStatus) {
+    async fetchNextPostsByStatus(status: ModerationPostStatus) {
       this.loading = true
       try {
         this.fetchPostsByStatus(status, null, this.endCursor)

@@ -1,7 +1,8 @@
 <template>
-  <div class="w-full h-full bg-gray-100">
+  <div class="w-full h-full">
     <main>
-      <div class="px-10 py-10 bg-gray-100">
+      <div class="px-10 py-10 bg-white">
+        <ModerationListHeaderAndToggle />
         <BaseTab
           :tabs="tabs"
           :initialTab="tabs[0]"
@@ -31,12 +32,13 @@ import BaseTab from '@/components/common/BaseTab.vue'
 import { onMounted, ref, watchEffect } from 'vue'
 import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { storeToRefs } from 'pinia'
+import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
-import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import type { ModerationListTab, ModerationStatusLabels } from '@/types/moderation'
 import type { PostStatus } from '@/stores/moderation-posts'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
 
-const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
+const tabToStatusMapping: Record<ModerationStatusLabels, PostStatus> = {
   Pending: 'PENDING',
   Approved: 'APPROVED',
   Rejected: 'REJECTED'
@@ -71,12 +73,15 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
   switch (tab.name) {
     case 'Pending':
       await commentsStore.fetchCommentsByStatus('PENDING')
+      tab.count = allComments.value.length
       break
     case 'Approved':
       await commentsStore.fetchCommentsByStatus('APPROVED')
+      tab.count = allComments.value.length
       break
     case 'Rejected':
       await commentsStore.fetchCommentsByStatus('REJECTED')
+      tab.count = allComments.value.length
       break
   }
 }

@@ -9,9 +9,13 @@ export const GET_VOTES_QUERY = gql`
       authorNickname
       comment {
         id
+        votesUp
+        votesDown
       }
       post {
         id
+        votesUp
+        votesDown
       }
     }
   }
@@ -23,8 +27,12 @@ export interface Vote {
   voteType: 'UPVOTE' | 'DOWNVOTE'
   comment: {
     id: number
+    votesUp: number
+    votesDown: number
   }
   post: {
     id: number
+    votesUp: number
+    votesDown: number
   }
 }

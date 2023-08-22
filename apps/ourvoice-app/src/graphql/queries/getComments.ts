@@ -1,6 +1,6 @@
-import gql from 'graphql-tag'
-
-export const GET_COMMENTS_QUERY = gql`
+// import gql from 'graphql-tag'
+import { graphql } from '../generated'
+export const GET_COMMENTS_QUERY = graphql(`
   query GetComments($filter: CommentsFilterInput, $pagination: CommentPaginationInput) {
     comments(filter: $filter, pagination: $pagination) {
       edges {
@@ -9,6 +9,10 @@ export const GET_COMMENTS_QUERY = gql`
           content
           votesDown
           votesUp
+          votes {
+            authorHash
+            voteType
+          }
           moderated
           published
           createdAt
@@ -34,4 +38,4 @@ export const GET_COMMENTS_QUERY = gql`
       }
     }
   }
-`
+`)

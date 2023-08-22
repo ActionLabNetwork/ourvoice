@@ -1,7 +1,7 @@
 import * as sha256 from 'crypto-js/sha256';
 import * as Base64 from 'crypto-js/enc-base64';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { AuthModuleConfig, ConfigInjectionToken } from './config.interface';
 import { SessionContainer } from 'supertokens-node/recipe/session';
 
@@ -25,9 +25,9 @@ export class AuthService {
     return (await this.hashInput(input, deployment)) === hash;
   }
 
-  async validateModeratorHash(
+  async validateClaimedHash(
     session: SessionContainer,
-    moderatorHash: string,
+    claimedHash: string,
   ): Promise<void> {
     const verifyHashesAreEqual = async (
       session: SessionContainer,
@@ -36,15 +36,14 @@ export class AuthService {
       const userId = session.getUserId();
       const deployment = session['userDataInAccessToken'].deployment;
       const sessionHash = await this.hashInput(userId, deployment);
-
       return sessionHash === hash;
     };
 
-    const hashesAreEqual = await verifyHashesAreEqual(session, moderatorHash);
+    const hashesAreEqual = await verifyHashesAreEqual(session, claimedHash);
 
     if (!hashesAreEqual) {
-      throw new Error(
-        'The moderator hash provided does not match the session hash',
+      throw new BadRequestException(
+        'The claimed hash provided does not match the session hash',
       );
     }
   }

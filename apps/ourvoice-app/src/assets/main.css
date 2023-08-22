@@ -1,40 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/tt-norms');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  @variants responsive {
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
+@layer base {
+  body {
+    @apply font-default;
+  }
 
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .no-scrollbar {
-      -ms-overflow-style: none; /* IE and Edge */
-      scrollbar-width: none; /* Firefox */
-    }
+  /* Using these for markdown files */
+  .faq-md h1 {
+    @apply text-xl md:text-4xl font-semibold text-center mb-8;
+  }
+  .faq-md h2 {
+    @apply text-lg md:text-2xl font-medium mb-4;
+  }
+  .faq-md h3 {
+    @apply text-lg md:text-2xl font-medium mb-4;
+  }
+  .faq-md p {
+    @apply text-sm mb-4;
+  }
+}
+@layer components {
+  .btn-primary {
+    @apply bg-ourvoice-primary-1 text-black;
+  }
+
+  .btn-secondary {
+    @apply bg-ourvoice-secondary-1 text-white;
+  }
+
+  .btn-outlined {
+    @apply inline-flex items-center rounded-2xl bg-white px-3.5 py-2 text-sm font-semibold text-ourvoice-neutral-body shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-200;
+  }
+
+  .btn-filled {
+    @apply inline-flex items-center rounded-lg bg-ourvoice-primary-1 px-3 py-2 text-sm font-semibold shadow-sm hover:bg-ourvoice-primary-1/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ourvoice-primary-1 disabled:bg-indigo-300 disabled:cursor-not-allowed;
+  }
+
+  .btn-square {
+    @apply px-6 py-3 rounded-lg transition duration-300;
+  }
+
+  .btn-rounded {
+    @apply px-4 py-2 rounded-full transition duration-300;
+  }
+
+  .btn-purple {
+    @apply bg-ourvoice-purple text-white;
+  }
+
+  .btn-red {
+    @apply bg-ourvoice-red text-white;
+  }
+
+  .btn-yellow {
+    @apply bg-ourvoice-yellow text-black;
+  }
+
+  .btn-hover {
+    @apply hover:bg-ourvoice-grey hover:text-white;
+  }
+
+  .card {
+    @apply p-6 rounded-lg break-all;
+  }
+  .card-outline {
+    @apply bg-white shadow-lg border;
+  }
+
+  .card-hover {
+    @apply hover:shadow-xl transition duration-300 ease-in-out;
   }
 }
 
-.btn {
-  @apply shadow-md py-3 px-6 rounded-md transition duration-300;
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
-.btn-purple {
-  @apply bg-ourvoice-purple text-white;
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
 }
 
-.btn-red {
-  @apply bg-ourvoice-red text-white;
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 90%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 95%);
+  }
 }
 
-.btn-hover {
-  @apply hover:bg-ourvoice-grey hover:text-black;
+h4 {
+  @apply text-[28px] font-medium;
+  color: var(--headings, #1a1a1a);
+  line-height: 120%;
 }
 
-.card-hover {
-  @apply hover:bg-ourvoice-purple;
+h6 {
+  @apply text-[18px] font-normal;
+  color: var(--headings, #1a1a1a);
+  line-height: 130%;
+}
+
+@media only screen and (min-width: 1024px) {
+  h4 {
+    @apply text-[28px];
+  }
+
+  h6 {
+    @apply text-[20px];
+  }
 }

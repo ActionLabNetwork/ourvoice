@@ -81,6 +81,18 @@ export class CategoryRepository {
       where: { id },
     });
   }
+
+  async countNumPostsOfCategories(ids: number[]) {
+    return this.prisma.category.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        _count: {
+          select: { posts: true },
+        },
+      },
+    });
+  }
 }
 
 // Helper functions for applying filters

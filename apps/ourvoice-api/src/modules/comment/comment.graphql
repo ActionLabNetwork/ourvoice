@@ -3,7 +3,7 @@ type Query {
   comments(
     filter: CommentsFilterInput
     pagination: CommentPaginationInput
-  ): CommentConnection
+  ): CommentConnection!
 }
 
 type Mutation {
@@ -12,11 +12,11 @@ type Mutation {
   deleteComment(id: Int!): Comment!
 }
 
-type Comment {
+type Comment @cacheControl(maxAge: 600) {
   id: Int!
   content: String!
-  votesDown: Int
-  votesUp: Int
+  votesDown: Int!
+  votesUp: Int!
   moderated: Boolean!
   published: Boolean!
   createdAt: DateTime
@@ -72,18 +72,18 @@ input CommentPaginationInput {
   limit: Int
 }
 
-type CommentEdge {
+type CommentEdge @cacheControl(inheritMaxAge: true) {
   node: Comment!
   cursor: String!
 }
 
-type CommentConnection {
-  totalCount: Int
+type CommentConnection @cacheControl(maxAge: 600) {
+  totalCount: Int!
   pageInfo: CommentPageInfo!
-  edges: [CommentEdge]
+  edges: [CommentEdge!]!
 }
 
-type CommentPageInfo {
+type CommentPageInfo @cacheControl(inheritMaxAge: true) {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean

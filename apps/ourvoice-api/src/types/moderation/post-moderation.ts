@@ -5,18 +5,28 @@ import {
 } from '@prisma-moderation-db/client';
 import { GetManyResponse } from '../general';
 
-export type ModerationPostsResponse = GetManyResponse<Post>;
+export type ModerationPostsResponse =
+  GetManyResponse<PostIncludesVersionIncludesModerations>;
 
-export type PostVersionIncludesModerations = PostVersion & {
-  moderations: PostModeration[];
-};
+export type WithIncluded<T, K extends string, V> = T & Record<K, V | undefined>;
 
-export type PostIncludesVersionIncludesModerations = Post & {
-  versions: PostVersionIncludesModerations[];
-};
+export type PostVersionIncludesModerations = WithIncluded<
+  PostVersion,
+  'moderations',
+  PostModeration[]
+>;
 
-export type PostIncludesVersion = Post & { versions: PostVersion[] };
+export type PostIncludesVersion<T = PostVersion> = WithIncluded<
+  Post,
+  'versions',
+  T[]
+>;
 
-export type ModerationIncludesVersion = PostModeration & {
-  postVersion: PostVersion;
-};
+export type PostIncludesVersionIncludesModerations =
+  PostIncludesVersion<PostVersionIncludesModerations>;
+
+export type ModerationIncludesVersion = WithIncluded<
+  PostModeration,
+  'postVersion',
+  PostVersion
+>;

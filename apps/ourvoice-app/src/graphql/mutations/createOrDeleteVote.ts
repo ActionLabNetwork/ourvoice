@@ -9,9 +9,13 @@ export const VOTE_MUTATION = gql`
       authorNickname
       post {
         id
+        votesUp
+        votesDown
       }
       comment {
         id
+        votesUp
+        votesDown
       }
     }
   }

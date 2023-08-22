@@ -31,6 +31,16 @@ export class CommentModerationResolver {
     await validateUserPermission(session);
     return await this.commentModerationService.getModerationCommentById(id);
   }
+  @Query()
+  async moderationCommentsHistory(
+    @GqlSession() session: SessionContainer,
+    @Args('id') id: number,
+  ) {
+    await validateUserPermission(session);
+    return await this.commentModerationService.getHistoryOfModerationCommentById(
+      id,
+    );
+  }
 
   @Query()
   async moderationComments(
@@ -74,7 +84,7 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.approveCommentVersion(
       id,
@@ -93,7 +103,7 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.rejectCommentVersion(
       id,
@@ -113,7 +123,7 @@ export class CommentModerationResolver {
     @Args('data') data: ModerationCommentModifyInput,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.modifyModerationComment(
       id,
@@ -142,7 +152,7 @@ export class CommentModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.renewCommentModeration(
       id,

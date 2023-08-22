@@ -8,11 +8,9 @@ import {
 
 export const validateTitle = (value: string) => {
   if (!value) return 'This field is required'
+  if (value.length < 5) return 'Title must be at least 5 characters long.'
   if (value.length > createPostTitleCharacterLimit)
     return `Title must not exceed ${createPostTitleCharacterLimit} characters.`
-
-  const regex = /^[a-zA-Z0-9\s]*$/
-  if (!regex.test(value)) return 'Title must only contain alphanumeric characters.'
 
   return true
 }
@@ -29,9 +27,9 @@ export const validateCategories = (value: any) => {
   if (!value || value.length < 1) {
     return 'Please select at least one category.'
   }
-  if (value.length > maxCategories) {
-    return 'Please select no more than two categories.'
-  }
+  // if (value.length > maxCategories) {
+  //   return 'Please select no more than two categories.'
+  // }
   return true
 }
 

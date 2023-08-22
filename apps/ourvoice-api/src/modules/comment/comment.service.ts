@@ -17,7 +17,7 @@ import { CommentCreateDto } from './dto/comment-create.dto';
 export class CommentService {
   constructor(private readonly commentRepository: CommentRepository) {}
 
-  async createComment(data: CommentCreateDto): Promise<Comment> {
+  async createComment(data: CommentCreateDto) {
     // Validate data
     const commentCreateDto = plainToClass(CommentCreateDto, data);
     const errors = await validate(commentCreateDto);
@@ -64,7 +64,7 @@ export class CommentService {
     const pageInfo = {
       startCursor: edges.length > 0 ? edges[0].cursor : null,
       endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      hasNextPage: comments.length < totalCount,
+      hasNextPage: comments.length === (pagination?.limit ?? 10),
     };
 
     return { totalCount, edges, pageInfo };

@@ -4,6 +4,7 @@ import { useDeploymentStore } from '@/stores/deployment'
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 import Session from 'supertokens-web-js/recipe/session'
 import { getSessionPayload, getUserId } from '../services/session.service'
+import Config from "../../../../config/config.yml"
 
 export interface UserState {
   userId: string
@@ -67,7 +68,7 @@ export const useUserStore = defineStore('user', {
 
       const nickname = uniqueNamesGenerator({
         dictionaries: [adjectives, colors, animals],
-        seed: sessionHash
+        seed: Config['persistNickNames'] ? userId : sessionHash
       })
       this.nickname = nickname
     }

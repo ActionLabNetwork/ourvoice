@@ -1,7 +1,7 @@
 import {
   IsInt,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsOptional,
   IsString,
   IsNotEmpty,
@@ -38,34 +38,34 @@ export class CommentsFilterDto {
   parentId?: number;
 
   @IsOptional()
-  @IsDateString()
-  createdAfter?: string;
+  @IsDate()
+  createdAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  createdBefore?: string;
+  @IsDate()
+  createdBefore?: Date;
 
   @IsOptional()
-  @IsDateString()
-  moderatedAfter?: string;
+  @IsDate()
+  moderatedAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  moderatedBefore?: string;
+  @IsDate()
+  moderatedBefore?: Date;
 
   @IsOptional()
-  @IsDateString()
-  publishedAfter?: string;
+  @IsDate()
+  publishedAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  publishedBefore?: string;
+  @IsDate()
+  publishedBefore?: Date;
 
   @IsOptional()
-  @IsDateString()
-  disabledAfter?: string;
+  @IsDate()
+  disabledAfter?: Date;
 
   @IsOptional()
-  @IsDateString()
-  disabledBefore?: string;
+  @IsDate()
+  disabledBefore?: Date;
 }

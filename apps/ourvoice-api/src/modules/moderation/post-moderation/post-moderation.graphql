@@ -40,7 +40,6 @@ type ModerationPost {
   status: ModerationPostStatus!
   versions: [ModerationPostVersion!]!
   requiredModerations: Int!
-  comments: [ModerationComment!]!
   authorHash: String!
   authorNickname: String!
 }
@@ -52,12 +51,11 @@ type ModerationPostVersion {
   categoryIds: [Int!]!
   files: [String!]
   version: Int!
+  reason: String
   authorHash: String!
   authorNickname: String!
-  reason: String
   latest: Boolean!
   timestamp: String!
-  post: ModerationPost!
   moderations: [PostModeration!]
 }
 
@@ -89,11 +87,12 @@ input ModerationPostCreateInput {
   files: [String]
   authorHash: String!
   authorNickname: String!
-  requiredModerations: Int!
 }
 
 input ModerationPostsFilterInput {
   status: ModerationPostStatus
+  published: Boolean
+  archived: Boolean
 }
 
 input ModerationPostPaginationInput {

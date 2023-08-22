@@ -58,8 +58,11 @@ export class PostModerationResolver {
 
   @Mutation()
   async createModerationPost(
+    @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationPostCreateInput,
   ): Promise<Post> {
+    await this.authService.validateClaimedHash(session, data.authorHash);
+
     return await this.postModerationService.createPost(data);
   }
 
@@ -72,7 +75,7 @@ export class PostModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.approvePostVersion(
       id,
@@ -91,7 +94,7 @@ export class PostModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.rejectPostVersion(
       id,
@@ -111,7 +114,7 @@ export class PostModerationResolver {
     @Args('data') data: ModerationPostModifyInput,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.modifyModerationPost(
       id,
@@ -140,7 +143,7 @@ export class PostModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateModeratorHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.renewPostModeration(
       id,

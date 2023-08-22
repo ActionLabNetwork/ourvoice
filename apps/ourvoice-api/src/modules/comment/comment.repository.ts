@@ -32,7 +32,7 @@ export class CommentRepository {
   async getComments(
     filter?: CommentsFilterInput,
     pagination?: CommentPaginationInput,
-  ): Promise<{ totalCount: number; comments: Comment[] }> {
+  ) {
     const {
       content,
       moderated,
@@ -96,6 +96,7 @@ export class CommentRepository {
         post: true,
         parent: true,
         children: true,
+        votes: true,
       },
       skip: pagination?.cursor ? 1 : undefined,
       cursor: pagination?.cursor

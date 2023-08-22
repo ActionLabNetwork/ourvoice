@@ -12,7 +12,7 @@ type Mutation {
   deleteCategory(id: Int!): Category!
 }
 
-type Category {
+type Category @cacheControl(maxAge: 600) {
   id: Int!
   name: String!
   description: String
@@ -23,6 +23,7 @@ type Category {
   parent: Category
   children: [Category!]
   posts: [Post!]
+  numPosts: Int!
 }
 
 input CategoryCreateInput {
@@ -55,17 +56,17 @@ input CategoryPaginationInput {
   limit: Int
 }
 
-type CategoryEdge {
+type CategoryEdge @cacheControl(inheritMaxAge: true) {
   node: Category!
   cursor: String!
 }
 
-type CategoryConnection {
+type CategoryConnection @cacheControl(maxAge: 600) {
   pageInfo: CategoryPageInfo!
   edges: [CategoryEdge!]!
 }
 
-type CategoryPageInfo {
+type CategoryPageInfo @cacheControl(inheritMaxAge: true) {
   startCursor: String
   endCursor: String
   hasNextPage: Boolean

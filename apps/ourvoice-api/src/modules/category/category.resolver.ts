@@ -1,14 +1,24 @@
+import { UseGuards } from '@nestjs/common';
+import {
+  Args,
+  GqlExecutionContext,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { Category } from '@prisma-main-db/client';
+import { GqlContext, useDataloader } from 'src/utils/dataloader';
+import { AuthGuard } from '../../auth/auth.guard';
 import {
   CategoriesFilterInput,
   CategoryCreateInput,
-  CategoryUpdateInput,
   CategoryPaginationInput,
+  CategoryUpdateInput,
 } from './../../graphql';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Category } from '@prisma-main-db/client';
 import { CategoryService } from './category.service';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../auth/auth.guard';
 
 @UseGuards(new AuthGuard())
 @Resolver('Category')
@@ -29,6 +39,17 @@ export class CategoryResolver {
       await this.categoryService.getCategories(filter, pagination);
 
     return { totalCount, edges, pageInfo };
+  }
+
+  @ResolveField()
+  async numPosts(
+    @GqlContext() context: GqlExecutionContext,
+    @Parent() category: Category,
+  ): Promise<number> {
+    const { id } = category;
+    return useDataloader(context, 'Category.numPosts', (keys: number[]) =>
+      this.categoryService.countNumPostsOfCategories(keys),
+    ).load(id);
   }
 
   @Mutation()

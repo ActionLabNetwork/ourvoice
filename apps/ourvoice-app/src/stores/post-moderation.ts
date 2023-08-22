@@ -1,3 +1,8 @@
+import type {
+  GetModerationPostByIdQuery,
+  GetPresignedDownloadUrlsQuery,
+  ModerationDecision
+} from './../graphql/generated/graphql'
 import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from './../graphql/queries/getPresignedDownloadUrls'
 import { useDeploymentStore } from './deployment'
 import { REJECT_MODERATION_POST_VERSION_MUTATION } from './../graphql/mutations/rejectModerationPostVersion'
@@ -24,7 +29,6 @@ interface PostVersionWithCategoryIds {
   files: string[]
   version: number
   timestamp: string
-  status: PostStatus
   authorHash: string
   authorNickname: string
   reason: string
@@ -33,9 +37,6 @@ interface PostVersionWithCategoryIds {
   attachmentsDownloadUrls?: { key: string; url: string }[]
 }
 
-export interface PostVersion extends Omit<PostVersionWithCategoryIds, 'categories'> {
-  categories: Category[]
-}
 export interface ModerationPostModel {
   id: number
   authorHash: string
@@ -44,15 +45,13 @@ export interface ModerationPostModel {
   status: PostStatus
   versions: PostVersionWithCategoryIds[]
 }
-export interface ModerationPost extends Omit<ModerationPostModel, 'versions'> {
-  versions: PostVersion[]
-}
+
 export interface Moderation {
   id: number
   decision: 'ACCEPTED' | 'REJECTED'
   moderatorHash: string
   moderatorNickname: string
-  reason: string
+  reason: string | null
   timestamp: string
 }
 
@@ -61,30 +60,52 @@ export interface Category {
   name: string
 }
 
-export interface pageInfo {
+export interface PageInfo {
   endCursor: string
   hasNextPage: boolean
   startCursor: string
 }
 
+export interface ModerationPost
+  extends Omit<NonNullable<GetModerationPostByIdQuery['moderationPost']>, 'versions'> {
+  versions: ModerationPostVersion[]
+}
+export type ModerationPostVersion = {
+  id: number
+  title: string
+  content: string
+  categoryIds: Array<number>
+  categories?: Array<Category>
+  files: Array<string> | null
+  timestamp: string
+  reason?: string | null
+  version: number
+  authorHash: string
+  authorNickname: string
+  latest: boolean
+  moderations: Array<{
+    id: number
+    decision: ModerationDecision
+    moderatorHash: string
+    moderatorNickname: string
+    reason: string | null
+    timestamp: string
+  }> | null
+} & { attachmentsDownloadUrls?: GetPresignedDownloadUrlsQuery['getPresignedDownloadUrls'] }
+
 export interface PostModerationState {
   postInModeration: ModerationPost | undefined
-  versionInModeration: PostVersion | undefined
+  versionInModeration: ModerationPostVersion | undefined
   versionInModification: {
-    version: Partial<PostVersionWithCategoryIds> | undefined
+    version: Partial<ModerationPostVersion> | undefined
     isValid: boolean
   }
   categories: Map<number, Category>
   totalCount: number
-  pageInfo: pageInfo | undefined
+  pageInfo: PageInfo | undefined
   loading: boolean
   hasErrors: boolean
   userHasModeratedPost: boolean
-}
-
-interface Edge<T> {
-  cursor: string
-  node: T
 }
 
 interface PostFields {
@@ -95,18 +116,62 @@ interface PostFields {
 }
 
 const findSelfModeration = async (
-  version: PostVersionWithCategoryIds,
+  version: ModerationPostVersion,
   userId: string,
   deployment: string
 ) => {
-  const promises = version.moderations.map((moderation) => {
+  const promises = version.moderations!.map((moderation) => {
     return authService.verifyHash(userId, deployment, moderation.moderatorHash)
   })
   const moderators = await Promise.all(promises)
-  return version.moderations[moderators.indexOf(true)]
+  return version.moderations![moderators.indexOf(true)]
 }
 
 provideApolloClient(apolloClient)
+
+export const getPostWithCategories = async (
+  moderationPost: ModerationPost
+): Promise<ModerationPost> => {
+  // Fetch category names from Main DB
+  const categoryIds = new Set<number>()
+  moderationPost.versions
+    .flatMap((version) => version.categoryIds)
+    .forEach((id: number) => {
+      categoryIds.add(id)
+    })
+
+  const { data: categoriesData } = await apolloClient.query({
+    query: GET_CATEGORIES_QUERY,
+    variables: { filter: { ids: Array.from(categoryIds) } }
+  })
+
+  const categories = categoriesData.categories?.edges.map((edge) => edge.node) ?? []
+
+  const categoriesMap = categories.reduce((acc, category) => {
+    acc.set(category.id, category)
+    return acc
+  }, new Map<number, Category>())
+
+  // Replace category Ids in each post with categories
+  const versionsWithCategoriesIncluded = moderationPost.versions.map((version) => {
+    const categoryObjs: Category[] = []
+
+    version.categoryIds.forEach((categoryId: number) => {
+      const category = categoriesMap.get(categoryId)
+      if (category) {
+        categoryObjs.push(category)
+      }
+
+      return { ...version, categories: categoryObjs }
+    })
+
+    return { ...version, categories: categoryObjs }
+  })
+
+  const post = { ...moderationPost, versions: versionsWithCategoriesIncluded }
+
+  return post
+}
 
 export const usePostModerationStore = defineStore('post-moderation', {
   state: (): PostModerationState => ({
@@ -153,47 +218,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
           fetchPolicy: 'no-cache'
         })
 
-        const moderationPost = data.moderationPost as ModerationPostModel
-
-        // Fetch category names from Main DB
-        const categoryIds = new Set<number>()
-        moderationPost.versions
-          .flatMap((version: PostVersionWithCategoryIds) => version.categoryIds)
-          .forEach((id: number) => {
-            categoryIds.add(id)
-          })
-
-        const { data: categoriesData } = await apolloClient.query({
-          query: GET_CATEGORIES_QUERY,
-          variables: { filter: { ids: Array.from(categoryIds) } }
-        })
-
-        const categories = categoriesData.categories.edges.map(
-          (edge: Edge<Category>) => edge.node
-        ) as Category[]
-
-        const categoriesMap = categories.reduce((acc, category) => {
-          acc.set(category.id, category)
-          return acc
-        }, new Map<number, Category>())
-
-        // Replace category Ids in each post with categories
-        const versionsWithCategoriesIncluded = moderationPost.versions.map((version) => {
-          const categoryObjs: Category[] = []
-
-          version.categoryIds.forEach((categoryId: number) => {
-            const category = categoriesMap.get(categoryId)
-            if (category) {
-              categoryObjs.push(category)
-            }
-
-            return { ...version, categories: categoryObjs }
-          })
-
-          return { ...version, categories: categoryObjs }
-        })
-
-        const post = { ...moderationPost, versions: versionsWithCategoriesIncluded }
+        const moderationPost = data.moderationPost!
+        const post = await getPostWithCategories(moderationPost)
 
         // Set states to be used for moderation
         this.postInModeration = post
@@ -204,30 +230,23 @@ export const usePostModerationStore = defineStore('post-moderation', {
       }
       this.loading = false
     },
-    async getPresignedDownloadUrls(bucket: string, keys: string[], expiresIn: number) {
-      this.loading = true
-      this.hasErrors = false
+    async getPresignedDownloadUrls(keys: string[], expiresIn: number) {
       try {
-        const downloadUrls = await apolloClient.query({
+        const { data } = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
           variables: {
-            bucket,
             keys,
             expiresIn
           }
         })
 
         if (this.versionInModeration) {
-          this.versionInModeration.attachmentsDownloadUrls =
-            downloadUrls.data.getPresignedDownloadUrls
+          this.versionInModeration.attachmentsDownloadUrls = data.getPresignedDownloadUrls
         }
       } catch (error) {
         console.error(error)
-        this.hasErrors = true
       }
-      this.loading = false
     },
-
     async createPost({
       title,
       content,
@@ -253,7 +272,6 @@ export const usePostModerationStore = defineStore('post-moderation', {
       }
 
       const authorHash = await authService.hashInput(userStore.userId, deploymentStore.deployment)
-      const requiredModerations = 1
 
       try {
         await apolloClient.mutate({
@@ -264,8 +282,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
               content,
               categoryIds,
               files,
-              authorHash,
-              requiredModerations
+              authorHash
             }
           }
         })
@@ -284,6 +301,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
       const version = this.versionInModeration
 
       if (!version) return
+      if (!version.moderations) return
 
       const versionModerators: string[] = Array.from(
         version.moderations.reduce((acc, moderation) => {

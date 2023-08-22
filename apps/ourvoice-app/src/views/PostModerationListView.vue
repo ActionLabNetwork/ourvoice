@@ -1,7 +1,8 @@
 <template>
-  <div class="w-full h-full bg-gray-100">
+  <div class="w-full h-full bg-white">
     <main>
-      <div class="px-10 py-10 bg-gray-100 border">
+      <div class="px-4 lg:px-10 py-10 bg-white">
+        <ModerationListHeaderAndToggle />
         <BaseTab
           :tabs="tabs"
           :initialTab="tabs[0]"
@@ -19,7 +20,7 @@
           </template>
         </BaseTab>
       </div>
-      <Pagination @page-change="handlePageChange" :has-next-page="hasNextPage" />
+      <Pagination @page-change="handlePageChanged" :has-next-page="hasNextPage" />
     </main>
   </div>
 </template>
@@ -29,29 +30,33 @@ import { onMounted, ref } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
-import { useModerationPostsStore, type PostStatus } from '@/stores/moderation-posts'
+import { useModerationPostsStore } from '@/stores/moderation-posts'
 import { LIST_TABS } from '@/constants/moderation'
 import { storeToRefs } from 'pinia'
+import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
 
-import type { ModerationListTab, ModerationStatus } from '@/types/moderation'
+import type { ModerationListTab, ModerationStatusLabels } from '@/types/moderation'
+import router from '@/router'
+import { ModerationPostStatus } from '@/graphql/generated/graphql'
 
-const tabToStatusMapping: Record<ModerationStatus, PostStatus> = {
-  Pending: 'PENDING',
-  Approved: 'APPROVED',
-  Rejected: 'REJECTED'
+const tabToStatusMapping: Record<ModerationStatusLabels, ModerationPostStatus> = {
+  Pending: ModerationPostStatus.Pending,
+  Approved: ModerationPostStatus.Approved,
+  Rejected: ModerationPostStatus.Rejected
 } as const
 
 const postsStore = useModerationPostsStore()
-onMounted(async () => {
-  console.log('Fetching new posts')
-  await postsStore.fetchPostsByStatus('PENDING')
-})
-
 const tabs = ref(LIST_TABS)
 const currentTab = ref(tabs.value[0].name)
 const { posts: allPosts, hasNextPage, loading } = storeToRefs(postsStore)
 
-const handlePageChange = (page: PageChangePayload) => {
+onMounted(async () => {
+  await router.isReady()
+  await postsStore.fetchPostsByStatus(ModerationPostStatus.Pending)
+  tabs.value[0].count = allPosts.value.length
+})
+
+const handlePageChanged = (page: PageChangePayload) => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   if (page.direction === 'Previous') {
     postsStore.fetchPreviousPostsByStatus(tabToStatusMapping[currentTab.value])
@@ -64,17 +69,20 @@ const handlePageChange = (page: PageChangePayload) => {
 
 const handleTabSwitched = async (tab: ModerationListTab) => {
   currentTab.value = tab.name
+
   switch (tab.name) {
     case 'Pending':
-      await postsStore.fetchPostsByStatus('PENDING')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Pending)
+      tab.count = allPosts.value.length
       break
     case 'Approved':
-      await postsStore.fetchPostsByStatus('APPROVED')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Approved)
+      tab.count = allPosts.value.length
       break
     case 'Rejected':
-      await postsStore.fetchPostsByStatus('REJECTED')
+      await postsStore.fetchPostsByStatus(ModerationPostStatus.Rejected)
+      tab.count = allPosts.value.length
       break
   }
-  console.log(postsStore.posts)
 }
 </script>

@@ -51,6 +51,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "crypto-js": "^4.1.1",
+    "dataloader": "^2.2.2",
     "graphql": "^16.7.1",
     "nodemailer": "^6.9.3",
     "reflect-metadata": "^0.1.13",

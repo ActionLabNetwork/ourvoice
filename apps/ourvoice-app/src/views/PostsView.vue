@@ -1,42 +1,37 @@
 <template>
-  <Suspense>
-    <div class="w-full overflow-y-hidden grid grid-cols-3">
-      <div class="col-span-3 overflow-y-auto relative border-r" ref="scrollContainer">
-        <PostSortFilter />
-        <div v-for="post in data" :key="post.id">
-          <PostCard :postId="post.id" @click="showCommentList(post.id)" />
-        </div>
-      </div>
+  <div class="flex flex-col overflow-y-auto relative p-4 md:p-10">
+    <PostSortFilter />
+    <div class="max-w-5xl w-full mx-auto space-y-3">
+      <PostCard
+        v-for="post in posts"
+        :key="post.id"
+        :postId="post.id"
+        class="card card-outline card-hover"
+      />
+      <EmptyState v-if="posts.length <= 0 && state == 'loaded'">No posts to display...</EmptyState>
+      <button
+        class="mx-auto block"
+        v-if="postStore.pageInfo?.hasNextPage"
+        @click="postStore.loadMorePosts()"
+      >
+        Load More
+      </button>
     </div>
-  </Suspense>
+    <div v-if="state == 'loading-initial'" class="max-w-5xl w-full mx-auto space-y-3">
+      <div v-for="i in 3" :key="i" class="h-[300px] card skeleton" />
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import PostSortFilter from '@/components/post/PostSortFilter.vue'
 import PostCard from '@/components/post/PostCard.vue'
-import { useScroll } from '@vueuse/core'
 import { usePostsStore } from '@/stores/posts'
-import { useCategoriesStore } from '@/stores/categories'
 import { storeToRefs } from 'pinia'
-import { ref, watchEffect } from 'vue'
-
-//load categories
-useCategoriesStore().fetchCategories()
-
-//use posts store
+import EmptyState from '../components/common/EmptyState.vue'
 const postStore = usePostsStore()
-const { data } = storeToRefs(postStore)
+const { data: posts, state } = storeToRefs(postStore)
 
-//setup scroll behaviour for loading more posts
-const scrollContainer = ref<HTMLElement | null>(null)
-const { arrivedState } = useScroll(scrollContainer)
-watchEffect(() => {
-  if (arrivedState.bottom) {
-    postStore.loadMorePosts()
-  }
-})
-
-const showCommentList = (postId: number) => {
-  // might add certain click logic here
-  console.log('postId:', postId, 'clicked')
+if (state.value == 'initial') {
+  postStore.fetchPosts()
 }
 </script>

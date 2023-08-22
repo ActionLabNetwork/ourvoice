@@ -8,7 +8,7 @@ type Query {
   votes(filter: VotesFilterInput): [Vote!]!
 }
 
-type Vote {
+type Vote @cacheControl(maxAge: 600) {
   id: Int!
   voteType: String!
   authorHash: String!
