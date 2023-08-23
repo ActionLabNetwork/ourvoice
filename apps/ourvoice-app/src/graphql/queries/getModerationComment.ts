@@ -25,6 +25,7 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = graphql(`
           authorHash
           authorNickname
           latest
+          hasContentWarning
           moderations {
             id
             decision
@@ -47,6 +48,7 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = graphql(`
           version
           authorHash
           authorNickname
+          hasContentWarning
           reason
           latest
         }
@@ -58,6 +60,7 @@ export const GET_MODERATION_COMMENT_BY_ID_QUERY = graphql(`
         version
         authorHash
         authorNickname
+        hasContentWarning
         reason
         latest
         moderations {

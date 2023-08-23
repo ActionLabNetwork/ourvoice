@@ -112,6 +112,7 @@ export class PostModerationResolver {
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationPostModifyInput,
+    @Args('hasContentWarning') hasContentWarning: boolean,
   ): Promise<Post> {
     await validateUserPermission(session);
     await this.authService.validateClaimedHash(session, moderatorHash);
@@ -122,6 +123,7 @@ export class PostModerationResolver {
       moderatorNickname,
       reason,
       data,
+      hasContentWarning,
     );
   }
 

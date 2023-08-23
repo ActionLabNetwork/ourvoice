@@ -99,7 +99,7 @@ import {
   type ModerationPostVersion
 } from '@/stores/post-moderation'
 import { useUserStore } from '@/stores/user'
-import { ref, onMounted, computed, type ComputedRef, watchEffect } from 'vue'
+import { ref, onMounted, computed, type ComputedRef, watchEffect, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue'
@@ -139,7 +139,7 @@ const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
-const hasContentWarning = ref<boolean>(false)
+const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false)
 
 const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
@@ -179,6 +179,12 @@ watchEffect(async () => {
   }
 })
 
+watch(version, async (newVersion) => {
+  if (newVersion) {
+    hasContentWarning.value = newVersion.hasContentWarning ?? false
+  }
+})
+
 async function initializeModerationPost() {
   await userStore.verifyUserSession()
 
@@ -210,6 +216,7 @@ function handleSidePaneToggle(open: boolean) {
 }
 
 async function handleVersionChange(newVersion: ModerationPostVersion) {
+  console.log({ newVersion: newVersion })
   postModerationStore.versionInModeration = newVersion
   await refreshVersion(newVersion)
 }
@@ -330,7 +337,8 @@ const modifyPost = async (reason: string) => {
     userStore.sessionHash,
     userStore.nickname,
     reason,
-    modifyValues.value
+    modifyValues.value,
+    hasContentWarning.value
   )
   selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 

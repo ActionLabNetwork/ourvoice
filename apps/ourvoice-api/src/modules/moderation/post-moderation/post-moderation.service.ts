@@ -187,6 +187,7 @@ export class PostModerationService {
     moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
+    hasContentWarning: boolean,
   ): Promise<Post> {
     // Validate data
     const postModifyDto = plainToClass(PostModifyDto, data);
@@ -214,6 +215,7 @@ export class PostModerationService {
       moderatorNickname,
       reason,
       data,
+      hasContentWarning,
     );
   }
 

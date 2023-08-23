@@ -79,6 +79,7 @@ export type ModerationPostVersion = {
   files: Array<string> | null
   timestamp: string
   reason?: string | null
+  hasContentWarning: boolean
   version: number
   authorHash: string
   authorNickname: string
@@ -388,7 +389,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       moderatorHash: string,
       moderatorNickname: string,
       reason: string,
-      modifiedData: PostFields
+      modifiedData: PostFields,
+      hasContentWarning: boolean
     ) {
       if (!this.postInModeration) return null
 
@@ -398,7 +400,14 @@ export const usePostModerationStore = defineStore('post-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_POST_MUTATION,
-          variables: { postId, moderatorHash, moderatorNickname, reason, data: modifiedData }
+          variables: {
+            postId,
+            moderatorHash,
+            moderatorNickname,
+            reason,
+            data: modifiedData,
+            hasContentWarning
+          }
         })
         console.log('Moderation post has been modified', data)
 

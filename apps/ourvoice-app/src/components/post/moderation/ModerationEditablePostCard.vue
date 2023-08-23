@@ -307,6 +307,10 @@ watchEffect(() => {
       isValid: true
     }
     emit('update', { version: localVersion, isValid: true })
+  } else if (
+    props.hasContentWarning !== moderationPostsStore.versionInModeration?.hasContentWarning
+  ) {
+    emit('update', { version: version.value, isValid: true })
   } else {
     moderationPostsStore.versionInModification = {
       ...moderationPostsStore.versionInModification,

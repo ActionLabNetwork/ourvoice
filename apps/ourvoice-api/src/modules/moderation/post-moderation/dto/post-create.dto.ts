@@ -18,7 +18,6 @@ export class PostCreateDto {
 
   @IsNumber({}, { each: true })
   @ArrayMinSize(1)
-  @ArrayMaxSize(2)
   categoryIds: number[];
 
   @IsString({ each: true })

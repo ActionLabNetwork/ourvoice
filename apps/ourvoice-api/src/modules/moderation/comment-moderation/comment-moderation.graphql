@@ -59,6 +59,7 @@ type ModerationCommentVersion {
   authorHash: String!
   authorNickname: String!
   reason: String
+  hasContentWarning: Boolean!
   latest: Boolean!
   timestamp: String!
   comment: ModerationComment!

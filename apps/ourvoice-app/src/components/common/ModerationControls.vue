@@ -40,7 +40,8 @@
             </div>
           </div>
 
-          <div class="gap-x-2 mt-3 flex items-center">
+          <!-- Include content warning checkbox -->
+          <div class="gap-x-2 mt-3 flex items-center" v-if="action.name === 'Modify'">
             <label for="content-warning-chkbox">Include Content Warning</label>
             <input
               type="checkbox"
@@ -68,9 +69,9 @@
         <div class="flex-shrink-0">
           <CustomButton
             data-cy="moderate-button"
-            :disabled-predicate="() => !isValidForm"
+            :disabled="!isValidForm"
             label="Submit Moderation"
-            class-name="bg-ourvoice-primary-3 text-white hover:bg-ourvoice-primary-3/80"
+            class-name="bg-ourvoice-primary-3 disabled:bg-ourvoice-primary-3/60 text-white hover:bg-ourvoice-primary-3/80"
             type="submit"
           />
         </div>
@@ -124,6 +125,8 @@ const { resetForm } = useForm()
 onMounted(async () => {
   store = await loadStore()
   if (store) isStoreLoaded.value = true
+
+  hasContentWarning.value = store?.versionInModeration?.hasContentWarning ?? false
 })
 // VeeValidate Form Fields
 function useVeeValidateField<T>(fieldName: string, validationNeeded = true) {
@@ -139,6 +142,10 @@ const isValidForm = computed(() => {
   const modifyFormHasNoErrors = store?.versionInModification.isValid
   const reasonFieldHasNoErrors =
     moderationReasonField.meta.validated && moderationReasonField.errorMessage.value == null
+  const modifiedContentWarning =
+    hasContentWarning.value !== store?.versionInModeration?.hasContentWarning
+
+  console.log({ cont: hasContentWarning.value, mod: store?.versionInModeration?.hasContentWarning })
 
   switch (action.value.name) {
     case 'Accept':
@@ -146,7 +153,7 @@ const isValidForm = computed(() => {
       return true
 
     case 'Modify':
-      return modifyFormHasNoErrors && reasonFieldHasNoErrors
+      return (modifyFormHasNoErrors || modifiedContentWarning) && reasonFieldHasNoErrors
 
     case 'Reject':
       return reasonFieldHasNoErrors

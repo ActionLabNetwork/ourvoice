@@ -27,7 +27,8 @@ type Mutation {
     moderatorNickname: String!
     reason: String!
     data: ModerationPostModifyInput!
-  ): ModerationPost
+    hasContentWarning: Boolean!
+  ): ModerationPost!
   rollbackModifiedModerationPost(postId: Int!): ModerationPost
   renewPostModeration(
     postModerationId: Int!
@@ -52,6 +53,7 @@ type ModerationPostVersion {
   files: [String!]
   version: Int!
   reason: String
+  hasContentWarning: Boolean!
   authorHash: String!
   authorNickname: String!
   latest: Boolean!

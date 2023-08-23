@@ -403,7 +403,7 @@ export abstract class IMutation {
 
     abstract rejectModerationPostVersion(id: number, moderatorHash: string, moderatorNickname: string, reason: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput, hasContentWarning: boolean): ModerationPost | Promise<ModerationPost>;
 
     abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
@@ -533,6 +533,7 @@ export class ModerationCommentVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
+    hasContentWarning: boolean;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -584,6 +585,7 @@ export class ModerationPostVersion {
     files?: Nullable<string[]>;
     version: number;
     reason?: Nullable<string>;
+    hasContentWarning: boolean;
     authorHash: string;
     authorNickname: string;
     latest: boolean;

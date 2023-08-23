@@ -108,8 +108,6 @@ import type { ModerationVersionDecision } from '@/types/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
-import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
-import Alert from '@/components/common/Alert.vue'
 import ContentWarning from '@/components/common/ContentWarning.vue'
 
 import type { Moderation } from '@/stores/moderation-posts'
