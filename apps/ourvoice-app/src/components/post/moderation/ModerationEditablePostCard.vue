@@ -12,6 +12,9 @@
       :modifierName="nickname.moderator.nickname"
     />
 
+    <!-- Content warning -->
+    <ContentWarning :has-content-warning="props.hasContentWarning" />
+
     <!-- Title -->
     <div>
       <div class="text-2xl font-extrabold text-black-700 mb-3">
@@ -127,8 +130,17 @@ import {
   validateTitle
 } from '@/validators/moderation-post-validator'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import ContentWarning from '@/components/common/ContentWarning.vue'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationVersionDecision } from '@/types/moderation'
+
+interface Props {
+  hasContentWarning: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hasContentWarning: false
+})
 
 const emit = defineEmits(['update'])
 
@@ -255,7 +267,8 @@ const moderationResultGroups = computed(() => {
   return groupsCount
 })
 
-const formattedDate = (version: ModerationPostVersion) => formatTimestampToReadableDate(+version.timestamp)
+const formattedDate = (version: ModerationPostVersion) =>
+  formatTimestampToReadableDate(+version.timestamp)
 
 // Reactive copies of version
 const localVersion = reactive({

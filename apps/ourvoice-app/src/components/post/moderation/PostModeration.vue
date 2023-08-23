@@ -41,14 +41,18 @@
 
           <!-- Post Preview -->
           <div v-if="post && version" class="col-span-full sm:col-span-3 px-4 sm:px-0">
-            <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
+            <ModerationEditablePostCard
+              v-if="showModifyForm"
+              @update="handleModifyFormUpdate"
+              :has-content-warning="hasContentWarning"
+            />
             <ModerationPostCard
               v-else
               :post="post"
               :version="version"
               :preview="true"
               :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
-              :hasContentWarning="hasContentWarning"
+              :has-content-warning="hasContentWarning"
             />
 
             <div class="grid grid-cols-4">

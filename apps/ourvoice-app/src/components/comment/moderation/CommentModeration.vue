@@ -61,7 +61,11 @@
             v-if="comment && version"
             class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
           >
-            <ModerationEditableCommentCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
+            <ModerationEditableCommentCard
+              v-if="showModifyForm"
+              @update="handleModifyFormUpdate"
+              :has-content-warning="hasContentWarning"
+            />
             <ModerationCommentCard
               v-else
               :comment="comment"
