@@ -29,6 +29,7 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             timestamp
             version
             latest
+            hasContentWarning
             moderations {
               id
               decision

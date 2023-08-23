@@ -32,6 +32,7 @@ export const GET_MODERATION_POSTS_QUERY = graphql(`
             timestamp
             version
             latest
+            hasContentWarning
             moderations {
               id
               decision

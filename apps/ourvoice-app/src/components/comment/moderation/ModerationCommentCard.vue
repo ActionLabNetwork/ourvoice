@@ -125,8 +125,7 @@ const props = defineProps({
   },
   hasContentWarning: {
     type: Boolean,
-    required: false,
-    default: false
+    required: true
   }
 })
 

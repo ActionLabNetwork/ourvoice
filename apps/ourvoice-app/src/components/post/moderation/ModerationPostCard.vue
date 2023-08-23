@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue'
 import type { ModerationVersionDecision } from '@/types/moderation'
@@ -138,8 +138,7 @@ const props = defineProps({
   },
   hasContentWarning: {
     type: Boolean,
-    required: false,
-    default: false
+    required: true,
   }
 })
 
@@ -204,5 +203,9 @@ const moderationResultGroups = computed(() => {
 
 const moderationCount = computed(() => {
   return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
+})
+
+watchEffect(() => {
+  console.log({ hasC: props.hasContentWarning })
 })
 </script>

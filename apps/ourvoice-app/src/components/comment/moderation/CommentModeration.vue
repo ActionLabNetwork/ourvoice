@@ -47,6 +47,7 @@
                 :post="comment.post"
                 :version="comment.post.versions[0]"
                 :preview="true"
+                :has-content-warning="comment.post.versions[0].hasContentWarning"
               />
             </div>
 
@@ -56,7 +57,12 @@
               class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10"
             >
               <div v-for="c in history" :key="c.id">
-                <ModerationCommentCard :comment="c" :version="c.versions[0]" :preview="true" />
+                <ModerationCommentCard
+                  :comment="c"
+                  :version="c.versions[0]"
+                  :preview="true"
+                  :has-content-warning="c.versions[0].hasContentWarning"
+                />
               </div>
             </div>
 
