@@ -104,7 +104,7 @@ const handleSubmit = async () => {
   })
   showToast.value = true
   if (res) {
-    toastMessage.value = 'Comment created successfully, waitng for moderation'
+    toastMessage.value = 'Comment created successfully, waiting for moderation'
     toastType.value = 'success'
   } else {
     toastMessage.value = 'Error creating comment'

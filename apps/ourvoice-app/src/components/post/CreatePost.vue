@@ -7,7 +7,7 @@
     </transition>
     <div class="container mx-auto p-4" v-if="!loading">
       <div class="mx-auto" v-if="showAlert">
-        <Alert title="Post Submitted for Moderation">
+        <Alert>
           <template #icon>
             <div class="flex-shrink-0">
               <CheckCircleIcon class="h-10 w-10 text-ourvoice-success/80" aria-hidden="true" />
@@ -15,7 +15,7 @@
           </template>
           <template #title>
             <h3 class="text-xl font-medium text-ourvoice-success">
-              "Post Submitted for Moderation"
+              Post Submitted for Moderation
             </h3>
           </template>
           <template #content>

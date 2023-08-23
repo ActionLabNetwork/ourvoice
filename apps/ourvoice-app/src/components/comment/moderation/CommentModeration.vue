@@ -68,6 +68,7 @@
               :version="version"
               :preview="true"
               :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+              :has-content-warning="hasContentWarning"
             />
 
             <div class="grid grid-cols-4">
@@ -77,6 +78,7 @@
                   thread-type="comment"
                   @moderation-submit="handleModerationControlsSubmit"
                   @moderation-action-change="handleModerationControlsActionChange"
+                  @content-warning-set="handleContentWarningSet"
                 />
               </div>
               <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
@@ -153,6 +155,7 @@ const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 const loading = ref(false)
+const hasContentWarning = ref<boolean>(false)
 
 const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
@@ -250,6 +253,10 @@ function handleModerationControlsActionChange(action: ModerationAction) {
   }
 }
 
+function handleContentWarningSet(value: boolean) {
+  hasContentWarning.value = value
+}
+
 function handleModifyFormUpdate({
   version: editedVersion,
   isValid
@@ -285,12 +292,10 @@ async function performModeration({
     console.error('No version selected')
     return
   }
-  console.log(commentModerationStore.commentInModeration?.status)
 
   await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 
-  console.log(commentModerationStore.commentInModeration?.status)
   // Redirect to comments list if status changes
   if (commentModerationStore.commentInModeration?.status !== 'PENDING') {
     router.push('/moderation/comments')

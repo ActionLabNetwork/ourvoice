@@ -104,7 +104,6 @@ export const usePostsStore = defineStore('posts', {
       try {
         if (this.pageInfo?.hasNextPage) {
           this.fetchPosts(true)
-          console.log('fetching more posts')
         }
       } catch (error) {
         if (error instanceof Error) {

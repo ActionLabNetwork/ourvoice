@@ -103,7 +103,6 @@ const props = defineProps({
 const post = computed(() => postsStore.getPostById(props.postId))
 
 const handleCommentBtnClicked = () => {
-  console.log('comment btn clicked')
   router.push({
     name: 'postpage',
     params: {

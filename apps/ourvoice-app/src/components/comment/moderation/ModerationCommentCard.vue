@@ -43,6 +43,9 @@
       </div>
     </div>
 
+    <!-- Content warning -->
+    <ContentWarning :has-content-warning="props.hasContentWarning" />
+
     <!-- Content -->
     <p class="text-gray-700 text-md sm:text-lg leading-relaxed mb-3">{{ version.content }}</p>
 
@@ -86,6 +89,7 @@ import { isModerationComment, isModerationCommentVersion } from '@/utils/types'
 
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
+import ContentWarning from '@/components/common/ContentWarning.vue'
 
 import type { Moderation } from '@/stores/moderation-comments'
 import type {
@@ -118,6 +122,11 @@ const props = defineProps({
   decisionIcon: {
     type: Object as PropType<DecisionIcon>,
     required: false
+  },
+  hasContentWarning: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 
