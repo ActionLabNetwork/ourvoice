@@ -2,7 +2,7 @@ export type ModerationStatusLabels = 'Pending' | 'Approved' | 'Rejected'
 export type ModerationVersionStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 export type ModerationVersionDecision = 'ACCEPTED' | 'REJECTED'
 export type ModerationVersionDecisionHistory = ModerationVersionDecision | 'MODIFIED'
-export type ModerationActions = 'Accept' | 'Modify' | 'Reject'
+export type ModerationAction = 'Accept' | 'Modify' | 'Reject'
 export interface ModeratedPostNicknames {
   author: {
     nickname: string

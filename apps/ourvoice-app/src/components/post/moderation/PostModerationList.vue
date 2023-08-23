@@ -5,7 +5,11 @@
     </div>
     <div v-else>
       <div v-for="post in props.posts" :key="post.id" class="py-3">
-        <ModerationPostCard :post="post" :version="post.versions[0]" />
+        <ModerationPostCard
+          :post="post"
+          :version="post.versions[0]"
+          :has-content-warning="post.versions[0].hasContentWarning"
+        />
       </div>
     </div>
   </div>

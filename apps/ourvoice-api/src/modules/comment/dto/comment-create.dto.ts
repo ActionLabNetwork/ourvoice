@@ -32,4 +32,7 @@ export class CommentCreateDto {
   @IsInt()
   @IsOptional()
   postId?: number;
+
+  @IsBoolean()
+  hasContentWarning: boolean;
 }

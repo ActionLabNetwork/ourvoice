@@ -1,5 +1,8 @@
 <template>
   <div class="break-all">
+    <!-- Content warning -->
+    <ContentWarning :has-content-warning="post?.hasContentWarning ?? false" />
+
     <h1 class="text-lg lg:text-2xl font-semibold flex flex-col md:flex-row justify-between">
       <div class="flex-none">
         {{ post?.title }}
@@ -85,9 +88,10 @@ import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CreateComment from '../comment/CreateComment.vue'
+import ContentWarning from '../common/ContentWarning.vue'
 import IconMessageCircle from '../icons/IconMessageCircle.vue'
 import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
-import Config from "../../../../../config/config.yml"
+import Config from '../../../../../config/config.yml'
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const { sessionHash } = storeToRefs(userStore)
@@ -103,7 +107,6 @@ const props = defineProps({
 const post = computed(() => postsStore.getPostById(props.postId))
 
 const handleCommentBtnClicked = () => {
-  console.log('comment btn clicked')
   router.push({
     name: 'postpage',
     params: {

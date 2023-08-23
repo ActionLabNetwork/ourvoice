@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import PostModerationList from '@/components/post/moderation/PostModerationList.vue'
 import BaseTab from '@/components/common/BaseTab.vue'
 import Pagination, { type PageChangePayload } from '@/components/common/Pagination.vue'
@@ -85,4 +85,8 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
       break
   }
 }
+
+watch(allPosts, () => {
+  console.log({ allPosts: allPosts.value })
+})
 </script>

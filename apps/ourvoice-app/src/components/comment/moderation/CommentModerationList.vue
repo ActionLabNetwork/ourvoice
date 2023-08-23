@@ -5,7 +5,11 @@
     </div>
     <div v-else>
       <div v-for="comment in props.comments" :key="comment.id" class="py-3">
-        <ModerationCommentCard :comment="comment" :version="comment.versions[0]" />
+        <ModerationCommentCard
+          :comment="comment"
+          :version="comment.versions[0]"
+          :has-content-warning="comment.versions[0].hasContentWarning"
+        />
       </div>
     </div>
   </div>

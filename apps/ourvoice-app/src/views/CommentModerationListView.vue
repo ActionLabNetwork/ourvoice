@@ -29,7 +29,7 @@
 import CommentModerationList from '@/components/comment/moderation/CommentModerationList.vue'
 import { LIST_TABS } from '@/constants/moderation'
 import BaseTab from '@/components/common/BaseTab.vue'
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useModerationCommentsStore } from '@/stores/moderation-comments'
 import { storeToRefs } from 'pinia'
 import ModerationListHeaderAndToggle from '@/components/common/ModerationListHeaderAndToggle.vue'
@@ -52,10 +52,6 @@ onMounted(async () => {
 const tabs = ref(LIST_TABS)
 const currentTab = ref(tabs.value[0].name)
 const { comments: allComments, hasNextPage, loading } = storeToRefs(commentsStore)
-
-watchEffect(() => {
-  console.log(allComments.value)
-})
 
 const handlePageChange = (page: PageChangePayload) => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })

@@ -20,9 +20,7 @@
               <p>
                 Moderation History
                 <span>
-                  <font-awesome-icon
-                    :icon="showSidePane ? faArrowLeft : faArrowRight"
-                  />
+                  <font-awesome-icon :icon="showSidePane ? faArrowLeft : faArrowRight" />
                 </span>
               </p>
             </div>
@@ -43,13 +41,18 @@
 
           <!-- Post Preview -->
           <div v-if="post && version" class="col-span-full sm:col-span-3 px-4 sm:px-0">
-            <ModerationEditablePostCard v-if="showModifyForm" @update="handleModifyFormUpdate" />
+            <ModerationEditablePostCard
+              v-if="showModifyForm"
+              @update="handleModifyFormUpdate"
+              :has-content-warning="hasContentWarning"
+            />
             <ModerationPostCard
               v-else
               :post="post"
               :version="version"
               :preview="true"
               :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+              :has-content-warning="hasContentWarning"
             />
 
             <div class="grid grid-cols-4">
@@ -59,6 +62,7 @@
                   thread-type="post"
                   @moderation-submit="handleModerationControlsSubmit"
                   @moderation-action-change="handleModerationControlsActionChange"
+                  @content-warning-set="handleContentWarningSet"
                 />
               </div>
               <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
@@ -95,7 +99,7 @@ import {
   type ModerationPostVersion
 } from '@/stores/post-moderation'
 import { useUserStore } from '@/stores/user'
-import { ref, onMounted, computed, type ComputedRef, watchEffect } from 'vue'
+import { ref, onMounted, computed, type ComputedRef, watchEffect, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
 import ModerationEditablePostCard from './ModerationEditablePostCard.vue'
@@ -108,7 +112,7 @@ import Loading from '@/components/common/Loading.vue'
 
 import { storeToRefs } from 'pinia'
 import { postFilesPresignedUrlTTL } from '@/constants/post'
-import type { ModerationActions } from '@/types/moderation'
+import type { ModerationAction } from '@/types/moderation'
 import { faArrowLeft, faArrowRight, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface PostFields {
@@ -135,11 +139,12 @@ const selfModeration = ref<Moderation['decision'] | undefined>(undefined)
 const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
+const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false)
 
 const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
 const hasModerationHistory = computed(() => {
-  const wasModified = version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
+  const wasModified = version.value?.version ? version.value?.version > 1 : false
   const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
 
   return wasModified || hasModerations
@@ -171,6 +176,12 @@ watchEffect(async () => {
     else if (hasErrors.value) {
       router.push('/moderation/posts')
     }
+  }
+})
+
+watch(version, async (newVersion) => {
+  if (newVersion) {
+    hasContentWarning.value = newVersion.hasContentWarning ?? false
   }
 })
 
@@ -209,13 +220,8 @@ async function handleVersionChange(newVersion: ModerationPostVersion) {
   await refreshVersion(newVersion)
 }
 
-function handleModerationControlsSubmit({
-  action,
-  reason
-}: {
-  action: ModerationActions
-  reason: string
-}) {
+function handleModerationControlsSubmit(data: { action: ModerationAction; reason: string }) {
+  const { action, reason } = data
   const moderationHandlers = {
     Accept: acceptPost,
     Modify: modifyPost,
@@ -224,13 +230,17 @@ function handleModerationControlsSubmit({
   moderationHandlers[action](reason)
 }
 
-function handleModerationControlsActionChange(action: ModerationActions) {
+function handleModerationControlsActionChange(action: ModerationAction) {
   if (action === 'Modify') {
     postModerationStore.resetVersionInModification()
     showModifyForm.value = true
   } else {
     showModifyForm.value = false
   }
+}
+
+function handleContentWarningSet(value: boolean) {
+  hasContentWarning.value = value
 }
 
 function handleModifyFormUpdate({
@@ -326,7 +336,8 @@ const modifyPost = async (reason: string) => {
     userStore.sessionHash,
     userStore.nickname,
     reason,
-    modifyValues.value
+    modifyValues.value,
+    hasContentWarning.value
   )
   selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 

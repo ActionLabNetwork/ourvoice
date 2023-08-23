@@ -188,9 +188,8 @@ export class CommentModerationService {
     moderatorNickname: string,
     reason: string,
     data: CommentModifyDto,
+    hasContentWarning: boolean,
   ): Promise<Comment> {
-    // TODO: Validate moderator hash to see if they have permission/role
-
     // Validate data
     const commentModifyDto = plainToClass(CommentModifyDto, data);
     const errors = await validate(commentModifyDto);
@@ -211,13 +210,14 @@ export class CommentModerationService {
     if (!commentToBeModified) {
       throw new NotFoundException('Comment version does not exist');
     }
-    // TODO: Validate moderator hash to see if they have permission/role
+
     return await this.moderationCommentRepository.modifyModerationComment(
       commentId,
       moderatorHash,
       moderatorNickname,
       reason,
       data,
+      hasContentWarning,
     );
   }
 

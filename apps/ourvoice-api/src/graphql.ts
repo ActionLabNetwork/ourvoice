@@ -95,6 +95,7 @@ export class CommentCreateInput {
     authorNickname: string;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
+    hasContentWarning: boolean;
 }
 
 export class CommentUpdateInput {
@@ -391,7 +392,7 @@ export abstract class IMutation {
 
     abstract rejectModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
-    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput, hasContentWarning: boolean): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
     abstract rollbackModifiedModerationComment(commentId: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
@@ -403,7 +404,7 @@ export abstract class IMutation {
 
     abstract rejectModerationPostVersion(id: number, moderatorHash: string, moderatorNickname: string, reason: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput, hasContentWarning: boolean): ModerationPost | Promise<ModerationPost>;
 
     abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
@@ -487,6 +488,7 @@ export class Comment {
     moderatedAt?: Nullable<DateTime>;
     publishedAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
+    hasContentWarning: boolean;
     authorHash: string;
     authorNickname: string;
     post?: Nullable<Post>;
@@ -533,6 +535,7 @@ export class ModerationCommentVersion {
     authorHash: string;
     authorNickname: string;
     reason?: Nullable<string>;
+    hasContentWarning: boolean;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -584,6 +587,7 @@ export class ModerationPostVersion {
     files?: Nullable<string[]>;
     version: number;
     reason?: Nullable<string>;
+    hasContentWarning: boolean;
     authorHash: string;
     authorNickname: string;
     latest: boolean;
@@ -704,6 +708,7 @@ export class Post {
     published: boolean;
     votesDown: number;
     votesUp: number;
+    hasContentWarning: boolean;
     createdAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;

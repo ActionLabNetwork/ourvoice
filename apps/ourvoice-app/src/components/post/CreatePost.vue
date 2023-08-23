@@ -7,23 +7,47 @@
     </transition>
     <div class="container mx-auto p-4" v-if="!loading">
       <div class="mx-auto" v-if="showAlert">
-        <Alert title="Post Submitted for Moderation">
-          <div class="space-y-5">
-            <p>
-              Your post has been successfully submitted and is now pending review by our moderation
-              team.
-            </p>
-            <p>
-              This is a standard process to ensure our discussions remains safe and welcoming for
-              everyone. Please allow up to 24 hours for the review process. Once your post has been
-              reviewed and approved, it will be visible to other community members.
-            </p>
-            <p>
-              In the meantime, feel free to explore other discussions and engage with our community.
-              We appreciate your patience and understanding.
-            </p>
-            <p>Thank you for being part of our community!</p>
-          </div>
+        <Alert>
+          <template #icon>
+            <div class="flex-shrink-0">
+              <CheckCircleIcon class="h-10 w-10 text-ourvoice-success/80" aria-hidden="true" />
+            </div>
+          </template>
+          <template #title>
+            <h3 class="text-xl font-medium text-ourvoice-success">
+              Post Submitted for Moderation
+            </h3>
+          </template>
+          <template #content>
+            <div class="space-y-5">
+              <p>
+                Your post has been successfully submitted and is now pending review by our
+                moderation team.
+              </p>
+              <p>
+                This is a standard process to ensure our discussions remains safe and welcoming for
+                everyone. Please allow up to 24 hours for the review process. Once your post has
+                been reviewed and approved, it will be visible to other community members.
+              </p>
+              <p>
+                In the meantime, feel free to explore other discussions and engage with our
+                community. We appreciate your patience and understanding.
+              </p>
+              <p>Thank you for being part of our community!</p>
+            </div>
+          </template>
+          <template #actions>
+            <div class="mt-10">
+              <div class="-my-1.5 flex">
+                <CustomButton
+                  type="button"
+                  to="/posts"
+                  class-name="rounded-md hover:bg-ourvoice-success-dark/80 px-2 py-1.5 text-sm font-medium bg-ourvoice-success-dark text-white"
+                  label="Back to Discussion page"
+                />
+              </div>
+            </div>
+          </template>
         </Alert>
       </div>
       <div class="bg-white rounded-lg shadow-md p-8 max-w-lg mx-auto" v-if="!showAlert">
@@ -204,6 +228,7 @@
 </template>
 
 <script setup lang="ts">
+import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 import IconArrowLeft from '../icons/IconArrowLeft.vue'
 import { ref, computed, watch, onMounted } from 'vue'
 import Multiselect from '@vueform/multiselect'
@@ -229,6 +254,7 @@ import Loading from '../common/Loading.vue'
 import Alert from '../common/Alert.vue'
 import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
 import YamlContent from '../../../../../config/config.yml'
+import CustomButton from '../common/CustomButton.vue'
 
 interface PresignedUrlResponse {
   key: string

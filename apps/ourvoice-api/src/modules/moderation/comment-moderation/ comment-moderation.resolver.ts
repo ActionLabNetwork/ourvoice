@@ -121,6 +121,7 @@ export class CommentModerationResolver {
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
     @Args('data') data: ModerationCommentModifyInput,
+    @Args('hasContentWarning') hasContentWarning: boolean,
   ): Promise<Comment> {
     await validateUserPermission(session);
     await this.authService.validateClaimedHash(session, moderatorHash);
@@ -131,6 +132,7 @@ export class CommentModerationResolver {
       moderatorNickname,
       reason,
       data,
+      hasContentWarning,
     );
   }
 

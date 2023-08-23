@@ -84,7 +84,6 @@ export const useCommentsStore = defineStore('comments', {
       try {
         if (this.pageInfo?.hasNextPage) {
           this.fetchComments(postId, true)
-          console.log('fetching more comments')
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -122,7 +121,6 @@ export const useCommentsStore = defineStore('comments', {
             }
           }
         })
-        // console.log(data)
         return data
       } catch (error) {
         if (error instanceof Error) {
@@ -139,7 +137,6 @@ export const useCommentsStore = defineStore('comments', {
             deleteCommentId: id
           }
         })
-        console.log(response)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
@@ -172,7 +169,6 @@ export const useCommentsStore = defineStore('comments', {
             }
           }
         })
-        console.log(response)
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
@@ -220,7 +216,6 @@ export const useCommentsStore = defineStore('comments', {
         }
         this.data = this.data.map((comment) => (comment.id === commentId ? storedComment : comment))
       } catch (error) {
-        console.log(error)
         if (error instanceof Error) {
           this.error = error
         }

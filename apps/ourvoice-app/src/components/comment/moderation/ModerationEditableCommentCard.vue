@@ -12,6 +12,9 @@
       :modifierName="nickname.moderator.nickname"
     />
 
+    <!-- Content warning -->
+    <ContentWarning :has-content-warning="props.hasContentWarning" />
+
     <!-- Content -->
     <div>
       <div class="text-gray-700 text-lg leading-relaxed mb-3">
@@ -49,10 +52,18 @@ import { useCategoriesStore } from '@/stores/categories'
 import { useField, useForm } from 'vee-validate'
 import { validateContent } from '@/validators/moderation-comment-validator'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
+import ContentWarning from '@/components/common/ContentWarning.vue'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import type { ModerationVersionDecision } from '@/types/moderation'
 import { useCommentModerationStore } from '@/stores/comment-moderation'
 
+interface Props {
+  hasContentWarning: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  hasContentWarning: false
+})
 const emit = defineEmits(['update'])
 
 const nickname = computed(() => {
@@ -158,6 +169,10 @@ watchEffect(() => {
       isValid: true
     }
     emit('update', { version: localVersion, isValid: true })
+  } else if (
+    props.hasContentWarning !== commentModerationStore.versionInModeration?.hasContentWarning
+  ) {
+    emit('update', { version: version.value, isValid: true })
   } else {
     commentModerationStore.versionInModification = {
       ...commentModerationStore.versionInModification,

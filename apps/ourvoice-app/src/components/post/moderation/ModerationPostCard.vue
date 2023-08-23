@@ -41,6 +41,9 @@
       </div>
     </div>
 
+    <!-- Content warning -->
+    <ContentWarning :has-content-warning="props.hasContentWarning" />
+
     <!-- Title -->
     <h3 class="text-xl sm:text-2xl font-extrabold text-ourvoice-black mb-3">
       {{ version.title }}
@@ -98,13 +101,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { formatTimestampToReadableDate } from '@/utils'
 import AttachmentBadge from '@/components/common/AttachmentBadge.vue'
 import type { ModerationVersionDecision } from '@/types/moderation'
 import { getGroupsByProperty } from '@/utils/groupByProperty'
 import AuthorBadge from '@/components/common/AuthorBadge.vue'
 import CustomButton from '@/components/common/CustomButton.vue'
+import ContentWarning from '@/components/common/ContentWarning.vue'
 
 import type { Moderation } from '@/stores/moderation-posts'
 import type { ModerationPost, ModerationPostVersion } from '@/stores/post-moderation'
@@ -131,6 +135,10 @@ const props = defineProps({
   decisionIcon: {
     type: Object as PropType<DecisionIcon>,
     required: false
+  },
+  hasContentWarning: {
+    type: Boolean,
+    required: true,
   }
 })
 
@@ -195,5 +203,9 @@ const moderationResultGroups = computed(() => {
 
 const moderationCount = computed(() => {
   return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
+})
+
+watchEffect(() => {
+  console.log({ hasC: props.hasContentWarning })
 })
 </script>

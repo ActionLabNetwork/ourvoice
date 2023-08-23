@@ -7,6 +7,7 @@ export const MODIFY_MODERATION_COMMENT_MUTATION = gql`
     $moderatorNickname: String!
     $reason: String!
     $data: ModerationCommentModifyInput!
+    $hasContentWarning: Boolean!
   ) {
     modifyModerationComment(
       commentId: $commentId
@@ -14,6 +15,7 @@ export const MODIFY_MODERATION_COMMENT_MUTATION = gql`
       moderatorNickname: $moderatorNickname
       reason: $reason
       data: $data
+      hasContentWarning: $hasContentWarning
     ) {
       id
       authorHash
@@ -28,6 +30,7 @@ export const MODIFY_MODERATION_COMMENT_MUTATION = gql`
         authorNickname
         reason
         latest
+        hasContentWarning
         moderations {
           id
           decision

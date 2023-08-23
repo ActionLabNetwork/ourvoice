@@ -291,6 +291,7 @@ export class PostModerationRepository {
     moderatorNickname: string,
     reason: string,
     data: PostModifyDto,
+    hasContentWarning: boolean,
   ): Promise<PostIncludesVersionIncludesModerations> {
     await this.prisma.$transaction(async (tx) => {
       // Fetch the current post with the latest version
@@ -320,6 +321,7 @@ export class PostModerationRepository {
           reason,
           version: latestVersion.version + 1,
           latest: true,
+          hasContentWarning,
         },
       });
     });
@@ -430,6 +432,7 @@ export class PostModerationRepository {
         authorHash: post.authorHash,
         authorNickname: post.authorNickname,
         moderated,
+        hasContentWarning: post.versions[0].hasContentWarning ?? false,
       });
 
       this.logger.debug(

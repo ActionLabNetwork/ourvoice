@@ -7,6 +7,7 @@ export const MODIFY_MODERATION_POST_MUTATION = gql`
     $moderatorNickname: String!
     $reason: String!
     $data: ModerationPostModifyInput!
+    $hasContentWarning: Boolean!
   ) {
     modifyModerationPost(
       postId: $postId
@@ -14,6 +15,7 @@ export const MODIFY_MODERATION_POST_MUTATION = gql`
       moderatorNickname: $moderatorNickname
       reason: $reason
       data: $data
+      hasContentWarning: $hasContentWarning
     ) {
       id
       authorHash
