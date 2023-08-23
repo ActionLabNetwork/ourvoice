@@ -391,7 +391,7 @@ export abstract class IMutation {
 
     abstract rejectModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
-    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput, hasContentWarning: boolean): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
     abstract rollbackModifiedModerationComment(commentId: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 

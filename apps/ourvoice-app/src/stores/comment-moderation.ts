@@ -247,7 +247,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       moderatorHash: string,
       moderatorNickname: string,
       reason: string,
-      modifiedData: CommentFields
+      modifiedData: CommentFields,
+      hasContentWarning: boolean
     ) {
       if (!this.commentInModeration) return null
 
@@ -257,7 +258,14 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: MODIFY_MODERATION_COMMENT_MUTATION,
-          variables: { commentId, moderatorHash, moderatorNickname, reason, data: modifiedData }
+          variables: {
+            commentId,
+            moderatorHash,
+            moderatorNickname,
+            reason,
+            data: modifiedData,
+            hasContentWarning
+          }
         })
 
         await this.fetchCommentById(this.commentInModeration.id)

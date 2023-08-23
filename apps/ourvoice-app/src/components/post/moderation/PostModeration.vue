@@ -216,7 +216,6 @@ function handleSidePaneToggle(open: boolean) {
 }
 
 async function handleVersionChange(newVersion: ModerationPostVersion) {
-  console.log({ newVersion: newVersion })
   postModerationStore.versionInModeration = newVersion
   await refreshVersion(newVersion)
 }

@@ -145,8 +145,6 @@ const isValidForm = computed(() => {
   const modifiedContentWarning =
     hasContentWarning.value !== store?.versionInModeration?.hasContentWarning
 
-  console.log({ cont: hasContentWarning.value, mod: store?.versionInModeration?.hasContentWarning })
-
   switch (action.value.name) {
     case 'Accept':
       // No validations for accepting the post

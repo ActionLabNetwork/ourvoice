@@ -30,6 +30,7 @@ type Mutation {
     moderatorNickname: String!
     reason: String!
     data: ModerationCommentModifyInput!
+    hasContentWarning: Boolean!
   ): ModerationComment
   rollbackModifiedModerationComment(commentId: Int!): ModerationComment
   renewCommentModeration(

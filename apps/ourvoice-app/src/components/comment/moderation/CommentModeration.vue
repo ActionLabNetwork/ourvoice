@@ -114,7 +114,7 @@
 
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import { ref, onMounted, computed, watchEffect } from 'vue'
+import { ref, onMounted, computed, watchEffect, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
 import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue'
@@ -159,7 +159,7 @@ const showSidePane = ref(false)
 const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 const loading = ref(false)
-const hasContentWarning = ref<boolean>(false)
+const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false)
 
 const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
@@ -198,6 +198,12 @@ watchEffect(() => {
     else if (hasErrors.value) {
       router.push('/moderation/comments')
     }
+  }
+})
+
+watch(version, async (newVersion) => {
+  if (newVersion) {
+    hasContentWarning.value = newVersion.hasContentWarning ?? false
   }
 })
 
@@ -349,7 +355,8 @@ const modifyComment = async (reason: string) => {
     userStore.sessionHash,
     userStore.nickname,
     reason,
-    modifyValues.value
+    modifyValues.value,
+    hasContentWarning.value
   )
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 

@@ -361,6 +361,7 @@ export class CommentModerationRepository {
     moderatorNickname: string,
     reason: string,
     data: CommentModifyDto,
+    hasContentWarning: boolean,
   ): Promise<CommentIncludesVersionIncludesModerations> {
     const modifiedModerationComment = await this.prisma.$transaction(
       async (tx) => {
@@ -386,6 +387,7 @@ export class CommentModerationRepository {
             authorNickname: moderatorNickname,
             comment: { connect: { id: commentId } },
             reason,
+            hasContentWarning,
             version: latestVersion.version + 1,
             latest: true,
           },

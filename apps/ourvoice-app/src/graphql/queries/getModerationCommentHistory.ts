@@ -22,6 +22,7 @@ export const GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY = graphql(`
           files
           timestamp
           version
+          hasContentWarning
           authorHash
           authorNickname
           latest
@@ -49,6 +50,7 @@ export const GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY = graphql(`
           authorNickname
           reason
           latest
+          hasContentWarning
         }
       }
       versions {
@@ -60,6 +62,7 @@ export const GET_MODERATION_COMMENT_HISTORY_BY_ID_QUERY = graphql(`
         authorNickname
         reason
         latest
+        hasContentWarning
         moderations {
           id
           decision
