@@ -144,7 +144,7 @@ const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false
 const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
 const hasModerationHistory = computed(() => {
-  const wasModified = version.value?.authorHash !== post.value?.versions?.at(-1)?.authorHash
+  const wasModified = version.value?.version ? version.value?.version > 1 : false
   const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
 
   return wasModified || hasModerations

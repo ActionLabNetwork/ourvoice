@@ -164,9 +164,7 @@ const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false
 const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
 const hasModerationHistory = computed(() => {
-  const wasModified =
-    version.value?.authorHash !== comment.value?.versions?.at(-1)?.authorHash ||
-    (version.value?.version && version.value?.version > 1)
+  const wasModified = version.value?.version ? version.value?.version > 1 : false
   const hasModerations = version.value?.moderations && version.value?.moderations.length > 0
 
   return wasModified || hasModerations
