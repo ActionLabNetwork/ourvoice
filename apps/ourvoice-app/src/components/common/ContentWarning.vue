@@ -16,12 +16,7 @@
               This post has been identified as containing sensitive content. Viewer discretion is
               advised. If this post has raised any concerns for you, please visit
               <span class="underline font-bold text-ourvoice-util-blue">
-                <a
-                  href="https://itstopswithme.humanrights.gov.au/take-action/support-services"
-                  target="_blank"
-                >
-                  It Stops With Me
-                </a>
+                <a :href="getConfig('contentWarningLink')" target="_blank"> It Stops With Me </a>
               </span>
               for a list of services that can provide support.
             </p>
@@ -35,6 +30,11 @@
 <script setup lang="ts">
 import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
 import Alert from './Alert.vue'
+import YamlContent from '../../../../../config/config.yml'
 
 const props = defineProps<{ hasContentWarning: boolean }>()
+
+const getConfig = (option: string) => {
+  return YamlContent[option]
+}
 </script>

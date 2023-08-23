@@ -45,3 +45,4 @@ postFrequency:
 persistNickNames: true
 attachmentBucket: test-bucket
 allowDownvote: true
+contentWarningLink: 'https://itstopswithme.humanrights.gov.au/take-action/support-services'
