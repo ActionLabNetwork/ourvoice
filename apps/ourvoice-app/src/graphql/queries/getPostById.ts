@@ -3,7 +3,7 @@ import { graphql } from '../generated'
 export const GET_POST_BY_ID_QUERY = graphql(`
   query Post(
     $postId: Int!
-    $presignedUrlExpiresIn: Int!  
+    $presignedUrlExpiresIn: Int!
   ) {
     post(id: $postId) {
       authorHash
@@ -27,6 +27,7 @@ export const GET_POST_BY_ID_QUERY = graphql(`
       title
       votesDown
       votesUp
+      hasContentWarning
       votes {
         authorHash
         voteType

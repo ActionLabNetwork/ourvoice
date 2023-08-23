@@ -37,7 +37,7 @@
               :versions="comment?.versions ?? []"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-full">
             <!-- Post Context Preview -->
             <div
               v-if="comment && comment.post && comment.post.versions"

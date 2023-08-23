@@ -23,6 +23,7 @@ type Comment @cacheControl(maxAge: 600) {
   moderatedAt: DateTime
   publishedAt: DateTime
   disabledAt: DateTime
+  hasContentWarning: Boolean!
   authorHash: String!
   authorNickname: String!
   post: Post

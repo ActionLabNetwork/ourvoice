@@ -13,6 +13,7 @@ export const GET_COMMENTS_QUERY = graphql(`
             authorHash
             voteType
           }
+          hasContentWarning
           moderated
           published
           createdAt

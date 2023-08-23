@@ -488,6 +488,7 @@ export class Comment {
     moderatedAt?: Nullable<DateTime>;
     publishedAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
+    hasContentWarning: boolean;
     authorHash: string;
     authorNickname: string;
     post?: Nullable<Post>;

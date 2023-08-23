@@ -8,6 +8,8 @@
       >
     </div>
     <div class="flex-1 leading-relaxed card bg-opacity-10" :class="bgclass">
+      <!-- Content warning -->
+      <ContentWarning :has-content-warning="comment?.hasContentWarning ?? false" />
       <span class="font-semibold">{{ comment?.authorNickname }} reply to</span>
       <span class="text-ourvoice-sky text-sm hover:underline hover:cursor-pointer">
         @{{ comment?.parent?.authorNickname ?? 'original post' }}
@@ -67,6 +69,7 @@ import { timePassed } from '@/utils'
 import { computed, ref } from 'vue'
 import { useCommentsStore } from '@/stores/comments'
 import CreateComment from '@/components/comment/CreateComment.vue'
+import ContentWarning from '../common/ContentWarning.vue'
 import IconThumb from '@/components/icons/IconThumb.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
