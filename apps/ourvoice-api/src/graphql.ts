@@ -95,6 +95,7 @@ export class CommentCreateInput {
     authorNickname: string;
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
+    hasContentWarning: boolean;
 }
 
 export class CommentUpdateInput {
@@ -706,6 +707,7 @@ export class Post {
     published: boolean;
     votesDown: number;
     votesUp: number;
+    hasContentWarning: boolean;
     createdAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;

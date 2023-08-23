@@ -535,6 +535,7 @@ export class CommentModerationRepository {
         postId: comment.post?.postIdInMainDb,
         parentId: comment.parent?.commentIdInMainDb,
         moderated,
+        hasContentWarning: comment.versions[0].hasContentWarning,
       });
 
       this.logger.debug(

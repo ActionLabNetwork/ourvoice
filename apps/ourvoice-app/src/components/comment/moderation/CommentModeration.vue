@@ -28,83 +28,88 @@
             </SidePane>
           </div>
         </div>
-        <div class="grid grid-cols-4 gap-2">
+        <!-- <div class="grid grid-cols-4 gap-2"> -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-2">
           <!-- Versioning -->
-          <div class="col-span-full sm:col-span-1 px-4 sm:px-0" v-if="comment">
+          <div class="col-span-full sm:col-span-1 pl-4 sm:px-0" v-if="comment">
             <ModerationVersionList
               @versionClicked="handleVersionChange"
               :versions="comment?.versions ?? []"
             />
           </div>
-
-          <!-- Post Context Preview -->
-          <div
-            v-if="comment && comment.post && comment.post.versions"
-            class="col-span-full sm:col-span-3 px-4 sm:px-0"
-          >
-            <ModerationPostCard
-              :post="comment.post"
-              :version="comment.post.versions[0]"
-              :preview="true"
-            />
-          </div>
-
-          <!-- Parent Comment Context Preview -->
-          <div v-if="history" class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10">
-            <div v-for="c in history" :key="c.id">
-              <ModerationCommentCard :comment="c" :version="c.versions[0]" :preview="true" />
+          <div className="space-y-2">
+            <!-- Post Context Preview -->
+            <div
+              v-if="comment && comment.post && comment.post.versions"
+              class="col-span-full sm:col-span-3 px-4 sm:px-0"
+            >
+              <ModerationPostCard
+                :post="comment.post"
+                :version="comment.post.versions[0]"
+                :preview="true"
+              />
             </div>
-          </div>
 
-          <!-- Comment Preview -->
-          <div
-            v-if="comment && version"
-            class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
-          >
-            <ModerationEditableCommentCard
-              v-if="showModifyForm"
-              @update="handleModifyFormUpdate"
-              :has-content-warning="hasContentWarning"
-            />
-            <ModerationCommentCard
-              v-else
-              :comment="comment"
-              :version="version"
-              :preview="true"
-              :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
-              :has-content-warning="hasContentWarning"
-            />
-
-            <div class="grid grid-cols-4">
-              <!-- Moderation Controls -->
-              <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
-                <ModerationControls
-                  thread-type="comment"
-                  @moderation-submit="handleModerationControlsSubmit"
-                  @moderation-action-change="handleModerationControlsActionChange"
-                  @content-warning-set="handleContentWarningSet"
-                />
+            <!-- Parent Comment Context Preview -->
+            <div
+              v-if="history"
+              class="col-span-full sm:col-span-3 px-4 sm:px-0 sm:col-start-2 pl-10"
+            >
+              <div v-for="c in history" :key="c.id">
+                <ModerationCommentCard :comment="c" :version="c.versions[0]" :preview="true" />
               </div>
-              <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
-                <!-- Renew button -->
-                <div class="mt-4 flex justify-end" v-if="comment.status === 'PENDING'">
-                  <div>
-                    <button
-                      @click="handleRenewModeration"
-                      class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
-                      data-cy="renew-button"
-                    >
-                      Renew Moderation
-                      <span><font-awesome-icon :icon="faRotateLeft" /></span>
-                    </button>
+            </div>
+
+            <!-- Comment Preview -->
+            <div
+              v-if="comment && version"
+              class="col-span-full sm:col-span-3 sm:col-start-2 pl-10 pr-2 sm:pr-0"
+            >
+              <ModerationEditableCommentCard
+                v-if="showModifyForm"
+                @update="handleModifyFormUpdate"
+                :has-content-warning="hasContentWarning"
+              />
+              <ModerationCommentCard
+                v-else
+                :comment="comment"
+                :version="version"
+                :preview="true"
+                :decisionIcon="selfModeration ? decisionIcon[selfModeration] : undefined"
+                :has-content-warning="hasContentWarning"
+              />
+
+              <div class="grid grid-cols-4">
+                <!-- Moderation Controls -->
+                <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
+                  <ModerationControls
+                    thread-type="comment"
+                    @moderation-submit="handleModerationControlsSubmit"
+                    @moderation-action-change="handleModerationControlsActionChange"
+                    @content-warning-set="handleContentWarningSet"
+                  />
+                </div>
+                <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
+                  <!-- Renew button -->
+                  <div class="mt-4 flex justify-end" v-if="comment.status === 'PENDING'">
+                    <div>
+                      <button
+                        @click="handleRenewModeration"
+                        class="inline-flex items-center justify-center px-5 py-2 gap-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700"
+                        data-cy="renew-button"
+                      >
+                        Renew Moderation
+                        <span><font-awesome-icon :icon="faRotateLeft" /></span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div v-else>
-            <p>Comment not found</p>
+            <div v-else>
+              <p>Comment not found</p>
+            </div>
           </div>
         </div>
       </div>

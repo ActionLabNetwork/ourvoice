@@ -73,6 +73,8 @@ export class PostService {
     const postCreateDto = plainToClass(PostCreateDto, data);
     const errors = await validate(postCreateDto);
 
+    console.log({ errors, postCreateDto });
+
     if (errors.length > 0) {
       throw new BadRequestException(errors);
     }

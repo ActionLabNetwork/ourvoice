@@ -39,6 +39,7 @@ input CommentCreateInput {
   authorNickname: String!
   postId: Int
   parentId: Int
+  hasContentWarning: Boolean!
 }
 
 input CommentUpdateInput {

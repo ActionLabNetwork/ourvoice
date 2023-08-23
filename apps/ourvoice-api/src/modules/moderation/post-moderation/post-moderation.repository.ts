@@ -432,6 +432,7 @@ export class PostModerationRepository {
         authorHash: post.authorHash,
         authorNickname: post.authorNickname,
         moderated,
+        hasContentWarning: post.versions[0].hasContentWarning ?? false,
       });
 
       this.logger.debug(

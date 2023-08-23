@@ -23,7 +23,7 @@
     <!-- Moderation actions -->
     <div class="absolute inset-x-px bottom-0 bg-white rounded-b-lg">
       <div class="flex items-center border-t justify-between border-gray-200 px-2 py-2 sm:px-3">
-        <div class="hidden md:flex md:flex-col gap-2">
+        <div class="hidden lg:flex lg:flex-col gap-2">
           <div class="md:flex gap-2">
             <div v-for="a in actions" :key="a.name">
               <CustomButton
@@ -53,7 +53,7 @@
         </div>
 
         <div
-          class="md:hidden px-4 py-2 bg-ourvoice-base-light-200 border-1 border-ourvoice-base-light-300 rounded-full"
+          class="lg:hidden px-4 py-2 bg-ourvoice-base-light-200 border-1 border-ourvoice-base-light-300 rounded-full"
         >
           <select
             class="bg-ourvoice-base-light-200"

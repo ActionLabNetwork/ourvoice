@@ -12,7 +12,7 @@
         </template>
         <template #content>
           <div class="mt-2 text-sm text-yellow-700">
-            <p>
+            <p class="break-normal">
               This post has been identified as containing sensitive content. Viewer discretion is
               advised. If this post has raised any concerns for you, please visit
               <span class="underline font-bold text-ourvoice-util-blue">

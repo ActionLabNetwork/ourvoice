@@ -49,4 +49,7 @@ export class PostCreateDto {
   @IsInt()
   @IsOptional()
   votesUp?: number;
+
+  @IsBoolean()
+  hasContentWarning: boolean;
 }
