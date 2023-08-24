@@ -18,7 +18,10 @@
     </h1>
     <h2 class="text-xs lg:text-sm text-ourvoice-gray">
       <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
-      <span class="font-semibold">{{ post?.authorNickname ?? '' }}</span>
+      <span class="font-semibold">
+        {{ post?.authorNickname ?? '' }}
+        <FromTheModeratorsTag v-if="post?.hasFromTheModeratorsTag" />
+      </span>
       <span v-if="post?.moderated" class="text-ourvoice-accent-3"> (moderated by moderator)</span>
     </h2>
     <p class="text-sm my-2">
@@ -79,6 +82,7 @@
 </template>
 <script lang="ts" setup>
 import IconThumb from '@/components/icons/IconThumb.vue'
+import FromTheModeratorsTag from '@/components/common/FromTheModeratorsTag.vue'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { usePostsStore } from '@/stores/posts'
 import { useUserStore } from '@/stores/user'

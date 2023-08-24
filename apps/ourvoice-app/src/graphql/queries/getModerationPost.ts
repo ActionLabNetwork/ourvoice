@@ -18,6 +18,7 @@ export const GET_MODERATION_POST_BY_ID_QUERY = graphql(`
         version
         reason
         hasContentWarning
+        hasFromTheModeratorsTag
         authorHash
         authorNickname
         latest

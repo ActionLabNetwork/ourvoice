@@ -36,6 +36,7 @@ type Post @cacheControl(maxAge: 600) {
   votesDown: Int!
   votesUp: Int!
   hasContentWarning: Boolean!
+  hasFromTheModeratorsTag: Boolean!
   createdAt: DateTime
   disabledAt: DateTime
   moderatedAt: DateTime

@@ -589,6 +589,7 @@ export class ModerationPostVersion {
     version: number;
     reason?: Nullable<string>;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     authorHash: string;
     authorNickname: string;
     latest: boolean;
@@ -710,6 +711,7 @@ export class Post {
     votesDown: number;
     votesUp: number;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     createdAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;

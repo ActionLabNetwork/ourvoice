@@ -201,11 +201,7 @@
           <div class="gap-x-2 mt-3 flex items-center" v-if="hasElevatedPermissions">
             <label for="from-moderator-chkbox">
               Include
-              <span
-                class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
-              >
-                <font-awesome-icon :icon="faUsers" /> From the moderators
-              </span>
+              <FromTheModeratorsTag />
               tag
             </label>
             <input
@@ -272,6 +268,7 @@ import Loading from '../common/Loading.vue'
 import Alert from '../common/Alert.vue'
 import { faHeading, faPaperclip, faUsers } from '@fortawesome/free-solid-svg-icons'
 import CustomButton from '../common/CustomButton.vue'
+import FromTheModeratorsTag from '../common/FromTheModeratorsTag.vue'
 import { useToast } from '@/composables/useToast'
 
 interface PresignedUrlResponse {

@@ -12,6 +12,7 @@
         :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
         :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
         :modifierName="nickname.moderator.nickname"
+        :has-moderator-author-tag="version.hasFromTheModeratorsTag"
       />
 
       <div>
@@ -66,7 +67,7 @@
     </div>
 
     <!-- Attachments -->
-    <div>
+    <!-- <div>
       <p v-if="version.files" class="mt-2 text-gray-400 text-md mb-2">
         {{ `${version.files.length}` }} attachments
       </p>
@@ -74,7 +75,7 @@
         v-if="version.attachmentsDownloadUrls"
         :files="version.attachmentsDownloadUrls"
       />
-    </div>
+    </div> -->
 
     <!-- Moderation decisions count -->
     <div
