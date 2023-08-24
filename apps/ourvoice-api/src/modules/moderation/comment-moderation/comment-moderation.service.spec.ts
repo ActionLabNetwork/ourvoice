@@ -89,14 +89,11 @@ describe('CommentModerationService', () => {
 
   it('should create a comment', async () => {
     // Arrange
-    const commentCreateInput = {
-      title: 'Test Title',
+    const commentCreateInput: CommentCreateDto = {
       content: 'Test Content',
-      categoryIds: [1, 3],
-      files: ['https://example.com/file1.jpg'],
-      requiredModerations: 1,
       authorHash: 'user1hash',
       authorNickname: 'correct_teal_duck',
+      hasFromTheModeratorsTag: false,
     };
 
     commentModerationRepositoryMock.createModerationComment.mockResolvedValue(
@@ -123,6 +120,7 @@ describe('CommentModerationService', () => {
       content: '',
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -137,6 +135,7 @@ describe('CommentModerationService', () => {
       content: 'Test Content',
       authorHash: null,
       authorNickname: null,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert

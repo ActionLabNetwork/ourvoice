@@ -56,6 +56,7 @@ describe('CommentService', () => {
       authorNickname: 'Test nickname',
       postId: 1,
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     commentRepositoryMock.createComment.mockResolvedValue(dummyComment);
@@ -81,6 +82,7 @@ describe('CommentService', () => {
       authorHash: null,
       authorNickname: null,
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     //Act & Assert
@@ -97,6 +99,7 @@ describe('CommentService', () => {
       authorHash: 'Test hash',
       authorNickname: 'Test nickname',
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     //Act & Assert

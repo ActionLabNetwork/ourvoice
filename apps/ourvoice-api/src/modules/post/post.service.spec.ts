@@ -28,6 +28,8 @@ describe('PostService', () => {
     comments: undefined,
     votes: undefined,
     categories: undefined,
+    hasContentWarning: false,
+    hasFromTheModeratorsTag: false,
   };
 
   const dummyCategories = [
@@ -69,6 +71,7 @@ describe('PostService', () => {
       authorNickname: 'Test nickname',
       categoryIds: [1, 2],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     postRepositoryMock.createPost.mockResolvedValue(dummyPost);
@@ -97,6 +100,7 @@ describe('PostService', () => {
       authorNickname: 'Test Nickname',
       categoryIds: [1],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -114,6 +118,7 @@ describe('PostService', () => {
       authorNickname: null,
       categoryIds: [1],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -131,6 +136,7 @@ describe('PostService', () => {
       authorNickname: 'Test Nickname',
       categoryIds: [],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     const validPostData: PostCreateDto = {
@@ -140,6 +146,7 @@ describe('PostService', () => {
       authorNickname: 'Test Nickname',
       categoryIds: [1],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     const tooManyCategoriesData: PostCreateDto = {
@@ -149,6 +156,7 @@ describe('PostService', () => {
       authorNickname: 'Test Nickname',
       categoryIds: [1, 2, 3],
       hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -221,6 +229,11 @@ describe('PostService', () => {
             title: 'Test Title',
             votesDown: 0,
             votesUp: 0,
+            votes: undefined,
+            categories: undefined,
+            comments: undefined,
+            hasContentWarning: false,
+            hasFromTheModeratorsTag: false,
           },
         },
       ],
