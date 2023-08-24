@@ -167,6 +167,7 @@ export class ModerationPostCreateInput {
     files?: Nullable<Nullable<string>[]>;
     authorHash: string;
     authorNickname: string;
+    hasFromTheModeratorsTag: boolean;
 }
 
 export class ModerationPostsFilterInput {

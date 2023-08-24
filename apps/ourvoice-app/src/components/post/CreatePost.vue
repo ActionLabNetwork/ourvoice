@@ -7,19 +7,17 @@
     </transition>
     <div class="container mx-auto p-4" v-if="!loading">
       <div class="mx-auto" v-if="showAlert">
-        <Alert>
+        <Alert class="bg-ourvoice-success/20 p-5 rounded-md">
           <template #icon>
             <div class="flex-shrink-0">
               <CheckCircleIcon class="h-10 w-10 text-ourvoice-success/80" aria-hidden="true" />
             </div>
           </template>
           <template #title>
-            <h3 class="text-xl font-medium text-ourvoice-success">
-              Post Submitted for Moderation
-            </h3>
+            <h3 class="text-xl font-medium text-ourvoice-success">Post Submitted for Moderation</h3>
           </template>
           <template #content>
-            <div class="space-y-5">
+            <div class="space-y-5 mt-5">
               <p>
                 Your post has been successfully submitted and is now pending review by our
                 moderation team.
@@ -128,7 +126,7 @@
             id="categoriesWrapper"
             name="categories"
             labelText="Categories"
-            labelSpan="select 1 to 2"
+            labelSpan="select at least 1"
             :error-message="categoriesField.errorMessage.value"
             :meta="categoriesField.meta"
           >
@@ -150,6 +148,7 @@
               </div>
             </div>
           </FormInput>
+
           <div v-else>
             <p class="font-semibold text-gray-500">Loading categories...</p>
           </div>
@@ -198,16 +197,27 @@
             :attachments="attachmentsField.value.value"
           />
 
+          <!-- Include from the moderators tag checkbox -->
+          <div class="gap-x-2 mt-3 flex items-center" v-if="hasElevatedPermissions">
+            <label for="from-moderator-chkbox">
+              Include
+              <span
+                class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
+              >
+                <font-awesome-icon :icon="faUsers" /> From the moderators
+              </span>
+              tag
+            </label>
+            <input
+              type="checkbox"
+              id="content-warning-chkbox"
+              name="from-moderator-chkbox"
+              v-model="hasFromTheModeratorsTag"
+            />
+          </div>
+
           <!-- Submit button -->
           <div v-if="!categoriesStore.loading" class="flex justify-end gap-2">
-            <!-- <button
-              type="button"
-              class="bg-neutral-500 hover:bg-neutral-600 text-white px-6 py-2 rounded-full shadow-md flex items-center transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-ourvoice-primary/50 disabled:cursor-not-allowed"
-              data-cy="reset-form-button"
-              @click="resetFormFields"
-            >
-              Reset Form
-            </button> -->
             <button
               type="submit"
               :disabled="!isValidForm"
@@ -224,14 +234,22 @@
         </form>
       </div>
     </div>
+    <Toast
+      type="danger"
+      class="fixed bottom-0 right-5"
+      :message="toast.toastMessage.value"
+      v-if="toast.showToast.value"
+      @click="toast.hide()"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { CheckCircleIcon } from '@heroicons/vue/20/solid'
 import IconArrowLeft from '../icons/IconArrowLeft.vue'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, watchEffect } from 'vue'
 import Multiselect from '@vueform/multiselect'
+import Toast from '../common/Toast.vue'
 import FormInput from '@/components/inputs/FormInput.vue'
 import { useCategoriesStore } from '@/stores/categories'
 import AttachmentList from '../inputs/AttachmentList.vue'
@@ -252,9 +270,9 @@ import {
 import { useUserStore } from '@/stores/user'
 import Loading from '../common/Loading.vue'
 import Alert from '../common/Alert.vue'
-import { faHeading, faPaperclip } from '@fortawesome/free-solid-svg-icons'
-import YamlContent from '../../../../../config/config.yml'
+import { faHeading, faPaperclip, faUsers } from '@fortawesome/free-solid-svg-icons'
 import CustomButton from '../common/CustomButton.vue'
+import { useToast } from '@/composables/useToast'
 
 interface PresignedUrlResponse {
   key: string
@@ -276,7 +294,11 @@ const createPostValidationSchema = {
   }
 }
 
+const toast = useToast()
 const userStore = useUserStore()
+const hasElevatedPermissions = computed(
+  () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
+)
 
 // Fetch categories and initial state
 const categoriesStore = useCategoriesStore()
@@ -291,10 +313,6 @@ const { handleSubmit, resetForm, errors } = useForm({
   validationSchema: createPostValidationSchema
 })
 
-const getConfig = (option: string) => {
-  return YamlContent[option]
-}
-
 const loading = ref(false)
 const showAlert = ref(false)
 const showAttachmentsInput = false
@@ -304,6 +322,7 @@ const selectedCategories = ref<string[]>([])
 const attachmentsInputRef = ref<HTMLInputElement | null>(null)
 const characterCount = ref(0)
 const presignedUrls = ref<PresignedUrlResponse[]>([])
+const hasFromTheModeratorsTag = ref<boolean>(false)
 
 // VeeValidate Form Fields
 const useVeeValidateField = function <T>(fieldName: string) {
@@ -385,11 +404,19 @@ const onSubmit = handleSubmit(async (values) => {
     }
   }
 
+  if (!hasElevatedPermissions.value && hasFromTheModeratorsTag.value) {
+    toast.setToastMessage('You are not a moderator, unable to include the tag')
+    toast.show()
+    loading.value = false
+    return
+  }
+
   await postsStore.createPost({
     title: values.title,
     content: values.content,
     categoryIds: values.categories,
-    files: presignedUrls.value.map(({ key }) => key)
+    files: presignedUrls.value.map(({ key }) => key),
+    hasFromTheModeratorsTag: hasFromTheModeratorsTag.value
   })
 
   // After successfully submitting the form, reset the form fields

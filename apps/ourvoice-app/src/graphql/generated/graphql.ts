@@ -297,6 +297,7 @@ export type ModerationPostCreateInput = {
   categoryIds: Array<Scalars['Int']['input']>;
   content: Scalars['String']['input'];
   files?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  hasFromTheModeratorsTag: Scalars['Boolean']['input'];
   title: Scalars['String']['input'];
 };
 

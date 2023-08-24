@@ -1,5 +1,8 @@
 import { AuthService } from './../../../auth/auth.service';
-import { validateUserPermission } from './../../../utils/auth';
+import {
+  hasElevatedPermissions,
+  validateUserPermission,
+} from './../../../utils/auth';
 import { ModerationPostsResponse } from './../../../types/moderation/post-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
@@ -61,7 +64,12 @@ export class PostModerationResolver {
     @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationPostCreateInput,
   ): Promise<Post> {
+    console.log({ data });
     await this.authService.validateClaimedHash(session, data.authorHash);
+
+    if (data.hasFromTheModeratorsTag) {
+      await validateUserPermission(session);
+    }
 
     return await this.postModerationService.createPost(data);
   }

@@ -18,6 +18,7 @@ export const validateUserPermission = async (session: SessionContainer) => {
   )) as AuthRoles[];
 
   if (!hasElevatedPermissions(roles)) {
+    console.error('Unauthorized user');
     throw new UnauthorizedException();
   }
 };

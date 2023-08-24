@@ -89,6 +89,7 @@ input ModerationPostCreateInput {
   files: [String]
   authorHash: String!
   authorNickname: String!
+  hasFromTheModeratorsTag: Boolean!
 }
 
 input ModerationPostsFilterInput {

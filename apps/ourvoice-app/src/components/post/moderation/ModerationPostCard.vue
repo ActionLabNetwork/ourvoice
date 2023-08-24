@@ -138,7 +138,7 @@ const props = defineProps({
   },
   hasContentWarning: {
     type: Boolean,
-    required: true,
+    required: true
   }
 })
 
@@ -203,9 +203,5 @@ const moderationResultGroups = computed(() => {
 
 const moderationCount = computed(() => {
   return moderationResultGroups.value.ACCEPTED + moderationResultGroups.value.REJECTED
-})
-
-watchEffect(() => {
-  console.log({ hasC: props.hasContentWarning })
 })
 </script>
