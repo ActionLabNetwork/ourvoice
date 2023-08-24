@@ -100,13 +100,15 @@ export const useCommentsStore = defineStore('comments', {
       parentId,
       postId,
       authorHash,
-      authorNickname
+      authorNickname,
+      hasFromTheModeratorsTag
     }: {
       content: string
       postId: number | undefined
       parentId: number | undefined
       authorHash: string
       authorNickname: string
+      hasFromTheModeratorsTag: boolean
     }) {
       try {
         const { data } = await apolloClient.mutate({
@@ -117,7 +119,8 @@ export const useCommentsStore = defineStore('comments', {
               authorNickname,
               content,
               parentId: parentId ?? null,
-              postId: postId ?? null
+              postId: postId ?? null,
+              hasFromTheModeratorsTag: hasFromTheModeratorsTag ?? false
             }
           }
         })

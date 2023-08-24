@@ -36,6 +36,19 @@
       />
     </div>
   </div>
+  <div class="gap-x-2 mt-3 flex justify-end items-center" v-if="hasElevatedPermissions && input">
+    <label for="from-moderator-chkbox">
+      Include
+      <FromTheModeratorsTag />
+      tag
+    </label>
+    <input
+      type="checkbox"
+      id="content-warning-chkbox"
+      name="from-moderator-chkbox"
+      v-model="hasFromTheModeratorsTag"
+    />
+  </div>
   <div>
     <Toast
       :type="toastType"
@@ -53,11 +66,15 @@ import { useUserStore } from '@/stores/user'
 import { useCommentsStore } from '@/stores/comments'
 import { useTextareaAutosize } from '@vueuse/core'
 import CustomButton from '@/components/common/CustomButton.vue'
+import FromTheModeratorsTag from '../common/FromTheModeratorsTag.vue'
 const { textarea, input } = useTextareaAutosize()
 import { useFocusWithin } from '@vueuse/core'
 
 const commentsStore = useCommentsStore()
 const userStore = useUserStore()
+const hasElevatedPermissions = computed(
+  () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
+)
 
 const props = defineProps({
   postId: {
@@ -80,6 +97,7 @@ const showErrorMessage = ref(false)
 const toastType = ref('warning')
 const showToast = ref(false)
 const toastMessage = ref('')
+const hasFromTheModeratorsTag = ref(false)
 
 const handleFocus = () => {
   showErrorMessage.value = false
@@ -100,7 +118,8 @@ const handleSubmit = async () => {
     authorNickname: userStore.nickname,
     postId: props.postId,
     parentId: props.commentId,
-    content: input.value
+    content: input.value,
+    hasFromTheModeratorsTag: hasFromTheModeratorsTag.value
   })
   showToast.value = true
   if (res) {

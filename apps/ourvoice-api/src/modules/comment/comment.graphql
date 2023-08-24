@@ -24,6 +24,7 @@ type Comment @cacheControl(maxAge: 600) {
   publishedAt: DateTime
   disabledAt: DateTime
   hasContentWarning: Boolean!
+  hasFromTheModeratorsTag: Boolean!
   authorHash: String!
   authorNickname: String!
   post: Post
@@ -41,6 +42,7 @@ input CommentCreateInput {
   postId: Int
   parentId: Int
   hasContentWarning: Boolean!
+  hasFromTheModeratorsTag: Boolean!
 }
 
 input CommentUpdateInput {

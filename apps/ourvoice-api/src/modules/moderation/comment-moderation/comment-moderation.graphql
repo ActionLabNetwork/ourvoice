@@ -61,6 +61,7 @@ type ModerationCommentVersion {
   authorNickname: String!
   reason: String
   hasContentWarning: Boolean!
+  hasFromTheModeratorsTag: Boolean!
   latest: Boolean!
   timestamp: String!
   comment: ModerationComment!
@@ -94,6 +95,7 @@ input ModerationCommentCreateInput {
   parentId: Int
   authorHash: String!
   authorNickname: String!
+  hasFromTheModeratorsTag: Boolean!
 }
 
 input ModerationCommentsFilterInput {

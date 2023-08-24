@@ -160,7 +160,14 @@ export class CommentModerationRepository {
   async createModerationComment(
     data: CommentCreateDto,
   ): Promise<CommentIncludesVersion> {
-    const { content, postId, parentId, authorHash, authorNickname } = data;
+    const {
+      content,
+      postId,
+      parentId,
+      authorHash,
+      authorNickname,
+      hasFromTheModeratorsTag,
+    } = data;
     const connectData = { post: undefined, parent: undefined };
 
     if (postId) {
@@ -199,6 +206,7 @@ export class CommentModerationRepository {
             authorNickname,
             latest: true,
             version: 1,
+            hasFromTheModeratorsTag,
           },
         },
         requiredModerations: this.config.moderatorCount,
@@ -536,6 +544,7 @@ export class CommentModerationRepository {
         parentId: comment.parent?.commentIdInMainDb,
         moderated,
         hasContentWarning: comment.versions[0].hasContentWarning,
+        hasFromTheModeratorsTag: comment.versions[0].hasFromTheModeratorsTag,
       });
 
       this.logger.debug(

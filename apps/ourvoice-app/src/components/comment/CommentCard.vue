@@ -4,8 +4,10 @@
       <span
         class="h-12 w-12 rounded-full inline-flex justify-center items-center uppercase font-semibold text-white text-2xl"
         :class="bgclass"
-        >{{ comment?.authorNickname[0] }}</span
       >
+        {{ comment?.authorNickname[0] }}
+        <FromTheModeratorsTag v-if="comment?.hasFromTheModeratorsTag" />
+      </span>
     </div>
     <div class="flex-1 leading-relaxed card bg-opacity-10" :class="bgclass">
       <!-- Content warning -->
@@ -71,6 +73,7 @@ import { useCommentsStore } from '@/stores/comments'
 import CreateComment from '@/components/comment/CreateComment.vue'
 import ContentWarning from '../common/ContentWarning.vue'
 import IconThumb from '@/components/icons/IconThumb.vue'
+import FromTheModeratorsTag from '../common/FromTheModeratorsTag.vue'
 import { storeToRefs } from 'pinia'
 import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
 import { useMutation } from '@vue/apollo-composable'

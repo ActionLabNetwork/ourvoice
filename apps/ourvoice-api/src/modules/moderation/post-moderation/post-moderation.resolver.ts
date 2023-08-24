@@ -64,7 +64,6 @@ export class PostModerationResolver {
     @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationPostCreateInput,
   ): Promise<Post> {
-    console.log({ data });
     await this.authService.validateClaimedHash(session, data.authorHash);
 
     if (data.hasFromTheModeratorsTag) {
