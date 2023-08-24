@@ -11,9 +11,44 @@ const resetCategoriesTable = async () => {
 };
 
 const addCategories = async (categoriesData: Categories) => {
+  // Check for duplicate names in provided data
+  const duplicateNames = categoriesData
+    .filter(
+      (category, index, self) =>
+        self.findIndex((c) => c.name === category.name) !== index,
+    )
+    .map((category) => category.name);
+
+  // Check if category names already exist in the database
+  const existingNames = await prisma.category.findMany({
+    where: {
+      name: {
+        in: categoriesData.map((category) => category.name),
+      },
+    },
+    select: {
+      name: true,
+    },
+  });
+
+  const existingNameList = existingNames.map((category) => category.name);
+
+  const allDuplicates = [...new Set([...duplicateNames, ...existingNameList])];
+
+  if (allDuplicates.length) {
+    console.log(
+      `Duplicate category names found:\n ${allDuplicates
+        .map((n) => `- ${n}`)
+        .join('\n ')}`,
+    );
+    console.log('Please remove duplicates and try again.');
+    return;
+  }
+
   await Promise.all(
     categoriesData.map((data) => prisma.category.create({ data })),
   );
+  console.log('Finished adding categories');
 };
 
 const prisma = new PrismaClient({
@@ -36,7 +71,10 @@ const main = () => {
     .description('Populates the main db with categories from the JSON file')
     .argument('<jsonFilePath>', 'Path to JSON file with category data')
     .option('--truncate', 'Overwrite existing categories')
-    .option('--append', 'Append to existing categories')
+    .option(
+      '--append',
+      'Append to existing categories (this is the default if no option is provided)',
+    )
     .action(async (jsonFilePath, options) => {
       try {
         if (options.truncate && options.append) {
@@ -53,7 +91,6 @@ const main = () => {
         }
 
         await addCategories(categoriesData);
-        console.log('Finished adding categories');
       } catch (error) {
         console.error('Error processing categories:', error.message);
       } finally {
