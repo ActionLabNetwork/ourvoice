@@ -16,7 +16,7 @@
     "typecheck:apps": "pnpm --recursive --parallel --stream --filter './apps/**' typecheck",
     "analyze:apps": "pnpm --recursive --parallel --stream --filter './apps/**' analyze",
     "info:apps": "pnpm --recursive --parallel --stream --filter './apps/**' info",
-    "clean": "rimraf **/coverage **/dist **/node_modules",
+    "clean": "rimraf --glob **/coverage **/dist **/node_modules node_modules",
     "dev:app": "pnpm --filter ./apps/ourvoice-app dev",
     "build:app": "pnpm --filter ./apps/ourvoice-app build",
     "preview:app": "pnpm --filter ./apps/ourvoice-app preview",
