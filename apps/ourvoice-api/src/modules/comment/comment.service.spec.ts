@@ -50,11 +50,12 @@ describe('CommentService', () => {
 
   it('should create a comment', async () => {
     // Arrange
-    const commentCreateInput = {
+    const commentCreateInput: CommentCreateDto = {
       content: 'Test content',
       authorHash: 'Test hash',
       authorNickname: 'Test nickname',
       postId: 1,
+      hasContentWarning: false,
     };
 
     commentRepositoryMock.createComment.mockResolvedValue(dummyComment);
@@ -79,6 +80,7 @@ describe('CommentService', () => {
       postId: 1,
       authorHash: null,
       authorNickname: null,
+      hasContentWarning: false,
     };
 
     //Act & Assert
@@ -94,6 +96,7 @@ describe('CommentService', () => {
       postId: 1,
       authorHash: 'Test hash',
       authorNickname: 'Test nickname',
+      hasContentWarning: false,
     };
 
     //Act & Assert

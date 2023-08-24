@@ -591,6 +591,7 @@ describe('CommentModerationService', () => {
       moderatorNickname,
       reason,
       modifyData,
+      false,
     );
 
     // Assert
@@ -603,6 +604,7 @@ describe('CommentModerationService', () => {
       moderatorNickname,
       reason,
       modifyData,
+      false,
     );
   });
 
@@ -634,6 +636,7 @@ describe('CommentModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -666,6 +669,7 @@ describe('CommentModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -692,6 +696,7 @@ describe('CommentModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(NotFoundException);
   });

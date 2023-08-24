@@ -68,6 +68,7 @@ describe('PostService', () => {
       authorHash: 'Test hash',
       authorNickname: 'Test nickname',
       categoryIds: [1, 2],
+      hasContentWarning: false,
     };
 
     postRepositoryMock.createPost.mockResolvedValue(dummyPost);
@@ -95,6 +96,7 @@ describe('PostService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
+      hasContentWarning: false,
     };
 
     // Act & Assert
@@ -111,6 +113,7 @@ describe('PostService', () => {
       authorHash: null,
       authorNickname: null,
       categoryIds: [1],
+      hasContentWarning: false,
     };
 
     // Act & Assert
@@ -127,6 +130,7 @@ describe('PostService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [],
+      hasContentWarning: false,
     };
 
     const validPostData: PostCreateDto = {
@@ -135,6 +139,7 @@ describe('PostService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
+      hasContentWarning: false,
     };
 
     const tooManyCategoriesData: PostCreateDto = {
@@ -143,6 +148,7 @@ describe('PostService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1, 2, 3],
+      hasContentWarning: false,
     };
 
     // Act & Assert
