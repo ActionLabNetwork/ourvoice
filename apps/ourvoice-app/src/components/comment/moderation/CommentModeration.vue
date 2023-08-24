@@ -85,7 +85,7 @@
                 :has-content-warning="hasContentWarning"
               />
 
-              <div class="grid grid-cols-4">
+              <div class="grid grid-cols-4 mt-4">
                 <!-- Moderation Controls -->
                 <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
                   <ModerationControls
