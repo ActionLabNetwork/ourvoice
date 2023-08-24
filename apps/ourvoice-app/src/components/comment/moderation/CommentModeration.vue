@@ -93,6 +93,7 @@
                     @moderation-submit="handleModerationControlsSubmit"
                     @moderation-action-change="handleModerationControlsActionChange"
                     @content-warning-set="handleContentWarningSet"
+                    @moderation-category-change="moderationCategory = $event"
                   />
                 </div>
                 <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
@@ -171,6 +172,7 @@ const modifyValues = ref<CommentFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 const loading = ref(false)
 const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false)
+const moderationCategory = ref<string | null>(null)
 
 const isLatestVersion = computed(() => commentModerationStore.latestCommentVersion)
 const hasNotBeenModeratedBySelf = computed(() => !commentModerationStore.userHasModeratedComment)
@@ -293,13 +295,7 @@ async function handleRenewModeration() {
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 }
 
-async function performModeration({
-  actionHandler,
-  reason
-}: {
-  actionHandler: Function
-  reason: string
-}) {
+async function performModeration(action: (versionId: number) => Promise<any>) {
   const version = commentModerationStore.versionInModeration
 
   if (!userStore.userId) {
@@ -312,7 +308,7 @@ async function performModeration({
     return
   }
 
-  await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
+  await action(version.id)
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 
   // Redirect to comments list if status changes
@@ -322,17 +318,21 @@ async function performModeration({
 }
 
 function acceptComment(reason: string) {
-  performModeration({
-    actionHandler: commentModerationStore.approveCommentVersion,
-    reason
-  })
+  performModeration((versionId) => 
+    commentModerationStore.approveCommentVersion(versionId, userStore.sessionHash, userStore.nickname, reason)
+  )
 }
 
 function rejectComment(reason: string) {
-  performModeration({
-    actionHandler: commentModerationStore.rejectCommentVersion,
-    reason
-  })
+  performModeration(
+    (versionId) => commentModerationStore.rejectCommentVersion(
+      versionId,
+      userStore.sessionHash,
+      userStore.nickname,
+      reason,
+      moderationCategory.value
+    )
+  )
 }
 
 const modifyComment = async (reason: string) => {
@@ -365,7 +365,8 @@ const modifyComment = async (reason: string) => {
     userStore.nickname,
     reason,
     modifyValues.value,
-    hasContentWarning.value
+    hasContentWarning.value,
+    moderationCategory.value
   )
   selfModeration.value = (await commentModerationStore.selfModerationForVersion)?.decision
 

@@ -216,7 +216,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       id: number,
       moderatorHash: string,
       moderatorNickname: string,
-      reason: string
+      reason: string,
+      moderationCategory: string  | null
     ): Promise<CommentVersion | null> {
       if (!this.commentInModeration) return null
 
@@ -226,7 +227,7 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_COMMENT_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason },
+          variables: { id, moderatorHash, moderatorNickname, reason, moderationCategory },
           fetchPolicy: 'no-cache'
         })
 
@@ -248,7 +249,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
       moderatorNickname: string,
       reason: string,
       modifiedData: CommentFields,
-      hasContentWarning: boolean
+      hasContentWarning: boolean,
+      moderationCategory: string | null
     ) {
       if (!this.commentInModeration) return null
 
@@ -264,7 +266,8 @@ export const useCommentModerationStore = defineStore('comment-moderation', {
             moderatorNickname,
             reason,
             data: modifiedData,
-            hasContentWarning
+            hasContentWarning,
+            moderationCategory
           }
         })
 

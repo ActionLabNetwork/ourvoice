@@ -6,12 +6,14 @@ export const REJECT_MODERATION_COMMENT_VERSION_MUTATION = gql`
     $moderatorHash: String!
     $moderatorNickname: String!
     $reason: String!
+    $moderationCategory: String
   ) {
     rejectModerationCommentVersion(
       id: $id
       moderatorHash: $moderatorHash
       moderatorNickname: $moderatorNickname
       reason: $reason
+      moderationCategory: $moderationCategory
     ) {
       id
       authorHash

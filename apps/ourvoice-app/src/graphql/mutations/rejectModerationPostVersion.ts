@@ -6,8 +6,15 @@ export const REJECT_MODERATION_POST_VERSION_MUTATION = gql`
     $moderatorHash: String!
     $moderatorNickname: String!
     $reason: String!
+    $moderationCategory: String
   ) {
-    rejectModerationPostVersion(id: $id, moderatorHash: $moderatorHash, moderatorNickname: $moderatorNickname, reason: $reason) {
+    rejectModerationPostVersion(
+      id: $id
+      moderatorHash: $moderatorHash
+      moderatorNickname: $moderatorNickname
+      reason: $reason
+      moderationCategory: $moderationCategory
+    ) {
       id
       authorHash
       authorNickname

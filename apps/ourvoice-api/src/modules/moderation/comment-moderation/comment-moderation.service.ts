@@ -16,6 +16,7 @@ import {
   ModerationCommentPaginationInput,
   ModerationCommentsFilterInput,
 } from 'src/graphql';
+import config from '../../../config/deployment';
 
 @Injectable()
 export class CommentModerationService {
@@ -158,6 +159,7 @@ export class CommentModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
+    moderationCategory: string | null,
   ): Promise<Comment> {
     // TODO: Validate moderator hash to see if they have permission/role
 
@@ -174,11 +176,14 @@ export class CommentModerationService {
       throw new BadRequestException('Comment version is not the latest one');
     }
 
+    this.checkIsValidModerationCategory(moderationCategory);
+
     return await this.moderationCommentRepository.rejectCommentVersion(
       id,
       moderatorHash,
       moderatorNickname,
       reason,
+      moderationCategory,
     );
   }
 
@@ -189,6 +194,7 @@ export class CommentModerationService {
     reason: string,
     data: CommentModifyDto,
     hasContentWarning: boolean,
+    moderationCategory: string | null,
   ): Promise<Comment> {
     // Validate data
     const commentModifyDto = plainToClass(CommentModifyDto, data);
@@ -202,6 +208,8 @@ export class CommentModerationService {
     if (!reason) {
       throw new BadRequestException('Reason is required');
     }
+
+    this.checkIsValidModerationCategory(moderationCategory);
 
     // Validate comment id
     const commentToBeModified =
@@ -218,6 +226,7 @@ export class CommentModerationService {
       reason,
       data,
       hasContentWarning,
+      moderationCategory,
     );
   }
 
@@ -251,5 +260,15 @@ export class CommentModerationService {
       id,
       moderatorHash,
     );
+  }
+
+  private checkIsValidModerationCategory(categoryKey: string | null): void {
+    if (!categoryKey) return;
+    const exists = config().moderationCategories.some(
+      (category) => category.key == categoryKey,
+    );
+    if (!exists) {
+      throw new BadRequestException('Invalid moderation category');
+    }
   }
 }

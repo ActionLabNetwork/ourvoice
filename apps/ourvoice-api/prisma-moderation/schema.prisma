@@ -40,6 +40,7 @@ model PostVersion {
   authorHash        String
   authorNickname    String
   reason            String?
+  moderationCategory String?
   hasContentWarning Boolean          @default(false)
   latest            Boolean          @default(false)
   timestamp         DateTime         @default(now())
@@ -80,6 +81,7 @@ model CommentVersion {
   authorHash        String
   authorNickname    String
   reason            String?
+  moderationCategory String?
   hasContentWarning Boolean             @default(false)
   latest            Boolean             @default(false)
   timestamp         DateTime            @default(now())
@@ -98,6 +100,7 @@ model PostModeration {
   moderatorNickname String
   decision          Decision
   reason            String?
+  moderationCategory String?
   hasContentWarning Boolean     @default(false)
   timestamp         DateTime    @default(now())
 
@@ -112,6 +115,7 @@ model CommentModeration {
   moderatorNickname String
   decision          Decision
   reason            String?
+  moderationCategory String?
   hasContentWarning Boolean        @default(false)
   timestamp         DateTime       @default(now())
 
