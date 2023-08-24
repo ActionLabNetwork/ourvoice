@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma-main-db/client';
 import { readFileSync } from 'node:fs';
 
 type Categories = readonly { name: string; description: string }[];
