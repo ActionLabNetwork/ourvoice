@@ -22,6 +22,36 @@
   .faq-md p {
     @apply text-sm mb-4;
   }
+  .consent-md {
+    @apply text-lg text-left mb-6;
+  }
+  .consent-md h1 {
+    @apply text-lg md:text-3xl font-semibold mb-8;
+  }
+  .consent-md h2 {
+    @apply text-lg md:text-2xl font-medium mb-4;
+  }
+  .consent-md p {
+    @apply text-sm mb-4;
+  }
+  .consent-md ul {
+    @apply text-sm mb-4 list-disc list-inside;
+  }
+  .consent-md ul ol {
+    @apply ml-4;
+  }
+  .consent-md ol {
+    @apply text-sm mb-4 list-decimal list-inside;
+  }
+  .consent-md ol ul {
+    @apply ml-4;
+  }
+  .consent-md li {
+    @apply text-sm mb-4;
+  }
+  .consent-md em {
+    @apply text-sm mb-4 text-ourvoice-grey;
+  }
 }
 @layer components {
   .btn-primary {

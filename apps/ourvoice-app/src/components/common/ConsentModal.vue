@@ -6,11 +6,16 @@
     v-show="isConsentModalVisible"
   >
     <!-- consent modal content-->
-    <div class="relative top-60 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div
+      class="relative top-60 mx-5 p-5 border w-auto shadow-lg rounded-md bg-white max-w-[800px] mx-auto"
+    >
       <div class="mt-3 text-center">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Consent Form</h3>
+        <h1 class="text-lg leading-6 font-medium text-gray-900">Consent Form</h1>
         <div class="mt-2 px-7 py-3">
-          <Consent class="text-ourvoice-grey text-lg text-center lg:text-left mb-6" ref="consent" />
+          <Consent class="consent-md" ref="consent" />
+          <a class="text-ourvoice-info hover:underline" href="/consent"
+            >Detailed Consent Agreement</a
+          >
         </div>
         <div class="items-center px-4 py-3">
           <button
@@ -33,6 +38,7 @@ import UserService from '../../services/user-service'
 import { useUserStore } from '../../stores/user'
 
 import Consent from '../../../../../config/content/consent.md'
+import router from '@/router'
 
 export default defineComponent({
   components: {
@@ -50,9 +56,9 @@ export default defineComponent({
   methods: {
     checkForConsent: async function () {
       if (!(await this.userStore.isLoggedIn)) return
-      const userConsent = await this.userStore.getConsent
+      const userConsent = (await this.userStore.getConsent) as string
       this.isConsentModalVisible =
-        !userConsent || this.consentEffectiveDate > userConsent ? true : false
+        !userConsent || this.consentEffectiveDate > new Date(userConsent) ? true : false
     },
     acceptConsent: async function () {
       const response = await UserService.updateUserConsent()
@@ -65,7 +71,12 @@ export default defineComponent({
     // get consent effective date
     this.consentEffectiveDate =
       new Date((this.$refs['consent'] as any).frontmatter.effective_date) || null
-    this.checkForConsent()
+    await router.isReady()
+    if (this.$route.name === 'consent') {
+      this.isConsentModalVisible = false
+    } else {
+      this.checkForConsent()
+    }
   }
 })
 </script>
