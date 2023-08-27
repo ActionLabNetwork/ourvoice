@@ -83,6 +83,10 @@ Local ports and URL reference:
 
 ## Configuration
 
+CLI (refer to help section of each cli command for more information):
+
+- Add categories: `ts-node add-categories.ts add <jsonDataPath>`
+
 ### Runtime
 
 All runtime configurations come from corresponding `.env` files:
