@@ -129,8 +129,15 @@ export class PostModerationRepository {
   async createModerationPost(
     data: PostCreateDto,
   ): Promise<PostIncludesVersion> {
-    const { title, content, categoryIds, files, authorHash, authorNickname } =
-      data;
+    const {
+      title,
+      content,
+      categoryIds,
+      files,
+      authorHash,
+      authorNickname,
+      hasFromTheModeratorsTag,
+    } = data;
     const newPost = await this.prisma.post.create({
       data: {
         authorHash,
@@ -145,6 +152,7 @@ export class PostModerationRepository {
             authorNickname,
             latest: true,
             version: 1,
+            hasFromTheModeratorsTag: hasFromTheModeratorsTag,
           },
         },
         requiredModerations: this.config.moderatorCount,
@@ -437,6 +445,7 @@ export class PostModerationRepository {
         authorNickname: post.authorNickname,
         moderated,
         hasContentWarning: post.versions[0].hasContentWarning ?? false,
+        hasFromTheModeratorsTag: post.versions[0].hasFromTheModeratorsTag,
       });
 
       this.logger.debug(

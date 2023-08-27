@@ -33,6 +33,7 @@ export const GET_MODERATION_POSTS_QUERY = graphql(`
             version
             latest
             hasContentWarning
+            hasFromTheModeratorsTag
             moderations {
               id
               decision

@@ -320,3 +320,17 @@ watchEffect(() => {
   }
 })
 </script>
+
+<style src="@vueform/multiselect/themes/default.css"></style>
+<style>
+:root {
+  --form-brand-blue: #2196f3;
+}
+
+.multiselect-blue {
+  --ms-tag-bg: #dbeafe;
+  --ms-tag-color: #2563eb;
+  --ms-border-color-active: var(--form-brand-blue);
+  --ms-ring-width: 0;
+}
+</style>

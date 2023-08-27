@@ -11,6 +11,7 @@
         :authorAvatar="`https://ui-avatars.com/api/?name=${nickname.author.parts.first}+${nickname.author.parts.last}`"
         :modificationDate="formatTimestampToReadableDate(Number(version.timestamp))"
         :modifierName="nickname.moderator.nickname"
+        :has-moderator-author-tag="version.hasFromTheModeratorsTag"
       />
       <div>
         <!-- Moderated Count -->

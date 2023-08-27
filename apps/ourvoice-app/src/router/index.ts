@@ -16,8 +16,7 @@ import { useDeploymentStore } from '@/stores/deployment'
 // const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
 const HomeView = () => import('../views/HomeView.vue')
 const AboutView = () => import('../views/AboutView.vue')
-const SettingsView = () => import("../views/SettingsView.vue")
-const PollViewVue = () => import('@/views/PollView.vue')
+const SettingsView = () => import('../views/SettingsView.vue')
 const PostsView = () => import('../views/PostsView.vue')
 const NoticeView = () => import('../views/NoticeView.vue')
 const PostPage = () => import('../views/PostPage.vue')
@@ -28,6 +27,7 @@ const CommentModerationListView = () => import('../views/CommentModerationListVi
 const CommentModerationView = () => import('../views/CommentModerationView.vue')
 const PollView = () => import('../views/PollView.vue')
 const PollModerationView = () => import('../views/PollModerationView.vue')
+const LongConsentView = () => import('../views/LongConsentView.vue')
 
 const authBaseURL = config.authURL
 const authURL = `${authBaseURL}/signinWithoutPassword?d=${getCurrentDeploymentDomain().deployment}`
@@ -70,10 +70,18 @@ const router = createRouter({
       }
     },
     {
+      path: '/consent',
+      name: 'consent',
+      component: LongConsentView,
+      meta: { requiresAuth: true },
+      props: () => {
+        return getCurrentDeploymentDomain()
+      }
+    },
+    {
       path: '/settings',
       name: 'settings',
-      component: SettingsView,
-
+      component: SettingsView
     },
     {
       path: '/post',
@@ -91,7 +99,7 @@ const router = createRouter({
       path: '/moderation/polls',
       name: 'moderation-polls-list',
       component: PollModerationView,
-      meta: {requiresAuth: true, requiresModeration: true, navBarSwitchState: 'polls'}
+      meta: { requiresAuth: true, requiresModeration: true, navBarSwitchState: 'polls' }
     },
     {
       path: '/moderation/posts',

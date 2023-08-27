@@ -85,8 +85,4 @@ const handleTabSwitched = async (tab: ModerationListTab) => {
       break
   }
 }
-
-watch(allPosts, () => {
-  console.log({ allPosts: allPosts.value })
-})
 </script>

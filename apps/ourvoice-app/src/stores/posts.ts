@@ -133,12 +133,14 @@ export const usePostsStore = defineStore('posts', {
       title,
       content,
       categoryIds,
-      files
+      files,
+      hasFromTheModeratorsTag
     }: {
       title: string
       content: string
       categoryIds: number[]
       files: string[]
+      hasFromTheModeratorsTag: boolean
     }) {
       // Check for valid deployment and user session
       const userStore = useUserStore()
@@ -162,7 +164,8 @@ export const usePostsStore = defineStore('posts', {
               categoryIds,
               files,
               authorHash,
-              authorNickname
+              authorNickname,
+              hasFromTheModeratorsTag
             }
           }
         })

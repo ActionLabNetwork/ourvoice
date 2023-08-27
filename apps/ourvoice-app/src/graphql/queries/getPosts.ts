@@ -36,6 +36,7 @@ export const GET_POSTS_QUERY = graphql(`
             voteType
           }
           hasContentWarning
+          hasFromTheModeratorsTag
           presignedDownloadUrls(expiresIn: $presignedUrlExpiresIn) {
             key
             url

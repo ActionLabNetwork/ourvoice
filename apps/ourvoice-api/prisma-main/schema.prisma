@@ -12,15 +12,16 @@ datasource db {
 }
 
 model Post {
-  id                Int     @id @default(autoincrement())
-  title             String
-  content           String
-  files             Json?
-  moderated         Boolean @default(false)
-  published         Boolean @default(false)
-  votesDown         Int     @default(0)
-  votesUp           Int     @default(0)
-  hasContentWarning Boolean @default(false)
+  id                      Int     @id @default(autoincrement())
+  title                   String
+  content                 String
+  files                   Json?
+  moderated               Boolean @default(false)
+  published               Boolean @default(false)
+  votesDown               Int     @default(0)
+  votesUp                 Int     @default(0)
+  hasContentWarning       Boolean @default(false)
+  hasFromTheModeratorsTag Boolean @default(false)
 
   // Meta
   createdAt   DateTime  @default(now())
@@ -54,13 +55,14 @@ model Category {
 }
 
 model Comment {
-  id                Int      @id @default(autoincrement())
-  content           String
-  moderated         Boolean? @default(false)
-  published         Boolean? @default(false)
-  votesDown         Int      @default(0)
-  votesUp           Int      @default(0)
-  hasContentWarning Boolean  @default(false)
+  id                      Int      @id @default(autoincrement())
+  content                 String
+  moderated               Boolean? @default(false)
+  published               Boolean? @default(false)
+  votesDown               Int      @default(0)
+  votesUp                 Int      @default(0)
+  hasContentWarning       Boolean  @default(false)
+  hasFromTheModeratorsTag Boolean  @default(false)
 
   // Meta
   createdAt   DateTime  @default(now())

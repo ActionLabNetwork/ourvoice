@@ -12,14 +12,16 @@ datasource db {
 }
 
 model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String
-  files     Json?
-  moderated Boolean @default(false)
-  published Boolean @default(false)
-  votesDown Int     @default(0)
-  votesUp   Int     @default(0)
+  id                      Int     @id @default(autoincrement())
+  title                   String
+  content                 String
+  files                   Json?
+  moderated               Boolean @default(false)
+  published               Boolean @default(false)
+  votesDown               Int     @default(0)
+  votesUp                 Int     @default(0)
+  hasContentWarning       Boolean @default(false)
+  hasFromTheModeratorsTag Boolean @default(false)
 
   // Meta
   createdAt   DateTime  @default(now())
@@ -53,12 +55,14 @@ model Category {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
-  moderated Boolean? @default(false)
-  published Boolean? @default(false)
-  votesDown Int      @default(0)
-  votesUp   Int      @default(0)
+  id                      Int      @id @default(autoincrement())
+  content                 String
+  moderated               Boolean? @default(false)
+  published               Boolean? @default(false)
+  votesDown               Int      @default(0)
+  votesUp                 Int      @default(0)
+  hasContentWarning       Boolean  @default(false)
+  hasFromTheModeratorsTag Boolean  @default(false)
 
   // Meta
   createdAt   DateTime  @default(now())
@@ -91,20 +95,20 @@ model Vote {
 }
 
 model Poll {
-  id Int @id @default(autoincrement())
-  options PollOption[]
-  question String
+  id        Int          @id @default(autoincrement())
+  options   PollOption[]
+  question  String
   published Boolean
-  active Boolean
-  postLink String?
-  weight Int
-  createdAt DateTime @default(now())
+  active    Boolean
+  postLink  String?
+  weight    Int
+  createdAt DateTime     @default(now())
   expiresAt DateTime?
 }
 
 model PollOption {
-  id Int @id @default(autoincrement())
-  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id     Int    @id @default(autoincrement())
+  poll   Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   pollId Int
   option String
 }

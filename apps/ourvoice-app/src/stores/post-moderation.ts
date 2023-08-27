@@ -80,6 +80,7 @@ export type ModerationPostVersion = {
   timestamp: string
   reason?: string | null
   hasContentWarning: boolean
+  hasFromTheModeratorsTag: boolean
   version: number
   authorHash: string
   authorNickname: string

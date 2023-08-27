@@ -52,4 +52,7 @@ export class PostCreateDto {
 
   @IsBoolean()
   hasContentWarning: boolean;
+
+  @IsBoolean()
+  hasFromTheModeratorsTag: boolean;
 }

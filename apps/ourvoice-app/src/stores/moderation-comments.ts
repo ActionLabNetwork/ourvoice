@@ -27,6 +27,7 @@ export interface CommentVersion {
   reason: string
   latest: boolean
   hasContentWarning: boolean
+  hasFromTheModeratorsTag: boolean
   moderations: Moderation[]
 }
 

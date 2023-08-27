@@ -14,6 +14,7 @@ export const GET_COMMENTS_QUERY = graphql(`
             voteType
           }
           hasContentWarning
+          hasFromTheModeratorsTag
           moderated
           published
           createdAt

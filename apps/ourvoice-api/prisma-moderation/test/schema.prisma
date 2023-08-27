@@ -21,7 +21,7 @@ model Post {
   archived            Boolean       @default(false)
   archivedAt          DateTime?
   published           Boolean       @default(false)
-  publishedAt         DateTime?     @default(now())
+  publishedAt         DateTime?
 
   // Relations
   comments       Comment[]
@@ -31,21 +31,23 @@ model Post {
 }
 
 model PostVersion {
-  id             Int              @id @default(autoincrement())
-  title          String
-  content        String
-  categoryIds    Int[]
-  files          Json?
-  version        Int              @default(0)
-  authorHash     String
-  authorNickname String
-  reason         String?
-  moderationCategory String?
-  latest         Boolean          @default(false)
-  timestamp      DateTime         @default(now())
-  postId         Int
-  post           Post             @relation(fields: [postId], references: [id])
-  moderations    PostModeration[]
+  id                      Int              @id @default(autoincrement())
+  title                   String
+  content                 String
+  categoryIds             Int[]
+  files                   Json?
+  version                 Int              @default(0)
+  authorHash              String
+  authorNickname          String
+  reason                  String?
+  moderationCategory      String?
+  hasContentWarning       Boolean          @default(false)
+  hasFromTheModeratorsTag Boolean          @default(false)
+  latest                  Boolean          @default(false)
+  timestamp               DateTime         @default(now())
+  postId                  Int
+  post                    Post             @relation(fields: [postId], references: [id])
+  moderations             PostModeration[]
 
   @@unique([postId, version])
 }
@@ -60,7 +62,7 @@ model Comment {
   archived            Boolean          @default(false)
   archivedAt          DateTime?
   published           Boolean          @default(false)
-  publishedAt         DateTime?        @default(now())
+  publishedAt         DateTime?
 
   // Relations
   authorHash        String
@@ -74,18 +76,20 @@ model Comment {
 }
 
 model CommentVersion {
-  id             Int                 @id @default(autoincrement())
-  content        String
-  version        Int                 @default(0)
-  authorHash     String
-  authorNickname String
-  reason         String?
-  moderationCategory String?
-  latest         Boolean             @default(false)
-  timestamp      DateTime            @default(now())
-  commentId      Int
-  comment        Comment             @relation(fields: [commentId], references: [id])
-  moderations    CommentModeration[]
+  id                      Int                 @id @default(autoincrement())
+  content                 String
+  version                 Int                 @default(0)
+  authorHash              String
+  authorNickname          String
+  reason                  String?
+  moderationCategory      String?
+  hasContentWarning       Boolean             @default(false)
+  hasFromTheModeratorsTag Boolean             @default(false)
+  latest                  Boolean             @default(false)
+  timestamp               DateTime            @default(now())
+  commentId               Int
+  comment                 Comment             @relation(fields: [commentId], references: [id])
+  moderations             CommentModeration[]
 
   @@unique([commentId, version])
 }
@@ -99,6 +103,7 @@ model PostModeration {
   decision          Decision
   moderationCategory String?
   reason            String?
+  hasContentWarning Boolean     @default(false)
   timestamp         DateTime    @default(now())
 
   @@index([postVersionId])
@@ -113,6 +118,7 @@ model CommentModeration {
   decision          Decision
   moderationCategory String?
   reason            String?
+  hasContentWarning Boolean        @default(false)
   timestamp         DateTime       @default(now())
 
   @@index([commentVersionId])
@@ -130,13 +136,13 @@ enum PostStatus {
 }
 
 model PollVoterVoted {
-  id Int @id @default(autoincrement())
-  pollId Int
+  id        Int    @id @default(autoincrement())
+  pollId    Int
   voterHash String
 }
 
 model PollVote {
-  pollId Int
+  pollId   Int
   optionId Int
   numVotes Int
 
@@ -144,10 +150,10 @@ model PollVote {
 }
 
 model ApiCallRecord {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   timestamp DateTime @default(now())
-  userHash String
-  endpoint String
-  action String?
-  data Json
+  userHash  String
+  endpoint  String
+  action    String?
+  data      Json
 }
