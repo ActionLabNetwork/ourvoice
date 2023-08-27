@@ -54,6 +54,7 @@ type ModerationPostVersion {
   version: Int!
   reason: String
   hasContentWarning: Boolean!
+  hasFromTheModeratorsTag: Boolean!
   authorHash: String!
   authorNickname: String!
   latest: Boolean!
@@ -89,6 +90,7 @@ input ModerationPostCreateInput {
   files: [String]
   authorHash: String!
   authorNickname: String!
+  hasFromTheModeratorsTag: Boolean!
 }
 
 input ModerationPostsFilterInput {

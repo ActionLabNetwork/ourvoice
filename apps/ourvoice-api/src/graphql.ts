@@ -96,6 +96,7 @@ export class CommentCreateInput {
     postId?: Nullable<number>;
     parentId?: Nullable<number>;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
 }
 
 export class CommentUpdateInput {
@@ -142,6 +143,7 @@ export class ModerationCommentCreateInput {
     parentId?: Nullable<number>;
     authorHash: string;
     authorNickname: string;
+    hasFromTheModeratorsTag: boolean;
 }
 
 export class ModerationCommentsFilterInput {
@@ -167,6 +169,7 @@ export class ModerationPostCreateInput {
     files?: Nullable<Nullable<string>[]>;
     authorHash: string;
     authorNickname: string;
+    hasFromTheModeratorsTag: boolean;
 }
 
 export class ModerationPostsFilterInput {
@@ -489,6 +492,7 @@ export class Comment {
     publishedAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     authorHash: string;
     authorNickname: string;
     post?: Nullable<Post>;
@@ -536,6 +540,7 @@ export class ModerationCommentVersion {
     authorNickname: string;
     reason?: Nullable<string>;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     latest: boolean;
     timestamp: string;
     comment: ModerationComment;
@@ -588,6 +593,7 @@ export class ModerationPostVersion {
     version: number;
     reason?: Nullable<string>;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     authorHash: string;
     authorNickname: string;
     latest: boolean;
@@ -709,6 +715,7 @@ export class Post {
     votesDown: number;
     votesUp: number;
     hasContentWarning: boolean;
+    hasFromTheModeratorsTag: boolean;
     createdAt?: Nullable<DateTime>;
     disabledAt?: Nullable<DateTime>;
     moderatedAt?: Nullable<DateTime>;

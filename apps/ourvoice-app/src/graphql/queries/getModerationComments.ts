@@ -30,6 +30,7 @@ export const GET_MODERATION_COMMENTS_QUERY = gql`
             version
             latest
             hasContentWarning
+            hasFromTheModeratorsTag
             moderations {
               id
               decision

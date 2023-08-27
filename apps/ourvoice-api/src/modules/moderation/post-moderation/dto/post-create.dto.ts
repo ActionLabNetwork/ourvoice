@@ -3,8 +3,8 @@ import {
   IsOptional,
   Length,
   IsNumber,
-  ArrayMaxSize,
   ArrayMinSize,
+  IsBoolean,
 } from 'class-validator';
 
 export class PostCreateDto {
@@ -29,4 +29,7 @@ export class PostCreateDto {
 
   @IsString()
   authorNickname: string;
+
+  @IsBoolean()
+  hasFromTheModeratorsTag: boolean;
 }

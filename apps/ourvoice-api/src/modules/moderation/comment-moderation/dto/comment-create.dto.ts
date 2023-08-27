@@ -1,4 +1,10 @@
-import { IsString, Length, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsNumber,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 
 export class CommentCreateDto {
   @IsString()
@@ -18,4 +24,7 @@ export class CommentCreateDto {
 
   @IsString()
   authorNickname: string;
+
+  @IsBoolean()
+  hasFromTheModeratorsTag: boolean;
 }

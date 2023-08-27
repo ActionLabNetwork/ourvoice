@@ -93,14 +93,14 @@ describe('PostModerationService', () => {
 
   it('should create a post', async () => {
     // Arrange
-    const postCreateInput = {
+    const postCreateInput: PostCreateDto = {
       title: 'Test Title',
       content: 'Test Content',
       categoryIds: [1, 3],
       files: ['https://example.com/file1.jpg'],
-      requiredModerations: 1,
       authorHash: 'user1hash',
       authorNickname: 'correct_teal_duck',
+      hasFromTheModeratorsTag: false,
     };
 
     postModerationRepositoryMock.createModerationPost.mockResolvedValue(
@@ -125,6 +125,7 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -141,6 +142,7 @@ describe('PostModerationService', () => {
       authorHash: null,
       authorNickname: null,
       categoryIds: [1],
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -149,7 +151,7 @@ describe('PostModerationService', () => {
     );
   });
 
-  it('should fail create post without 1 to 2 categories', async () => {
+  it('should fail create post without 1 categories', async () => {
     // Arrange
     const noCategoryData: PostCreateDto = {
       title: 'Test Title',
@@ -157,6 +159,7 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [],
+      hasFromTheModeratorsTag: false,
     };
 
     const validPostData: PostCreateDto = {
@@ -165,14 +168,7 @@ describe('PostModerationService', () => {
       authorHash: 'Test Hash',
       authorNickname: 'Test Nickname',
       categoryIds: [1],
-    };
-
-    const tooManyCategoriesData: PostCreateDto = {
-      title: 'Test Title',
-      content: 'Test Content',
-      authorHash: 'Test Hash',
-      authorNickname: 'Test Nickname',
-      categoryIds: [1, 2, 3],
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -182,9 +178,6 @@ describe('PostModerationService', () => {
     await expect(
       postModerationService.createPost(validPostData),
     ).resolves.not.toThrow();
-    await expect(
-      postModerationService.createPost(tooManyCategoriesData),
-    ).rejects.toThrow(BadRequestException);
   });
 
   it('should get a post by ID', async () => {
@@ -615,6 +608,7 @@ describe('PostModerationService', () => {
       moderatorNickname,
       reason,
       modifyData,
+      false,
     );
 
     // Assert
@@ -627,6 +621,7 @@ describe('PostModerationService', () => {
       moderatorNickname,
       reason,
       modifyData,
+      false,
     );
   });
 
@@ -659,6 +654,7 @@ describe('PostModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -692,6 +688,7 @@ describe('PostModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -719,6 +716,7 @@ describe('PostModerationService', () => {
         moderatorNickname,
         reason,
         modifyData,
+        false,
       ),
     ).rejects.toThrow(NotFoundException);
   });

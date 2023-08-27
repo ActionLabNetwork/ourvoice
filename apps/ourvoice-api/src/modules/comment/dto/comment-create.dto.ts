@@ -35,4 +35,7 @@ export class CommentCreateDto {
 
   @IsBoolean()
   hasContentWarning: boolean;
+
+  @IsBoolean()
+  hasFromTheModeratorsTag: boolean;
 }

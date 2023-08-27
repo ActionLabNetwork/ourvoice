@@ -19,11 +19,16 @@
           {{ props.modificationDate }}
         </p>
       </div>
+      <div v-show="props.hasModeratorAuthorTag">
+        <FromTheModeratorsTag />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import FromTheModeratorsTag from './FromTheModeratorsTag.vue'
+
 const props = defineProps({
   authorName: {
     type: String,
@@ -40,6 +45,10 @@ const props = defineProps({
   modifierName: {
     type: String,
     default: ''
+  },
+  hasModeratorAuthorTag: {
+    type: Boolean,
+    default: false
   }
 })
 </script>

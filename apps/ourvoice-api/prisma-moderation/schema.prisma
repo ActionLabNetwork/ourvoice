@@ -31,21 +31,22 @@ model Post {
 }
 
 model PostVersion {
-  id                Int              @id @default(autoincrement())
-  title             String
-  content           String
-  categoryIds       Int[]
-  files             Json?
-  version           Int              @default(0)
-  authorHash        String
-  authorNickname    String
-  reason            String?
-  hasContentWarning Boolean          @default(false)
-  latest            Boolean          @default(false)
-  timestamp         DateTime         @default(now())
-  postId            Int
-  post              Post             @relation(fields: [postId], references: [id])
-  moderations       PostModeration[]
+  id                      Int              @id @default(autoincrement())
+  title                   String
+  content                 String
+  categoryIds             Int[]
+  files                   Json?
+  version                 Int              @default(0)
+  authorHash              String
+  authorNickname          String
+  reason                  String?
+  hasContentWarning       Boolean          @default(false)
+  hasFromTheModeratorsTag Boolean          @default(false)
+  latest                  Boolean          @default(false)
+  timestamp               DateTime         @default(now())
+  postId                  Int
+  post                    Post             @relation(fields: [postId], references: [id])
+  moderations             PostModeration[]
 
   @@unique([postId, version])
 }
@@ -74,18 +75,19 @@ model Comment {
 }
 
 model CommentVersion {
-  id                Int                 @id @default(autoincrement())
-  content           String
-  version           Int                 @default(0)
-  authorHash        String
-  authorNickname    String
-  reason            String?
-  hasContentWarning Boolean             @default(false)
-  latest            Boolean             @default(false)
-  timestamp         DateTime            @default(now())
-  commentId         Int
-  comment           Comment             @relation(fields: [commentId], references: [id])
-  moderations       CommentModeration[]
+  id                      Int                 @id @default(autoincrement())
+  content                 String
+  version                 Int                 @default(0)
+  authorHash              String
+  authorNickname          String
+  reason                  String?
+  hasContentWarning       Boolean             @default(false)
+  hasFromTheModeratorsTag Boolean             @default(false)
+  latest                  Boolean             @default(false)
+  timestamp               DateTime            @default(now())
+  commentId               Int
+  comment                 Comment             @relation(fields: [commentId], references: [id])
+  moderations             CommentModeration[]
 
   @@unique([commentId, version])
 }
