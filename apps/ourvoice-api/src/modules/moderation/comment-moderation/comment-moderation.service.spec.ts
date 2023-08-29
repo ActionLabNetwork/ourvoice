@@ -507,13 +507,20 @@ describe('CommentModerationService', () => {
       moderatorHash,
       moderatorNickname,
       reason,
+      null,
     );
 
     // Assert
     expect(result).toEqual({ ...dummyComment });
     expect(
       commentModerationRepositoryMock.rejectCommentVersion,
-    ).toHaveBeenCalledWith(commentId, moderatorHash, moderatorNickname, reason);
+    ).toHaveBeenCalledWith(
+      commentId,
+      moderatorHash,
+      moderatorNickname,
+      reason,
+      null,
+    );
   });
 
   it('should throw not found exception when calling rejectCommentVersion with an invalid id', async () => {
@@ -534,6 +541,7 @@ describe('CommentModerationService', () => {
         moderatorHash,
         moderatorNickname,
         reason,
+        null,
       ),
     ).rejects.toThrow(NotFoundException);
   });
@@ -558,6 +566,7 @@ describe('CommentModerationService', () => {
         moderatorHash,
         moderatorNickname,
         reason,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -591,6 +600,7 @@ describe('CommentModerationService', () => {
       reason,
       modifyData,
       false,
+      null,
     );
 
     // Assert
@@ -604,6 +614,7 @@ describe('CommentModerationService', () => {
       reason,
       modifyData,
       false,
+      null,
     );
   });
 
@@ -636,6 +647,7 @@ describe('CommentModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -669,6 +681,7 @@ describe('CommentModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -696,6 +709,7 @@ describe('CommentModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(NotFoundException);
   });

@@ -523,6 +523,7 @@ describe('PostModerationService', () => {
       moderatorHash,
       moderatorNickname,
       reason,
+      null,
     );
 
     // Assert
@@ -532,6 +533,7 @@ describe('PostModerationService', () => {
       moderatorHash,
       moderatorNickname,
       reason,
+      null,
     );
   });
 
@@ -551,6 +553,7 @@ describe('PostModerationService', () => {
         moderatorHash,
         moderatorNickname,
         reason,
+        null,
       ),
     ).rejects.toThrow(NotFoundException);
   });
@@ -575,6 +578,7 @@ describe('PostModerationService', () => {
         moderatorHash,
         moderatorNickname,
         reason,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -609,6 +613,7 @@ describe('PostModerationService', () => {
       reason,
       modifyData,
       false,
+      null,
     );
 
     // Assert
@@ -622,6 +627,7 @@ describe('PostModerationService', () => {
       reason,
       modifyData,
       false,
+      null,
     );
   });
 
@@ -655,6 +661,7 @@ describe('PostModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -689,6 +696,7 @@ describe('PostModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(BadRequestException);
   });
@@ -717,6 +725,7 @@ describe('PostModerationService', () => {
         reason,
         modifyData,
         false,
+        null,
       ),
     ).rejects.toThrow(NotFoundException);
   });
