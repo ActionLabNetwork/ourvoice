@@ -8,6 +8,7 @@ export const GET_CATEGORIES_QUERY = graphql(`
           id
           name
           numPosts
+          description
         }
         cursor
       }

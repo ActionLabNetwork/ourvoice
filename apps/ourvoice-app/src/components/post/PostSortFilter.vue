@@ -1,7 +1,11 @@
 <template>
-  <div class="flex flex-col justify-center justify-items-center space-y-10 max-w-5xl w-full mx-auto mb-3">
+  <div
+    class="flex flex-col justify-center justify-items-center space-y-10 max-w-5xl w-full mx-auto mb-3"
+  >
     <!-- Categories Filter start -->
-    <div class="px-8 flex space-x-2 md:space-y-5 overflow-x-auto no-scrollbar md:block md:text-center -mx-10 md:mx-0">
+    <div
+      class="px-8 flex space-x-2 md:space-y-5 overflow-x-auto no-scrollbar md:block md:text-center -mx-10 md:mx-0"
+    >
       <PostSortFilterCategoryButton
         v-if="result?.posts?.totalCount"
         :count="result.posts.totalCount"
@@ -24,9 +28,8 @@
     </div>
     <!-- Categories Filter end -->
 
-    <div class="flex text-center text-xl md:text-2xl lg:text-3xl font-semibold">
-      Discuss your experience of balancing out your work and personal life in your organization, and
-      any suggestions to improve matters.
+    <div class="min-h-[72px] flex text-center self-center text-center text-xl md:text-2xl lg:text-3xl font-semibold">
+      {{ message }}
     </div>
 
     <!-- Time range and sorting start -->
@@ -116,7 +119,7 @@ import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCatego
 import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import { useToggle } from '@vueuse/core'
-import { ref, watch, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
 import { storeToRefs } from 'pinia'
@@ -173,4 +176,18 @@ const { sortFilter } = storeToRefs(postsStore)
 const selectCategory = (id: number | null) => {
   postsStore.setSelectedCategoryIds(id ? [id] : null)
 }
+
+const message = computed(() => {
+  const selectedCategory = sortFilter.value.selectedCategoryIds?.at(0)
+  const defaultMessage =
+    'Discuss your experience of balancing out your work and personal life in your organization, and any suggestions to improve matters.'
+
+  if (!selectedCategory) {
+    return defaultMessage
+  }
+  return (
+    categories.value.find((category) => category.id === selectedCategory)?.description ??
+    defaultMessage
+  )
+})
 </script>
