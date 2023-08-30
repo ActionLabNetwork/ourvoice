@@ -1,12 +1,45 @@
 <template>
-  <form @submit.prevent="onSubmit" class="relative" v-if="isStoreLoaded">
+  <form
+    @submit.prevent="onSubmit"
+    class="relative flex flex-col bg-white p-2 gap-2 rounded-sm shadow-lg"
+    v-if="isStoreLoaded"
+  >
+    <div class="flex flex-row relative" v-if="action.name === 'Modify' || action.name === 'Reject'">
+      <Listbox v-model="moderationCategory">
+        <ListboxButton
+          class="p-2 w-full md:w-fit min-w-[200px] rounded-md border-2 border-ourvoice-base-light-200"
+        >
+          {{ moderationCategory?.label ?? 'Select a category (optional)' }}
+          <font-awesome-icon :icon="faChevronDown" class="ml-2" />
+        </ListboxButton>
+        <ListboxOptions
+          class="absolute py-2 top-[40px] flex flex-col rounded-md bg-white shadow-md"
+        >
+          <ListboxOption
+            v-for="category in moderationCategories"
+            :key="category.key"
+            :value="category"
+            v-slot="{ selected }"
+          >
+            <div
+              class="py-1 px-2"
+              :class="{
+                'bg-ourvoice-base-light-300': selected,
+                'hover:bg-ourvoice-base-light-200': !selected
+              }"
+            >
+              {{ category.label }}
+            </div>
+          </ListboxOption>
+        </ListboxOptions>
+      </Listbox>
+    </div>
+
     <div
       class="overflow-hidden rounded-b-lg border border-gray-300 shadow-sm"
       :class="{
-        'focus-within:border-red-500  focus-within:ring-red-500':
-          moderationReasonField.errorMessage.value,
-        'focus-within:border-indigo-500 focus-within:ring-indigo-500':
-          !moderationReasonField.errorMessage.value
+        'focus-within:border-ourvoice-error focus-within:ring-ourvoice-error':
+          moderationReasonField.errorMessage.value
       }"
     >
       <textarea
@@ -14,15 +47,15 @@
         name="moderationReason"
         v-model="moderationReasonField.value.value"
         rows="6"
-        class="block w-full resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+        class="block w-full min-h-[200px] resize-none border-none outline-none py-5 px-6 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
         :placeholder="fieldPlaceholder"
         data-cy="moderation-reason-textarea"
       />
     </div>
 
     <!-- Moderation actions -->
-    <div class="absolute inset-x-px bottom-0 bg-white rounded-b-lg">
-      <div class="flex items-center border-t justify-between border-gray-200 px-2 py-2 sm:px-3">
+    <div class="bg-white rounded-b-lg">
+      <div class="flex items-start justify-between px-2 py-2 sm:px-3">
         <div class="hidden lg:flex lg:flex-col gap-2">
           <div class="md:flex gap-2">
             <div v-for="a in actions" :key="a.name">
@@ -87,6 +120,9 @@ import { validateModerationReason } from '@/validators/moderation-post-validator
 import { MODERATION_ACTIONS } from '@/constants/moderation'
 import CustomButton from '@/components/common/CustomButton.vue'
 import type { ModerationAction } from '@/types/moderation'
+import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/vue'
+import Config from '../../../../../config/config.yml'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const props = defineProps({
   threadType: {
@@ -99,6 +135,7 @@ const emit = defineEmits<{
   'content-warning-set': [value: boolean]
   'moderation-action-change': [action: ModerationAction]
   'moderation-submit': [data: { action: ModerationAction; reason: string }]
+  'moderation-category-change': [category: string | null]
 }>()
 
 const loadStore = async () => {
@@ -118,6 +155,11 @@ const action = ref(actions[0])
 const fieldPlaceholder = ref('')
 const isStoreLoaded = ref(false)
 const hasContentWarning = ref(false)
+const moderationCategories = [
+  { key: null, label: 'No category selected' },
+  ...Config['moderationCategories']
+]
+const moderationCategory = ref<{ key: string; label: string } | null>(null)
 let store: Awaited<ReturnType<typeof loadStore>> | undefined = undefined
 
 const { resetForm } = useForm()
@@ -188,5 +230,6 @@ watchEffect(() => {
   fieldPlaceholder.value = action.value.placeholder
 
   emit('content-warning-set', hasContentWarning.value)
+  emit('moderation-category-change', moderationCategory.value?.key ?? null)
 })
 </script>

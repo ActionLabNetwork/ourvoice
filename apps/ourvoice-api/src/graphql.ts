@@ -393,9 +393,9 @@ export abstract class IMutation {
 
     abstract approveModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
-    abstract rejectModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract rejectModerationCommentVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>, moderationCategory?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
-    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput, hasContentWarning: boolean): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
+    abstract modifyModerationComment(commentId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationCommentModifyInput, hasContentWarning: boolean, moderationCategory?: Nullable<string>): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
     abstract rollbackModifiedModerationComment(commentId: number): Nullable<ModerationComment> | Promise<Nullable<ModerationComment>>;
 
@@ -405,9 +405,9 @@ export abstract class IMutation {
 
     abstract approveModerationPostVersion(id: number, moderatorHash: string, moderatorNickname: string, reason?: Nullable<string>): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract rejectModerationPostVersion(id: number, moderatorHash: string, moderatorNickname: string, reason: string): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
+    abstract rejectModerationPostVersion(id: number, moderatorHash: string, moderatorNickname: string, reason: string, moderationCategory?: Nullable<string>): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
-    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput, hasContentWarning: boolean): ModerationPost | Promise<ModerationPost>;
+    abstract modifyModerationPost(postId: number, moderatorHash: string, moderatorNickname: string, reason: string, data: ModerationPostModifyInput, hasContentWarning: boolean, moderationCategory?: Nullable<string>): ModerationPost | Promise<ModerationPost>;
 
     abstract rollbackModifiedModerationPost(postId: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 

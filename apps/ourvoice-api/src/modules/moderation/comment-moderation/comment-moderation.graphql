@@ -23,6 +23,7 @@ type Mutation {
     moderatorHash: String!
     moderatorNickname: String!
     reason: String
+    moderationCategory: String
   ): ModerationComment
   modifyModerationComment(
     commentId: Int!
@@ -31,6 +32,7 @@ type Mutation {
     reason: String!
     data: ModerationCommentModifyInput!
     hasContentWarning: Boolean!
+    moderationCategory: String
   ): ModerationComment
   rollbackModifiedModerationComment(commentId: Int!): ModerationComment
   renewCommentModeration(

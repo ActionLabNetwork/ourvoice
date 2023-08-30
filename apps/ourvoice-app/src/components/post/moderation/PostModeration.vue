@@ -55,7 +55,7 @@
               :has-content-warning="hasContentWarning"
             />
 
-            <div class="grid grid-cols-4">
+            <div class="grid grid-cols-4 mt-4">
               <!-- Moderation Controls -->
               <div v-if="isLatestVersion && hasNotBeenModeratedBySelf" class="col-span-4">
                 <ModerationControls
@@ -63,6 +63,7 @@
                   @moderation-submit="handleModerationControlsSubmit"
                   @moderation-action-change="handleModerationControlsActionChange"
                   @content-warning-set="handleContentWarningSet"
+                  @moderation-category-change="moderationCategory = $event"
                 />
               </div>
               <div v-if="isLatestVersion && !hasNotBeenModeratedBySelf" class="col-span-4">
@@ -140,6 +141,7 @@ const showSidePane = ref<boolean>(false)
 const modifyValues = ref<PostFields | null>(null)
 const showModifyForm = ref<boolean>(false)
 const hasContentWarning = ref<boolean>(version.value?.hasContentWarning ?? false)
+const moderationCategory = ref<string | null>(null)
 
 const isLatestVersion: ComputedRef<boolean> = computed(() => postModerationStore.latestPostVersion)
 const hasNotBeenModeratedBySelf = computed(() => !postModerationStore.userHasModeratedPost)
@@ -265,13 +267,7 @@ async function handleRenewModeration() {
   selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 }
 
-async function performModeration({
-  actionHandler,
-  reason
-}: {
-  actionHandler: Function
-  reason: string
-}) {
+async function performModeration(action: (versionId: number) => Promise<any>) {
   const version = postModerationStore.versionInModeration
 
   if (!userStore.userId) {
@@ -283,8 +279,7 @@ async function performModeration({
     console.error('No version selected')
     return
   }
-
-  await actionHandler(version.id, userStore.sessionHash, userStore.nickname, reason)
+  await action(version.id)
   selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 
   // Redirect to posts list if status changes
@@ -294,17 +289,26 @@ async function performModeration({
 }
 
 function acceptPost(reason: string) {
-  performModeration({
-    actionHandler: postModerationStore.approvePostVersion,
-    reason
-  })
+  performModeration((versionId) =>
+    postModerationStore.approvePostVersion(
+      versionId,
+      userStore.sessionHash,
+      userStore.nickname,
+      reason
+    )
+  )
 }
 
 function rejectPost(reason: string) {
-  performModeration({
-    actionHandler: postModerationStore.rejectPostVersion,
-    reason
-  })
+  performModeration((versionId) =>
+    postModerationStore.rejectPostVersion(
+      versionId,
+      userStore.sessionHash,
+      userStore.nickname,
+      reason,
+      moderationCategory.value
+    )
+  )
 }
 
 const modifyPost = async (reason: string) => {
@@ -337,7 +341,8 @@ const modifyPost = async (reason: string) => {
     userStore.nickname,
     reason,
     modifyValues.value,
-    hasContentWarning.value
+    hasContentWarning.value,
+    moderationCategory.value
   )
   selfModeration.value = (await postModerationStore.selfModerationForVersion)?.decision
 

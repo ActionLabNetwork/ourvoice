@@ -16,6 +16,7 @@ import { ModerationPostsFilterDto } from './dto/posts-filter.dto';
 import { PostModerationRepository } from './post-moderation.repository';
 import { PostCreateDto } from './dto/post-create.dto';
 import { PostModifyDto } from './dto/post-modify.dto';
+import config from '../../../config/deployment';
 
 @Injectable()
 export class PostModerationService {
@@ -159,6 +160,7 @@ export class PostModerationService {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
+    moderationCategory: string | null,
   ): Promise<Post> {
     // Validate id exists
     const postToBeRejected =
@@ -173,11 +175,14 @@ export class PostModerationService {
       throw new BadRequestException('Post version is not the latest one');
     }
 
+    this.checkIsValidModerationCategory(moderationCategory);
+
     return await this.moderationPostRepository.rejectPostVersion(
       id,
       moderatorHash,
       moderatorNickname,
       reason,
+      moderationCategory,
     );
   }
 
@@ -188,6 +193,7 @@ export class PostModerationService {
     reason: string,
     data: PostModifyDto,
     hasContentWarning: boolean,
+    moderationCategory: string | null,
   ): Promise<Post> {
     // Validate data
     const postModifyDto = plainToClass(PostModifyDto, data);
@@ -201,6 +207,8 @@ export class PostModerationService {
     if (!reason) {
       throw new BadRequestException('Reason is required');
     }
+
+    this.checkIsValidModerationCategory(moderationCategory);
 
     // Validate post id
     const postToBeModified =
@@ -216,6 +224,7 @@ export class PostModerationService {
       reason,
       data,
       hasContentWarning,
+      moderationCategory,
     );
   }
 
@@ -242,5 +251,15 @@ export class PostModerationService {
       id,
       moderatorHash,
     );
+  }
+
+  private checkIsValidModerationCategory(categoryKey: string | null): void {
+    if (!categoryKey) return;
+    const exists = config().moderationCategories.some(
+      (category) => category.key == categoryKey,
+    );
+    if (!exists) {
+      throw new BadRequestException('Invalid moderation category');
+    }
   }
 }

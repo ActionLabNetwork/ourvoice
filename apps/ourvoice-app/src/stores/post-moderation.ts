@@ -357,7 +357,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       id: number,
       moderatorHash: string,
       moderatorNickname: string,
-      reason: string
+      reason: string,
+      moderationCategory: string | null
     ): Promise<PostVersionWithCategoryIds | null> {
       if (!this.postInModeration) return null
 
@@ -367,7 +368,7 @@ export const usePostModerationStore = defineStore('post-moderation', {
       try {
         const { data } = await apolloClient.mutate({
           mutation: REJECT_MODERATION_POST_VERSION_MUTATION,
-          variables: { id, moderatorHash, moderatorNickname, reason },
+          variables: { id, moderatorHash, moderatorNickname, reason, moderationCategory },
           fetchPolicy: 'no-cache'
         })
 
@@ -391,7 +392,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
       moderatorNickname: string,
       reason: string,
       modifiedData: PostFields,
-      hasContentWarning: boolean
+      hasContentWarning: boolean,
+      moderationCategory: string | null
     ) {
       if (!this.postInModeration) return null
 
@@ -407,7 +409,8 @@ export const usePostModerationStore = defineStore('post-moderation', {
             moderatorNickname,
             reason,
             data: modifiedData,
-            hasContentWarning
+            hasContentWarning,
+            moderationCategory
           }
         })
         console.log('Moderation post has been modified', data)

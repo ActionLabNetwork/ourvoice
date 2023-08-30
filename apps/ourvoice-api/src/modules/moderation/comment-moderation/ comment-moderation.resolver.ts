@@ -105,6 +105,7 @@ export class CommentModerationResolver {
     @Args('moderatorHash') moderatorHash: string,
     @Args('moderatorNickname') moderatorNickname: string,
     @Args('reason') reason: string,
+    @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Comment> {
     await validateUserPermission(session);
     await this.authService.validateClaimedHash(session, moderatorHash);
@@ -114,6 +115,7 @@ export class CommentModerationResolver {
       moderatorHash,
       moderatorNickname,
       reason,
+      moderationCategory,
     );
   }
 
@@ -126,6 +128,7 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
     @Args('data') data: ModerationCommentModifyInput,
     @Args('hasContentWarning') hasContentWarning: boolean,
+    @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Comment> {
     await validateUserPermission(session);
     await this.authService.validateClaimedHash(session, moderatorHash);
@@ -137,6 +140,7 @@ export class CommentModerationResolver {
       reason,
       data,
       hasContentWarning,
+      moderationCategory,
     );
   }
 
