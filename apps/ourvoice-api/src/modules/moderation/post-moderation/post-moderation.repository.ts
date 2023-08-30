@@ -274,7 +274,6 @@ export class PostModerationRepository {
           decision: 'REJECTED',
           reason,
           postVersionId: id,
-          moderationCategory,
         },
         select: { postVersion: { select: { postId: true } } },
       });
@@ -333,7 +332,6 @@ export class PostModerationRepository {
           version: latestVersion.version + 1,
           latest: true,
           hasContentWarning,
-          moderationCategory,
         },
       });
     });

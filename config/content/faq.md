@@ -11,8 +11,8 @@ stakeholder3_link: https://www.monash.edu/it/hcc/action-lab
 stakeholder4:
 stakeholder4_link:
 email: support@ourvoice.app
-startDate: Monday 21 August
-endDate: Monday 4 September 2023
+startDate: Monday 18 September
+endDate: Monday 2 october 2023
 project: RISE project
 ---
 
@@ -21,7 +21,7 @@ project: RISE project
 ## 1. What are you trying to achieve with OURVOICE.app?
 
 The [{{frontmatter.deployment}}](/) platform is a safe and anonymous place for you to share your experiences in the workplace as part of the [{{frontmatter.project}}](/).
-The {{frontmatter.organisation}}, including [{{frontmatter.stakeholder1}}](https://www.dca.org.au/) and [{{frontmatter.stakeholder2}}](https://www.ssi.org.au/) is collaborating with [{{frontmatter.stakeholder3}}](https://www.monash.edu/it/hcc/action-lab) to give 60 culturally and racially marginalised (CARM) women participants across four pilot organisations the opportunity to take part in an online forum ({{frontmatter.deployment}}). This is an exploratory activity in the [{{frontmatter.project}}](https://www.dca.org.au/research/project/rise) - the [{{frontmatter.deployment}}](/) platform aims to create a safe space for CARM women to discuss their views on systemic barriers and enablers to Culturally and Racially Marginalised Women’s progression to leadership positions in their organisations.
+The {{frontmatter.organisation}}, including [{{frontmatter.stakeholder1}}](https://www.dca.org.au/) and [{{frontmatter.stakeholder2}}](https://www.ssi.org.au/) is collaborating with [{{frontmatter.stakeholder3}}](https://www.monash.edu/it/hcc/action-lab) to give 50 culturally and racially marginalised (CARM) women participants across three pilot organisations the opportunity to take part in an online forum ({{frontmatter.deployment}}). This is an exploratory activity in the [{{frontmatter.project}}](https://www.dca.org.au/research/project/rise) - the [{{frontmatter.deployment}}](/) platform aims to create a safe space for CARM women to discuss their views on systemic barriers and enablers to Culturally and Racially Marginalised Women’s progression to leadership positions in their organisations.
 
 ## 2. How does the OurVoice platform work?
 
@@ -35,7 +35,7 @@ The [{{frontmatter.deployment}}](/) platform, as part of the [{{frontmatter.proj
 
 ## 4. How can I be sure that this platform is anonymous and secure?
 
-[{{frontmatter.deployment}}](/) uses industry grade encryption ([Advanced Encryption Standard](https://www.iso.org/standard/54531.html)) to ensure that all data transferred is secure. Additionally, all connections to [{{frontmatter.deployment}}](/) are made using the [HTTPS](https://tools.ietf.org/html/rfc5246) protocol. The private link is generated randomly and is not linked to your email address in any way, and we do not keep a record of the email addresses that have either requested a link or have been sent a link. There are no user accounts or other mechanisms to identify people who have used the system. [{{frontmatter.deployment}}](/) is hosted on servers that are external to participating organisations, and all other parties in the {{frontmatter.organisation}}.
+[{{frontmatter.deployment}}](/) uses industry grade encryption ([Advanced Encryption Standard](https://www.iso.org/standard/54531.html)) to ensure that all data transferred is secure. Additionally, all connections to [{{frontmatter.deployment}}](/) are made using the [HTTPS](https://tools.ietf.org/html/rfc5246) protocol. The private link is generated randomly and is not linked to your email address in any way, and we do not keep a record of the email addresses that have either requested a link or have been sent a link. There are no user accounts or other mechanisms to identify people who have used the system. [{{frontmatter.deployment}}](/) is hosted on DCA servers and so are external to the organisations participating in this deployment. This server is security key protected and only accessible to the {{frontmatter.organisation}} team and Action Lab, Monash University (for maintenance purposes only).
 
 ## 5. How long is the OurVoice platform open?
 
@@ -61,7 +61,7 @@ The message forum will be available for all CARM women participants for 2 weeks 
 
 ## 7. I am ready to post. Are there any restrictions on what I can write?
 
-To protect all users, all posts are moderated before they appear on the platform. Moderation happens twice per day (morning and afternoon Mon-Friday) by a small team of moderators at {{ frontmatter.stakeholder3}}, {{ frontmatter.stakeholder1}} and {{ frontmatter.stakeholder2}}.
+To protect all users, all posts are moderated before they appear on the platform. Moderation happens every weekday morning by a small team of moderators at Action Lab at {{ frontmatter.stakeholder3}}, {{ frontmatter.stakeholder1}} and {{ frontmatter.stakeholder2}}.
 
 The [{{frontmatter.deployment}}](/) platform has Community Guidelines that govern participation on the platform. The platform is guided by the core principles of the {{frontmatter.project}} including:
 
@@ -114,7 +114,7 @@ You can also participate in polls on the system by voting for your preferred opt
 
 ## 9. Who can see the messages on the system?
 
-All other users of the system (60 CARM women participants) will be able to see your messages, respond to them and upvote. Your messages will also be able to be seen by the [{{frontmatter.deployment}}](/) moderation team, as all messages will undergo moderation prior to being posted on the platform.
+All other users of the system (50 CARM women participants) will be able to see your messages, respond to them and upvote. Your messages will also be able to be seen by the [{{frontmatter.deployment}}](/) moderation team, as all messages will undergo moderation prior to being posted on the platform.
 
 All messages are posted anonymously - no one will be able to identify you (including the moderators) from your post.
 

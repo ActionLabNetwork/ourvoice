@@ -336,7 +336,6 @@ export class CommentModerationRepository {
           decision: 'REJECTED',
           reason,
           commentVersionId: id,
-          moderationCategory,
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
@@ -399,7 +398,6 @@ export class CommentModerationRepository {
             comment: { connect: { id: commentId } },
             reason,
             hasContentWarning,
-            moderationCategory,
             version: latestVersion.version + 1,
             latest: true,
           },

@@ -3,8 +3,8 @@ name: Deployment Description
 deployment: OURVOICE.APP
 organisation: RISE project consortium
 email: support@ourvoice.app
-startDate: Monday 21 August
-endDate: Monday 4 September 2023
+startDate: Monday 18 September
+endDate: Monday 2 October 2023
 contact: Claire Moran
 ---
 
