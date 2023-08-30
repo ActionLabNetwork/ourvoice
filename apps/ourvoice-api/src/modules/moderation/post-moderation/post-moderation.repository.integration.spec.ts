@@ -346,6 +346,8 @@ describe('PostRepository', () => {
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       categoryIds: [1, 2],
+      hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act
@@ -427,6 +429,7 @@ describe('PostRepository', () => {
       6,
       'testHash',
       'testNickname',
+      null,
       'test reason',
     );
 
@@ -435,6 +438,7 @@ describe('PostRepository', () => {
         6,
         'testHash',
         'testNickname',
+        null,
         'test reason',
       ),
     ).rejects.toThrowError();
@@ -470,6 +474,7 @@ describe('PostRepository', () => {
       6,
       'testHash',
       'testNickname',
+      null,
       'test reason',
     );
 
@@ -489,6 +494,7 @@ describe('PostRepository', () => {
         5,
         'testHash',
         'testNickname',
+        null,
         'test reason',
       ),
     ).rejects.toThrowError();
@@ -506,6 +512,7 @@ describe('PostRepository', () => {
         content: 'Test Content',
         categoryIds: [1, 2],
       },
+      false,
     );
 
     expect(post.versions[0].title).toEqual('Test Title');

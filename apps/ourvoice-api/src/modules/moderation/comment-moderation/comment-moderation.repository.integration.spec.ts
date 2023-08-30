@@ -406,6 +406,8 @@ describe('CommentRepository', () => {
       authorNickname: 'Test Hash',
       authorHash: 'Test Nickname',
       postId: 1,
+      hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act
@@ -435,6 +437,8 @@ describe('CommentRepository', () => {
       authorHash: 'Test Nickname',
       postId: 999,
       requiredModerations: 1,
+      hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -451,6 +455,8 @@ describe('CommentRepository', () => {
       authorHash: 'Test Nickname',
       postId: 1,
       parentId: 1,
+      hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act
@@ -481,6 +487,8 @@ describe('CommentRepository', () => {
       postId: 1,
       parentId: 999,
       requiredModerations: 1,
+      hasContentWarning: false,
+      hasFromTheModeratorsTag: false,
     };
 
     // Act & Assert
@@ -552,6 +560,7 @@ describe('CommentRepository', () => {
       7,
       'testHash',
       'testNickname',
+      null,
       'test reason',
     );
 
@@ -560,6 +569,7 @@ describe('CommentRepository', () => {
         7,
         'testHash',
         'testNickname',
+        null,
         'test reason',
       ),
     ).rejects.toThrowError();
@@ -595,6 +605,7 @@ describe('CommentRepository', () => {
       7,
       'testHash',
       'testNickname',
+      null,
       'test reason',
     );
 
@@ -616,6 +627,7 @@ describe('CommentRepository', () => {
         6,
         'testHash',
         'testNickname',
+        null,
         'test reason',
       ),
     ).rejects.toThrowError();
@@ -631,6 +643,7 @@ describe('CommentRepository', () => {
       {
         content: 'Test Content',
       },
+      false,
     );
 
     expect(comment.versions[0].content).toEqual('Test Content');
@@ -666,6 +679,7 @@ describe('CommentRepository', () => {
         7,
         'testHash',
         'testNickname',
+        null,
         'test reason',
       );
     const rejectedCommentModerationId =

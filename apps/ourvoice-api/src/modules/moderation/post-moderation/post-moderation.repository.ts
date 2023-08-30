@@ -237,6 +237,7 @@ export class PostModerationRepository {
     id: number,
     moderatorHash: string,
     moderatorNickname: string,
+    moderationCategory: string | null = null,
     reason: string,
   ): Promise<PostIncludesVersionIncludesModerations> {
     const newPostModeration = await this.prisma.$transaction(async (tx) => {
@@ -272,6 +273,7 @@ export class PostModerationRepository {
           moderatorNickname,
           decision: 'REJECTED',
           reason,
+          moderationCategory,
           postVersionId: id,
         },
         select: { postVersion: { select: { postId: true } } },
