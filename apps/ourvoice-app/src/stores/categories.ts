@@ -28,7 +28,12 @@ export const useCategoriesStore = defineStore('categories', {
         if (!categories) {
           throw Error('Returned data is null')
         }
-        this.data = categories.edges.map((edge) => edge.node)
+        this.data = categories.edges.map((edge) => {
+          return {
+            ...edge.node,
+            description: edge.node.description || ''
+          }
+        })
         this.state = 'loaded'
       } catch (error) {
         if (error instanceof Error) {
