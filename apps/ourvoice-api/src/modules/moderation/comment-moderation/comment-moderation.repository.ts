@@ -297,7 +297,6 @@ export class CommentModerationRepository {
     id: number,
     moderatorHash: string,
     moderatorNickname: string,
-    moderationCategory: string | null = null,
     reason: string,
   ): Promise<CommentIncludesVersionIncludesModerations> {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
@@ -334,7 +333,6 @@ export class CommentModerationRepository {
           moderatorHash,
           moderatorNickname,
           decision: 'REJECTED',
-          moderationCategory,
           reason,
           commentVersionId: id,
         },
