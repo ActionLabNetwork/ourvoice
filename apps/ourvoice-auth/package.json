@@ -15,7 +15,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@tsconfig/node18": "^2.0.1",
+    "@tsconfig/node18": "^18.2.2",
     "@unhead/vue": "^1.1.28",
     "pinia": "^2.1.4",
     "supertokens-web-js": "^0.6.0",
