@@ -74,12 +74,14 @@ export class UserController {
     const now = new Date().toISOString();
     const { status } = await this.metadataService.update(userId, {
       consent: now,
+      deployment: 'dca',
     });
     // TODO: error handling
     if (status === 'OK') {
       // update session payload
       await session.mergeIntoAccessTokenPayload({
         consent: now,
+        deployment: 'dca', // TODO: Change FIXME: DIRTY HACK
       });
       return { message: 'successfully updated user consent' };
     }

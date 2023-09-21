@@ -64,6 +64,7 @@ export default defineComponent({
       const response = await UserService.updateUserConsent()
       if (response.status === 200) {
         this.isConsentModalVisible = false
+        location.reload()
       }
     }
   },
