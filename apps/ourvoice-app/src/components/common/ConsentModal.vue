@@ -64,7 +64,8 @@ export default defineComponent({
       const response = await UserService.updateUserConsent()
       if (response.status === 200) {
         this.isConsentModalVisible = false
-        location.reload()
+        const verify = await UserService.verifyEmail()
+        if (verify.status === 200) location.reload()
       }
     }
   },
