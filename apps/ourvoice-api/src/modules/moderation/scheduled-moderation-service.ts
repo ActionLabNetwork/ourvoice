@@ -28,10 +28,7 @@ function convertFrequencyToCron(frequency: {
         throw new Error(`Invalid days value: ${value}`);
       }
       return `0 0 */${value} * *`;
-    case 'exact-minutes':
-      if (value < 0 || value > 59) {
-        throw new Error(`Invalid minutes value: ${value}`);
-      }
+    case 'every-minute':
       return `*/${value} * * * *`;
     case 'exact-hours':
       if (value < 0 || value > 23) {
