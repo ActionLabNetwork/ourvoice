@@ -62,7 +62,7 @@
       <p>Add allowed user emails:</p>
       <span v-if="!allowedEmails.length">All emails are allowed to register</span>
       <div
-        class="grid-flow-col overflow-x-auto py-4 space-x-5 space-y-2 backdrop-blur-md items-center allowed-emails"
+        class="grid-flow-col overflow-x-auto py-4 space-x-5 space-y-2 backdrop-blur-md items-center allowed-emails min-h-[30%]"
       >
         <div v-for="email in allowedEmails" :key="email" class="chip">
           <div class="chip-content">{{ email }}</div>
