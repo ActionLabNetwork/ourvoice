@@ -9,11 +9,10 @@ import {
 
 export class PostCreateDto {
   @IsString()
-  @Length(1, 100)
+  @Length(1, 255)
   title: string;
 
   @IsString()
-  @Length(1, 255)
   content: string;
 
   @IsNumber({}, { each: true })
