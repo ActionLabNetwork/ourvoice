@@ -8,7 +8,7 @@ import {
 
 export class CommentCreateDto {
   @IsString()
-  @Length(1, 255)
+  @Length(1, 2000)
   content: string;
 
   @IsBoolean()

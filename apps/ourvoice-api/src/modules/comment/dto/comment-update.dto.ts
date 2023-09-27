@@ -8,7 +8,7 @@ import {
 
 export class CommentUpdateDto {
   @IsOptional()
-  @Length(1, 255)
+  @Length(1, 2000)
   @IsString()
   content?: string;
 
