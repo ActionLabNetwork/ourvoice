@@ -4,23 +4,20 @@ import {
   IsInt,
   ArrayMinSize,
   ArrayNotEmpty,
-  ArrayMaxSize,
   IsOptional,
   Length,
 } from 'class-validator';
 
 export class PostCreateDto {
   @IsString()
-  @Length(1, 100)
+  @Length(1, 255)
   title: string;
 
   @IsString()
-  @Length(1, 255)
   content: string;
 
   @ArrayNotEmpty()
   @ArrayMinSize(1)
-  @ArrayMaxSize(2)
   @IsInt({ each: true })
   categoryIds: number[];
 

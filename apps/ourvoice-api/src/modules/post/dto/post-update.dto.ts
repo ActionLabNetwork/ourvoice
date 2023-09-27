@@ -10,12 +10,11 @@ import {
 
 export class PostUpdateDto {
   @IsOptional()
-  @Length(1, 100)
+  @Length(1, 255)
   @IsString()
   title?: string;
 
   @IsOptional()
-  @Length(1, 255)
   @IsString()
   content?: string;
 
