@@ -57,12 +57,12 @@ const router = createRouter({
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
-          deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
+          deployment.set(`${to.query.d || 'dca'}`)
+          redirect.set(`http://${to.query.d || 'dca'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || 'demo' })
+      props: (route) => ({ deployment: route.query.d || 'dca' })
     },
     {
       path: '/signinWithEmailPassword',
@@ -87,12 +87,12 @@ const router = createRouter({
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
-          deployment.set(`${to.query.d || 'demo'}`)
-          redirect.set(`http://${to.query.d || 'demo'}${domain}/posts`)
+          deployment.set(`${to.query.d || 'dca'}`)
+          redirect.set(`http://${to.query.d || 'dca'}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || 'demo' })
+      props: (route) => ({ deployment: route.query.d || 'dca' })
     },
     {
       path: '/magicLink',

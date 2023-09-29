@@ -392,7 +392,7 @@ export default defineComponent({
 
       try {
         await Passwordless.createCode({
-          email: this.email
+          email: this.email.toLowerCase()
         })
         // Magic link sent successfully.
         this.processing = false
@@ -475,7 +475,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://demo${domain}`
+        window.location.href = `http://dca${domain}`
       }
     },
     redirectToIndexPage: function () {

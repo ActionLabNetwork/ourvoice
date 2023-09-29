@@ -66,7 +66,7 @@ const domain = config.sessionTokenFrontendDomain
 
 export default defineComponent({
   setup() {
-    return { deployment: deployment.exists() ? deployment.get() : 'demo' }
+    return { deployment: deployment.exists() ? deployment.get() : 'dca' }
   },
   data() {
     return {
@@ -163,7 +163,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://demo${domain}`
+        window.location.href = `http://dca${domain}`
       }
     }
   }
