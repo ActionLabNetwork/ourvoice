@@ -61,6 +61,7 @@ export default defineComponent({
         !userConsent || this.consentEffectiveDate > new Date(userConsent) ? true : false
     },
     acceptConsent: async function () {
+      this.isConsentModalVisible = false
       const response = await UserService.updateUserConsent()
       if (response.status === 200) {
         this.isConsentModalVisible = false
