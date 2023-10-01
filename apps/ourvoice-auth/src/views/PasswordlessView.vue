@@ -276,6 +276,7 @@ const domain = config.sessionTokenFrontendDomain
 
 // TODO: this list might be coming from the database later
 const organisation = YamlContent.organisation
+const deploymentOrganisation = YamlContent.deployment as string
 
 export default defineComponent({
   components: {
@@ -475,7 +476,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://dca${domain}`
+        window.location.href = `http://${deploymentOrganisation}${domain}`
       }
     },
     redirectToIndexPage: function () {

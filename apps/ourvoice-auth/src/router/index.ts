@@ -9,9 +9,12 @@ import { ManageRedirectStateService } from '../utils/manage-redirect-state.servi
 import { DeploymentService } from '../utils/deployment.service'
 
 import config from '@/config'
+import YamlContent from '../../../../config/config.yml'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
+// TODO: this list might be coming from the database later
+const deploymentOrganisation = YamlContent.deployment as string
 
 // const adminURL = import.meta.env.VITE_APP_ADMIN_URL
 const domain = config.sessionTokenFrontendDomain
@@ -57,12 +60,13 @@ const router = createRouter({
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
-          deployment.set(`${to.query.d || 'dca'}`)
-          redirect.set(`http://${to.query.d || 'dca'}${domain}/posts`)
+          console.log(to.query, ': ', deploymentOrganisation)
+          deployment.set(`${to.query.d || deploymentOrganisation}`)
+          redirect.set(`http://${to.query.d || deploymentOrganisation }${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || 'dca' })
+      props: (route) => ({ deployment: route.query.d || deploymentOrganisation })
     },
     {
       path: '/signinWithEmailPassword',
@@ -87,12 +91,12 @@ const router = createRouter({
       beforeEnter: (to) => {
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
-          deployment.set(`${to.query.d || 'dca'}`)
-          redirect.set(`http://${to.query.d || 'dca'}${domain}/posts`)
+          deployment.set(`${to.query.d || deploymentOrganisation}`)
+          redirect.set(`http://${to.query.d || deploymentOrganisation }${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || 'dca' })
+      props: (route) => ({ deployment: route.query.d || deploymentOrganisation })
     },
     {
       path: '/magicLink',

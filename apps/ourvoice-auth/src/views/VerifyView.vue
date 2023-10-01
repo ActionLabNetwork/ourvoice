@@ -58,15 +58,18 @@ import { ManageRedirectStateService } from '../utils/manage-redirect-state.servi
 import { defineComponent } from 'vue'
 import { DeploymentService } from '../utils/deployment.service'
 import config from '@/config'
+import YamlContent from '../../../../config/config.yml'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
+// TODO: this list might be coming from the database later
+const deploymentOrganisation = YamlContent.deployment as string
 
 const domain = config.sessionTokenFrontendDomain
 
 export default defineComponent({
   setup() {
-    return { deployment: deployment.exists() ? deployment.get() : 'dca' }
+    return { deployment: deployment.exists() ? deployment.get() : deploymentOrganisation }
   },
   data() {
     return {
@@ -163,7 +166,7 @@ export default defineComponent({
         window.location.href = redirectTo
       } else {
         // fallback redirect
-        window.location.href = `http://dca${domain}`
+        window.location.href = `http://${deploymentOrganisation}${domain}`
       }
     }
   }

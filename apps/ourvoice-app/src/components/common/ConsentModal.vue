@@ -66,7 +66,9 @@ export default defineComponent({
       if (response.status === 200) {
         this.isConsentModalVisible = false
         const verify = await UserService.verifyEmail()
-        if (verify.status === 200) location.reload()
+        if (verify.status === 200) {
+          this.$router.push({ name: 'posts' })
+        }
       }
     }
   },
