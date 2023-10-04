@@ -119,6 +119,7 @@ services:
       POSTGRESQL_CONNECTION_URI: 'postgresql://${AUTH_POSTGRES_USER}:${AUTH_POSTGRES_PASSWORD}@authdb:5432/${AUTH_POSTGRES_DB}'
       # session timeout (1 day in minutes)
       REFRESH_TOKEN_VALIDITY: ${SUPERTOKENS_REFRESH_TOKEN_VALIDITY}
+      ACCESS_TOKEN_VALIDITY: ${SUPERTOKENS_ACCESS_TOKEN_VALIDITY}
     networks:
       - backend
     restart: unless-stopped
