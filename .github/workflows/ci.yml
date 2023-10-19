@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.1
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.2.4
@@ -110,7 +110,7 @@ jobs:
 
     steps:
       - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.1
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.8.0
@@ -215,7 +215,7 @@ jobs:
 
     steps:
       - name: Repository checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.1
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2.2.4
