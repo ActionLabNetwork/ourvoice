@@ -44,9 +44,8 @@ export class SupertokensService {
                 ...originalImplementation,
                 createNewSession: async function (input) {
                   const userId = input.userId;
-                  const { metadata } = await UserMetadata.getUserMetadata(
-                    userId,
-                  );
+                  const { metadata } =
+                    await UserMetadata.getUserMetadata(userId);
                   // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
@@ -65,7 +64,6 @@ export class SupertokensService {
   }
 
   private getAuthModules(config: AuthModuleConfig) {
-    const isTestMode = String(config.authBypassTest.isTestMode) == 'true';
     const smtpSettings = config.smtpSettings;
 
     const recipeList = {
@@ -149,21 +147,19 @@ export class SupertokensService {
                   throw Error('Should never come here');
                 }
                 // First we call the original implementation
-                const response = await originalImplementation.verifyEmailPOST(
-                  input,
-                );
+                const response =
+                  await originalImplementation.verifyEmailPOST(input);
 
                 // Then we check if it was successfully completed
                 if (response.status === 'OK') {
-                  const { id } = response.user;
+                  const id = response.user.recipeUserId.getAsString();
                   const { metadata } = await UserMetadata.getUserMetadata(id);
                   // add
                   const sessionHandles =
                     await Session.getAllSessionHandlesForUser(id);
                   sessionHandles.forEach(async (handle) => {
-                    const currSessionInfo = await Session.getSessionInformation(
-                      handle,
-                    );
+                    const currSessionInfo =
+                      await Session.getSessionInformation(handle);
                     if (currSessionInfo === undefined) {
                       return;
                     }
@@ -224,9 +220,8 @@ export class SupertokensService {
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/consumeCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/ConsumeCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L165
-                const response = await originalImplementation.consumeCode(
-                  input,
-                );
+                const response =
+                  await originalImplementation.consumeCode(input);
 
                 return response;
               },
@@ -258,13 +253,12 @@ export class SupertokensService {
                   throw Error('Should never come here');
                 }
                 // First we call the original implementation of consumeCodePOST.
-                const response = await originalImplementation.consumeCodePOST(
-                  input,
-                );
+                const response =
+                  await originalImplementation.consumeCodePOST(input);
                 // Post sign up response, we check if it was successful
                 if (response.status === 'OK') {
                   // const { id, email, phoneNumber } = response.user;
-                  if (response.createdNewUser) {
+                  if (response.createdNewRecipeUser) {
                     let deployment = '';
                     const request = supertokens.getRequestFromUserContext(
                       input.userContext,
