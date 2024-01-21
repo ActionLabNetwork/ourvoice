@@ -3,6 +3,8 @@ import UserRoles from 'supertokens-node/recipe/userroles';
 import Session from 'supertokens-node/recipe/session';
 import { UserRole } from './roles.interface';
 
+const DEFAULT_TENANT_ID = 'public';
+
 @Injectable()
 export class RolesService {
   private readonly logger = new Logger('RolesService');
@@ -24,7 +26,11 @@ export class RolesService {
   }
 
   async addRoleToUserAndTheirSession(userId: string, role: UserRole) {
-    const response = await UserRoles.addRoleToUser(userId, role);
+    const response = await UserRoles.addRoleToUser(
+      DEFAULT_TENANT_ID,
+      userId,
+      role,
+    );
 
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
       // No such role exists
@@ -39,12 +45,15 @@ export class RolesService {
   }
 
   async getRolesForUser(userId: string): Promise<string[]> {
-    const response = await UserRoles.getRolesForUser(userId);
+    const response = await UserRoles.getRolesForUser(DEFAULT_TENANT_ID, userId);
     return response.roles;
   }
 
   async getUsersThatHaveRole(role: UserRole): Promise<string[] | undefined> {
-    const response = await UserRoles.getUsersThatHaveRole(role);
+    const response = await UserRoles.getUsersThatHaveRole(
+      DEFAULT_TENANT_ID,
+      role,
+    );
 
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
       // No such role exists
@@ -55,7 +64,11 @@ export class RolesService {
   }
 
   async removeRoleFromUserAndTheirSession(userId: string, role: UserRole) {
-    const response = await UserRoles.removeUserRole(userId, role);
+    const response = await UserRoles.removeUserRole(
+      DEFAULT_TENANT_ID,
+      userId,
+      role,
+    );
     if (response.status === 'UNKNOWN_ROLE_ERROR') {
       // No such role exists
       return;

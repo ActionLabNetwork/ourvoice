@@ -9,7 +9,7 @@ import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { snapshot: true });
   const configService = app.get(ConfigService);
 
   if (configService.get<string>('NODE_ENV') === 'development') {

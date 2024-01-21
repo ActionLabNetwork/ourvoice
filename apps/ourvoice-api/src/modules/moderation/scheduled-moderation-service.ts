@@ -3,8 +3,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { PostModerationRepository } from './post-moderation/post-moderation.repository';
 import getDeploymentConfig from '../../config/deployment';
-import { CronJob } from 'cron';
 import { CommentModerationRepository } from './comment-moderation/comment-moderation.repository';
+import { CronJob } from 'cron';
 
 function convertFrequencyToCron(frequency: {
   unit: string;
@@ -48,7 +48,7 @@ export class ScheduledModerationService {
   constructor(
     private readonly moderationPostRepository: PostModerationRepository,
     private readonly moderationCommentRepository: CommentModerationRepository,
-    private schedulerRegistry: SchedulerRegistry,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async handleCron() {
@@ -68,7 +68,13 @@ export class ScheduledModerationService {
       'postFrequency'
     ] satisfies ModerationPublishFrequency;
     const cronTime = convertFrequencyToCron(postFrequency);
-    const job = new CronJob(cronTime, () => this.handleCron());
+    const job = new CronJob(
+      cronTime,
+      () => this.handleCron(),
+      null,
+      true,
+      'Australia/Melbourne',
+    );
 
     this.logger.log(
       `Adding a cron job for publishing post and comment every ${postFrequency.value} ${postFrequency.unit} `,
