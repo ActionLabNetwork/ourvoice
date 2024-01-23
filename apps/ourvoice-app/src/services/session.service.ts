@@ -35,6 +35,7 @@ export const getUserId = async () => {
 }
 
 export const checkDeployment = async (deployment: string): Promise<boolean> => {
+  console.log({ deployment })
   const payload = await Session.getAccessTokenPayloadSecurely()
   const userDeployment = payload?.deployment || ''
   return userDeployment === deployment || userDeployment === '*'
@@ -64,7 +65,7 @@ export const isAllowedDeployment = (
         ? parts[0]
         : false
       : parts.length === domainLength
-      ? false
-      : parts[1]
+        ? false
+        : parts[1]
   return deployment && deployments.indexOf(deployment) > -1 ? deployment : false
 }

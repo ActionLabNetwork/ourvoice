@@ -4,40 +4,24 @@
       <Loading>Loading Comment...</Loading>
     </div>
     <transition name="fade">
-      <div>
-        <div class="flex justify-between items-center my-10" v-if="!loading">
+      <div v-if="!loading">
+        <div class="flex justify-between items-center my-10">
           <div>
             <BackButton />
           </div>
-          <div v-if="hasModerationHistory" class="flex justify-end pr-5 sm:pr-0">
-            <!-- Side pane button -->
-            <div
-              @click="toggleSidePane"
-              class="my-2 px-3 py-2 cursor-pointer hover:bg-gray-100 border border-ourvoice-grey rounded-md shadow-md text-sm sm:text-lg"
-              data-cy="moderation-history-button"
-            >
-              <p>
-                Moderation History
-                <span>
-                  <font-awesome-icon :icon="showSidePane ? faArrowLeft : faArrowRight" />
-                </span>
-              </p>
-            </div>
-            <SidePane v-if="showSidePane" @side-pane-toggle="handleSidePaneToggle">
-              <ModerationHistory />
-            </SidePane>
+          <div>
+            <ModerationHistoryTrigger v-if="hasModerationHistory" />
           </div>
         </div>
-        <!-- <div class="grid grid-cols-4 gap-2"> -->
-        <div class="flex flex-wrap sm:flex-nowrap gap-2">
+        <div class="flex flex-wrap sm:flex-nowrap md:grid md:grid-cols-8 gap-5">
           <!-- Versioning -->
-          <div class="col-span-full sm:col-span-1 pl-4 sm:px-0" v-if="comment">
+          <div class="col-span-full sm:col-span-2 pl-4 sm:px-0" v-if="comment">
             <ModerationVersionList
               @versionClicked="handleVersionChange"
               :versions="comment?.versions ?? []"
             />
           </div>
-          <div className="space-y-2 w-full">
+          <div className="col-span-6 space-y-2 w-full">
             <!-- Post Context Preview -->
             <div
               v-if="comment && comment.post && comment.post.versions"
@@ -125,9 +109,11 @@
 </template>
 
 <script setup lang="ts">
+import Button from '@/components/ui/button/Button.vue'
 import { useUserStore } from '@/stores/user'
 import { ref, onMounted, computed, watchEffect, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ModerationHistoryTrigger from './ModerationHistoryTrigger.vue'
 import ModerationPostCard from '@/components/post/moderation/ModerationPostCard.vue'
 import ModerationCommentCard from '@/components/comment/moderation/ModerationCommentCard.vue'
 import ModerationEditableCommentCard from './ModerationEditableCommentCard.vue'
@@ -318,14 +304,19 @@ async function performModeration(action: (versionId: number) => Promise<any>) {
 }
 
 function acceptComment(reason: string) {
-  performModeration((versionId) => 
-    commentModerationStore.approveCommentVersion(versionId, userStore.sessionHash, userStore.nickname, reason)
+  performModeration((versionId) =>
+    commentModerationStore.approveCommentVersion(
+      versionId,
+      userStore.sessionHash,
+      userStore.nickname,
+      reason
+    )
   )
 }
 
 function rejectComment(reason: string) {
-  performModeration(
-    (versionId) => commentModerationStore.rejectCommentVersion(
+  performModeration((versionId) =>
+    commentModerationStore.rejectCommentVersion(
       versionId,
       userStore.sessionHash,
       userStore.nickname,

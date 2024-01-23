@@ -41,6 +41,8 @@ export class AuthService {
       return sessionHash === hash;
     };
 
+    console.log({ session, claimedHash });
+
     const hashesAreEqual = await verifyHashesAreEqual(session, claimedHash);
     if (!hashesAreEqual) {
       throw new BadRequestException(

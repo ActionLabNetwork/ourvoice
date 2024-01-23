@@ -26,7 +26,7 @@ roles:
 allowedEmails:
   - user@ourvoice.app
 moderators:
-  - odeployment_admin@ourvoice.app
+  - deployment_admin@ourvoice.app
   - moderator1@ourvoice.app
   - moderator2@ourvoice.app
 authModules:
