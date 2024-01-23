@@ -8,9 +8,11 @@ import { SessionContainer } from 'supertokens-node/recipe/session';
 @Injectable()
 export class AuthService {
   private readonly globalPepper: string;
+  private readonly deployment: string;
 
   constructor(@Inject(ConfigInjectionToken) private config: AuthModuleConfig) {
     this.globalPepper = config.globalPepper;
+    this.deployment = config.deployment;
   }
 
   async hashInput(input: string, deployment: string): Promise<string> {
@@ -34,13 +36,11 @@ export class AuthService {
       hash: string,
     ): Promise<boolean> => {
       const userId = session.getUserId();
-      const deployment = session['userDataInAccessToken'].deployment;
-      const sessionHash = await this.hashInput(userId, deployment);
+      const sessionHash = await this.hashInput(userId, this.deployment);
       return sessionHash === hash;
     };
 
     const hashesAreEqual = await verifyHashesAreEqual(session, claimedHash);
-
     if (!hashesAreEqual) {
       throw new BadRequestException(
         'The claimed hash provided does not match the session hash',

@@ -58,6 +58,7 @@ import { DateTimeScalar } from './graphql/DatetimeScalar';
           smtpSettings: configService.get<SMTPConfig>('smtp'),
           cookieDomain: configService.get<string>('supertokens.cookieDomain'),
           globalPepper: configService.get<string>('api.globalPepper'),
+          deployment: configService.get<string>('deployment'),
         };
       },
     }),
