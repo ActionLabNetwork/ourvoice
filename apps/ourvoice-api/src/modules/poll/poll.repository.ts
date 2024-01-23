@@ -125,19 +125,23 @@ export class PollRepository {
         ? { expiresAt: { not: null } }
         : undefined;
 
+    const compositeConditions: Prisma.PollWhereInput[] = [];
+
+    if (createdBefore || createdAfter) {
+      compositeConditions.push({
+        createdAt: {
+          gte: createdAfter,
+          lte: createdBefore,
+        },
+      });
+    }
+    if (whereExpires) {
+      compositeConditions.push(whereExpires);
+    }
+
     const where: Prisma.PollWhereInput = {
       ...rest,
-      AND: [
-        createdBefore || createdAfter
-          ? {
-              createdAt: {
-                gte: createdAfter,
-                lte: createdBefore,
-              },
-            }
-          : undefined,
-        whereExpires,
-      ],
+      ...(compositeConditions.length !== 0 ? { AND: compositeConditions } : {}),
     };
 
     const totalCount = await this.prisma.poll.count({ where });
