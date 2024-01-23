@@ -6,7 +6,6 @@ import { PollFilterInput, PollPaginationInput } from 'src/graphql';
 import { cursorToNumber } from '../../utils/cursor-pagination';
 import { PollCreateDto } from './dto/poll-create.dto';
 import { PollUpdateDto } from './dto/poll-update.dto';
-import { create } from 'domain';
 
 @Injectable()
 export class PollRepository {
@@ -123,8 +122,8 @@ export class PollRepository {
             OR: [whereExpiresRange, { expiresAt: null }],
           }
       : expiresExcludeNull
-      ? { expiresAt: { not: null } }
-      : undefined;
+        ? { expiresAt: { not: null } }
+        : undefined;
 
     const where: Prisma.PollWhereInput = {
       ...rest,

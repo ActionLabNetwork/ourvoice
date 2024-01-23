@@ -88,7 +88,7 @@ export class CommentModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.approveCommentVersion(
       id,
@@ -108,7 +108,7 @@ export class CommentModerationResolver {
     @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.rejectCommentVersion(
       id,
@@ -131,7 +131,7 @@ export class CommentModerationResolver {
     @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Comment> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.commentModerationService.modifyModerationComment(
       id,

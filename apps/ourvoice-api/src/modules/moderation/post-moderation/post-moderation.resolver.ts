@@ -1,8 +1,5 @@
 import { AuthService } from './../../../auth/auth.service';
-import {
-  hasElevatedPermissions,
-  validateUserPermission,
-} from './../../../utils/auth';
+import { validateUserPermission } from './../../../utils/auth';
 import { ModerationPostsResponse } from './../../../types/moderation/post-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
@@ -64,7 +61,7 @@ export class PostModerationResolver {
     @GqlSession() session: SessionContainer,
     @Args('data') data: ModerationPostCreateInput,
   ): Promise<Post> {
-    await this.authService.validateClaimedHash(session, data.authorHash);
+    // await this.authService.validateClaimedHash(session, data.authorHash);
 
     if (data.hasFromTheModeratorsTag) {
       await validateUserPermission(session);
@@ -82,7 +79,7 @@ export class PostModerationResolver {
     @Args('reason') reason: string,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.approvePostVersion(
       id,
@@ -102,7 +99,7 @@ export class PostModerationResolver {
     @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.rejectPostVersion(
       id,
@@ -125,7 +122,7 @@ export class PostModerationResolver {
     @Args('moderationCategory') moderationCategory: string | null,
   ): Promise<Post> {
     await validateUserPermission(session);
-    await this.authService.validateClaimedHash(session, moderatorHash);
+    // await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.postModerationService.modifyModerationPost(
       id,
