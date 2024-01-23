@@ -2,7 +2,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { PostModule } from './modules/post/post.module';
 import { VoteModule } from './modules/vote/vote.module';
 import { CommentModule } from './modules/comment/comment.module';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -111,8 +111,4 @@ import { DateTimeScalar } from './graphql/DatetimeScalar';
   controllers: [AppController],
   providers: [AppService, DateTimeScalar],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): any {
-    // consumer.apply(AnalyticsMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
