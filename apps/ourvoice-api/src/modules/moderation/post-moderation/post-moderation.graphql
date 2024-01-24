@@ -1,4 +1,5 @@
 type Query {
+  latestModerationPost(authorHash: String!): ModerationPostId!
   moderationPost(id: Int!): ModerationPost
   moderationPosts(
     filter: ModerationPostsFilterInput
@@ -130,4 +131,8 @@ input ModerationPostModifyInput {
   content: String
   categoryIds: [Int!]
   files: [String]
+}
+
+type ModerationPostId {
+  id: Int!
 }

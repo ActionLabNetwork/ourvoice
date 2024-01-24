@@ -24,6 +24,15 @@ export class PostModerationResolver {
   ) {}
 
   @Query()
+  async latestModerationPost(
+    @GqlSession() session: SessionContainer,
+    @Args('authorHash') authorHash: string,
+  ) {
+    await this.authService.validateClaimedHash(session, authorHash);
+    return await this.postModerationService.getLatestModerationPost(authorHash);
+  }
+
+  @Query()
   async moderationPost(
     @GqlSession() session: SessionContainer,
     @Args('id') id: number,

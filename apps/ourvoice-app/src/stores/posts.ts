@@ -1,4 +1,8 @@
-import { postFilesPresignedUrlTTL, type sortOptions, type sortOrder } from '@/constants/post'
+import {
+  postFilesPresignedUrlTTL,
+  type sortOptions,
+  type sortOrder,
+} from '@/constants/post'
 import type { GetPostsQuery } from '@/graphql/generated/graphql'
 import { GET_PRESIGNED_DOWNLOAD_URLS_QUERY } from '@/graphql/queries/getPresignedDownloadUrls'
 import type { ApolloError } from '@apollo/client/errors'
@@ -34,6 +38,7 @@ export interface PostsState {
   error: Error | undefined
   errorMessage: string | undefined
   sortFilter: SortFilter
+  userStore: ReturnType<typeof useUserStore>
 }
 
 provideApolloClient(apolloClient)
@@ -50,13 +55,14 @@ export const usePostsStore = defineStore('posts', {
       sortBy: 'sortByCreatedAt',
       sortOrder: 'desc',
       selectedCategoryIds: null,
-      createdAfter: null
-    }
+      createdAfter: null,
+    },
+    userStore: useUserStore(),
   }),
   getters: {
-    getPostById: (state) => (id: number) => {
-      return state.data.find((post) => post.id === id)
-    }
+    getPostById: state => (id: number) => {
+      return state.data.find(post => post.id === id)
+    },
   },
   actions: {
     async fetchPosts(loadMore = false) {
@@ -66,17 +72,18 @@ export const usePostsStore = defineStore('posts', {
           query: GET_POSTS_QUERY,
           variables: {
             sort: {
-              [this.sortFilter.sortBy]: this.sortFilter.sortOrder
+              [this.sortFilter.sortBy]: this.sortFilter.sortOrder,
             },
             pagination: {
-              cursor: loadMore && this.pageInfo ? this.pageInfo.endCursor : null
+              cursor:
+                loadMore && this.pageInfo ? this.pageInfo.endCursor : null,
             },
             filter: {
               categoryIds: this.sortFilter.selectedCategoryIds,
-              createdAfter: this.sortFilter.createdAfter
+              createdAfter: this.sortFilter.createdAfter,
             },
-            presignedUrlExpiresIn: postFilesPresignedUrlTTL
-          }
+            presignedUrlExpiresIn: postFilesPresignedUrlTTL,
+          },
         })
         if (!data) {
           throw Error('data is null')
@@ -86,7 +93,7 @@ export const usePostsStore = defineStore('posts', {
           throw Error('posts is null')
         }
 
-        const newPosts = posts.edges.map((edge) => edge.node)
+        const newPosts = posts.edges.map(edge => edge.node)
 
         this.data = loadMore ? [...this.data, ...newPosts] : newPosts
         this.totalCount = data.posts.totalCount ?? 0
@@ -119,7 +126,7 @@ export const usePostsStore = defineStore('posts', {
       try {
         const { data } = await apolloClient.query({
           query: GET_PRESIGNED_DOWNLOAD_URLS_QUERY,
-          variables: { keys, expiresIn }
+          variables: { keys, expiresIn },
         })
         return data.getPresignedDownloadUrls
       } catch (error) {
@@ -134,7 +141,7 @@ export const usePostsStore = defineStore('posts', {
       content,
       categoryIds,
       files,
-      hasFromTheModeratorsTag
+      hasFromTheModeratorsTag,
     }: {
       title: string
       content: string
@@ -143,16 +150,14 @@ export const usePostsStore = defineStore('posts', {
       hasFromTheModeratorsTag: boolean
     }) {
       // Check for valid deployment and user session
-      const userStore = useUserStore()
-
       // Check if we can access the session and generate a user hash for storing in the db
-      if (!userStore.isLoggedIn) {
+      if (!this.userStore.isLoggedIn) {
         // TODO: Set up a proper error handling module
         throw new Error('User session is invalid')
       }
 
-      const authorHash = useUserStore().sessionHash
-      const authorNickname = useUserStore().nickname
+      const authorHash = this.userStore.sessionHash
+      const authorNickname = this.userStore.nickname
 
       try {
         await apolloClient.mutate({
@@ -165,10 +170,12 @@ export const usePostsStore = defineStore('posts', {
               files,
               authorHash,
               authorNickname,
-              hasFromTheModeratorsTag
-            }
-          }
+              hasFromTheModeratorsTag,
+            },
+          },
         })
+
+        await this.userStore.invalidateNickname()
       } catch (error: unknown) {
         if (error instanceof Error) {
           this.error = error
@@ -179,7 +186,7 @@ export const usePostsStore = defineStore('posts', {
     async votePost({
       postId,
       userId,
-      voteType
+      voteType,
     }: {
       postId: number
       userId: number
@@ -187,7 +194,7 @@ export const usePostsStore = defineStore('posts', {
     }) {
       await apolloClient.mutate({
         mutation: VOTE_MUTATION,
-        variables: { data: { postId, userId, voteType } }
+        variables: { data: { postId, userId, voteType } },
       })
     },
 
@@ -196,7 +203,7 @@ export const usePostsStore = defineStore('posts', {
       votesUp,
       votesDown,
       authorHash,
-      voteType
+      voteType,
     }: {
       postId: number
       votesUp: number
@@ -206,18 +213,20 @@ export const usePostsStore = defineStore('posts', {
     }) {
       try {
         //sync votesUp/votesDown state with the post table
-        const storedPost = { ...this.data.find((post) => post.id === postId)! }
+        const storedPost = { ...this.data.find(post => post.id === postId)! }
         evictItem(storedPost)
         storedPost.votesUp = votesUp
         storedPost.votesDown = votesDown
         const userVoteForStoredPost = storedPost.votes.find(
-          (vote) => vote.authorHash === authorHash
+          vote => vote.authorHash === authorHash,
         )
         if (userVoteForStoredPost) {
           if (userVoteForStoredPost.voteType === voteType) {
-            storedPost.votes = storedPost.votes.filter((vote) => vote.authorHash !== authorHash)
+            storedPost.votes = storedPost.votes.filter(
+              vote => vote.authorHash !== authorHash,
+            )
           } else {
-            storedPost.votes = storedPost.votes.map((vote) => {
+            storedPost.votes = storedPost.votes.map(vote => {
               if (vote.authorHash !== authorHash) {
                 return vote
               }
@@ -227,7 +236,9 @@ export const usePostsStore = defineStore('posts', {
         } else {
           storedPost.votes = [...storedPost.votes, { authorHash, voteType }]
         }
-        this.data = this.data.map((post) => (post.id === postId ? storedPost : post))
+        this.data = this.data.map(post =>
+          post.id === postId ? storedPost : post,
+        )
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
@@ -254,8 +265,11 @@ export const usePostsStore = defineStore('posts', {
 
         const { data } = await apolloClient.query({
           query: GET_POST_BY_ID_QUERY,
-          variables: { postId, presignedUrlExpiresIn: postFilesPresignedUrlTTL },
-          fetchPolicy: 'no-cache'
+          variables: {
+            postId,
+            presignedUrlExpiresIn: postFilesPresignedUrlTTL,
+          },
+          fetchPolicy: 'no-cache',
         })
         const post = data?.post
         if (!post) {
@@ -267,6 +281,6 @@ export const usePostsStore = defineStore('posts', {
           this.error = error
         }
       }
-    }
-  }
+    },
+  },
 })

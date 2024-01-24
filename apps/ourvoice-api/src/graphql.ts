@@ -341,6 +341,8 @@ export abstract class IQuery {
 
     abstract commentVersion(id: number): ModerationCommentVersion | Promise<ModerationCommentVersion>;
 
+    abstract latestModerationPost(authorHash: string): ModerationPostId | Promise<ModerationPostId>;
+
     abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 
     abstract moderationPosts(filter?: Nullable<ModerationPostsFilterInput>, pagination?: Nullable<ModerationPostPaginationInput>): Nullable<ModerationPostConnection> | Promise<Nullable<ModerationPostConnection>>;
@@ -633,6 +635,10 @@ export class ModerationPostPageInfo {
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
     hasPreviousPage?: Nullable<boolean>;
+}
+
+export class ModerationPostId {
+    id: number;
 }
 
 export class PollOption implements BasePollOption {

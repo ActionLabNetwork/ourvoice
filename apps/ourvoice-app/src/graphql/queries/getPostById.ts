@@ -1,3 +1,4 @@
+import gql from 'graphql-tag'
 import { graphql } from '../generated'
 
 export const GET_POST_BY_ID_QUERY = graphql(`
@@ -34,6 +35,14 @@ export const GET_POST_BY_ID_QUERY = graphql(`
         key
         url
       }
+    }
+  }
+`)
+
+export const GET_LATEST_POST_QUERY = gql(`
+  query LatestPost($authorHash: String!) {
+    latestModerationPost(authorHash: $authorHash) {
+      id
     }
   }
 `)

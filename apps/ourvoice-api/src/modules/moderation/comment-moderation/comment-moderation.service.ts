@@ -189,7 +189,7 @@ export class CommentModerationService {
       moderatorHash,
       moderatorNickname,
       reason,
-      // moderationCategory,
+      moderationCategory,
     );
   }
 
@@ -232,7 +232,7 @@ export class CommentModerationService {
       reason,
       data,
       hasContentWarning,
-      // moderationCategory,
+      moderationCategory,
     );
   }
 

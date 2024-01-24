@@ -58,6 +58,14 @@ export class PostModerationRepository {
     private readonly postService: PostService,
   ) {}
 
+  async getLatestModerationPost(authorHash: string) {
+    return await this.prisma.post.findFirst({
+      where: { authorHash },
+      orderBy: { id: 'desc' },
+      select: { id: true },
+    });
+  }
+
   async getModerationPostById(
     id: number,
   ): Promise<PostIncludesVersionIncludesModerations> {
@@ -274,6 +282,7 @@ export class PostModerationRepository {
           decision: 'REJECTED',
           reason,
           postVersionId: id,
+          moderationCategory,
         },
         select: { postVersion: { select: { postId: true } } },
       });
@@ -332,6 +341,7 @@ export class PostModerationRepository {
           version: latestVersion.version + 1,
           latest: true,
           hasContentWarning,
+          moderationCategory,
         },
       });
     });

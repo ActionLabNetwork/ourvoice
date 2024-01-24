@@ -14,6 +14,7 @@ import { apolloClient } from './../graphql/client/index'
 import { provideApolloClient, useQuery } from '@vue/apollo-composable'
 import { GET_LATEST_COMMENT_QUERY } from '@/graphql/queries/getCommentById'
 import { computed, ref } from 'vue'
+import { GET_LATEST_POST_QUERY } from '@/graphql/queries/getPostById'
 
 export interface UserState {
   userId: string
@@ -34,13 +35,21 @@ export const useUserStore = defineStore('user', () => {
   const userDeployment = ref('')
   const consentDate = ref<Date | null>(null)
 
-  const { result: latestCommentResult, refetch } = useQuery(
-    GET_LATEST_COMMENT_QUERY,
+  const { result: latestPostResult, refetch: refetchLatestPost } = useQuery(
+    GET_LATEST_POST_QUERY,
     {
       authorHash: sessionHash.value,
     },
     { fetchPolicy: 'network-only' },
   )
+  const { result: latestCommentResult, refetch: refetchLatestComment } =
+    useQuery(
+      GET_LATEST_COMMENT_QUERY,
+      {
+        authorHash: sessionHash.value,
+      },
+      { fetchPolicy: 'network-only' },
+    )
 
   const isLoggedIn = computed(async () => await Session.doesSessionExist())
   const nicknameInParts = computed(() => {
@@ -53,6 +62,10 @@ export const useUserStore = defineStore('user', () => {
   const getConsent = computed(async () => {
     const payload = await getSessionPayload()
     return payload.consent
+  })
+  const latestPostId = computed(() => {
+    if (!latestPostResult.value) return -1
+    return latestPostResult.value.latestModerationPost.id
   })
   const latestCommentId = computed(() => {
     if (!latestCommentResult.value) return -1
@@ -68,8 +81,14 @@ export const useUserStore = defineStore('user', () => {
     if (Config['persistNickNames'] === 'fixed') {
       seed = userId
     } else if (Config['persistNickNames'] === 'action') {
-      await refetch({ authorHash: sessionHash.value })
-      seed = userId + sessionHandle + latestCommentId.value
+      await refetchLatestPost({ authorHash: sessionHash.value })
+      await refetchLatestComment({ authorHash: sessionHash.value })
+      seed = JSON.stringify({
+        userId,
+        sessionHandle,
+        latestPostId: latestPostId.value,
+        latestCommentId: latestCommentId.value,
+      })
     } else if (Config['persistNickNames'] === 'session') {
       seed = userId + sessionHandle
     }
@@ -118,6 +137,5 @@ export const useUserStore = defineStore('user', () => {
     getConsent,
     verifyUserSession,
     invalidateNickname,
-    refetch,
   }
 })

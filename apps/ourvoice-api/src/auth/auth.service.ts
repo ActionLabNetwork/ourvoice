@@ -38,7 +38,6 @@ export class AuthService {
       const userId = session.getUserId();
       const sessionHash = await this.hashInput(userId, this.deployment);
 
-      console.log({ sessionHash, claimedHash });
       return sessionHash === hash;
     };
 

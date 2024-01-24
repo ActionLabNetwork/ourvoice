@@ -304,7 +304,7 @@ export class CommentModerationRepository {
     moderatorHash: string,
     moderatorNickname: string,
     reason: string,
-    // moderationCategory: string | null,
+    moderationCategory: string | null,
   ): Promise<CommentIncludesVersionIncludesModerations> {
     const newCommentModeration = await this.prisma.$transaction(async (tx) => {
       // Check if moderator has already moderated this comment version
@@ -342,6 +342,7 @@ export class CommentModerationRepository {
           decision: 'REJECTED',
           reason,
           commentVersionId: id,
+          moderationCategory,
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
@@ -377,7 +378,7 @@ export class CommentModerationRepository {
     reason: string,
     data: CommentModifyDto,
     hasContentWarning: boolean,
-    // moderationCategory: string | null,
+    moderationCategory: string | null,
   ): Promise<CommentIncludesVersionIncludesModerations> {
     const modifiedModerationComment = await this.prisma.$transaction(
       async (tx) => {
@@ -406,6 +407,7 @@ export class CommentModerationRepository {
             hasContentWarning,
             version: latestVersion.version + 1,
             latest: true,
+            moderationCategory,
           },
         });
 
