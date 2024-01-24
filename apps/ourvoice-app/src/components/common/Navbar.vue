@@ -1,5 +1,9 @@
 <template>
-  <header class="bg-ourvoice-primary-2" v-if="userStore.sessionHash" data-cy="ourvoice-navbar">
+  <header
+    class="bg-ourvoice-primary-2"
+    v-if="userStore.sessionHash"
+    data-cy="ourvoice-navbar"
+  >
     <nav
       class="mx-auto grid grid-cols-3 md:grid-cols-5 grid-flow-row-dense p-6 gap-y-5"
       aria-label="Global"
@@ -20,7 +24,11 @@
           <div>
             <a href="/" class="">
               <span class="sr-only">Diversity Council Australia</span>
-              <img class="w-24 rounded-md" src="@/assets/logo/dca_logo.png" alt="Deployment Logo" />
+              <img
+                class="w-24 rounded-md"
+                src="@/assets/logo/dca_logo.png"
+                alt="Deployment Logo"
+              />
             </a>
           </div>
         </div>
@@ -73,7 +81,9 @@
       <!-- Desktop Menu -->
       <div
         class="hidden lg:flex lg:gap-x-10 justify-center justify-self-end px-2"
-        :class="`${hasElevatedPermissions ? 'lg:col-start-3' : 'lg:col-start-4'}`"
+        :class="`${
+          hasElevatedPermissions ? 'lg:col-start-3' : 'lg:col-start-4'
+        }`"
       >
         <!-- Nav Items -->
         <PopoverGroup class="flex gap-5 items-center">
@@ -87,14 +97,20 @@
             <span
               v-if="hasElevatedPermissions"
               class="lg:block"
-              :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }"
+              :class="{
+                'border-b-2': item.current,
+                hidden: !item.showOnSmallScreen,
+              }"
             >
               {{ item.name }}
             </span>
             <span
               v-else-if="item.href === '/about'"
               class="lg:block"
-              :class="{ 'border-b-2': item.current, hidden: !item.showOnSmallScreen }"
+              :class="{
+                'border-b-2': item.current,
+                hidden: !item.showOnSmallScreen,
+              }"
             >
               {{ item.name }}
             </span>
@@ -103,7 +119,7 @@
           <!-- Moderation Dropdown start-->
           <Popover
             :class="{
-              hidden: !hasElevatedPermissions
+              hidden: !hasElevatedPermissions,
             }"
             class="relative"
             v-slot="{ open, close }"
@@ -156,7 +172,9 @@
           <!-- Moderation Dropdown end-->
         </PopoverGroup>
       </div>
-      <div class="hidden lg:inline-flex items-center gap-5 lg:col-start-5 justify-self-end">
+      <div
+        class="hidden lg:inline-flex items-center gap-5 lg:col-start-5 justify-self-end"
+      >
         <!-- Create Post Button LG and above -->
         <div>
           <CreatePostNavButton class="hidden lg:inline-flex" />
@@ -194,10 +212,10 @@
                 <div class="p-4">
                   <div
                     v-on:click="
-                      (() => {
+                      () => {
                         navigateToSettings()
                         close()
-                      })
+                      }
                     "
                     class="p-4 text-sm block font-semibold rounded-lg text-ourvoice-white cursor-pointer hover:bg-ourvoice-primary-1"
                   >
@@ -231,7 +249,12 @@
     </nav>
 
     <!-- Mobile Menu -->
-    <Dialog as="div" class="lg:hidden" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
+    <Dialog
+      as="div"
+      class="lg:hidden"
+      @close="mobileMenuOpen = false"
+      :open="mobileMenuOpen"
+    >
       <div class="fixed inset-0 z-30" />
       <DialogPanel
         class="fixed inset-y-0 right-0 z-30 w-full overflow-y-auto bg-ourvoice-primary-2 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
@@ -251,7 +274,10 @@
             @click="mobileMenuOpen = false"
           >
             <span class="sr-only">Close menu</span>
-            <font-awesome-icon :icon="faXmark" class="h-6 w-6 bg-ourvoice-white rounded-md" />
+            <font-awesome-icon
+              :icon="faXmark"
+              class="h-6 w-6 bg-ourvoice-white rounded-md"
+            />
           </button>
         </div>
         <div class="mt-6 flow-root">
@@ -274,7 +300,7 @@
                 as="div"
                 class="-mx-3"
                 :class="{
-                  hidden: !hasElevatedPermissions
+                  hidden: !hasElevatedPermissions,
                 }"
                 v-slot="{ open }"
               >
@@ -321,7 +347,9 @@
                       alt="PseudoNickname"
                     />
                   </div>
-                  <p class="text-ourvoice-white inline-block my-auto underline underline-offset-4">
+                  <p
+                    class="text-ourvoice-white inline-block my-auto underline underline-offset-4"
+                  >
                     {{ userStore.nickname }}
                   </p>
                   <font-awesome-icon
@@ -336,10 +364,10 @@
                     as="div"
                     class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-ourvoice-white hover:underline cursor-pointer"
                     @click.prevent="
-                        () => {
-                          navigateToSettings()
-                          mobileMenuOpen = false
-                        }
+                      () => {
+                        navigateToSettings()
+                        mobileMenuOpen = false
+                      }
                     "
                   >
                     Preferences
@@ -374,7 +402,7 @@ import {
   Popover,
   PopoverButton,
   PopoverGroup,
-  PopoverPanel
+  PopoverPanel,
 } from '@headlessui/vue'
 import { useUserStore } from '@/stores/user'
 import { useRoute, useRouter } from 'vue-router'
@@ -385,21 +413,25 @@ import ThreadsIcon from '@/assets/icons/threads.svg'
 import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
 import PollsIcon from '@/assets/icons/polls.svg'
 import PollsIconDark from '@/assets/icons/polls-dark.svg'
-import { faBars, faChevronDown, faXmark } from '@fortawesome/free-solid-svg-icons'
+import {
+  faBars,
+  faChevronDown,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons'
 
 const toggleItems = {
   left: {
     iconLight: ThreadsIcon,
     iconDark: ThreadsIconDark,
     label: 'Discussion',
-    hasUpdates: false
+    hasUpdates: false,
   },
   right: {
     iconLight: PollsIcon,
     iconDark: PollsIconDark,
     label: 'Polls',
-    hasUpdates: false
-  }
+    hasUpdates: false,
+  },
 }
 let currentPathIsReady = ref(false)
 
@@ -407,10 +439,12 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const currentPath = computed(() => route.fullPath)
-const navBarSwitchState = computed(() => route.meta.navBarSwitchState as string | undefined)
+const navBarSwitchState = computed(
+  () => route.meta.navBarSwitchState as string | undefined,
+)
 
 const hasElevatedPermissions = computed(
-  () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
+  () => userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin,
 )
 
 router.afterEach(async () => {
@@ -435,22 +469,22 @@ const navItems = ref([
     name: 'Discussion',
     href: '/posts',
     current: currentPath.value === '/posts',
-    showOnSmallScreen: false
+    showOnSmallScreen: false,
   },
   {
     id: 2,
     name: 'Polls',
     href: '/polls',
     current: currentPath.value === '/polls',
-    showOnSmallScreen: false
+    showOnSmallScreen: false,
   },
   {
     id: 3,
     name: 'FAQ',
     href: '/about',
     current: currentPath.value === '/about',
-    showOnSmallScreen: true
-  }
+    showOnSmallScreen: true,
+  },
 ])
 
 // Multi level nav items
@@ -460,20 +494,20 @@ const moderation = ref([
     id: 1,
     name: 'Posts',
     href: '/moderation/posts',
-    current: currentPath.value === '/moderation/posts'
+    current: currentPath.value === '/moderation/posts',
   },
   {
     id: 2,
     name: 'Comments',
     href: '/moderation/comments',
-    current: currentPath.value === '/moderation/comments'
+    current: currentPath.value === '/moderation/comments',
   },
   {
     id: 3,
     name: 'Polls',
     href: '/moderation/polls',
-    current: currentPath.value === '/moderation/polls'
-  }
+    current: currentPath.value === '/moderation/polls',
+  },
 ])
 
 const mobileMenuOpen = ref(false)
@@ -482,7 +516,7 @@ const handleItemClick = (id: number) => {
   for (let item of navItems.value) {
     item.current = item.id === id
   }
-  moderation.value = moderation.value.map((item) => ({ ...item, current: false }))
+  moderation.value = moderation.value.map(item => ({ ...item, current: false }))
 
   if (mobileMenuOpen.value) {
     mobileMenuOpen.value = false
@@ -493,7 +527,7 @@ const handleChildItemClick = (id: number) => {
   for (let item of moderation.value) {
     item.current = item.id === id
   }
-  navItems.value = navItems.value.map((item) => ({ ...item, current: false }))
+  navItems.value = navItems.value.map(item => ({ ...item, current: false }))
 
   if (mobileMenuOpen.value) {
     mobileMenuOpen.value = false
@@ -520,22 +554,22 @@ watchEffect(() => {
       name: 'Discussion',
       href: '/posts',
       current: currentPath.value === '/posts',
-      showOnSmallScreen: false
+      showOnSmallScreen: false,
     },
     {
       id: 2,
       name: 'Polls',
       href: '/polls',
       current: currentPath.value === '/polls',
-      showOnSmallScreen: false
+      showOnSmallScreen: false,
     },
     {
       id: 3,
       name: 'FAQ',
       href: '/about',
       current: currentPath.value === '/about',
-      showOnSmallScreen: true
-    }
+      showOnSmallScreen: true,
+    },
   ]
 
   // Multi level nav items
@@ -544,20 +578,20 @@ watchEffect(() => {
       id: 1,
       name: 'Posts',
       href: '/moderation/posts',
-      current: currentPath.value === '/moderation/posts'
+      current: currentPath.value === '/moderation/posts',
     },
     {
       id: 2,
       name: 'Comments',
       href: '/moderation/comments',
-      current: currentPath.value === '/moderation/comments'
+      current: currentPath.value === '/moderation/comments',
     },
     {
       id: 3,
       name: 'Polls',
       href: '/moderation/polls',
-      current: currentPath.value === '/moderation/polls'
-    }
+      current: currentPath.value === '/moderation/polls',
+    },
   ]
 })
 </script>

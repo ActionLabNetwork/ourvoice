@@ -42,7 +42,7 @@ moderatorCount: 1
 postFrequency:
   unit: 'minutes'
   value: 1
-persistNickNames: true
+persistNickNames: action
 attachmentBucket: test-bucket
 allowDownvote: true
 contentWarningLink: 'https://itstopswithme.humanrights.gov.au/take-action/support-services'

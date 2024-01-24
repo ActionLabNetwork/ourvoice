@@ -1,10 +1,19 @@
 import authService from '@/services/auth-service'
 import { defineStore } from 'pinia'
 import { useDeploymentStore } from '@/stores/deployment'
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+} from 'unique-names-generator'
 import Session from 'supertokens-web-js/recipe/session'
 import { getSessionPayload, getUserId } from '../services/session.service'
-import Config from "../../../../config/config.yml"
+import Config from '../../../../config/config.yml'
+import { apolloClient } from './../graphql/client/index'
+import { provideApolloClient, useQuery } from '@vue/apollo-composable'
+import { GET_LATEST_COMMENT_QUERY } from '@/graphql/queries/getCommentById'
+import { computed, ref } from 'vue'
 
 export interface UserState {
   userId: string
@@ -15,62 +24,100 @@ export interface UserState {
   consentDate: Date | null
 }
 
-export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    userId: '',
-    sessionHash: '',
-    nickname: '',
-    userRoles: [],
-    userDeployment: '',
-    consentDate: null
-  }),
-  getters: {
-    isLoggedIn: async () => {
-      return await Session.doesSessionExist()
+provideApolloClient(apolloClient)
+
+export const useUserStore = defineStore('user', () => {
+  const userId = ref('')
+  const sessionHash = ref('')
+  const nickname = ref('')
+  const userRoles = ref<string[]>([])
+  const userDeployment = ref('')
+  const consentDate = ref<Date | null>(null)
+
+  const { result: latestCommentResult, refetch } = useQuery(
+    GET_LATEST_COMMENT_QUERY,
+    {
+      authorHash: sessionHash.value,
     },
-    nicknameInParts: (state) => {
-      const [first, middle, last] = state.nickname.split('_')
-      return { first, middle, last }
-    },
-    isModerator: (state) => {
-      return state.userRoles.includes('moderator')
-    },
-    isAdmin: (state) => {
-      return state.userRoles.includes('admin')
-    },
-    isSuperAdmin: (state) => {
-      return state.userRoles.includes('super')
-    },
-    getConsent: async () => {
-      const payload = await getSessionPayload()
-      return payload.consent
+    { fetchPolicy: 'network-only' },
+  )
+
+  const isLoggedIn = computed(async () => await Session.doesSessionExist())
+  const nicknameInParts = computed(() => {
+    const [first, middle, last] = nickname.value.split('_')
+    return { first, middle, last }
+  })
+  const isModerator = computed(() => userRoles.value.includes('moderator'))
+  const isAdmin = computed(() => userRoles.value.includes('admin'))
+  const isSuperAdmin = computed(() => userRoles.value.includes('super'))
+  const getConsent = computed(async () => {
+    const payload = await getSessionPayload()
+    return payload.consent
+  })
+  const latestCommentId = computed(() => {
+    if (!latestCommentResult.value) return -1
+    return latestCommentResult.value.latestModerationComment.id
+  })
+
+  async function invalidateNickname() {
+    const userId = getUserId()
+    const sessionHandle = (await getSessionPayload())['sessionHandle']
+
+    let seed = undefined
+
+    if (Config['persistNickNames'] === 'fixed') {
+      seed = userId
+    } else if (Config['persistNickNames'] === 'action') {
+      await refetch({ authorHash: sessionHash.value })
+      seed = userId + sessionHandle + latestCommentId.value
+    } else if (Config['persistNickNames'] === 'session') {
+      seed = userId + sessionHandle
     }
-  },
-  actions: {
-    async verifyUserSession() {
-      // TODO: refreshes token
-      await authService.refreshToken()
-      const deploymentStore = useDeploymentStore()
-      const deployment = deploymentStore.deployment
 
-      const userId = await getUserId()
-      this.userId = userId
+    const _nickname = uniqueNamesGenerator({
+      dictionaries: [adjectives, colors, animals],
+      seed,
+    })
 
-      const sessionHash = await authService.hashInput(userId, deployment)
-      this.sessionHash = sessionHash
+    nickname.value = _nickname
+  }
 
-      const payload = await getSessionPayload()
-      const userRoles = payload['st-role']?.v || []
-      const userDeployment = payload?.deployment || ''
-      this.userRoles = userRoles
-      this.userDeployment = userDeployment
-      this.consentDate = new Date(payload.consent)
+  async function verifyUserSession() {
+    await authService.refreshToken()
+    const deploymentStore = useDeploymentStore()
+    const deployment = deploymentStore.deployment
 
-      const nickname = uniqueNamesGenerator({
-        dictionaries: [adjectives, colors, animals],
-        seed: Config['persistNickNames'] ? userId : sessionHash
-      })
-      this.nickname = nickname
-    }
+    const _userId = await getUserId()
+    userId.value = _userId
+
+    const _sessionHash = await authService.hashInput(_userId, deployment)
+    sessionHash.value = _sessionHash
+
+    const _payload = await getSessionPayload()
+    const _userRoles = _payload['st-role']?.v || []
+    const _userDeployment = _payload?.deployment || ''
+    userRoles.value = _userRoles
+    userDeployment.value = _userDeployment
+    consentDate.value = new Date(_payload.consent)
+
+    await invalidateNickname()
+  }
+
+  return {
+    userId,
+    sessionHash,
+    nickname,
+    userRoles,
+    userDeployment,
+    consentDate,
+    isLoggedIn,
+    nicknameInParts,
+    isModerator,
+    isAdmin,
+    isSuperAdmin,
+    getConsent,
+    verifyUserSession,
+    invalidateNickname,
+    refetch,
   }
 })

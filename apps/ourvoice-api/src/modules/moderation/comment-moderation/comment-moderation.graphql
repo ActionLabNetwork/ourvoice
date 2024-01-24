@@ -1,4 +1,5 @@
 type Query {
+  latestModerationComment(authorHash: String!): ModerationCommentId!
   moderationComment(id: Int!): ModerationComment!
   moderationCommentsHistory(id: Int!): [ModerationComment!]!
   moderationComments(
@@ -132,4 +133,8 @@ type ModerationCommentPageInfo {
 
 input ModerationCommentModifyInput {
   content: String
+}
+
+type ModerationCommentId {
+  id: Int!
 }

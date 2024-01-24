@@ -331,6 +331,8 @@ export abstract class IQuery {
 
     abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): CommentConnection | Promise<CommentConnection>;
 
+    abstract latestModerationComment(authorHash: string): ModerationCommentId | Promise<ModerationCommentId>;
+
     abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
     abstract moderationCommentsHistory(id: number): ModerationComment[] | Promise<ModerationComment[]>;
@@ -573,6 +575,10 @@ export class ModerationCommentPageInfo {
     endCursor?: Nullable<string>;
     hasNextPage?: Nullable<boolean>;
     hasPreviousPage?: Nullable<boolean>;
+}
+
+export class ModerationCommentId {
+    id: number;
 }
 
 export class ModerationPost {
