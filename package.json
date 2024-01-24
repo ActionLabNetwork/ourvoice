@@ -13,6 +13,7 @@
     "dev:apps": "pnpm --recursive --parallel --stream --filter './apps/**' dev",
     "prepare": "pnpm simple-git-hooks",
     "build:apps": "pnpm --recursive --parallel --stream --filter './apps/**' build",
+    "start:apps": "pnpm --recursive --parallel --stream --filter './apps/**' start:prod",
     "typecheck:apps": "pnpm --recursive --parallel --stream --filter './apps/**' typecheck",
     "analyze:apps": "pnpm --recursive --parallel --stream --filter './apps/**' analyze",
     "info:apps": "pnpm --recursive --parallel --stream --filter './apps/**' info",

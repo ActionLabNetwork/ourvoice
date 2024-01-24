@@ -25,7 +25,8 @@ async function bootstrap() {
   }
 
   const whitelist: string[] = [
-    // 'http://localhost:4173', // cypress
+    'http://localhost:4173', // cypress
+    'http://localhost:4174', // cypress
     `http://localhost:${configService.get<number>('api.port')}`, // localhost
     configService.get<string>('api.url'), // API
     configService.get<string>('admin.url'), // ADMIN

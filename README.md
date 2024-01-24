@@ -87,6 +87,13 @@ CLI (refer to help section of each cli command for more information):
 
 - Add categories: `ts-node add-categories.ts add <jsonDataPath>`
 
+Config.yml:
+
+- Persisting nicknames:
+  - fixed: uses the same nickname for each user
+  - action: change nickname every time the user creates a post or a comment
+  - session: change nickname every time the user logs in
+
 ### Runtime
 
 All runtime configurations come from corresponding `.env` files:
