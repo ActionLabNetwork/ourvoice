@@ -38,7 +38,7 @@ import UserService from '../../services/user-service'
 import { useUserStore } from '../../stores/user'
 
 import Consent from '../../../../../config/content/consent.md'
-import router from '@/router'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -47,7 +47,9 @@ export default defineComponent({
   data() {
     return {
       isConsentModalVisible: false,
-      consentEffectiveDate: new Date()
+      consentEffectiveDate: new Date(),
+      router: useRouter(),
+      route: useRoute()
     }
   },
   computed: {
@@ -67,7 +69,7 @@ export default defineComponent({
         this.isConsentModalVisible = false
         const verify = await UserService.verifyEmail()
         if (verify.status === 200) {
-          this.$router.push({ name: 'posts' })
+          this.router.push({ name: 'posts' })
         }
       }
     }
@@ -76,8 +78,8 @@ export default defineComponent({
     // get consent effective date
     this.consentEffectiveDate =
       new Date((this.$refs['consent'] as any).frontmatter.effective_date) || null
-    await router.isReady()
-    if (this.$route.name === 'consent') {
+    await this.router.isReady()
+    if (this.route.name === 'consent') {
       this.isConsentModalVisible = false
     } else {
       this.checkForConsent()

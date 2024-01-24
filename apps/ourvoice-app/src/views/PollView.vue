@@ -23,7 +23,7 @@
         </div>
         <button
           class="min-w-[212px] px-2 py-4 rounded-full bg-ourvoice-primary text-ourvoice-white text-[18px] font-medium"
-          @click="$router.push({ name: 'posts' })"
+          @click="router.push({ name: 'posts' })"
         >
           Go Back to Discussion
         </button>
@@ -51,6 +51,9 @@ import ActivePollCard from '@/components/poll/ActivePollCard.vue'
 import PollResultCard from '@/components/poll/PollResultCard.vue'
 import { usePollStore } from '@/stores/poll'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const pollStore = usePollStore()
 const { availablePolls, votedPolls, state } = storeToRefs(pollStore)
