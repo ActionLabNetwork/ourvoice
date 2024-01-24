@@ -1,5 +1,5 @@
 type Query {
-  latestModerationPost(authorHash: String!): ModerationPostId!
+  latestModerationPost(authorHash: String!): ModerationPostId
   moderationPost(id: Int!): ModerationPost
   moderationPosts(
     filter: ModerationPostsFilterInput

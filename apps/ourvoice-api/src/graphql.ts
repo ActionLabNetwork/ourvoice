@@ -331,7 +331,7 @@ export abstract class IQuery {
 
     abstract comments(filter?: Nullable<CommentsFilterInput>, pagination?: Nullable<CommentPaginationInput>): CommentConnection | Promise<CommentConnection>;
 
-    abstract latestModerationComment(authorHash: string): ModerationCommentId | Promise<ModerationCommentId>;
+    abstract latestModerationComment(authorHash: string): Nullable<ModerationCommentId> | Promise<Nullable<ModerationCommentId>>;
 
     abstract moderationComment(id: number): ModerationComment | Promise<ModerationComment>;
 
@@ -341,7 +341,7 @@ export abstract class IQuery {
 
     abstract commentVersion(id: number): ModerationCommentVersion | Promise<ModerationCommentVersion>;
 
-    abstract latestModerationPost(authorHash: string): ModerationPostId | Promise<ModerationPostId>;
+    abstract latestModerationPost(authorHash: string): Nullable<ModerationPostId> | Promise<Nullable<ModerationPostId>>;
 
     abstract moderationPost(id: number): Nullable<ModerationPost> | Promise<Nullable<ModerationPost>>;
 

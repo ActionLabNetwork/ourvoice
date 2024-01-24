@@ -65,11 +65,11 @@ export const useUserStore = defineStore('user', () => {
   })
   const latestPostId = computed(() => {
     if (!latestPostResult.value) return -1
-    return latestPostResult.value.latestModerationPost.id
+    return latestPostResult.value.latestModerationPost?.id ?? 0
   })
   const latestCommentId = computed(() => {
     if (!latestCommentResult.value) return -1
-    return latestCommentResult.value.latestModerationComment.id
+    return latestCommentResult.value.latestModerationComment?.id ?? 0
   })
 
   async function invalidateNickname() {

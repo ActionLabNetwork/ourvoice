@@ -1,5 +1,5 @@
 type Query {
-  latestModerationComment(authorHash: String!): ModerationCommentId!
+  latestModerationComment(authorHash: String!): ModerationCommentId
   moderationComment(id: Int!): ModerationComment!
   moderationCommentsHistory(id: Int!): [ModerationComment!]!
   moderationComments(
