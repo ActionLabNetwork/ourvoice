@@ -10,6 +10,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { PollOptionCreateDto } from './option-create.dto';
 import { PollCreateDto } from './poll-create.dto';
 
@@ -45,6 +46,7 @@ export class PollUpdateDto {
   @ArrayMinSize(2)
   @ArrayMaxSize(PollCreateDto.MAX_NUM_OPTIONS)
   @ValidateNested()
+  @Type(() => PollOptionCreateDto)
   // easier to force the user to recreate the poll
   options?: PollOptionCreateDto[];
 }
