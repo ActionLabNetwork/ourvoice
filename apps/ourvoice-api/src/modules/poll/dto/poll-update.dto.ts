@@ -39,7 +39,7 @@ export class PollUpdateDto {
 
   @IsString()
   @IsOptional()
-  @Length(1, 200)
+  @Length(1, 400)
   question?: string;
 
   @IsOptional()

@@ -17,7 +17,7 @@ export class PollCreateDto {
   static readonly MAX_NUM_OPTIONS = 6;
 
   @IsString()
-  @Length(1, 200)
+  @Length(1, 400)
   question: string;
 
   @IsBoolean()

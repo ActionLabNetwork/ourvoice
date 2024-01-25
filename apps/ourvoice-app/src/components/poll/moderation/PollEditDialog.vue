@@ -19,9 +19,9 @@
         id="title"
         placeholder="Question"
         class="rounded-3xl px-4 py-2 focus:placeholder:opacity-50 border-2 border-black-400 focus:border-0 rounded-md"
-        maxlength=200
+        maxlength=400
       />
-      <div class="text-sm text-gray text-right">{{ fields.question.length }}/200</div>
+      <div class="text-sm text-gray text-right">{{ fields.question.length }}/400</div>
       <div class="py-2 flex flex-col gap-2">
         <div
           v-for="(_, i) in fields.options.length"
