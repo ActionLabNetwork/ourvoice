@@ -10,7 +10,9 @@
       class="relative top-60 mx-5 p-5 border w-auto shadow-lg rounded-md bg-white max-w-[800px] mx-auto"
     >
       <div class="mt-3 text-center">
-        <h1 class="text-lg leading-6 font-medium text-gray-900">Consent Form</h1>
+        <h1 class="text-lg leading-6 font-medium text-gray-900">
+          Consent Form
+        </h1>
         <div class="mt-2 px-7 py-3">
           <Consent class="consent-md" ref="consent" />
           <a class="text-ourvoice-info hover:underline" href="/consent"
@@ -42,25 +44,28 @@ import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
-    Consent
+    Consent,
   },
   data() {
     return {
       isConsentModalVisible: false,
       consentEffectiveDate: new Date(),
       router: useRouter(),
-      route: useRoute()
+      route: useRoute(),
     }
   },
   computed: {
-    ...mapStores(useUserStore)
+    ...mapStores(useUserStore),
   },
   methods: {
     checkForConsent: async function () {
       if (!(await this.userStore.isLoggedIn)) return
       const userConsent = (await this.userStore.getConsent) as string
+      console.log({ userConsent })
       this.isConsentModalVisible =
-        !userConsent || this.consentEffectiveDate > new Date(userConsent) ? true : false
+        !userConsent || this.consentEffectiveDate > new Date(userConsent)
+          ? true
+          : false
     },
     acceptConsent: async function () {
       this.isConsentModalVisible = false
@@ -72,19 +77,20 @@ export default defineComponent({
           this.router.push({ name: 'posts' })
         }
       }
-    }
+    },
   },
   async mounted() {
     // get consent effective date
     this.consentEffectiveDate =
-      new Date((this.$refs['consent'] as any).frontmatter.effective_date) || null
+      new Date((this.$refs['consent'] as any).frontmatter.effective_date) ||
+      null
     await this.router.isReady()
     if (this.route.name === 'consent') {
       this.isConsentModalVisible = false
     } else {
-      this.checkForConsent()
+      await this.checkForConsent()
     }
-  }
+  },
 })
 </script>
 

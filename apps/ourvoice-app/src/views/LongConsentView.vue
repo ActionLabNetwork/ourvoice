@@ -43,6 +43,6 @@ onMounted(async () => {
   consentEffectiveDate.value = new Date(consent.value.frontmatter.effective_date) || null
   hasConsent.value = false
   await router.isReady()
-  checkForConsent()
+  await checkForConsent()
 })
 </script>

@@ -61,6 +61,7 @@ export const useUserStore = defineStore('user', () => {
   const isSuperAdmin = computed(() => userRoles.value.includes('super'))
   const getConsent = computed(async () => {
     const payload = await getSessionPayload()
+    console.log({ payload })
     return payload.consent
   })
   const latestPostId = computed(() => {

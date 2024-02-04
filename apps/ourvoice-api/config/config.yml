@@ -25,6 +25,7 @@ roles:
       - delete:all
 allowedEmails:
   - user@ourvoice.app
+  - user1@ourvoice.app
 moderators:
   - odeployment_admin@ourvoice.app
   - moderator1@ourvoice.app
