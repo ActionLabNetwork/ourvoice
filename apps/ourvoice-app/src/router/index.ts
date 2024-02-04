@@ -4,8 +4,9 @@ import {
   getCurrentDeploymentDomain,
   checkForSession,
   checkDeployment,
-  redirectTo
+  redirectTo,
 } from '../services/session.service'
+import Session from 'supertokens-web-js/recipe/session'
 
 import config from '@/config'
 
@@ -21,16 +22,20 @@ const PostsView = () => import('../views/PostsView.vue')
 const NoticeView = () => import('../views/NoticeView.vue')
 const PostPage = () => import('../views/PostPage.vue')
 const CreatePostView = () => import('../views/CreatePostView.vue')
-const PostModerationListView = () => import('../views/PostModerationListView.vue')
+const PostModerationListView = () =>
+  import('../views/PostModerationListView.vue')
 const PostModerationView = () => import('../views/PostModerationView.vue')
-const CommentModerationListView = () => import('../views/CommentModerationListView.vue')
+const CommentModerationListView = () =>
+  import('../views/CommentModerationListView.vue')
 const CommentModerationView = () => import('../views/CommentModerationView.vue')
 const PollView = () => import('../views/PollView.vue')
 const PollModerationView = () => import('../views/PollModerationView.vue')
 const LongConsentView = () => import('../views/LongConsentView.vue')
 
 const authBaseURL = config.authURL
-const authURL = `${authBaseURL}/signinWithoutPassword?d=${getCurrentDeploymentDomain().deployment}`
+const authURL = `${authBaseURL}/signinWithoutPassword?d=${
+  getCurrentDeploymentDomain().deployment
+}`
 const authModURL = `${authBaseURL}?d=${getCurrentDeploymentDomain().deployment}`
 
 // TODO: this list might be coming from the database later
@@ -39,7 +44,6 @@ const authModURL = `${authBaseURL}?d=${getCurrentDeploymentDomain().deployment}`
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior() {
-
     return { top: 0, left: 0, behavior: 'smooth' }
   },
   routes: [
@@ -50,7 +54,7 @@ const router = createRouter({
       meta: { requiresAuth: false },
       props: () => {
         return getCurrentDeploymentDomain()
-      }
+      },
     },
     {
       path: '/about',
@@ -59,7 +63,7 @@ const router = createRouter({
       meta: { requiresAuth: false },
       props: () => {
         return getCurrentDeploymentDomain()
-      }
+      },
     },
     {
       path: '/notice',
@@ -68,7 +72,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
       props: () => {
         return getCurrentDeploymentDomain()
-      }
+      },
     },
     {
       path: '/consent',
@@ -77,68 +81,88 @@ const router = createRouter({
       meta: { requiresAuth: true },
       props: () => {
         return getCurrentDeploymentDomain()
-      }
+      },
     },
     {
       path: '/settings',
       name: 'settings',
-      component: SettingsView
+      component: SettingsView,
     },
     {
       path: '/post',
       name: 'create-post',
       component: CreatePostView,
-      meta: { requiresAuth: true, navBarSwitchState: 'post' }
+      meta: { requiresAuth: true, navBarSwitchState: 'post' },
     },
     {
       path: '/polls',
       name: 'polls',
       component: PollView,
-      meta: { requiresAuth: true, navBarSwitchState: 'polls' }
+      meta: { requiresAuth: true, navBarSwitchState: 'polls' },
     },
     {
       path: '/moderation/polls',
       name: 'moderation-polls-list',
       component: PollModerationView,
-      meta: { requiresAuth: true, requiresModeration: true, navBarSwitchState: 'polls' }
+      meta: {
+        requiresAuth: true,
+        requiresModeration: true,
+        navBarSwitchState: 'polls',
+      },
     },
     {
       path: '/moderation/posts',
       name: 'moderate-post-list',
       component: PostModerationListView,
-      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
+      meta: {
+        requiresAuth: true,
+        requiresModerator: true,
+        navBarSwitchState: 'post',
+      },
     },
     {
       path: '/moderation/post/:id',
       name: 'moderate-post',
       component: PostModerationView,
-      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
+      meta: {
+        requiresAuth: true,
+        requiresModerator: true,
+        navBarSwitchState: 'post',
+      },
     },
     {
       path: '/moderation/comments',
       name: 'moderate-comment-list',
       component: CommentModerationListView,
-      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
+      meta: {
+        requiresAuth: true,
+        requiresModerator: true,
+        navBarSwitchState: 'post',
+      },
     },
     {
       path: '/moderation/comment/:id',
       name: 'moderate-comment',
       component: CommentModerationView,
-      meta: { requiresAuth: true, requiresModerator: true, navBarSwitchState: 'post' }
+      meta: {
+        requiresAuth: true,
+        requiresModerator: true,
+        navBarSwitchState: 'post',
+      },
     },
     {
       path: '/posts',
       name: 'posts',
       component: PostsView,
-      meta: { requiresAuth: true, navBarSwitchState: 'post' }
+      meta: { requiresAuth: true, navBarSwitchState: 'post' },
     },
     {
       path: '/posts/:id(\\d+)',
       name: 'postpage',
       component: PostPage,
-      meta: { requiresAuth: true, navBarSwitchState: 'post' }
-    }
-  ]
+      meta: { requiresAuth: true, navBarSwitchState: 'post' },
+    },
+  ],
 })
 
 // Check deployment and session
@@ -159,6 +183,7 @@ router.beforeEach(async (to, from, next) => {
   if (isSession) {
     // if current deployment matches with user then init user store
     if (await checkDeployment(deployment)) {
+      await Session.attemptRefreshingSession()
       // update user state
       await userStore.verifyUserSession()
     }

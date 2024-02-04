@@ -26,9 +26,8 @@ export class SupertokensService {
                 ...originalImplementation,
                 createNewSession: async function (input) {
                   const userId = input.userId;
-                  const { metadata } = await UserMetadata.getUserMetadata(
-                    userId,
-                  );
+                  const { metadata } =
+                    await UserMetadata.getUserMetadata(userId);
                   // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
