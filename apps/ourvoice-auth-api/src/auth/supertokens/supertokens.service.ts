@@ -38,6 +38,7 @@ export class SupertokensService {
         UserRoles.init(),
         Session.init({
           cookieDomain: config.cookieDomain,
+          cookieSecure: process.env.NODE_ENV === 'production',
           override: {
             functions: (originalImplementation) => {
               return {

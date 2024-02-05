@@ -20,7 +20,7 @@ export class AnalyticsInterceptor implements NestInterceptor {
     const body = req.body;
     await this.repository.createApiCallRecord({
       data: {
-        userHash: req.session?.userId ?? null,
+        userHash: req.session?.userId ?? '',
         endpoint: req.path,
         action: body?.operationName ?? null,
         data: {
