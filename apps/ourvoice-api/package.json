@@ -41,7 +41,7 @@
     "@golevelup/ts-jest": "^0.3.7",
     "@nestjs/apollo": "^11.0.6",
     "@nestjs/common": "^9.4.3",
-    "@nestjs/config": "^2.3.4",
+    "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^9.4.3",
     "@nestjs/graphql": "^11.0.6",
     "@nestjs/platform-express": "^9.4.3",
