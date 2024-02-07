@@ -63,7 +63,7 @@
     "webpack": "^5.88.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.5.0",
+    "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^9.2.0",
     "@nestjs/testing": "^9.4.3",
     "@types/cron": "^2.0.1",
