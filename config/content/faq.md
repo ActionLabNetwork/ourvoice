@@ -11,8 +11,8 @@ stakeholder3_link: https://www.monash.edu/it/hcc/action-lab
 stakeholder4:
 stakeholder4_link:
 email: support@ourvoice.app
-startDate: Monday 18 September
-endDate: Monday 2 october 2023
+startDate: Friday 16 February
+endDate: Friday 26 2024
 project: RISE project
 ---
 

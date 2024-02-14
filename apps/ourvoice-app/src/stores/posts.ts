@@ -81,6 +81,7 @@ export const usePostsStore = defineStore('posts', {
             filter: {
               categoryIds: this.sortFilter.selectedCategoryIds,
               createdAfter: this.sortFilter.createdAfter,
+              published: true,
             },
             presignedUrlExpiresIn: postFilesPresignedUrlTTL,
           },
