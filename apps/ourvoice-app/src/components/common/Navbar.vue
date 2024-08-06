@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/component-name-in-template-casing -->
 <!-- eslint-disable prettier/prettier -->
 <template>
   <header
@@ -250,7 +251,7 @@
     </nav>
 
     <!-- Mobile Menu -->
-    <dialog
+    <Dialog
       as="div"
       class="lg:hidden"
       :open="mobileMenuOpen"
@@ -397,7 +398,7 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import {
-  // Dialog,
+  Dialog,
   DialogPanel,
   Disclosure,
   DisclosureButton,
@@ -415,7 +416,6 @@ import PollsIcon from '@/assets/icons/polls.svg'
 import PollsIconDark from '@/assets/icons/polls-dark.svg'
 import ThreadsIcon from '@/assets/icons/threads.svg'
 import ThreadsIconDark from '@/assets/icons/threads-dark.svg'
-// import { useDeploymentStore } from '@/stores/deployment'
 import { useUserStore } from '@/stores/user'
 
 import CreatePostNavButton from '../post/CreatePostNavButton.vue'
