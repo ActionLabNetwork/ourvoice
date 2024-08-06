@@ -1,23 +1,25 @@
 <template>
   <div ref="createPostNavLink">
-    <CustomButton
+    <custom-button
+      class-name="rounded-3xl text-xs md:p-3 md:space-x-1 text-ourvoice-black"
       :label="smAndLarger ? 'Create Post' : ''"
-      :to="'/post'"
-      class-name="rounded-3xl text-xs md:p-3 md:space-x-1 text-ourvoice-white"
+      to="/post"
     >
       <template #icon-after-text>
-        <IconMessageStripeCircle v-if="isHovered" class="" />
-        <IconMessagePlusCircle v-else />
+        <icon-message-stripe-circle v-if="isHovered" class="" />
+        <icon-message-plus-circle v-else />
       </template>
-    </CustomButton>
+    </custom-button>
   </div>
 </template>
+
 <script lang="ts" setup>
-import CustomButton from '../common/CustomButton.vue'
-import { ref } from 'vue'
-import IconMessageStripeCircle from '../icons/IconMessageStripeCircle.vue'
-import IconMessagePlusCircle from '../icons/IconMessagePlusCircle.vue'
 import { breakpointsTailwind, useBreakpoints, useElementHover } from '@vueuse/core'
+import { ref } from 'vue'
+
+import CustomButton from '../common/CustomButton.vue'
+import IconMessagePlusCircle from '../icons/IconMessagePlusCircle.vue'
+import IconMessageStripeCircle from '../icons/IconMessageStripeCircle.vue'
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const smAndLarger = breakpoints.greaterOrEqual('sm')

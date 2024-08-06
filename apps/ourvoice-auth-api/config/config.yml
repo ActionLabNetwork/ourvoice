@@ -35,10 +35,10 @@ authModules:
   - Passwordless
   - Verify
   - Dashboard
-heroImage: /hero-image.png
+heroImage:
 logo: /ourvoice_logo_new.png
-deploymentLogo: dca_logo.png
-slogan: 'Welcome to the RISE Aspiring Leaders OurVoice Community Platform'
+deploymentLogo: ourvoice_logo_demo_org.svg
+slogan: 'Welcome to the DEMO ORG OurVoice Community Platform'
 moderatorCount: 1
 postFrequency:
   unit: 'minutes'
