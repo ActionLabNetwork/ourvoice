@@ -6,34 +6,34 @@
           <circle
             cx="50"
             cy="50"
-            r="20"
             fill="none"
-            strokeWidth="20"
+            r="20"
             stroke="rgb(255, 155, 51)"
-            strokeLinecap="round"
-            strokeDashoffset="0"
             strokeDasharray="200, 200"
+            strokeDashoffset="0"
+            strokeLinecap="round"
+            strokeWidth="20"
           >
             <animateTransform
               attributeName="transform"
               attributeType="XML"
-              type="rotate"
-              from="0 50 50"
-              to="360 50 50"
               dur="4s"
+              from="0 50 50"
               repeatCount="indefinite"
+              to="360 50 50"
+              type="rotate"
             />
             <animate
               attributeName="stroke-dashoffset"
-              values="0;-30;-124"
               dur="2s"
               repeatCount="indefinite"
+              values="0;-30;-124"
             />
             <animate
               attributeName="stroke-dasharray"
-              values="0,200;110,200;110,200"
               dur="2s"
               repeatCount="indefinite"
+              values="0,200;110,200;110,200"
             />
           </circle>
         </svg>
@@ -44,37 +44,41 @@
         v-if="recepie === 'emailpassword' && !needsVerifying"
         class="auth-form-content-container"
       >
-        <div v-if="isSignIn" class="form-title">Sign In</div>
-        <div v-else class="form-title">Sign Up</div>
+        <div v-if="isSignIn" class="form-title">
+          Sign In
+        </div>
+        <div v-else class="form-title">
+          Sign Up
+        </div>
         <div class="sign-in-up-text-container">
-          <span v-if="isSignIn"
-            >Not yet registered?
-            <span class="clickable-text" v-on:click="goToSignUp">Sign Up</span></span
-          >
-          <span v-else
-            >Already have an account?
-            <span class="clickable-text" v-on:click="goToSignIn">Sign In</span></span
-          >
+          <span v-if="isSignIn">Not yet registered?
+            <span class="clickable-text" @click="goToSignUp">Sign Up</span></span>
+          <span v-else>Already have an account?
+            <span class="clickable-text" @click="goToSignIn">Sign In</span></span>
         </div>
         <div class="divider-container">
           <div class="divider" />
         </div>
         <div v-if="error" class="error-container">
-          <div class="error-message">{{ errorMessage }}</div>
+          <div class="error-message">
+            {{ errorMessage }}
+          </div>
         </div>
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
           <div class="input-section-container" :class="emailError ? 'error' : ''">
-            <div class="input-label">Email</div>
+            <div class="input-label">
+              Email
+            </div>
             <div class="input-container">
               <div class="input-wrapper" :class="emailError ? 'error' : ''">
                 <input
                   v-model="email"
                   autocomplete="email"
                   class="input"
-                  type="email"
                   name="email"
                   placeholder="Email address"
-                />
+                  type="email"
+                >
               </div>
             </div>
             <div v-if="emailError" class="input-error">
@@ -83,17 +87,19 @@
           </div>
 
           <div class="input-section-container" :class="passwordError ? 'error' : ''">
-            <div class="input-label">Password</div>
+            <div class="input-label">
+              Password
+            </div>
             <div class="input-container">
               <div class="input-wrapper" :class="passwordError ? 'error' : ''">
                 <input
                   v-model="password"
                   autocomplete="current-password"
                   class="input"
-                  type="password"
                   name="password"
                   placeholder="Password"
-                />
+                  type="password"
+                >
               </div>
             </div>
             <div v-if="passwordError" class="input-error">
@@ -103,39 +109,49 @@
 
           <div class="input-section-container">
             <div v-if="isSignIn">
-              <button type="submit" class="button">SIGN IN</button>
+              <button class="button" type="submit">
+                SIGN IN
+              </button>
             </div>
             <div v-else>
-              <button type="submit" class="button">SIGN UP</button>
+              <button class="button" type="submit">
+                SIGN UP
+              </button>
             </div>
           </div>
         </form>
       </div>
       <div v-if="recepie === 'passwordless' && !needsVerifying" class="auth-form-content-container">
-        <div class="form-title">Sign In or Sign Up</div>
+        <div class="form-title">
+          Sign In or Sign Up
+        </div>
 
         <div class="divider-container">
           <div class="divider" />
         </div>
 
         <div v-if="error" class="error-container">
-          <div class="error-message">{{ errorMessage }}</div>
+          <div class="error-message">
+            {{ errorMessage }}
+          </div>
         </div>
 
-        <div class="divider-container"></div>
+        <div class="divider-container" />
         <form autocomplete="on" novalidate @submit="onSubmitPressed">
           <div class="input-section-container" :class="emailError ? 'error' : ''">
-            <div class="input-label">Email</div>
+            <div class="input-label">
+              Email
+            </div>
             <div class="input-container">
               <div class="input-wrapper" :class="emailError ? 'error' : ''">
                 <input
                   v-model="email"
                   autocomplete="email"
                   class="input"
-                  type="email"
                   name="email"
                   placeholder="Email address"
-                />
+                  type="email"
+                >
               </div>
             </div>
             <div v-if="emailError" class="input-error">
@@ -144,36 +160,38 @@
           </div>
 
           <div class="input-section-container">
-            <button type="submit" class="button">CONTINUE</button>
+            <button class="button" type="submit">
+              CONTINUE
+            </button>
           </div>
         </form>
       </div>
       <div v-if="isSignIn && recepie === 'emailpassword' && !needsVerifying" class="faded-link">
-        <router-link :to="{ path: `/auth/reset-password` }"> Forgot Password? </router-link>
+        <router-link :to="{ path: `/auth/reset-password` }">
+          Forgot Password?
+        </router-link>
       </div>
       <div v-if="needsVerifying" class="auth-form-content-container">
         <div class="conformation">
-          <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-          <div class="form-title" v-html="verifyTitle"></div>
-          <p v-html="verifyText" class="form-subtitle"></p>
+          <img alt="Email Icon" class="emailIcon" src="@/assets/email_icon.svg">
+          <div class="form-title" v-html="verifyTitle" />
+          <p class="form-subtitle" v-html="verifyText" />
           <span
             v-if="recepie === 'emailpassword' && !isVerify"
             class="resend-button"
-            v-on:click="sendVerificationEmail"
-            >Resend Email</span
-          >
+            @click="sendVerificationEmail"
+          >Resend Email</span>
           <div v-else>
             <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-            <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+            <span v-else class="resend-button" @click="resendMagicLink">Resend link</span>
           </div>
-          <div class="divider-container"></div>
+          <div class="divider-container" />
           <span
             v-if="recepie === 'emailpassword' && !isVerify"
-            v-on:click="signOut"
             class="faded-link"
-            >Logout</span
-          >
-          <span v-else v-on:click="reset" class="faded-link">Change email</span>
+            @click="signOut"
+          >Logout</span>
+          <span v-else class="faded-link" @click="reset">Change email</span>
         </div>
         <div style="margin-bottom: 10px" />
       </div>
@@ -183,17 +201,15 @@
 
 <script lang="ts">
 import EmailPassword from 'supertokens-web-js/recipe/emailpassword'
+import { EmailVerificationClaim, sendVerificationEmail } from 'supertokens-web-js/recipe/emailverification'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import Session from 'supertokens-web-js/recipe/session'
-import { sendVerificationEmail } from 'supertokens-web-js/recipe/emailverification'
-
-import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
-import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
 import config from '@/config'
 
 import YamlContent from '../../../../config/config.yml'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 
 // const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
 // const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
@@ -231,23 +247,15 @@ export default defineComponent({
       // Countdown timer
       period: 15,
       timer: 1,
-      recepie: 'emailpassword'
-    }
-  },
-  watch: {
-    email: {
-      handler: function () {
-        this.error = false
-      },
-      deep: true
+      recepie: 'emailpassword',
     }
   },
   computed: {
     verifyTitle() {
-      return this.recepie == 'emailpassword' ? 'Verify your email address' : 'Link sent!'
+      return this.recepie === 'emailpassword' ? 'Verify your email address' : 'Link sent!'
     },
     verifyText() {
-      return this.recepie == 'emailpassword'
+      return this.recepie === 'emailpassword'
         ? 'To confirm your email address, <strong>click on the link</strong> in the email we sent you.'
         : `We sent a link to <strong> ${
             this.email !== '' ? this.email : 'your email'
@@ -255,7 +263,15 @@ export default defineComponent({
     },
     counter() {
       return this.period.toString().length === 1 ? `0${this.period}` : this.period
-    }
+    },
+  },
+  watch: {
+    email: {
+      handler() {
+        this.error = false
+      },
+      deep: true,
+    },
   },
   mounted() {
     this.recepie = this.mode
@@ -272,7 +288,7 @@ export default defineComponent({
   },
 
   methods: {
-    hasInitialMagicLinkBeenSent: async function () {
+    async hasInitialMagicLinkBeenSent() {
       if (await Passwordless.getLoginAttemptInfo()) {
         this.needsVerifying = true
         this.isVerify = true
@@ -283,7 +299,8 @@ export default defineComponent({
     startTimer() {
       this.period = 15
       this.timer = window.setInterval(() => {
-        if (!this.period) this.stopTimer()
+        if (!this.period)
+          this.stopTimer()
         this.period -= 1
       }, 1000)
     },
@@ -296,11 +313,11 @@ export default defineComponent({
     goToSignIn() {
       this.isSignIn = true
     },
-    signOut: async function () {
+    async signOut() {
       await Session.signOut()
       this.handleRedirect()
     },
-    reset: async function () {
+    async reset() {
       this.isSignIn = true
       this.email = ''
       this.password = ''
@@ -313,18 +330,18 @@ export default defineComponent({
       this.period = 15
       this.isVerify = false
     },
-    signIn: async function () {
+    async signIn() {
       const response = await EmailPassword.signIn({
         formFields: [
           {
             id: 'email',
-            value: this.email
+            value: this.email,
           },
           {
             id: 'password',
-            value: this.password
-          }
-        ]
+            value: this.password,
+          },
+        ],
       })
 
       if (response.status === 'WRONG_CREDENTIALS_ERROR') {
@@ -342,7 +359,8 @@ export default defineComponent({
             // this means that something was wrong with the entered email.
             // probably that it's not a valid email (from a syntax point of view)
             this.emailError = item.error
-          } else if (item.id === 'password') {
+          }
+          else if (item.id === 'password') {
             this.passwordError = item.error
           }
         })
@@ -359,21 +377,21 @@ export default defineComponent({
       return email
         .toLowerCase()
         .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\])|(([a-z\-0-9]+\.)+[a-z]{2,}))$/i,
         )
     },
-    signUp: async function () {
+    async signUp() {
       const response = await EmailPassword.signUp({
         formFields: [
           {
             id: 'email',
-            value: this.email
+            value: this.email,
           },
           {
             id: 'password',
-            value: this.password
-          }
-        ]
+            value: this.password,
+          },
+        ],
       })
       if (response.status === 'FIELD_ERROR') {
         response.formFields.forEach((item) => {
@@ -381,7 +399,8 @@ export default defineComponent({
             // this means that something was wrong with the entered email.
             // probably that it's not a valid email (from a syntax point of view)
             this.emailError = item.error
-          } else if (item.id === 'password') {
+          }
+          else if (item.id === 'password') {
             // this means that something was wrong with the entered password.
             // probably it doesn't meet the password validation criteria on the backend.
             this.passwordError = item.error
@@ -398,31 +417,34 @@ export default defineComponent({
       this.sendVerificationEmail()
     },
 
-    sendVerificationEmail: async function () {
+    async sendVerificationEmail() {
       try {
-        let response = await sendVerificationEmail()
+        const response = await sendVerificationEmail()
         if (response.status === 'EMAIL_ALREADY_VERIFIED_ERROR') {
           // This can happen if the info about email verification in the session was outdated.
           // Redirect the user to the home page
           this.handleRedirect()
-        } else {
+        }
+        else {
           // email was sent successfully.
           this.needsVerifying = true
           this.processing = false
         }
-      } catch (err: any) {
+      }
+      catch (err: any) {
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you.
           this.errorMessage = err.message
           this.error = true
-        } else {
+        }
+        else {
           this.errorMessage = 'Oops! Something went wrong.'
           this.error = true
         }
       }
     },
 
-    sendMagicLink: async function () {
+    async sendMagicLink() {
       if (this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         this.processing = false
         this.errorMessage = 'Organisation does not match'
@@ -431,56 +453,61 @@ export default defineComponent({
       }
       try {
         await Passwordless.createCode({
-          email: this.email
+          email: this.email,
         })
         // Magic link sent successfully.
         this.processing = false
         this.needsVerifying = true
         this.startTimer()
-      } catch (err: any) {
+      }
+      catch (err: any) {
         this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
           this.errorMessage = err.message
           this.error = true
-        } else {
+        }
+        else {
           this.errorMessage = 'Oops! Something went wrong.'
           this.error = true
         }
       }
     },
 
-    resendMagicLink: async function () {
+    async resendMagicLink() {
       this.processing = true
       try {
-        let response = await Passwordless.resendCode()
+        const response = await Passwordless.resendCode()
 
         if (response.status === 'RESTART_FLOW_ERROR') {
           // this can happen if the user has already successfully logged in into
           // another device whilst also trying to login to this one.
           window.location.assign('/signinWithoutPassword')
-        } else {
+        }
+        else {
           // Magic link resent successfully.
           this.processing = false
           this.needsVerifying = true
           this.isVerify = false
           this.startTimer()
         }
-      } catch (err: any) {
+      }
+      catch (err: any) {
         this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
           this.errorMessage = err.message
           this.error = true
-        } else {
+        }
+        else {
           this.errorMessage = 'Oops! Something went wrong.'
           this.error = true
         }
       }
     },
-    onSubmitPressed: function (e: Event) {
+    onSubmitPressed(e: Event) {
       e.preventDefault()
       // we reset the error states in case the user has fixed the input errors
       this.error = false
@@ -492,24 +519,27 @@ export default defineComponent({
       if (this.recepie === 'emailpassword') {
         if (this.isSignIn) {
           this.signIn()
-        } else {
+        }
+        else {
           this.signUp()
         }
-      } else {
+      }
+      else {
         this.sendMagicLink()
       }
     },
-    checkForSession: async function () {
+    async checkForSession() {
       if (await Session.doesSessionExist()) {
         // session exists but checking if verification is needed
-        let validationErrors = await Session.validateClaims()
+        const validationErrors = await Session.validateClaims()
 
         if (validationErrors.length === 0) {
           // user has verified their email address
           this.handleRedirect()
-        } else {
+        }
+        else {
           for (const err of validationErrors) {
-            if (err.validatorId === EmailVerificationClaim.id) {
+            if (err.id === EmailVerificationClaim.id) {
               // email is not verified
               this.needsVerifying = true
             }
@@ -517,16 +547,17 @@ export default defineComponent({
         }
       }
     },
-    handleRedirect: function () {
+    handleRedirect() {
       if (redirect.exists()) {
         const redirectTo = redirect.get()
         redirect.purge()
         window.location.href = redirectTo
-      } else {
+      }
+      else {
         window.location.assign('/auth')
       }
-    }
-  }
+    },
+  },
 })
 </script>
 

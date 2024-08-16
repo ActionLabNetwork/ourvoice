@@ -132,7 +132,7 @@ export default defineComponent({
       }
       else {
         for (const err of validationErrors) {
-          if (err.validatorId === EmailVerificationClaim.id) {
+          if (err.id === EmailVerificationClaim.id) {
             // email is not verified
             window.location.href = this.authURL
           }

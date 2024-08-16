@@ -1,10 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
-import { UserRoleClaim /*PermissionClaim*/ } from 'supertokens-web-js/recipe/userroles'
+import Session from 'supertokens-web-js/recipe/session'
+import { UserRoleClaim /* PermissionClaim */ } from 'supertokens-web-js/recipe/userroles'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import config from '@/config'
+
+import HomeView from '../views/HomeView.vue'
 
 const authURL = `${config.authURL}/auth`
 const portalURL = config.portalURL
@@ -16,19 +17,21 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true, requiresAdmin: true }
-    }
-  ]
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+  ],
 })
 
-const checkForSession = async () => {
-  if (!(await Session.doesSessionExist())) return false
+async function checkForSession() {
+  if (!(await Session.doesSessionExist()))
+    return false
   const validationErrors = await Session.validateClaims()
   if (validationErrors.length === 0) {
     return true
-  } else {
+  }
+  else {
     for (const err of validationErrors) {
-      if (err.validatorId === EmailVerificationClaim.id) {
+      if (err.id === EmailVerificationClaim.id) {
         return false
       }
     }
@@ -37,7 +40,7 @@ const checkForSession = async () => {
   }
 }
 
-const redirectTo = (url: string) => {
+function redirectTo(url: string) {
   window.location.replace(url)
 }
 
@@ -48,12 +51,12 @@ router.beforeEach(async (to, from, next) => {
     if (hasSession) {
       if (to.matched.some((record: any) => record.meta.requiresAdmin)) {
         const validationErrors = await Session.validateClaims({
-          overrideGlobalClaimValidators: (globalValidators) => [
+          overrideGlobalClaimValidators: globalValidators => [
             ...globalValidators,
-            UserRoleClaim.validators.includesAny(['admin', 'super'])
+            UserRoleClaim.validators.includesAny(['admin', 'super']),
             // UserRoleClaim.validators.includes('super')
             /* PermissionClaim.validators.includes("modify") */
-          ]
+          ],
         })
 
         if (validationErrors.length === 0) {
@@ -61,11 +64,12 @@ router.beforeEach(async (to, from, next) => {
         }
 
         for (const err of validationErrors) {
-          if (err.validatorId === UserRoleClaim.id) {
+          if (err.id === UserRoleClaim.id) {
             // user roles claim check failed
             // not admin or not moderator
             redirectTo(portalURL)
-          } else {
+          }
+          else {
             // some other claim check failed (from the global validators list)
             // not verified for example
             // redirect to auth
@@ -73,11 +77,13 @@ router.beforeEach(async (to, from, next) => {
           }
         }
       }
-    } else {
+    }
+    else {
       // redirect to auth
       redirectTo(authURL)
     }
-  } else {
+  }
+  else {
     next()
   }
 })
