@@ -133,7 +133,7 @@ export default defineComponent({
               }
             ]
           })
-          if (response.status !== 'OK') {
+          if (response.status ==='FIELD_ERROR') {
             // this means that the email validation logic failed.
             throw new Error(response.formFields[0].error)
           }

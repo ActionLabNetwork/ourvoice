@@ -36,6 +36,7 @@ import { SMTPConfig } from 'src/auth/config.interface';
           smtpSettings: configService.get<SMTPConfig>('smtp'),
           cookieDomain: configService.get<string>('supertokens.cookieDomain'),
           globalPepper: configService.get<string>('api.globalPepper'),
+          deployment: configService.get<string>('deployment')
         };
       },
     }),

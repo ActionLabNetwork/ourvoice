@@ -20,15 +20,15 @@ export class SupertokensService {
       recipeList: [
         Session.init({
           cookieDomain: config.cookieDomain,
+          cookieSecure: process.env.NODE_ENV === 'production',
           override: {
             functions: (originalImplementation) => {
               return {
                 ...originalImplementation,
                 createNewSession: async function (input) {
                   const userId = input.userId;
-                  const { metadata } = await UserMetadata.getUserMetadata(
-                    userId,
-                  );
+                  const { metadata } =
+                    await UserMetadata.getUserMetadata(userId);
                   // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,

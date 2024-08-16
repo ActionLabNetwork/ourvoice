@@ -4,7 +4,9 @@
     class="container flex flex-col-reverse lg:flex-row items-center gap-12 mt-14 lg:mt-28 fill"
   >
     <div class="top-bar">
-      <div class="sign-out" v-on:click="signOut">SIGN OUT</div>
+      <div class="sign-out" @click="signOut">
+        SIGN OUT
+      </div>
     </div>
     <!-- Content -->
     <div class="flex fill flex-1 flex-col items-center lg:items-start">
@@ -15,7 +17,7 @@
         A safe space for employees and community members to anonymously discuss issues and concerns
         about their work environments.
       </p>
-      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <hr style="width: 100%; text-align: left; margin-left: 0">
       <p>Manage moderators:</p>
       <table class="table table-striped table-bordered">
         <thead>
@@ -33,14 +35,14 @@
             <td>{{ user.id || 'not yet registred' }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.deployment }}</td>
-            <td v-for="(role, index) in roles" :key="index">
+            <td v-for="(role, idx) in roles" :key="idx">
               <input
-                @change="changeRole($event, user.id, role.name)"
-                type="checkbox"
                 :checked="user.roles.includes(role.name)"
-                :fieldId="role.id"
                 :disabled="!user.roles.length"
-              />
+                :fieldId="role.id"
+                type="checkbox"
+                @change="changeRole($event, user.id, role.name)"
+              >
               <!-- <check-box :checked="user.roles.includes(role.name)" :fieldId="role.id" /> -->
               <!-- <select class="form-control" @change="changeRole($event, user.id, user.role)">
                 <option value="" selected disabled>Choose</option>
@@ -58,51 +60,53 @@
         </tbody>
       </table>
 
-      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <hr style="width: 100%; text-align: left; margin-left: 0">
       <p>Add allowed user emails:</p>
       <span v-if="!allowedEmails.length">All emails are allowed to register</span>
       <div
         class="grid-flow-col overflow-x-auto py-4 space-x-5 space-y-2 backdrop-blur-md items-center allowed-emails min-h-[30%]"
       >
         <div v-for="email in allowedEmails" :key="email" class="chip">
-          <div class="chip-content">{{ email }}</div>
+          <div class="chip-content">
+            {{ email }}
+          </div>
           <div class="chip-close" @click="removeAllowedEmail(email)">
-            <svg class="chip-svg" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+            <svg aria-hidden="true" class="chip-svg" focusable="false" viewBox="0 0 24 24">
               <path
                 d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"
-              ></path>
+              />
             </svg>
           </div>
         </div>
       </div>
       <input
-        type="email"
+        v-model="allowedEmailsInput"
         inputmode="text"
         multiple
-        v-model="allowedEmailsInput"
+        type="email"
         @keydown="emailsChanged"
-      />
+      >
       <button
+        class="btn btn-red btn-hover"
         :disabled="!emailsValid || allowedEmailsInput.length < 1"
         type="button"
-        class="btn btn-red btn-hover"
         @click="addAllowedEmails()"
       >
         Submit
       </button>
-      <hr style="width: 100%; text-align: left; margin-left: 0" />
+      <hr style="width: 100%; text-align: left; margin-left: 0">
       <p>Add allowed moderator emails:</p>
       <input
-        type="email"
+        v-model="moderatorsInput"
         inputmode="text"
         multiple
-        v-model="moderatorsInput"
+        type="email"
         @keydown="moderatorsChanged"
-      />
+      >
       <button
+        class="btn btn-red btn-hover"
         :disabled="!moderatorsValid || moderatorsInput.length < 1"
         type="button"
-        class="btn btn-red btn-hover"
         @click="addAllowedModerators()"
       >
         Submit
@@ -123,9 +127,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
+import Session from 'supertokens-web-js/recipe/session'
+import { defineComponent } from 'vue'
 
 import config from '@/config'
 
@@ -133,10 +137,10 @@ const apiURL = config.apiURL
 const authURL = `${config.authURL}/signinWithEmailPassword`
 
 export type User = {
-  id: string
-  email: string
-  deployment: string
-  roles: string[]
+  id: string;
+  email: string;
+  deployment: string;
+  roles: string[];
 }
 
 export default defineComponent({
@@ -152,42 +156,50 @@ export default defineComponent({
       roles: [
         { name: 'user', id: 1 },
         { name: 'moderator', id: 2 },
-        { name: 'admin', id: 2 }
+        { name: 'admin', id: 2 },
       ],
       allowedEmailsInput: '',
       moderatorsInput: '',
-      allowedEmails: []
+      allowedEmails: [],
     }
+  },
+
+  mounted() {
+    // this function checks if a session exists, and if not,
+    // it will redirect to the login screen.
+    this.checkForSession()
+    this.getUsers()
+    this.getAllowedEmails()
   },
   methods: {
     emailsChanged() {
       // remove empty values
-      const emails = this.allowedEmailsInput.split(',').filter((e) => String(e).trim())
+      const emails = this.allowedEmailsInput.split(',').filter(e => String(e).trim())
       this.emailsValid = emails.every(this.validateEmail)
     },
     moderatorsChanged() {
       // remove empty values
-      const emails = this.moderatorsInput.split(',').filter((e) => String(e).trim())
+      const emails = this.moderatorsInput.split(',').filter(e => String(e).trim())
       this.moderatorsValid = emails.every(this.validateEmail)
     },
     validateEmail(email: string) {
       return email
         .toLowerCase()
         .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\])|(([a-z\-0-9]+\.)+[a-z]{2,}))$/i,
         )
     },
-    signOut: async function () {
+    async signOut() {
       await Session.signOut()
       window.location.href = authURL
     },
 
-    checkForSession: async function () {
+    async checkForSession() {
       if (!(await Session.doesSessionExist())) {
         // since a session does not exist, we send the user to the login page.
         window.location.href = authURL
       }
-      let validationErrors = await Session.validateClaims()
+      const validationErrors = await Session.validateClaims()
 
       if (validationErrors.length === 0) {
         // user has verified their email address
@@ -195,16 +207,17 @@ export default defineComponent({
         // this will render the UI
         this.session = true
         this.userId = userId
-      } else {
+      }
+      else {
         for (const err of validationErrors) {
-          if (err.validatorId === EmailVerificationClaim.id) {
+          if (err.id === EmailVerificationClaim.id) {
             // email is not verified
             window.location.href = authURL
           }
         }
       }
     },
-    callAPI: async function () {
+    async callAPI() {
       const response = await fetch(`${apiURL}/sessioninfo`)
 
       if (response.status === 401) {
@@ -216,9 +229,10 @@ export default defineComponent({
 
       const json = await response.json()
 
-      window.alert('Session Information:\n' + JSON.stringify(json, null, 2))
+      // eslint-disable-next-line no-alert
+      window.alert(`Session Information:\n${JSON.stringify(json, null, 2)}`)
     },
-    getUsers: async function () {
+    async getUsers() {
       await fetch(`${apiURL}/users`)
         .then(async (response) => {
           const data = await response.json()
@@ -236,7 +250,7 @@ export default defineComponent({
           console.error('There was an error!', error)
         })
     },
-    getAllowedEmails: async function () {
+    async getAllowedEmails() {
       await fetch(`${apiURL}/users/allowed`)
         .then(async (response) => {
           const data = await response.json()
@@ -259,12 +273,12 @@ export default defineComponent({
         method: 'PUT',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           role,
-          assign: event.target.checked
-        })
+          assign: event.target.checked,
+        }),
       })
         .then(async (response) => {
           const data = await response.json()
@@ -282,16 +296,16 @@ export default defineComponent({
         })
     },
     async addAllowedEmails() {
-      const emails = this.allowedEmailsInput.split(',').filter((e) => String(e).trim())
+      const emails = this.allowedEmailsInput.split(',').filter(e => String(e).trim())
       await fetch(`${apiURL}/users/allowed`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          emails
-        })
+          emails,
+        }),
       })
         .then(async (response) => {
           const data = await response.json()
@@ -318,11 +332,11 @@ export default defineComponent({
         method: 'DELETE',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email
-        })
+          email,
+        }),
       })
         .then(async (response) => {
           const data = await response.json()
@@ -336,7 +350,7 @@ export default defineComponent({
           }
           // TODO: show user message
           if (response.status === 200) {
-            this.allowedEmails = this.allowedEmails.filter((e) => e != email)
+            this.allowedEmails = this.allowedEmails.filter(e => e !== email)
           }
         })
         .catch((error) => {
@@ -344,16 +358,16 @@ export default defineComponent({
         })
     },
     async addAllowedModerators() {
-      const moderators = this.moderatorsInput.split(',').filter((e) => String(e).trim())
+      const moderators = this.moderatorsInput.split(',').filter(e => String(e).trim())
       await fetch(`${apiURL}/users/moderators`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          moderators
-        })
+          moderators,
+        }),
       })
         .then(async (response) => {
           const data = await response.json()
@@ -374,16 +388,8 @@ export default defineComponent({
         .catch((error) => {
           console.error('There was an error!', error)
         })
-    }
+    },
   },
-
-  mounted() {
-    // this function checks if a session exists, and if not,
-    // it will redirect to the login screen.
-    this.checkForSession()
-    this.getUsers()
-    this.getAllowedEmails()
-  }
 })
 </script>
 
@@ -454,7 +460,7 @@ button:disabled {
   outline: none;
   padding: 0;
   font-size: 14px;
-  font-color: #333333;
+  color: #333333;
   font-family: 'Open Sans', sans-serif;
   white-space: nowrap;
   align-items: center;

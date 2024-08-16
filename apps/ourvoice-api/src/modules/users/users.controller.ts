@@ -33,7 +33,7 @@ export class UserController {
     const userInfo = await this.userService.getUserInfo(userId);
     return JSON.stringify({
       userId: userInfo?.id,
-      email: userInfo?.email,
+      emails: userInfo?.emails,
       joined: userInfo?.timeJoined,
     });
   }
@@ -116,20 +116,20 @@ export class UserController {
     const allUsers = await this.userService.getUsers('emailpassword');
     const deploymentUsers = allUsers.users.flatMap(async (object) => {
       // check if self
-      if (adminId === object.user.id) {
+      if (adminId === object.id) {
         return [];
       } else {
         // check if admin is allowed to manage (deployments match)
         const metadata = await this.metadataService.checkDeployment(
           adminId,
-          object.user.id,
+          object.id,
         );
         if (metadata) {
-          const roles = await this.rolesService.getRolesForUser(object.user.id);
+          const roles = await this.rolesService.getRolesForUser(object.id);
           return [
             {
-              id: object.user.id,
-              email: object.user.email,
+              id: object.id,
+              email: object.emails,
               roles,
               ...metadata,
             },

@@ -9,7 +9,7 @@ import { SupertokensExceptionFilter } from './auth/auth.filter';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { snapshot: true });
   const configService = app.get(ConfigService);
 
   if (configService.get<string>('NODE_ENV') === 'development') {
@@ -25,7 +25,8 @@ async function bootstrap() {
   }
 
   const whitelist: string[] = [
-    // 'http://localhost:4173', // cypress
+    'http://localhost:4173', // cypress
+    'http://localhost:4174', // cypress
     `http://localhost:${configService.get<number>('api.port')}`, // localhost
     configService.get<string>('api.url'), // API
     configService.get<string>('admin.url'), // ADMIN

@@ -16,6 +16,7 @@ export type AuthModuleConfig = {
   apiKey?: string;
   cookieDomain?: string;
   globalPepper: string;
+  deployment: string;
 };
 
 export type AuthModuleAsyncConfig = Pick<ModuleMetadata, 'imports'> &

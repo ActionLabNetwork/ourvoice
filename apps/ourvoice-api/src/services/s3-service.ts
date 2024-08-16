@@ -30,7 +30,6 @@ export async function generatePresignedDownloadUrl(
   try {
     const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
     const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn });
-    console.log(`Generated presigned download URL: ${presignedUrl}`);
     return presignedUrl;
   } catch (error) {
     console.error(

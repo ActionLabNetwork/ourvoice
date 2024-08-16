@@ -23,6 +23,8 @@ async function bootstrap() {
 
   // TODO: add admin and app addresses to list
   const whitelist: string[] = [
+    'http://localhost:4173', // cypress
+    'http://localhost:4174', // cypress
     `http://localhost:${configService.get<number>('authApi.port')}`, // localhost
     configService.get<string>('authApi.url'), // AUTHAPI
     configService.get<string>('auth.url'), // AUTH

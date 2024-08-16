@@ -1,5 +1,5 @@
 import {
-  INestApplication,
+  // INestApplication,
   Injectable,
   OnModuleDestroy,
   OnModuleInit,
@@ -23,9 +23,9 @@ export class ContactFormPrismaService
     await this.$disconnect();
   }
 
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
-  }
+  // async enableShutdownHooks(app: INestApplication) {
+  //   this.$on('beforeExit', async () => {
+  //     await app.close();
+  //   });
+  // }
 }

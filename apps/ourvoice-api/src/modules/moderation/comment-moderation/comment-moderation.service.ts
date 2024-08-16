@@ -24,6 +24,12 @@ export class CommentModerationService {
     private readonly moderationCommentRepository: CommentModerationRepository,
   ) {}
 
+  async getLatestModerationComment(authorHash: string) {
+    return await this.moderationCommentRepository.getLatestModerationComment(
+      authorHash,
+    );
+  }
+
   async getModerationCommentById(id: number): Promise<Comment> {
     const moderationComment =
       await this.moderationCommentRepository.getModerationCommentById(id);

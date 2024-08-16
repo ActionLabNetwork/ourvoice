@@ -110,7 +110,7 @@ export default defineComponent({
 
         if (response.status === 'OK') {
           Passwordless.clearLoginAttemptInfo()
-          if (response.createdNewUser) {
+          if (response.createdNewRecipeUser) {
             // attempt refreshing token to get deployment data into payload
             Session.attemptRefreshingSession().then((success) => {
               if (success) {

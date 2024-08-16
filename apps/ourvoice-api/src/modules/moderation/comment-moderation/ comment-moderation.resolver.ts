@@ -24,6 +24,17 @@ export class CommentModerationResolver {
   ) {}
 
   @Query()
+  async latestModerationComment(
+    @GqlSession() session: SessionContainer,
+    @Args('authorHash') authorHash: string,
+  ) {
+    await this.authService.validateClaimedHash(session, authorHash);
+    return await this.commentModerationService.getLatestModerationComment(
+      authorHash,
+    );
+  }
+
+  @Query()
   async moderationComment(
     @GqlSession() session: SessionContainer,
     @Args('id') id: number,

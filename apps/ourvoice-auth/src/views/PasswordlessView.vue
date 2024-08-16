@@ -1,3 +1,4 @@
+<!-- eslint-disable prettier/prettier -->
 <template>
   <div class="">
     <div class="hidden">
@@ -6,36 +7,17 @@
           <div class="spinner">
             <svg version="1.1" viewBox="25 25 50 50">
               <circle
-                cx="50"
-                cy="50"
-                r="20"
-                fill="none"
-                strokeWidth="20"
-                stroke="rgb(255, 155, 51)"
-                strokeLinecap="round"
-                strokeDashoffset="0"
-                strokeDasharray="200, 200"
+                cx="50" cy="50" fill="none" r="20" stroke="rgb(255, 155, 51)" strokeDasharray="200, 200"
+                strokeDashoffset="0" strokeLinecap="round" strokeWidth="20"
               >
                 <animateTransform
-                  attributeName="transform"
-                  attributeType="XML"
-                  type="rotate"
-                  from="0 50 50"
-                  to="360 50 50"
-                  dur="4s"
-                  repeatCount="indefinite"
+                  attributeName="transform" attributeType="XML" dur="4s" from="0 50 50"
+                  repeatCount="indefinite" to="360 50 50" type="rotate"
                 />
+                <animate attributeName="stroke-dashoffset" dur="2s" repeatCount="indefinite" values="0;-30;-124" />
                 <animate
-                  attributeName="stroke-dashoffset"
-                  values="0;-30;-124"
-                  dur="2s"
-                  repeatCount="indefinite"
-                />
-                <animate
-                  attributeName="stroke-dasharray"
+                  attributeName="stroke-dasharray" dur="2s" repeatCount="indefinite"
                   values="0,200;110,200;110,200"
-                  dur="2s"
-                  repeatCount="indefinite"
                 />
               </circle>
             </svg>
@@ -43,7 +25,9 @@
         </div>
         <div v-else class="auth-form-container">
           <div v-if="!needsVerifying" class="auth-form-content-container">
-            <div class="form-title">Sign In or Sign Up</div>
+            <div class="form-title">
+              Sign In or Sign Up
+            </div>
 
             <div class="divider-container">
               <div class="divider" />
@@ -51,31 +35,30 @@
             <!-- Deployment image -->
             <div class="flex justify-center flex-1 mb-10 md:mb-16 lg:mb-0 z-10">
               <img
-                class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
+                alt="OurVoice interface" class="w-5/6 h-5/6 sm:w-3/4 sm:h-3/4 md:w-full md:h-full"
                 :src="getConfig('deploymentLogo')"
-                alt="OurVoice interface"
-              />
+              >
             </div>
-            <Login />
+            <login />
 
             <div v-if="error" class="error-container">
-              <div class="error-message">{{ errorMessage }}</div>
+              <div class="error-message">
+                {{ errorMessage }}
+              </div>
             </div>
 
-            <div class="divider-container"></div>
+            <div class="divider-container" />
             <form autocomplete="on" novalidate @submit="onSubmitPressed">
               <div class="input-section-container" :class="emailError ? 'error' : ''">
-                <div class="input-label">Email</div>
+                <div class="input-label">
+                  Email
+                </div>
                 <div class="input-container">
                   <div class="input-wrapper" :class="emailError ? 'error' : ''">
                     <input
-                      v-model="email"
-                      autocomplete="email"
-                      class="input"
+                      v-model="email" autocomplete="email" class="input" name="email" placeholder="Email address"
                       type="email"
-                      name="email"
-                      placeholder="Email address"
-                    />
+                    >
                   </div>
                 </div>
                 <div v-if="emailError" class="input-error">
@@ -84,21 +67,25 @@
               </div>
 
               <div class="input-section-container">
-                <button type="submit" class="button">CONTINUE</button>
+                <button class="button" type="submit">
+                  CONTINUE
+                </button>
               </div>
             </form>
           </div>
           <div v-else class="auth-form-content-container">
             <div class="conformation">
-              <img src="@/assets/email_icon.svg" alt="Email Icon" class="emailIcon" />
-              <div class="form-title">Link sent!</div>
-              <p v-html="verifyText" class="form-subtitle"></p>
+              <img alt="Email Icon" class="emailIcon" src="@/assets/email_icon.svg">
+              <div class="form-title">
+                Link sent!
+              </div>
+              <p class="form-subtitle" v-html="verifyText" />
               <div>
                 <span v-if="period >= 0 && !isVerify" class="faded-text">00:{{ counter }}</span>
-                <span v-else class="resend-button" v-on:click="resendMagicLink">Resend link</span>
+                <span v-else class="resend-button" @click="resendMagicLink">Resend link</span>
               </div>
-              <div class="divider-container"></div>
-              <span v-on:click="reset" class="faded-link">Change email</span>
+              <div class="divider-container" />
+              <span class="faded-link" @click="reset">Change email</span>
             </div>
             <div style="margin-bottom: 10px" />
           </div>
@@ -111,34 +98,27 @@
       <div class="w-full flex flex-col px-4 md:px-16 py-20 items-center md:items-start md:translate-y-0">
         <!-- Back Button -->
         <button
-          @click="redirectToIndexPage"
           class="inline-flex font-semibold items-center gap-2 transform duration-200 hover:gap-[13px] mb-10"
+          @click="redirectToIndexPage"
         >
-          <IconArrowLeft />
+          <icon-arrow-left />
           Go Back
         </button>
         <div>
-          <div
-            class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8"
-          >
+          <div class="grid grid-cols-2 divide-x-4 divide-black gap-2 place-items-center mb-16 -ml-8">
             <div>
-              <a href="#" class="">
+              <a class="" href="#">
                 <span class="sr-only">OurVoice</span>
-                <img
-                  class="h-11"
-                  src="@/assets/logo/ourvoice_logo_primary_dark.svg"
-                  alt="OurVoice Logo"
-                />
+                <img alt="OurVoice Logo" class="h-11" src="@/assets/logo/ourvoice_logo_primary_dark.svg">
               </a>
             </div>
             <div>
-              <a href="#" class="">
-                <span class="sr-only">DCA</span>
+              <a class="" href="#">
+                <span class="sr-only">OurVocie</span>
                 <img
-                  class="h-11 ml-6 rounded-md"
-                  src="@/assets/logo/dca_logo.png"
-                  alt="Deployment Logo"
-                />
+                  alt="Deployment Logo" class="h-11 ml-6 rounded-md"
+                  src="@/assets/logo/ourvoice_logo_demo_org.svg"
+                >
               </a>
             </div>
           </div>
@@ -153,60 +133,41 @@
         <Description class="description-text text-lg text-left mb-6" />
         <div class="flex flex-wrap gap-2 justify-center mx-auto md:mx-0">
           <CustomButton
-            label="Get Started"
-            class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base"
+            class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-base" label="Get Started"
             variant="filled"
           />
           <CustomButton
-            to="/about"
-            label="FAQ"
-            class-name="w-52 h-14 px-2 py-4 rounded-full border-2  border-ourvoice-secondary"
-            variant="outlined"
+            class-name="w-52 h-14 px-2 py-4 rounded-full border-2  border-ourvoice-secondary" label="FAQ"
+            to="/about" variant="outlined"
           />
         </div>
         <!-- Passwordless input -->
         <div class="w-full flex flex-col gap-5 items-center md:items-start">
           <div v-if="error" class="error-container">
-            <div class="error-message">{{ errorMessage }}</div>
+            <div class="error-message">
+              {{ errorMessage }}
+            </div>
           </div>
           <div class="w-full relative mt-2" :class="emailError ? 'error' : ''">
             <input
-              v-model="email"
-              autocomplete="email"
-              type="email"
-              name="email"
-              placeholder="Staff email"
+              v-model="email" autocomplete="email"
               class="w-full md:max-w-[400px] h-12 p-4 bg-neutral-100 rounded-2xl gap-2 inline-flex text-neutral-600 text-sm font-medium leading-tight tracking-tight"
-            />
+              name="email" placeholder="Staff email" type="email"
+            >
             <div v-if="processing" class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <!-- Loading spinner -->
               <span class="inline-flex items-center px-1 font-sans text-xs text-gray-400">
-                <svg
-                  class="h-8 w-8 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
+                <svg class="h-8 w-8 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path
                     class="opacity-75"
-                    fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                    fill="currentColor"
+                  />
                 </svg>
               </span>
             </div>
-            <div
-              v-if="!processing && needsVerifying"
-              class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5"
-            >
+            <div v-if="!processing && needsVerifying" class="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
               <!-- Sent indicator -->
               <span class="inline-flex items-center px-1 font-sans text-xs text-ourvoice-success">
                 Email sent
@@ -224,49 +185,53 @@
               class="px-5 cursor-pointer py-3 bg-ourvoice-primary hover:bg-ourvoice-primary/80 rounded-full justify-center items-center gap-2 flex"
               @click="onSubmitPressed"
             >
-              <div class="text-black text-lg font-medium">Send Link</div>
+              <div class="text-black text-lg font-medium">
+                Send Link
+              </div>
             </button>
             <button
               v-if="needsVerifying"
               class="px-5 cursor-pointer py-3 bg-ourvoice-primary hover:bg-ourvoice-primary/80 rounded-full justify-center items-center gap-2 flex"
               @click="resendMagicLink"
             >
-              <div class="text-black text-lg font-medium">Resend Link</div>
+              <div class="text-black text-lg font-medium">
+                Resend Link
+              </div>
             </button>
             <button
               v-if="needsVerifying"
               class="px-5 cursor-pointer py-3 bg-ourvoice-secondary hover:bg-ourvoice-secondary/80 rounded-full justify-center items-center gap-2 flex"
               @click="reset"
             >
-              <div class="text-black text-lg font-medium">Change Email</div>
+              <div class="text-black text-lg font-medium">
+                Change Email
+              </div>
             </button>
           </div>
         </div>
       </div>
-      <div class="hidden md:inline-flex">
+      <div class="hidden md:inline-flex bg-ourvoice-primary">
         <img
-          class="w-full object-cover h-full"
+          v-if="getConfig('heroImage')" alt="OurVoice interface" class="w-full object-cover h-full"
           :src="getConfig('heroImage')"
-          alt="OurVoice interface"
-        />
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
 import Passwordless from 'supertokens-web-js/recipe/passwordless'
 import Session from 'supertokens-web-js/recipe/session'
-
-import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
-import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 import { defineComponent } from 'vue'
 
-import config from '@/config'
 import IconArrowLeft from '@/components/icons/IconArrowLeft.vue'
+import config from '@/config'
 
 import YamlContent from '../../../../config/config.yml'
 import Login from '../../../../config/content/login.md'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
 
 // const websitePort = import.meta.env.VUE_APP_WEB_PORT || 3000
 // const websiteDomain = import.meta.env.VUE_APP_WEB_URL || `http://localhost:${websitePort}`
@@ -281,7 +246,7 @@ const deploymentOrganisation = YamlContent.deployment as string
 export default defineComponent({
   components: {
     Login,
-    IconArrowLeft
+    IconArrowLeft,
   },
   props: ['deployment'],
   data() {
@@ -304,15 +269,7 @@ export default defineComponent({
 
       // Countdown timer
       period: 15,
-      timer: 0
-    }
-  },
-  watch: {
-    email: {
-      handler: function () {
-        this.error = false
-      },
-      deep: true
+      timer: 0,
     }
   },
   computed: {
@@ -323,7 +280,15 @@ export default defineComponent({
     },
     counter() {
       return this.period.toString().length === 1 ? `0${this.period}` : this.period
-    }
+    },
+  },
+  watch: {
+    email: {
+      handler() {
+        this.error = false
+      },
+      deep: true,
+    },
   },
   mounted() {
     const params = new URLSearchParams(window.location.search)
@@ -343,7 +308,7 @@ export default defineComponent({
     getConfig(option: string) {
       return YamlContent[option]
     },
-    hasInitialMagicLinkBeenSent: async function () {
+    async hasInitialMagicLinkBeenSent() {
       if (await Passwordless.getLoginAttemptInfo()) {
         this.needsVerifying = true
         this.isVerify = true
@@ -353,18 +318,19 @@ export default defineComponent({
     startTimer() {
       this.period = 15
       this.timer = window.setInterval(() => {
-        if (!this.period) this.stopTimer()
+        if (!this.period)
+          this.stopTimer()
         this.period -= 1
       }, 1000)
     },
     stopTimer() {
       clearInterval(this.timer)
     },
-    signOut: async function () {
+    async signOut() {
       await Session.signOut()
       this.handleRedirect()
     },
-    reset: async function () {
+    async reset() {
       this.email = ''
       this.error = false
       this.errorMessage = 'Something went wrong'
@@ -378,11 +344,11 @@ export default defineComponent({
       return email
         .toLowerCase()
         .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\])|(([a-z\-0-9]+\.)+[a-z]{2,}))$/i,
         )
     },
 
-    sendMagicLink: async function () {
+    async sendMagicLink() {
       // check for organisation restrictions
       if (organisation && this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
         this.processing = false
@@ -393,56 +359,61 @@ export default defineComponent({
 
       try {
         await Passwordless.createCode({
-          email: this.email.toLowerCase()
+          email: this.email.toLowerCase(),
         })
         // Magic link sent successfully.
         this.processing = false
         this.needsVerifying = true
         this.startTimer()
-      } catch (err: any) {
+      }
+      catch (err: any) {
         this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
           this.errorMessage = err.message
           this.error = true
-        } else {
+        }
+        else {
           this.errorMessage = 'Oops! Something went wrong.'
           this.error = true
         }
       }
     },
 
-    resendMagicLink: async function () {
+    async resendMagicLink() {
       this.processing = true
       try {
-        let response = await Passwordless.resendCode()
+        const response = await Passwordless.resendCode()
 
         if (response.status === 'RESTART_FLOW_ERROR') {
           // this can happen if the user has already successfully logged in into
           // another device whilst also trying to login to this one.
           window.location.assign('/signinWithoutPassword')
-        } else {
+        }
+        else {
           // Magic link resent successfully.
           this.processing = false
           this.needsVerifying = true
           this.isVerify = false
           this.startTimer()
         }
-      } catch (err: any) {
+      }
+      catch (err: any) {
         this.processing = false
         if (err.isSuperTokensGeneralError === true) {
           // this may be a custom error message sent from the API by you,
           // or if the input email / phone number is not valid.
           this.errorMessage = err.message
           this.error = true
-        } else {
+        }
+        else {
           this.errorMessage = 'Oops! Something went wrong.'
           this.error = true
         }
       }
     },
-    onSubmitPressed: function (e: Event) {
+    onSubmitPressed(e: Event) {
       e.preventDefault()
       // we reset the error states in case the user has fixed the input errors
       this.error = false
@@ -451,17 +422,18 @@ export default defineComponent({
       this.processing = true
       this.sendMagicLink()
     },
-    checkForSession: async function () {
+    async checkForSession() {
       if (await Session.doesSessionExist()) {
         // session exists but checking if verification is needed
-        let validationErrors = await Session.validateClaims()
+        const validationErrors = await Session.validateClaims()
 
         if (validationErrors.length === 0) {
           // user has verified their email address
           this.handleRedirect()
-        } else {
+        }
+        else {
           for (const err of validationErrors) {
-            if (err.validatorId === EmailVerificationClaim.id) {
+            if (err.id === EmailVerificationClaim.id) {
               // email is not verified
               this.needsVerifying = true
             }
@@ -469,20 +441,21 @@ export default defineComponent({
         }
       }
     },
-    handleRedirect: function () {
+    handleRedirect() {
       if (redirect.exists()) {
         const redirectTo = redirect.get()
         redirect.purge()
         window.location.href = redirectTo
-      } else {
+      }
+      else {
         // fallback redirect
         window.location.href = `http://${deploymentOrganisation}${domain}`
       }
     },
-    redirectToIndexPage: function () {
+    redirectToIndexPage() {
       window.location.href = config.appURL
-    }
-  }
+    },
+  },
 })
 </script>
 
@@ -541,6 +514,7 @@ export default defineComponent({
 .emailIcon {
   margin: auto;
 }
+
 .input-section-container {
   display: flex;
   flex-direction: column;

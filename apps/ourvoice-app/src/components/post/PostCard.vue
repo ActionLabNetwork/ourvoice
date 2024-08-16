@@ -1,7 +1,7 @@
 <template>
   <div class="break-all">
     <!-- Content warning -->
-    <ContentWarning :has-content-warning="post?.hasContentWarning ?? false" />
+    <content-warning :has-content-warning="post?.hasContentWarning ?? false" />
 
     <h1 class="text-lg lg:text-2xl font-semibold flex flex-col md:flex-row justify-between">
       <div class="flex-none">
@@ -11,8 +11,8 @@
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-ourvoice-util-pink text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
-          ># {{ cat?.name }}
+          class="bg-ourvoice-util-yellow text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
+        ># {{ cat?.name }}
         </span>
       </div>
     </h1>
@@ -20,114 +20,117 @@
       <span>{{ timePassed(post?.createdAt ?? '') }} </span> by
       <span class="font-semibold">
         {{ post?.authorNickname ?? '' }}
-        <FromTheModeratorsTag v-if="post?.hasFromTheModeratorsTag" />
+        <from-the-moderators-tag v-if="post?.hasFromTheModeratorsTag" />
       </span>
-      <span v-if="post?.moderated" class="text-ourvoice-accent-3"> (moderated by moderator)</span>
+      <span v-if="post?.moderated" class="text-ourvoice-accent-2"> (moderated by moderator)</span>
     </h2>
     <p class="text-sm my-2">
       <font-awesome-icon :icon="faQuoteLeft" />
       {{ post?.content }}
       <font-awesome-icon :icon="faQuoteRight" />
     </p>
-    <!-- NOTICE: Hidden for this deployment start-->
-    <div id="fileUrlsWrapper" class="text-right" v-show="false">
+    <!-- NOTICE: Hidden for this deployment start -->
+    <div v-show="false" id="fileUrlsWrapper" class="text-right">
       <a
-        class="font-medium text-sm text-ourvoice-info hover:underline"
         v-for="url in post?.presignedDownloadUrls.map((url) => url.url)"
         :key="url"
+        class="font-medium text-sm text-ourvoice-info hover:underline"
         :href="url"
         target="_blank"
       >
         file
       </a>
     </div>
-    <!-- NOTICE: Hidden for this deployment end-->
+    <!-- NOTICE: Hidden for this deployment end -->
     <div class="mt-6 flex justify-between items-center">
       <div class="flex gap-2">
         <button
-          @click.stop="voteForPost('UPVOTE')"
-          type="button"
           class="btn-outlined btn-rounded font-medium text-sm"
+          type="button"
+          @click.stop="voteForPost('UPVOTE')"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesUp }}
-            <IconThumb :fill="hasUpvote" :thumbup="true" />
+            <icon-thumb :fill="hasUpvote" :thumbup="true" />
           </span>
         </button>
 
         <button
-          @click.stop="voteForPost('DOWNVOTE')"
-          v-if="Config['allowDownvote']"
-          type="button"
+          v-if="Config.allowDownvote"
           class="btn-outlined btn-rounded font-medium text-sm"
+          type="button"
+          @click.stop="voteForPost('DOWNVOTE')"
         >
           <span class="inline-flex items-center gap-1">
             {{ post?.votesDown }}
-            <IconThumb :fill="hasDownvote" :thumbup="false" />
+            <icon-thumb :fill="hasDownvote" :thumbup="false" />
           </span>
         </button>
       </div>
       <div>
         <slot>
           <!-- default slot -->
-          <button @click.stop="handleCommentBtnClicked" class="inline-flex items-center gap-1">
-            {{ post?.comments?.length ?? 0 }} <IconMessageCircle />
+          <button class="inline-flex items-center gap-1" @click.stop="handleCommentBtnClicked">
+            {{ post?.comments?.length ?? 0 }} <icon-message-circle />
           </button>
         </slot>
       </div>
     </div>
-    <div class="h-px my-5 border border-stone-300 border-opacity-50"></div>
-    <CreateComment :postId="post?.id" />
+    <div class="h-px my-5 border border-stone-300 border-opacity-50" />
+    <create-comment :post-id="post?.id" />
   </div>
 </template>
+
 <script lang="ts" setup>
-import IconThumb from '@/components/icons/IconThumb.vue'
-import FromTheModeratorsTag from '@/components/common/FromTheModeratorsTag.vue'
-import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { usePostsStore } from '@/stores/posts'
-import { useUserStore } from '@/stores/user'
-import { timePassed } from '@/utils/index'
+import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
 import { useMutation } from '@vue/apollo-composable'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+
+import FromTheModeratorsTag from '@/components/common/FromTheModeratorsTag.vue'
+import IconThumb from '@/components/icons/IconThumb.vue'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { usePostsStore } from '@/stores/posts'
+import { useUserStore } from '@/stores/user'
+import { timePassed } from '@/utils/index'
+
+import Config from '../../../../../config/config.yml'
 import CreateComment from '../comment/CreateComment.vue'
 import ContentWarning from '../common/ContentWarning.vue'
 import IconMessageCircle from '../icons/IconMessageCircle.vue'
-import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
-import Config from '../../../../../config/config.yml'
+
+const props = defineProps({
+  postId: {
+    type: Number,
+    required: true,
+  },
+})
 const postsStore = usePostsStore()
 const userStore = useUserStore()
 const { sessionHash } = storeToRefs(userStore)
 const router = useRouter()
 
-const props = defineProps({
-  postId: {
-    type: Number,
-    required: true
-  }
-})
-
 const post = computed(() => postsStore.getPostById(props.postId))
 
-const handleCommentBtnClicked = () => {
+function handleCommentBtnClicked() {
   router.push({
     name: 'postpage',
     params: {
-      id: props.postId
-    }
+      id: props.postId,
+    },
   })
 }
 
 const userVote = computed(() =>
-  post.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
+  post.value?.votes?.find(vote => vote.authorHash === sessionHash.value),
 )
-const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
-const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
+const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE')
+const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE')
 
 const { mutate: createOrDeleteVoteForPost } = useMutation(VOTE_MUTATION)
 
-const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+async function voteForPost(voteType: 'UPVOTE' | 'DOWNVOTE') {
   try {
     const res = await createOrDeleteVoteForPost({
       data: {
@@ -135,18 +138,20 @@ const voteForPost = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         postId: props.postId,
         authorHash: userStore.sessionHash,
         authorNickname: userStore.nickname,
-        voteType: voteType
-      }
+        voteType,
+      },
     })
-    if (res?.data)
+    if (res?.data) {
       postsStore.syncVotesForPostById({
         postId: props.postId,
         votesUp: res.data.createVote.post.votesUp,
         votesDown: res.data.createVote.post.votesDown,
         authorHash: userStore.sessionHash,
-        voteType: res.data.createVote.voteType
+        voteType: res.data.createVote.voteType,
       })
-  } catch (error) {
+    }
+  }
+  catch (error) {
     console.log(error)
   }
 }

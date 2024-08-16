@@ -24,6 +24,12 @@ export class PostModerationService {
     private readonly moderationPostRepository: PostModerationRepository,
   ) {}
 
+  async getLatestModerationPost(authorHash: string) {
+    return await this.moderationPostRepository.getLatestModerationPost(
+      authorHash,
+    );
+  }
+
   async getModerationPostById(id: number): Promise<Post> {
     const moderationPost =
       await this.moderationPostRepository.getModerationPostById(id);
@@ -118,9 +124,8 @@ export class PostModerationService {
   }
 
   async getPostVersionById(id: number): Promise<PostVersion> {
-    const postVersion = await this.moderationPostRepository.getPostVersionById(
-      id,
-    );
+    const postVersion =
+      await this.moderationPostRepository.getPostVersionById(id);
 
     if (!postVersion) {
       throw new NotFoundException(`Post version with id ${id} not found`);

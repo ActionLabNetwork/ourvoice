@@ -1,8 +1,6 @@
 import {
   CommentIncludesVersion,
   CommentIncludesVersionIncludesModerations,
-  CommentIncludesVersionIncludesModerationsIncludesPost,
-  CommentWithAllItsRelations,
   ModerationIncludesVersionIncludesComment,
 } from './../../../types/moderation/comment-moderation';
 import { GetManyRepositoryResponse } from './../../../types/general';
@@ -58,6 +56,14 @@ export class CommentModerationRepository {
     private readonly prisma: PrismaService,
     private readonly commentService: CommentService,
   ) {}
+
+  async getLatestModerationComment(authorHash: string) {
+    return await this.prisma.comment.findFirst({
+      where: { authorHash },
+      orderBy: { id: 'desc' },
+      select: { id: true },
+    });
+  }
 
   async getModerationCommentById(id: number) {
     return await this.prisma.comment.findUnique({
@@ -336,6 +342,7 @@ export class CommentModerationRepository {
           decision: 'REJECTED',
           reason,
           commentVersionId: id,
+          moderationCategory,
         },
         select: { commentVersion: { select: { commentId: true } } },
       });
@@ -400,6 +407,7 @@ export class CommentModerationRepository {
             hasContentWarning,
             version: latestVersion.version + 1,
             latest: true,
+            moderationCategory,
           },
         });
 

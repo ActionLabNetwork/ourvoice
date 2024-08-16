@@ -7,7 +7,6 @@ import {
   PollFilterInput,
   PollPaginationInput,
   PollUpdateInput,
-  PollWithResult,
   PollWithResultConnection,
   PollWithStats,
   VoteInput,
@@ -33,7 +32,7 @@ export class PollResolver {
     @GqlSession() session: SessionContainer,
     @Args('userHash') userHash: string,
   ): Promise<Poll[]> {
-    this.authService.validateClaimedHash(session, userHash);
+    await this.authService.validateClaimedHash(session, userHash);
 
     return await this.pollService.getAvailablePolls(userHash);
   }
@@ -46,7 +45,7 @@ export class PollResolver {
     @Args('pagination') pagination?: PollPaginationInput,
   ): Promise<PollWithResultConnection> {
     await validateUserPermission(session);
-    this.authService.validateClaimedHash(session, moderatorHash);
+    await this.authService.validateClaimedHash(session, moderatorHash);
 
     return await this.pollService.getPollsWithResult(
       moderatorHash,

@@ -7,6 +7,7 @@ import { GET_COMMENTS_QUERY } from '@/graphql/queries/getComments'
 import type { GetCommentsQuery } from '@/graphql/generated/graphql'
 import { provideApolloClient } from '@vue/apollo-composable'
 import type { ApolloError } from '@apollo/client/errors'
+import { useUserStore } from './user'
 
 export interface pageInfo {
   endCursor: string | null
@@ -24,6 +25,7 @@ export interface CommentsState {
   errorMessage: string | undefined
   pageInfo: pageInfo | undefined
   totalCount: number | undefined
+  userStore: ReturnType<typeof useUserStore>
 }
 
 provideApolloClient(apolloClient)
@@ -35,12 +37,13 @@ export const useCommentsStore = defineStore('comments', {
     error: undefined,
     errorMessage: undefined,
     pageInfo: undefined,
-    totalCount: undefined
+    totalCount: undefined,
+    userStore: useUserStore(),
   }),
   getters: {
-    getCommentById: (state) => (id: number) => {
-      return state.data.find((comment) => comment.id === id)
-    }
+    getCommentById: state => (id: number) => {
+      return state.data.find(comment => comment.id === id)
+    },
   },
   actions: {
     async fetchComments(postId: number | null, loadMore = false) {
@@ -50,13 +53,14 @@ export const useCommentsStore = defineStore('comments', {
           query: GET_COMMENTS_QUERY,
           variables: {
             filter: {
-              postId: postId
+              postId: postId,
             },
             pagination: {
               limit: null,
-              cursor: loadMore && this.pageInfo ? this.pageInfo.endCursor : null
-            }
-          }
+              cursor:
+                loadMore && this.pageInfo ? this.pageInfo.endCursor : null,
+            },
+          },
         })
 
         if (!data) {
@@ -67,7 +71,7 @@ export const useCommentsStore = defineStore('comments', {
           throw Error('comments is null')
         }
 
-        const newComments = comments.edges.map((edge) => edge.node)
+        const newComments = comments.edges.map(edge => edge.node)
 
         this.data = loadMore ? [...this.data, ...newComments] : newComments
         this.pageInfo = data.comments.pageInfo ?? undefined
@@ -101,7 +105,7 @@ export const useCommentsStore = defineStore('comments', {
       postId,
       authorHash,
       authorNickname,
-      hasFromTheModeratorsTag
+      hasFromTheModeratorsTag,
     }: {
       content: string
       postId: number | undefined
@@ -120,10 +124,14 @@ export const useCommentsStore = defineStore('comments', {
               content,
               parentId: parentId ?? null,
               postId: postId ?? null,
-              hasFromTheModeratorsTag: hasFromTheModeratorsTag ?? false
-            }
-          }
+              hasFromTheModeratorsTag: hasFromTheModeratorsTag ?? false,
+            },
+          },
         })
+
+        console.log('Created comment')
+        await this.userStore.invalidateNickname()
+
         return data
       } catch (error) {
         if (error instanceof Error) {
@@ -134,11 +142,11 @@ export const useCommentsStore = defineStore('comments', {
 
     async deleteComment(id: number) {
       try {
-        const response = await apolloClient.mutate({
+        await apolloClient.mutate({
           mutation: DELETE_COMMENT_MUTATION,
           variables: {
-            deleteCommentId: id
-          }
+            deleteCommentId: id,
+          },
         })
       } catch (error) {
         if (error instanceof Error) {
@@ -149,7 +157,7 @@ export const useCommentsStore = defineStore('comments', {
 
     async updateComment({
       id,
-      data
+      data,
     }: {
       id: number
       data: {
@@ -168,9 +176,9 @@ export const useCommentsStore = defineStore('comments', {
               content: data.content,
               authorId: data.authorId,
               published: data.published,
-              moderated: data.moderated
-            }
-          }
+              moderated: data.moderated,
+            },
+          },
         })
       } catch (error) {
         if (error instanceof Error) {
@@ -184,7 +192,7 @@ export const useCommentsStore = defineStore('comments', {
       votesUp,
       votesDown,
       authorHash,
-      voteType
+      voteType,
     }: {
       commentId: number
       votesUp: number
@@ -194,20 +202,22 @@ export const useCommentsStore = defineStore('comments', {
     }) {
       try {
         //sync votesUp/votesDown state with the comment table
-        const storedComment = { ...this.data.find((comment) => comment.id === commentId)! }
+        const storedComment = {
+          ...this.data.find(comment => comment.id === commentId)!,
+        }
         evictItem(storedComment)
         storedComment.votesUp = votesUp
         storedComment.votesDown = votesDown
         const userVoteForStoredComment = storedComment.votes.find(
-          (vote) => vote.authorHash === authorHash
+          vote => vote.authorHash === authorHash,
         )
         if (userVoteForStoredComment) {
           if (userVoteForStoredComment.voteType === voteType) {
             storedComment.votes = storedComment.votes.filter(
-              (vote) => vote.authorHash !== authorHash
+              vote => vote.authorHash !== authorHash,
             )
           } else {
-            storedComment.votes = storedComment.votes.map((vote) => {
+            storedComment.votes = storedComment.votes.map(vote => {
               if (vote.authorHash !== authorHash) {
                 return vote
               }
@@ -215,14 +225,19 @@ export const useCommentsStore = defineStore('comments', {
             })
           }
         } else {
-          storedComment.votes = [...storedComment.votes, { authorHash, voteType }]
+          storedComment.votes = [
+            ...storedComment.votes,
+            { authorHash, voteType },
+          ]
         }
-        this.data = this.data.map((comment) => (comment.id === commentId ? storedComment : comment))
+        this.data = this.data.map(comment =>
+          comment.id === commentId ? storedComment : comment,
+        )
       } catch (error) {
         if (error instanceof Error) {
           this.error = error
         }
       }
-    }
-  }
+    },
+  },
 })

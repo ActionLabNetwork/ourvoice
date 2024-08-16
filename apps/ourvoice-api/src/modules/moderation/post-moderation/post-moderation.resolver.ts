@@ -1,8 +1,5 @@
 import { AuthService } from './../../../auth/auth.service';
-import {
-  hasElevatedPermissions,
-  validateUserPermission,
-} from './../../../utils/auth';
+import { validateUserPermission } from './../../../utils/auth';
 import { ModerationPostsResponse } from './../../../types/moderation/post-moderation';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
@@ -25,6 +22,15 @@ export class PostModerationResolver {
     private postModerationService: PostModerationService,
     private authService: AuthService,
   ) {}
+
+  @Query()
+  async latestModerationPost(
+    @GqlSession() session: SessionContainer,
+    @Args('authorHash') authorHash: string,
+  ) {
+    await this.authService.validateClaimedHash(session, authorHash);
+    return await this.postModerationService.getLatestModerationPost(authorHash);
+  }
 
   @Query()
   async moderationPost(

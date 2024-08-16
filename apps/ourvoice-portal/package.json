@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev --port=3011",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "nuxt preview --port=3011 --host",
     "postinstall": "nuxt prepare",
     "start": "node .output/server/index.mjs",
     "analyze": "nuxi analyze",

@@ -4,9 +4,7 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { AnalyticsRepository } from './analytics.repository';
 import { getRequest } from 'src/utils/executionContext';
 
@@ -22,7 +20,7 @@ export class AnalyticsInterceptor implements NestInterceptor {
     const body = req.body;
     await this.repository.createApiCallRecord({
       data: {
-        userHash: req.session.userId ?? null,
+        userHash: req.session?.userId ?? '',
         endpoint: req.path,
         action: body?.operationName ?? null,
         data: {

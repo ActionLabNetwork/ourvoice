@@ -1,5 +1,5 @@
 import {
-  INestApplication,
+  // INestApplication,
   Injectable,
   OnModuleDestroy,
   OnModuleInit,
@@ -36,9 +36,9 @@ export class PrismaService
     await this.$disconnect();
   }
 
-  async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
-  }
+  // async enableShutdownHooks(app: INestApplication) {
+  //   this.$on('beforeExit', async () => {
+  //     await app.close();
+  //   });
+  // }
 }

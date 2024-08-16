@@ -1,16 +1,18 @@
-import Session from 'supertokens-web-js/recipe/session'
 import { EmailVerificationClaim } from 'supertokens-web-js/recipe/emailverification'
+import Session from 'supertokens-web-js/recipe/session'
 
 // TODO: add error handling
-export const checkForSession = async () => {
-  if (!(await Session.doesSessionExist())) return false
+export async function checkForSession() {
+  if (!(await Session.doesSessionExist()))
+    return false
   const validationErrors = await Session.validateClaims()
 
   if (validationErrors.length === 0) {
     return true
-  } else {
+  }
+  else {
     for (const err of validationErrors) {
-      if (err.validatorId === EmailVerificationClaim.id) {
+      if (err.id === EmailVerificationClaim.id) {
         return false
       }
     }
@@ -19,52 +21,51 @@ export const checkForSession = async () => {
   }
 }
 
-export const getDeployment = async () => {
-  if (!(await Session.doesSessionExist())) return ''
+export async function getDeployment() {
+  if (!(await Session.doesSessionExist()))
+    return ''
   const payload = await Session.getAccessTokenPayloadSecurely()
   return payload.deployment || ''
 }
 
-export const getSessionPayload = async () => {
-  if (!(await Session.doesSessionExist())) return undefined
+export async function getSessionPayload() {
+  if (!(await Session.doesSessionExist()))
+    return undefined
   return await Session.getAccessTokenPayloadSecurely()
 }
-export const getUserId = async () => {
-  if (!(await Session.doesSessionExist())) return ''
+export async function getUserId() {
+  if (!(await Session.doesSessionExist()))
+    return ''
   return await Session.getUserId()
 }
 
-export const checkDeployment = async (deployment: string): Promise<boolean> => {
+export async function checkDeployment(deployment: string): Promise<boolean> {
   const payload = await Session.getAccessTokenPayloadSecurely()
   const userDeployment = payload?.deployment || ''
   return userDeployment === deployment || userDeployment === '*'
 }
 
-export const redirectTo = (url: string) => {
+export function redirectTo(url: string) {
   window.location.replace(url)
 }
 
-export const getCurrentDeploymentDomain = () => {
+export function getCurrentDeploymentDomain() {
   const host = window.location.host
   const parts = host.split('.')
   return { deployment: parts[0] !== 'www' ? parts[0] : parts[1] }
 }
 
-export const isAllowedDeployment = (
-  host: string,
-  deploymentDomain: string,
-  deployments: string[]
-) => {
+export function isAllowedDeployment(host: string, deploymentDomain: string, deployments: string[]) {
   const parts = host.split('.')
   // NOTE: set proper domain length (localhost has 2 parts)
   const domainLength = deploymentDomain === 'localhost' ? 2 : 3
-  const deployment =
-    parts[0] !== 'www'
+  const deployment
+    = parts[0] !== 'www'
       ? parts.length === domainLength
         ? parts[0]
         : false
       : parts.length === domainLength
-      ? false
-      : parts[1]
-  return deployment && deployments.indexOf(deployment) > -1 ? deployment : false
+        ? false
+        : parts[1]
+  return deployment && deployments.includes(deployment) ? deployment : false
 }
