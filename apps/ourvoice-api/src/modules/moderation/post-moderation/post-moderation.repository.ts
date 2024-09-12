@@ -1,26 +1,27 @@
-import { GetManyRepositoryResponse } from './../../../types/general';
-import { PostModifyDto } from './dto/post-modify.dto';
-import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common'
 import {
-  Prisma,
+  PostModeration,
   PostStatus,
   PostVersion,
-  PostModeration,
-} from '@prisma-moderation-db/client';
-import { PrismaService } from '../../../database/moderation/prisma.service';
+  Prisma,
+} from '@prisma-moderation-db/client'
+
+import getDeploymentConfig from '../../../config/deployment'
+import { PrismaService } from '../../../database/moderation/prisma.service'
 import {
-  ModerationPostsFilterInput,
   ModerationPostPaginationInput,
-} from '../../../graphql';
-import { cursorToNumber } from '../../../utils/cursor-pagination';
-import { PostCreateDto } from './dto/post-create.dto';
-import { PostService } from '../../../modules/post/post.service';
+  ModerationPostsFilterInput,
+} from '../../../graphql'
+import { PostService } from '../../../modules/post/post.service'
 import {
-  PostIncludesVersionIncludesModerations,
-  PostIncludesVersion,
   ModerationIncludesVersion,
-} from '../../../types/moderation/post-moderation';
-import getDeploymentConfig from '../../../config/deployment';
+  PostIncludesVersion,
+  PostIncludesVersionIncludesModerations,
+} from '../../../types/moderation/post-moderation'
+import { cursorToNumber } from '../../../utils/cursor-pagination'
+import { GetManyRepositoryResponse } from './../../../types/general'
+import { PostCreateDto } from './dto/post-create.dto'
+import { PostModifyDto } from './dto/post-modify.dto'
 
 function countPostVersionModerationDecisions(
   version: PostVersion & {
@@ -28,29 +29,29 @@ function countPostVersionModerationDecisions(
   },
 ) {
   const groups = version.moderations.reduce((acc, moderation) => {
-    const group = moderation.decision;
+    const group = moderation.decision
     if (!acc[group]) {
-      acc[group] = [];
+      acc[group] = []
     }
-    acc[group].push(moderation);
-    return acc;
-  }, {});
+    acc[group].push(moderation)
+    return acc
+  }, {})
 
-  const groupsCount = {} as Record<'ACCEPTED' | 'REJECTED', number>;
+  const groupsCount = {} as Record<'ACCEPTED' | 'REJECTED', number>
 
   if (groups) {
     Object.keys(groups).forEach((key) => {
-      groupsCount[key] = groups[key].length;
-    });
+      groupsCount[key] = groups[key].length
+    })
 
-    return groupsCount;
+    return groupsCount
   }
 }
 
 @Injectable()
 export class PostModerationRepository {
-  private readonly logger = new Logger(PostModerationRepository.name);
-  private readonly config = getDeploymentConfig();
+  private readonly logger = new Logger(PostModerationRepository.name)
+  private readonly config = getDeploymentConfig()
 
   constructor(
     @Inject(forwardRef(() => PrismaService))
@@ -63,7 +64,7 @@ export class PostModerationRepository {
       where: { authorHash },
       orderBy: { id: 'desc' },
       select: { id: true },
-    });
+    })
   }
 
   async getModerationPostById(
@@ -77,37 +78,38 @@ export class PostModerationRepository {
           include: { moderations: { orderBy: { timestamp: 'desc' } } },
         },
       },
-    });
+    })
   }
 
   async getModerationPosts(
     filter?: ModerationPostsFilterInput,
     pagination?: ModerationPostPaginationInput,
   ): Promise<
-    GetManyRepositoryResponse<
-      'moderationPosts',
-      PostIncludesVersionIncludesModerations
-    >
-  > {
-    const { status, published, archived } = filter ?? {};
+      GetManyRepositoryResponse<
+        'moderationPosts',
+        PostIncludesVersionIncludesModerations
+      >
+    > {
+    const { status, published, archived } = filter ?? {}
 
     const where: Prisma.PostWhereInput = {
       status: status ?? undefined,
       published: published ?? undefined,
       archived: archived ?? undefined,
-    };
+    }
 
-    const totalCount = await this.prisma.post.count({ where });
+    const totalCount = await this.prisma.post.count({ where })
 
     // Determine if going forwards or backwards
-    let cursorDirection = 1;
-    let cursor: Prisma.PostWhereUniqueInput | undefined = undefined;
+    let cursorDirection = 1
+    let cursor: Prisma.PostWhereUniqueInput | undefined
     if (pagination?.before) {
-      cursorDirection = -1;
-      cursor = { id: cursorToNumber(pagination.before) };
-    } else if (pagination?.after) {
-      cursorDirection = 1;
-      cursor = { id: cursorToNumber(pagination.after) };
+      cursorDirection = -1
+      cursor = { id: cursorToNumber(pagination.before) }
+    }
+    else if (pagination?.after) {
+      cursorDirection = 1
+      cursor = { id: cursorToNumber(pagination.after) }
     }
 
     const moderationPosts = await this.prisma.post.findMany({
@@ -119,19 +121,19 @@ export class PostModerationRepository {
         },
       },
       skip: cursor ? 1 : undefined,
-      cursor: cursor,
+      cursor,
       take: (pagination?.limit ?? 10) * cursorDirection,
       orderBy: { id: 'asc' },
-    });
+    })
 
-    return { totalCount, moderationPosts };
+    return { totalCount, moderationPosts }
   }
 
   async getPostModerationById(id: number): Promise<ModerationIncludesVersion> {
     return await this.prisma.postModeration.findUnique({
       where: { id },
       include: { postVersion: true },
-    });
+    })
   }
 
   async createModerationPost(
@@ -145,7 +147,7 @@ export class PostModerationRepository {
       authorHash,
       authorNickname,
       hasFromTheModeratorsTag,
-    } = data;
+    } = data
     const newPost = await this.prisma.post.create({
       data: {
         authorHash,
@@ -160,15 +162,15 @@ export class PostModerationRepository {
             authorNickname,
             latest: true,
             version: 1,
-            hasFromTheModeratorsTag: hasFromTheModeratorsTag,
+            hasFromTheModeratorsTag,
           },
         },
         requiredModerations: this.config.moderatorCount,
       },
       include: { versions: true },
-    });
+    })
 
-    return newPost;
+    return newPost
   }
 
   async getPostVersionById(
@@ -177,7 +179,7 @@ export class PostModerationRepository {
     return await this.prisma.postVersion.findUnique({
       where: { id },
       include: { moderations: { orderBy: { timestamp: 'desc' } } },
-    });
+    })
   }
 
   async approvePostVersion(
@@ -193,24 +195,24 @@ export class PostModerationRepository {
           moderatorHash,
           postVersionId: id,
         },
-      });
+      })
 
       if (existingPostModeration) {
-        throw new Error('Moderator has already moderated this post version');
+        throw new Error('Moderator has already moderated this post version')
       }
 
       const postVersion = await tx.postVersion.findUnique({
         where: { id },
         include: { post: true },
-      });
+      })
 
       if (!postVersion.latest) {
-        throw new Error('Post version is not the latest');
+        throw new Error('Post version is not the latest')
       }
 
       // Check that post has pending status
       if (postVersion.post.status !== 'PENDING') {
-        throw new Error('Post status is not PENDING');
+        throw new Error('Post status is not PENDING')
       }
 
       // Create a new post moderation entry
@@ -223,22 +225,23 @@ export class PostModerationRepository {
           postVersionId: id,
         },
         select: { postVersion: { select: { postId: true } } },
-      });
+      })
 
-      return newPostModeration;
-    });
+      return newPostModeration
+    })
 
-    const postId = newPostModeration.postVersion.postId;
+    const postId = newPostModeration.postVersion.postId
 
     // Try to change the status of the post
     try {
-      await this.approvePost(postId);
-    } catch (error) {
-      this.logger.error(error);
+      await this.approvePost(postId)
+    }
+    catch (error) {
+      this.logger.error(error)
     }
 
     // Return the new post
-    return await this.findPostWithVersionsAndModerations(postId);
+    return await this.findPostWithVersionsAndModerations(postId)
   }
 
   async rejectPostVersion(
@@ -255,23 +258,23 @@ export class PostModerationRepository {
           moderatorHash,
           postVersionId: id,
         },
-      });
+      })
 
       if (existingPostModeration) {
-        throw new Error('Moderator has already moderated this post version');
+        throw new Error('Moderator has already moderated this post version')
       }
 
       const postVersion = await tx.postVersion.findUnique({
         where: { id },
         include: { post: true },
-      });
+      })
 
       if (!postVersion.latest) {
-        throw new Error('Post version is not the latest');
+        throw new Error('Post version is not the latest')
       }
 
       if (postVersion.post.status !== 'PENDING') {
-        throw new Error('Post status is not PENDING');
+        throw new Error('Post status is not PENDING')
       }
 
       // Create a new post moderation entry
@@ -285,22 +288,23 @@ export class PostModerationRepository {
           moderationCategory,
         },
         select: { postVersion: { select: { postId: true } } },
-      });
+      })
 
-      return newPostModeration;
-    });
+      return newPostModeration
+    })
 
-    const postId = newPostModeration.postVersion.postId;
+    const postId = newPostModeration.postVersion.postId
 
     // Change status if there are enough moderations
     try {
-      await this.rejectPost(postId);
-    } catch (error) {
-      this.logger.error(error);
+      await this.rejectPost(postId)
+    }
+    catch (error) {
+      this.logger.error(error)
     }
 
     // Return the new post
-    return await this.findPostWithVersionsAndModerations(postId);
+    return await this.findPostWithVersionsAndModerations(postId)
   }
 
   async modifyModerationPost(
@@ -319,13 +323,13 @@ export class PostModerationRepository {
       } = await tx.post.findUnique({
         where: { id: postId },
         include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
-      });
+      })
 
       // Update latest field of latest post version to false
       await tx.postVersion.update({
         where: { id: latestVersion.id },
         data: { latest: false },
-      });
+      })
 
       // Create a new PostVersion
       return await tx.postVersion.create({
@@ -343,10 +347,10 @@ export class PostModerationRepository {
           hasContentWarning,
           moderationCategory,
         },
-      });
-    });
+      })
+    })
 
-    return await this.findPostWithVersionsAndModerations(postId);
+    return await this.findPostWithVersionsAndModerations(postId)
   }
 
   async rollbackModifiedModerationPost(
@@ -357,22 +361,22 @@ export class PostModerationRepository {
       const post = await tx.post.findUnique({
         where: { id: postId },
         include: { versions: { orderBy: { version: 'desc' } } },
-      });
+      })
 
       // Set 2nd latest version to latest version
       await tx.postVersion.update({
         where: { id: post.versions[1].id },
         data: { latest: true },
-      });
+      })
 
       // Delete the latest version
       await tx.postVersion.delete({
         where: { id: post.versions[0].id },
-      });
-    });
+      })
+    })
 
     // Fetch the updated post
-    return this.findPostWithVersionsAndModerations(postId);
+    return this.findPostWithVersionsAndModerations(postId)
   }
 
   async renewPostModeration(
@@ -384,30 +388,30 @@ export class PostModerationRepository {
       const postModeration = await tx.postModeration.findUnique({
         where: { id },
         include: { postVersion: { include: { post: true } } },
-      });
+      })
 
       if (!postModeration) {
-        throw new Error('PostModeration not found');
+        throw new Error('PostModeration not found')
       }
 
       if (postModeration.moderatorHash !== moderatorHash) {
-        throw new Error('Moderator hash does not match');
+        throw new Error('Moderator hash does not match')
       }
 
       if (postModeration.postVersion.post.status !== 'PENDING') {
-        throw new Error('Post is not pending');
+        throw new Error('Post is not pending')
       }
 
-      const postId = postModeration.postVersion.postId;
+      const postId = postModeration.postVersion.postId
 
       // Delete the postModeration
-      await tx.postModeration.delete({ where: { id } });
+      await tx.postModeration.delete({ where: { id } })
 
-      return postId;
-    });
+      return postId
+    })
 
     // Fetch the post with its versions and moderations
-    return await this.findPostWithVersionsAndModerations(renewedPostId);
+    return await this.findPostWithVersionsAndModerations(renewedPostId)
   }
 
   private async publishPost(postId: number): Promise<void> {
@@ -422,26 +426,26 @@ export class PostModerationRepository {
             take: 1,
           },
         },
-      });
+      })
       const originalVersion = await tx.postVersion.findFirst({
-        where: { postId: postId },
+        where: { postId },
         orderBy: { version: 'asc' },
-      });
-      const latestVersion = post.versions[0];
-      const moderated =
-        originalVersion.title !== latestVersion.title ||
-        originalVersion.content !== latestVersion.content;
+      })
+      const latestVersion = post.versions[0]
+      const moderated
+        = originalVersion.title !== latestVersion.title
+        || originalVersion.content !== latestVersion.content
 
       if (!post) {
         throw new Error(
           `Post with id ${postId} not found. It is likely that it has already been published`,
-        );
+        )
       }
 
       if (post.status !== PostStatus.APPROVED) {
         throw new Error(
           `Post with id ${postId} does not have the 'approved' status`,
-        );
+        )
       }
 
       const newPostInMainDb = await this.postService.createPost({
@@ -452,13 +456,14 @@ export class PostModerationRepository {
         authorHash: post.authorHash,
         authorNickname: post.authorNickname,
         moderated,
+        published: true,
         hasContentWarning: post.versions[0].hasContentWarning ?? false,
         hasFromTheModeratorsTag: post.versions[0].hasFromTheModeratorsTag,
-      });
+      })
 
       this.logger.debug(
         `Created new post in main db with id ${newPostInMainDb.id}`,
-      );
+      )
 
       await tx.post.update({
         where: { id: post.id },
@@ -467,12 +472,12 @@ export class PostModerationRepository {
           published: true,
           publishedAt: new Date(),
         },
-      });
+      })
 
       this.logger.debug(
         `Updated post with id ${post.id} to have main db id ${newPostInMainDb.id}`,
-      );
-    });
+      )
+    })
   }
 
   private async archivePost(postId: number): Promise<void> {
@@ -487,27 +492,27 @@ export class PostModerationRepository {
             take: 1,
           },
         },
-      });
+      })
 
       if (!post) {
         throw new Error(
           `No post with id ${post.id} found. It is likely that it has already been archived.`,
-        );
+        )
       }
 
       if (post.status !== PostStatus.REJECTED) {
         throw new Error(
           `Post with id ${postId} does not have the 'rejected' status`,
-        );
+        )
       }
 
       await tx.post.update({
         where: { id: postId },
         data: { archived: true, archivedAt: new Date() },
-      });
+      })
 
-      this.logger.debug(`Archived post with id ${post.id}`);
-    });
+      this.logger.debug(`Archived post with id ${post.id}`)
+    })
   }
 
   private async approvePost(postId: number): Promise<void> {
@@ -522,30 +527,30 @@ export class PostModerationRepository {
             take: 1,
           },
         },
-      });
+      })
 
-      const latestVersion = post.versions[0];
-      const decisionsCount = countPostVersionModerationDecisions(latestVersion);
+      const latestVersion = post.versions[0]
+      const decisionsCount = countPostVersionModerationDecisions(latestVersion)
 
       if (!decisionsCount) {
-        throw new Error('Post has no moderations');
+        throw new Error('Post has no moderations')
       }
 
       if (decisionsCount.REJECTED > 0) {
         throw new Error(
           `Unable to move post to accepted status. Post has ${decisionsCount.REJECTED} rejection(s)`,
-        );
+        )
       }
 
       if (decisionsCount.ACCEPTED >= post.requiredModerations) {
         await tx.post.update({
           where: { id: postId },
           data: { status: 'APPROVED' },
-        });
+        })
 
-        this.logger.debug(`Finished approving post with post id ${postId}`);
+        this.logger.debug(`Finished approving post with post id ${postId}`)
       }
-    });
+    })
   }
 
   private async rejectPost(postId: number) {
@@ -560,30 +565,30 @@ export class PostModerationRepository {
             take: 1,
           },
         },
-      });
+      })
 
-      const latestVersion = post.versions[0];
-      const decisionsCount = countPostVersionModerationDecisions(latestVersion);
+      const latestVersion = post.versions[0]
+      const decisionsCount = countPostVersionModerationDecisions(latestVersion)
 
       if (!decisionsCount) {
-        throw new Error('Post has no moderations');
+        throw new Error('Post has no moderations')
       }
 
       if (decisionsCount.ACCEPTED > 0) {
         throw new Error(
           `Unable to move post to rejected status. It has ${decisionsCount.ACCEPTED} approval(s)`,
-        );
+        )
       }
 
       if (decisionsCount.REJECTED >= post.requiredModerations) {
         await tx.post.update({
           where: { id: postId },
           data: { status: 'REJECTED' },
-        });
+        })
 
-        this.logger.log(`Finished rejecting post with post id ${postId}`);
+        this.logger.log(`Finished rejecting post with post id ${postId}`)
       }
-    });
+    })
   }
 
   async publishOrArchivePosts(): Promise<void> {
@@ -595,40 +600,44 @@ export class PostModerationRepository {
         ],
       },
       include: { versions: { orderBy: { version: 'desc' }, take: 1 } },
-    });
+    })
 
-    let publishedCount = 0;
-    let archivedCount = 0;
+    let publishedCount = 0
+    let archivedCount = 0
 
     const tasks = posts.map((post) => {
       if (post.status === 'APPROVED') {
         return this.publishPost(post.id)
           .then(() => {
-            publishedCount++;
+            publishedCount++
           })
           .catch((error) => {
             this.logger.debug(
               `Post with post id ${post.id} was not published. ${error.message}`,
-            );
-          });
-      } else if (post.status === 'REJECTED') {
+            )
+          })
+      }
+      else if (post.status === 'REJECTED') {
         return this.archivePost(post.id)
           .then(() => {
-            archivedCount++;
+            archivedCount++
           })
           .catch((error) => {
             this.logger.debug(
               `Post with post id ${post.id} was not archived. ${error.message}`,
-            );
-          });
+            )
+          })
       }
-    });
+      else {
+        return null
+      }
+    })
 
-    await Promise.all(tasks);
+    await Promise.all(tasks)
 
     this.logger.debug(
       `Number of posts published: ${publishedCount}, Number of posts archived: ${archivedCount}`,
-    );
+    )
   }
 
   async findPostWithVersionsAndModerations(
@@ -642,6 +651,6 @@ export class PostModerationRepository {
           include: { moderations: { orderBy: { timestamp: 'desc' } } },
         },
       },
-    });
+    })
   }
 }

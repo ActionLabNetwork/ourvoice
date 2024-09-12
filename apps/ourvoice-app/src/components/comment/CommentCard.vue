@@ -6,18 +6,18 @@
         :class="bgclass"
       >
         {{ comment?.authorNickname[0] }}
-        <FromTheModeratorsTag v-if="comment?.hasFromTheModeratorsTag" />
+        <from-the-moderators-tag v-if="comment?.hasFromTheModeratorsTag" />
       </span>
     </div>
     <div class="flex-1 leading-relaxed card bg-opacity-10" :class="bgclass">
       <!-- Content warning -->
-      <ContentWarning :has-content-warning="comment?.hasContentWarning ?? false" />
+      <content-warning :has-content-warning="comment?.hasContentWarning ?? false" />
       <span class="font-semibold">{{ comment?.authorNickname }} reply to</span>
       <span class="text-ourvoice-sky text-sm hover:underline hover:cursor-pointer">
         @{{ comment?.parent?.authorNickname ?? 'original post' }}
       </span>
       <div class="text-xs">
-        {{ ' ' + timePassed(comment?.createdAt ?? '') }}
+        {{ ` ${timePassed(comment?.createdAt ?? '')}` }}
         <span v-if="comment?.moderated"> (moderated by moderator)</span>
       </div>
       <div class="text-sm md:text-md py-2">
@@ -30,69 +30,70 @@
       <div class="flex justify-between">
         <div class="flex gap-2">
           <button
-            @click.stop="voteForComment('UPVOTE')"
-            type="button"
             class="btn-outlined btn-rounded font-medium text-sm"
+            type="button"
+            @click.stop="voteForComment('UPVOTE')"
           >
             <span class="inline-flex items-center gap-2">
               {{ comment?.votesUp }}
-              <IconThumb :fill="hasUpvote" :thumbup="true" />
+              <icon-thumb :fill="hasUpvote" :thumbup="true" />
             </span>
           </button>
 
           <button
-            @click.stop="voteForComment('DOWNVOTE')"
-            type="button"
             class="btn-outlined btn-rounded font-medium text-sm"
+            type="button"
+            @click.stop="voteForComment('DOWNVOTE')"
           >
             <span class="inline-flex items-center gap-1">
               {{ comment?.votesDown }}
-              <IconThumb :fill="hasDownvote" :thumbup="false" />
+              <icon-thumb :fill="hasDownvote" :thumbup="false" />
             </span>
           </button>
         </div>
         <div>
           <button
-            @click="showReply = !showReply"
-            type="button"
             class="hover:underline text-sm lg:text-base"
+            type="button"
+            @click="showReply = !showReply"
           >
             Reply
           </button>
         </div>
       </div>
-      <CreateComment v-if="showReply" :commentId="comment?.id" :postId="comment?.post?.id" />
+      <create-comment v-if="showReply" :comment-id="comment?.id" :post-id="comment?.post?.id" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { timePassed } from '@/utils'
-import { computed, ref } from 'vue'
-import { useCommentsStore } from '@/stores/comments'
-import CreateComment from '@/components/comment/CreateComment.vue'
-import ContentWarning from '../common/ContentWarning.vue'
-import IconThumb from '@/components/icons/IconThumb.vue'
-import FromTheModeratorsTag from '../common/FromTheModeratorsTag.vue'
-import { storeToRefs } from 'pinia'
-import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
-import { useMutation } from '@vue/apollo-composable'
-import { useUserStore } from '@/stores/user'
-import { indexToColor } from '@/utils'
-const userStore = useUserStore()
-const { sessionHash } = storeToRefs(userStore)
 import { faQuoteLeft, faQuoteRight } from '@fortawesome/free-solid-svg-icons'
+import { useMutation } from '@vue/apollo-composable'
+import { storeToRefs } from 'pinia'
+import { computed, ref } from 'vue'
+
+import CreateComment from '@/components/comment/CreateComment.vue'
+import IconThumb from '@/components/icons/IconThumb.vue'
+import { VOTE_MUTATION } from '@/graphql/mutations/createOrDeleteVote'
+import { useCommentsStore } from '@/stores/comments'
+import { useUserStore } from '@/stores/user'
+import { indexToColor, timePassed } from '@/utils'
+
+import ContentWarning from '../common/ContentWarning.vue'
+import FromTheModeratorsTag from '../common/FromTheModeratorsTag.vue'
+
 const props = defineProps({
   commentId: {
     type: Number,
-    required: true
+    required: true,
   },
   indexInList: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 })
-
+const userStore = useUserStore()
+const { sessionHash } = storeToRefs(userStore)
 const bgclass = computed(() => {
   return indexToColor(props.indexInList ?? 0)
 })
@@ -102,15 +103,15 @@ const commentStore = useCommentsStore()
 const comment = computed(() => commentStore.getCommentById(props.commentId))
 
 const userVote = computed(() =>
-  comment.value?.votes?.find((vote) => vote.authorHash == sessionHash.value)
+  comment.value?.votes?.find(vote => vote.authorHash === sessionHash.value),
 )
-const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' ?? false)
-const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' ?? false)
+const hasUpvote = computed(() => userVote.value?.voteType === 'UPVOTE' || false)
+const hasDownvote = computed(() => userVote.value?.voteType === 'DOWNVOTE' || false)
 
 const showReply = ref(false)
 
 const { mutate: createVoteForComemnt } = useMutation(VOTE_MUTATION)
-const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
+async function voteForComment(voteType: 'UPVOTE' | 'DOWNVOTE') {
   try {
     const res = await createVoteForComemnt({
       data: {
@@ -118,19 +119,21 @@ const voteForComment = async (voteType: 'UPVOTE' | 'DOWNVOTE') => {
         postId: comment.value?.post?.id,
         authorHash: userStore.sessionHash,
         authorNickname: userStore.nickname,
-        voteType: voteType
-      }
+        voteType,
+      },
     })
     // console.log(res?.data.createVote)
-    if (res?.data)
+    if (res?.data) {
       commentStore.syncVotesForCommentById({
         commentId: props.commentId,
         votesUp: res.data.createVote.comment.votesUp,
         votesDown: res.data.createVote.comment.votesDown,
         authorHash: userStore.sessionHash,
-        voteType: res.data.createVote.voteType
+        voteType: res.data.createVote.voteType,
       })
-  } catch (error) {
+    }
+  }
+  catch (error) {
     console.log(error)
   }
 }

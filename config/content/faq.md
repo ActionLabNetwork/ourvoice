@@ -1,55 +1,55 @@
 ---
 name: Frequently asked questions
-deployment: OURVOICE.APP
-organisation: RISE project consortium
-stakeholder1: Diversity Council Australia
-stakeholder1_link: https://www.dca.org.au/
-stakeholder2: Settlement Services International
-stakeholder2_link: https://www.ssi.org.au/
-stakeholder3: Action Lab at Monash University
-stakeholder3_link: https://www.monash.edu/it/hcc/action-lab
+deployment: Monash University OURVOICE.APP
+organisation: National Tertiary Education Union
+stakeholder1: Monash Student Association
+stakeholder1_link: https://msa.monash.edu/
+stakeholder2: Action Lab
+stakeholder2_link: https://www.monash.edu/it/hcc/action-lab/
+stakeholder3:
+stakeholder3_link:
 stakeholder4:
 stakeholder4_link:
-email: support@ourvoice.app
-startDate: Friday 16 February
-endDate: Friday 26 2024
-project: RISE project
+participants: Monash University staff and students
+email: afernandes@nteu.org.au
+startDate: Wednesday 18 September
+endDate: Wednesday 02 October
+project: Better Parking at Monash
 ---
 
 # Frequently Asked Questions
 
 ## 1. What are you trying to achieve with OURVOICE.app?
 
-The [{{frontmatter.deployment}}](/) platform is a safe and anonymous place for you to share your experiences in the workplace as part of the [{{frontmatter.project}}](/).
-The {{frontmatter.organisation}}, including [{{frontmatter.stakeholder1}}](https://www.dca.org.au/) and [{{frontmatter.stakeholder2}}](https://www.ssi.org.au/) is collaborating with [{{frontmatter.stakeholder3}}](https://www.monash.edu/it/hcc/action-lab) to give 50 culturally and racially marginalised (CARM) women participants across three pilot organisations the opportunity to take part in an online forum ({{frontmatter.deployment}}). This is an exploratory activity in the [{{frontmatter.project}}](https://www.dca.org.au/research/project/rise) - the [{{frontmatter.deployment}}](/) platform aims to create a safe space for CARM women to discuss their views on systemic barriers and enablers to Culturally and Racially Marginalised Women’s progression to leadership positions in their organisations.
+The {{frontmatter.deployment}} platform is a safe and anonymous place for you to share your experiences in the workplace as part of the {{frontmatter.project}}. The {{frontmatter.organisation}}, including {{frontmatter.stakeholder1}} is collaborating with {{frontmatter.stakeholder2}} to give a voice to Monash University staff and students the opportunity to take part in ({{frontmatter.deployment}}). This is an exploratory activity in the {{frontmatter.project}} - the {{frontmatter.deployment}} platform aims to create a safe space for staff and students to discuss their experiences on the parking system at Monash University and how it could be improved.
 
 ## 2. How does the OurVoice platform work?
 
-To access [{{frontmatter.deployment}}](/) you need to be registered as a CARM participant in the {{frontmatter.project}}.
+To access {{frontmatter.deployment}} you need to be registered as a Monash University staff or student.
 
-You visit the [{{frontmatter.deployment}}](/) homepage and enter your work email. You will then be sent a private one-time link to that email account to access [{{frontmatter.deployment}}](/) (be sure to check your spam/junk folder). The link can only be used once (your will receive a new link every time you want to access the system). When you access the system using the one-time private link, you can read others’ messages and comments, submit your own messages and comments, vote content up and participate in polls.
+You visit the {{frontmatter.deployment}} homepage and enter your Monash work or student email. You will then be sent a private one-time link to that email account to access {{frontmatter.deployment}} (be sure to check your spam/junk folder). The link can only be used once (your will receive a new link every time you want to access the system). When you access the system using the one-time private link, you can read others’ messages and comments, submit your own messages and comments, vote content up and participate in polls.
 
 ## 3. Why would I participate in this project?
 
-The [{{frontmatter.deployment}}](/) platform, as part of the [{{frontmatter.project}}](/), seeks to provide CARM women with a place that they can safely and anonymously discuss the cultural and racial barriers that they face in their workplace. By participating in this project we invite you to share your experiences with other CARM women so we can build a collective understanding of what the systemic barriers and enablers are and help your organisation address these barriers and enablers.
+The {{frontmatter.deployment}} platform, as part of the {{frontmatter.project}}, seeks to provide staff and students with a place that they can safely and anonymously discuss some of the issues experienced with parking at Monash University. By participating in this project we invite you to share your experiences with others so we can build a collective understanding of what the issues are and help everyone address these challenges.
 
 ## 4. How can I be sure that this platform is anonymous and secure?
 
-[{{frontmatter.deployment}}](/) uses industry grade encryption ([Advanced Encryption Standard](https://www.iso.org/standard/54531.html)) to ensure that all data transferred is secure. Additionally, all connections to [{{frontmatter.deployment}}](/) are made using the [HTTPS](https://tools.ietf.org/html/rfc5246) protocol. The private link is generated randomly and is not linked to your email address in any way, and we do not keep a record of the email addresses that have either requested a link or have been sent a link. There are no user accounts or other mechanisms to identify people who have used the system. [{{frontmatter.deployment}}](/) is hosted on DCA servers and so are external to the organisations participating in this deployment. This server is security key protected and only accessible to the {{frontmatter.organisation}} team and Action Lab, Monash University (for maintenance purposes only).
+{{frontmatter.deployment}} uses industry grade encryption (Advanced Encryption Standard) to ensure that all data transferred is secure. Additionally, all connections to {{frontmatter.deployment}} are made using the HTTPS protocol. The private link is generated randomly and is not linked to your email address in any way, and we do not keep a record of the email addresses that have either requested a link or have been sent a link. No user accounts or other mechanisms exist to identify people using the system. {{frontmatter.deployment}} is hosted on Monash independant servers and so are external to the institution participating in this deployment. This server is security key protected and only accessible to the {{frontmatter.organisation}} team and admins (for maintenance purposes only).
 
 ## 5. How long is the OurVoice platform open?
 
-The message forum will be available for all CARM women participants for 2 weeks {{frontmatter.startDate}} - {{frontmatter.endDate}}. After this time the system will close and the data collected from your participation on the platform will be analysed and compiled into a report for your organisation.
+The message forum will be available for all {{frontmatter.participants}} for 2 weeks {{frontmatter.startDate}} - {{frontmatter.endDate}}. After this time the system will close and the data collected from your participation on the platform will be analysed and compiled into a report for your organisation.
 
 ## 6. Great, I am happy that OURVOICE.app is safe and secure. How do I get started?
 
-(1) Go to [{{frontmatter.deployment}}](/)
+(1) Go to {{frontmatter.deployment}}
 
 (2) Click ‘Get Started’.
 
-(3) Enter your work email (this is the email that will have been registered with the RISE project)
+(3) Enter your staff/student email (this is the email that ends with 'monash.edu' )
 
-(4) [{{frontmatter.deployment}}](/) will immediately send a private link to your email (this may take up to five minutes to arrive depending on how busy the email service is at the time). For some users this mail maybe detected as SPAM so check your SPAM or JUNK folders if you have not received the message.
+(4) {{frontmatter.deployment}} will immediately send a private link to your email (this may take up to five minutes to arrive depending on how busy the email service is at the time). For some users this mail maybe detected as SPAM so check your SPAM or JUNK folders if you have not received the message.
 
 (5) Go to your email and click on the private one-time link.
 
