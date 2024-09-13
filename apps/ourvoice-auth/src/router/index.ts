@@ -1,15 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import VerifyView from '../views/VerifyView.vue'
-import VerifyEmailView from '../views/VerifyEmailView.vue'
-import EmailPasswordView from '../views/EmailPasswordView.vue'
-import PasswordlessView from '../views/PasswordlessView.vue'
-import ForgotPasswordView from '../views/ForgotPasswordView.vue'
-import VerifyChangeEmailView from "../views/VerifyChangeEmailView.vue"
-import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
-import { DeploymentService } from '../utils/deployment.service'
 
 import config from '@/config'
+
 import YamlContent from '../../../../config/config.yml'
+import { DeploymentService } from '../utils/deployment.service'
+import { ManageRedirectStateService } from '../utils/manage-redirect-state.service'
+import EmailPasswordView from '../views/EmailPasswordView.vue'
+import ForgotPasswordView from '../views/ForgotPasswordView.vue'
+import PasswordlessView from '../views/PasswordlessView.vue'
+import VerifyChangeEmailView from '../views/VerifyChangeEmailView.vue'
+import VerifyEmailView from '../views/VerifyEmailView.vue'
+import VerifyView from '../views/VerifyView.vue'
 
 const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const deployment: DeploymentService = new DeploymentService()
@@ -62,11 +63,11 @@ const router = createRouter({
           // set deployment and redirect url
           console.log(to.query, ': ', deploymentOrganisation)
           deployment.set(`${to.query.d || deploymentOrganisation}`)
-          redirect.set(`http://${to.query.d || deploymentOrganisation }${domain}/posts`)
+          redirect.set(`http://${to.query.d || deploymentOrganisation}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || deploymentOrganisation })
+      props: route => ({ deployment: route.query.d || deploymentOrganisation }),
     },
     {
       path: '/signinWithEmailPassword',
@@ -74,7 +75,7 @@ const router = createRouter({
         // the function receives the target route as the argument
         // we return a redirect path/location here.
         return { path: '/', query: to.query, hash: to.hash }
-      }
+      },
     },
     {
       path: '/auth',
@@ -82,7 +83,7 @@ const router = createRouter({
         // the function receives the target route as the argument
         // we return a redirect path/location here.
         return { path: '/', query: to.query }
-      }
+      },
     },
     {
       path: '/signinWithoutPassword',
@@ -92,11 +93,11 @@ const router = createRouter({
         if (Object.keys(to.query).length) {
           // set deployment and redirect url
           deployment.set(`${to.query.d || deploymentOrganisation}`)
-          redirect.set(`http://${to.query.d || deploymentOrganisation }${domain}/posts`)
+          redirect.set(`http://${to.query.d || deploymentOrganisation}${domain}/posts`)
           return { path: to.path, query: {}, hash: to.hash }
         }
       },
-      props: (route) => ({ deployment: route.query.d || deploymentOrganisation })
+      props: route => ({ deployment: route.query.d || deploymentOrganisation }),
     },
     {
       path: '/magicLink',
@@ -104,7 +105,7 @@ const router = createRouter({
         // the function receives the target route as the argument
         // we return a redirect path/location here.
         return { path: '/signinWithoutPassword', query: to.query, hash: to.hash }
-      }
+      },
     },
     {
       path: '/passwordless',
@@ -112,7 +113,7 @@ const router = createRouter({
         // the function receives the target route as the argument
         // we return a redirect path/location here.
         return { path: '/signinWithoutPassword', query: to.query, hash: to.hash }
-      }
+      },
     },
     {
       path: '/signinWithEmailPassword',
@@ -120,35 +121,35 @@ const router = createRouter({
         // the function receives the target route as the argument
         // we return a redirect path/location here.
         return { path: '/auth', query: to.query, hash: to.hash }
-      }
+      },
     },
     {
       path: '/reset-password',
       name: 'resetPassword',
-      component: ForgotPasswordView
+      component: ForgotPasswordView,
     },
     {
       path: '/verify',
       name: 'verify',
-      component: VerifyView
+      component: VerifyView,
     },
     {
       path: '/verify-email',
       name: 'verifyemail',
-      component: VerifyEmailView
+      component: VerifyEmailView,
     },
     {
       path: '/verify-change-email',
       name: 'verifychangeemail',
-      component: VerifyChangeEmailView
+      component: VerifyChangeEmailView,
     },
     // default route
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/'
+      redirect: '/',
       // component: PageNotFound
-    }
-  ]
+    },
+  ],
 })
 
 export default router

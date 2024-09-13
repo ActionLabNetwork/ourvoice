@@ -1,7 +1,7 @@
 <template>
   <button
     class="px-4 my-1 h-8 md:h-10 items-center text-sm rounded-full border-2 border-ourvoice-base-light-300"
-    :class="{ 'bg-ourvoice-primary text-ourvoice-black': active }"
+    :class="{ 'bg-ourvoice-primary text-ourvoice-white': active }"
     @click="$emit('select')"
   >
     <span
@@ -9,7 +9,7 @@
       :class="
         active
           ? 'bg-ourvoice-white text-ourvoice-black'
-          : 'bg-ourvoice-accent text-ourvoice-black'
+          : 'bg-ourvoice-accent text-ourvoice-white'
       "
     >
       {{ count }}

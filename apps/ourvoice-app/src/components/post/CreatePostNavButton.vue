@@ -1,7 +1,7 @@
 <template>
   <div ref="createPostNavLink">
     <custom-button
-      class-name="rounded-3xl text-xs md:p-3 md:space-x-1 text-ourvoice-black"
+      class-name="rounded-3xl text-xs md:p-3 md:space-x-1 text-ourvoice-white"
       :label="smAndLarger ? 'Create Post' : ''"
       to="/post"
     >

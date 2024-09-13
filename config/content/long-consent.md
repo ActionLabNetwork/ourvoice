@@ -1,20 +1,23 @@
 ---
 name: Detailed Consent Agreement
-deployment: DCA deployment
-effective_date: 2023-07-19
+deployment: Monash University OURVOICE.APP
+organisation: National Tertiary Education Union
+email: afernandes@nteu.org.au
+startDate: Wednesday 18 September
+endDate: Wednesday 02 October
+project: Better Parking at Monash
+effective_date: 2024-09-05
 ---
 
 # Aspiring Leaders OurVoice Community Platform Information
 
 ## **What is OurVoice?**
 
-DCA is collaborating with Action Lab at Monash University to give CARM women participants across four pilot organisations the opportunity to take part in an online message board and forum on the OurVoice digital platform. This is an exploratory activity in the RISE project - the OurVoice platform aims to create a safe space for CARM women to discuss their views on systemic barriers and enablers to Culturally and Racially Marginalised Women’s progression to leadership positions in their organisations.
-
-This collaborative activity has ethics approval from the Monash University Human Research Ethics Committee (Project ID: 38763)
+{{frontmatter.deployment}} is a secure anonymous communication platform developed by Action Lab for {{frontmatter.organisation}}. This is a confidential online forum to share your experiences, insights, and opportunities with other Monash staff and students within Monash University.  The OurVoice platform gives you an anonymous way to contribute your views on the systemic barriers and enablers that may prevent people from speaking up for fear of retribution. This forum will be open from {{frontmatter.startDate}} - {{frontmatter.endDate}}. For more information on the OurVoice platform please see the FAQs or send us an email {{frontmatter.email}}.
 
 ## **What does participation involve?**
 
-The RISE Project team will email all participants with a link to access the OurVoice platform. Enter your email address to receive a one-time non-reusable link to access the system. Participating CARM women will be given the opportunity to read the consent form for the OurVoice platform and to accept the form prior to logging into the platform for the first time.  To maintain anonymity, participants will be given a new ‘name’ (pseudonym) each time they join the message board.
+The {{forematter.organisation}} team will email all participants with a link to access the OurVoice platform. Enter your email address to receive a one-time non-reusable link to access the system. Participating CARM women will be given the opportunity to read the consent form for the OurVoice platform and to accept the form prior to logging into the platform for the first time.  To maintain anonymity, participants will be given a new ‘name’ (pseudonym) each time they join the message board.
 
 Once participants join the message board, they will have a chance to post messages to reply to key questions on the message board. All users are assigned different randomly generated nicknames every time they log-in to ensure anonymity.  Automated system posts will ask participants about particular aspects of racism and discrimination in the workplace, such as 'Is your workplace a safe space for culturally and racially marginalised women?' and participants can respond or comment on a response.
 

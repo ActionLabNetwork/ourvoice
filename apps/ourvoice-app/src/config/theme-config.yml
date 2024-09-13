@@ -1,30 +1,30 @@
 default:
   colors:
     ourvoice-primary:
-      DEFAULT: '#FFCD29'
-      1: '#FFCD29'
-      2: '#FA5959'
-      3: '#0446C6'
+      DEFAULT: '#006DAE'
+      1: '#006DAE'
+      2: '#DF0021'
+      3: '#6F64A9'
     ourvoice-secondary:
-      DEFAULT: '#242A45'
-      1: '#242A45'
+      DEFAULT: '#F6F6F6'
+      1: '#6f64a9'
       2: '#F7F8F8'
       3: '#A6ADBA'
     ourvoice-accent:
-      DEFAULT: '#FFCD29'
+      DEFAULT: '#00739d'
       1: '#FFBE00'
-      2: '#FA5959'
+      2: '#DF0021'
       3: '#CF8799'
 
     ourvoice-util: # Utility colors for polls, avatar, etc.
       green: '#14AE5C'
-      yellow: '#FFCD29'
-      red: '#FA5959'
+      yellow: '#006DAE'
+      red: '#DF0021'
       blue: '#0D99FF'
       pink: '#FDE2E2'
     ourvoice-neutral:
-      DEFAULT:: '#2A323C'
-      focus: '#242B33'
+      DEFAULT:: '#F6F6F6'
+      focus: '#F7F8F8'
       content: '#A6ADBA'
       body: '#3D3D3D'
     ourvoice-base: # Base color of page, used for blank backgrounds
@@ -36,7 +36,7 @@ default:
       dark-200: '#191E24'
       dark-300: '#15191E'
     ourvoice-error:
-      DEFAULT: '#FA5959'
+      DEFAULT: '#DF0021'
       light: '#FFE9E9'
       dark: '#A3361E'
     ourvoice-info:
@@ -53,7 +53,7 @@ default:
       dark: '#E45C0D'
     ourvoice:
       purple: '#5267DF'
-      red: '#FA5959'
+      red: '#DF0021'
       blue: '#242A45'
       grey: '#9194A2'
       white: '#f7f7f7'
@@ -74,15 +74,15 @@ custom:
       1: '#f5c06a'
       2: '#F7F8F8'
     ourvoice-accent:
-      DEFAULT: '#FFCD29'
+      DEFAULT: '#006DAE'
       1: '#FFBE00'
-      2: '#FA5959'
+      2: '#DF0021'
       3: '#CF8799'
 
     ourvoice-util: # Utility colors for polls, avatar, etc.
       green: '#14AE5C'
-      yellow: '#FFCD29'
-      red: '#FA5959'
+      yellow: '#006DAE'
+      red: '#DF0021'
       blue: '#0D99FF'
       pink: '#FDE2E2'
     ourvoice-neutral:
@@ -99,7 +99,7 @@ custom:
       dark-200: '#191E24'
       dark-300: '#15191E'
     ourvoice-error:
-      DEFAULT: '#FA5959'
+      DEFAULT: '#DF0021'
       light: '#FFE9E9'
       dark: '#A3361E'
     ourvoice-info:
@@ -116,7 +116,7 @@ custom:
       dark: '#E45C0D'
     ourvoice:
       purple: '#5267DF'
-      red: '#FA5959'
+      red: '#DF0021'
       blue: '#242A45'
       grey: '#9194A2'
       white: '#f7f7f7'

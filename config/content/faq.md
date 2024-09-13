@@ -39,7 +39,7 @@ The {{frontmatter.deployment}} platform, as part of the {{frontmatter.project}},
 
 ## 5. How long is the OurVoice platform open?
 
-The message forum will be available for all {{frontmatter.participants}} for 2 weeks {{frontmatter.startDate}} - {{frontmatter.endDate}}. After this time the system will close and the data collected from your participation on the platform will be analysed and compiled into a report for your organisation.
+The message forum will be available for all Monash University staff and students for 2 weeks {{frontmatter.startDate}} - {{frontmatter.endDate}}. After this time the system will close and the data collected from your participation on the platform will be analysed and compiled into a report for your organisation.
 
 ## 6. Great, I am happy that OURVOICE.app is safe and secure. How do I get started?
 
@@ -61,22 +61,19 @@ The message forum will be available for all {{frontmatter.participants}} for 2 w
 
 ## 7. I am ready to post. Are there any restrictions on what I can write?
 
-To protect all users, all posts are moderated before they appear on the platform. Moderation happens every weekday morning by a small team of moderators at Action Lab at {{ frontmatter.stakeholder3}}, {{ frontmatter.stakeholder1}} and {{ frontmatter.stakeholder2}}.
+All posts are moderated to protect all users before appearing on the platform. Moderation happens every weekday morning by a small team of moderators at Action Lab at {{ frontmatter.stakeholder3}}, {{ frontmatter.stakeholder1}} and {{ frontmatter.stakeholder2}}.
 
-The [{{frontmatter.deployment}}](/) platform has Community Guidelines that govern participation on the platform. The platform is guided by the core principles of the {{frontmatter.project}} including:
+The {{frontmatter.deployment}} platform has Community Guidelines that govern participation on the platform. The platform is guided by the core principles of the {{frontmatter.project}} including:
 
-- (I) Activities and decisions should benefit CARM women,
-- (II) Activities and decisions should centre CARM women’s voices,
+(I) Activities and decisions should benefit Monash staff and students,
 
-- (III) Creating racial safety for CARM women should be a priority.
+(II) Activities and decisions should centre staff and student voices,
 
-The [{{frontmatter.deployment}}](/) platform, through a process of moderation, will uphold our Community Guidelines:
+(III) Creating a safe space for staff and students should be a priority.
 
-(1) **Racial and Cultural Safety** - You are entitled to feel socially, culturally, physically, emotionally and spiritually safe on the OurVoice platform. You also have a responsibility to respect the racial and cultural safety of other participants on the platform. If you are feeling unsafe please contact the RISE team at RISE@dca.org.au. You can also contact any services in the following directories for assistance:
+The {{frontmatter.deployment}} platform, through a process of moderation, will uphold our Community Guidelines:
 
-[It Stop With Me Support](https://itstopswithme.humanrights.gov.au/take-action/support-services)
-
-[Anrows](https://www.anrows.org.au/support-directory/)
+(1) **Personal Safety** - You are entitled to feel socially, physically, emotionally and professionally safe on the OurVoice platform. You also have a responsibility to respect the safety of other participants on the platform. If you are feeling unsafe, please contact the {{frontmatter.organisation}} team at {{frontmatter.email}}.
 
 (2) **Honesty** - We encourage you to post about your own lived experience.
 
@@ -100,7 +97,7 @@ Specific content is prohibited on the [{{frontmatter.deployment}}](/) platform a
 
 (-) Spam
 
-Messages that breach these community guidelines will be moderated. Users are also encouraged to report any behaviour that they believe violates these community standards by contacting the [{{frontmatter.deployment}}](/) team at {{frontmatter.email}}. You can also contact the RISE team RISE@dca.org.au
+Messages that breach these community guidelines will be moderated. Users are also encouraged to report any behaviour that they believe violates these community standards by contacting the [{{frontmatter.deployment}}](/) team at {{frontmatter.email}}. You can also contact the {{frontmatter.organisation}} team at {{frontmatter.email}}
 
 ## 8. Okay, so my messages will be moderated – now how do I post?
 
@@ -114,24 +111,20 @@ You can also participate in polls on the system by voting for your preferred opt
 
 ## 9. Who can see the messages on the system?
 
-All other users of the system (50 CARM women participants) will be able to see your messages, respond to them and upvote. Your messages will also be able to be seen by the [{{frontmatter.deployment}}](/) moderation team, as all messages will undergo moderation prior to being posted on the platform.
+All other users of the system will be able to see your messages, respond to them and upvote. Your messages will also be able to be seen by the {{frontmatter.deployment}} moderation team, as all messages will undergo moderation prior to being posted on the platform.
 
 All messages are posted anonymously - no one will be able to identify you (including the moderators) from your post.
 
 ## 10. How do I report unsafe, harmful or illegal content?
 
-All posts are moderated before they appear on the platform so you shouldn’t see posts that are unsafe, harmful or illegal. However if you do see something upsetting that you believe goes against our Community Guidelines please let us know. You can contact the [{{frontmatter.deployment}}](/) team at {{frontmatter.stakeholder3}} {{frontmatter.email}} or the RISE project team RISE@dca.org.au.
+All posts are moderated before they appear on the platform so you shouldn’t see posts that are unsafe, harmful or illegal. However if you do see something upsetting that you believe goes against our Community Guidelines please let us know. You can contact the [{{frontmatter.organisation}}](/) team at {{frontmatter.email}}.
 
 ## 11. Is this a research project?
 
-Yes, this is an exploratory activity in the RISE project and a research collaboration between {{frontmatter.stakeholder1}},{{frontmatter.stakeholder2}} and {{frontmatter.stakeholder3}} The [{{frontmatter.deployment}}](/) platform aims to create a safe space for CARM women to discuss their views on systemic barriers and enablers to Culturally and Racially Marginalised Women’s progression to leadership positions in their organisations.
-The evidence collected from the [{{frontmatter.deployment}}](/) platform will be analysed and used within an aggregated report (where the responses of all women from all four pilot organisations will be combined and reported in a group), which will summarise CARM women’s views on systemic barriers and enablers for CARM women’s progression to leadership.
+No, this space was created with a view that staff and students have not been consulted regarding changes to parking fees, including the surge pricing policy. The consequence of this lack of consultation is a wide and deeply felt anger across staff and students affected by the rising costs of coming to work, in a greater context of a cost of living crisis. This space was created with the belief that staff and students should be consulted, because the best solutions to incentivising sustainable transport lie with those who commute to university each day.
 
-The data collected on [{{frontmatter.deployment}}](/) may also be used in publications such as in journal articles and conference papers.
-If you’d like to know more about this research project please contact:
+The evidence collected from the [{{frontmatter.deployment}}](/) platform will be analysed and used within an aggregated report (where the responses of everyone will be collated and reported in a group). The report will summarise staff and student views on issues with the parking system and what can be done to truly incentivise sustainable transport at Monash University
 
-RISE project team at RISE@dca.org.au
+The data collected on [{{frontmatter.deployment}}](/) may also be used in publications such as in journal articles and conference papers. If you’d like to know more about this project please contact:
 
-Or
-
-{{frontmatter.stakeholder3}} at {{frontmatter.email}}
+{{frontmatter.organisation}} at {{frontmatter.email}}

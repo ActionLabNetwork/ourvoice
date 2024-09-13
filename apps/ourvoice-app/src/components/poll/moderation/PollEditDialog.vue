@@ -1,10 +1,10 @@
 <template>
-  <div class="fixed inset-0 bg-black/30" aria-hidden="true" />
+  <div aria-hidden="true" class="fixed inset-0 bg-black/30" />
   <div class="fixed inset-0 flex items-center justify-center p-4">
-    <DialogPanel class="w-full max-w-[800px] p-4 flex flex-col bg-white rounded-lg">
-      <DialogTitle>
+    <dialog-panel class="w-full max-w-[800px] p-4 flex flex-col bg-white rounded-lg">
+      <dialog-title>
         <h4>{{ props.title }}</h4>
-      </DialogTitle>
+      </dialog-title>
       <div
         v-if="locked"
         class="my-2 p-2 text-sm flex flex-row bg-ourvoice-error bg-opacity-30 rounded-md"
@@ -13,38 +13,44 @@
       </div>
       <div>Poll Question</div>
       <textarea
-        v-model="fields.question"
-        :disabled="props.locked"
-        type="text"
         id="title"
-        placeholder="Question"
+        v-model="fields.question"
         class="rounded-3xl px-4 py-2 focus:placeholder:opacity-50 border-2 border-black-400 focus:border-0 rounded-md"
-        maxlength=400
+        :disabled="props.locked"
+        maxlength="400"
+        placeholder="Question"
+        type="text"
       />
-      <div class="text-sm text-gray text-right">{{ fields.question.length }}/400</div>
+      <div class="text-sm text-gray text-right">
+        {{ fields.question.length }}/400
+      </div>
       <div class="py-2 flex flex-col gap-2">
         <div
           v-for="(_, i) in fields.options.length"
           :key="i"
           class="w-full flex flex-row items-center"
         >
-          <div class="min-w-[16px] text-gray mr-4">{{ i + 1 }}</div>
+          <div class="min-w-[16px] text-gray mr-4">
+            {{ i + 1 }}
+          </div>
           <input
             v-model="fields.options[i]"
-            :disabled="props.locked"
-            type="text"
             class="mr-2 flex-grow px-4 py-2 border-2 border-black-400 focus:border-0 rounded-md"
+            :disabled="props.locked"
+            maxlength="100"
             placeholder="no option"
-            maxlength=100
-          />
-          <div class="text-sm text-gray text-right">{{ fields.options[i].length }}/100</div>
-          <button v-if="!locked" :disabled="locked" class="p-2 rounded-full" @click="addOption(i)">
+            type="text"
+          >
+          <div class="text-sm text-gray text-right">
+            {{ fields.options[i].length }}/100
+          </div>
+          <button v-if="!locked" class="p-2 rounded-full" :disabled="locked" @click="addOption(i)">
             <font-awesome-icon :icon="faPlus" />
           </button>
           <button
             v-if="!locked"
-            :disabled="locked"
             class="p-2 rounded-full"
+            :disabled="locked"
             @click="removeOption(i)"
           >
             <font-awesome-icon :icon="faMinus" />
@@ -58,53 +64,64 @@
         </div>
       </div>
       <div class="py-2 flex flex-row">
-        <div class="flex-grow">Closing Date</div>
-        <input v-model="fields.expiresAtEnabled" type="checkbox" class="mr-2" />
+        <div class="flex-grow">
+          Closing Date
+        </div>
+        <input v-model="fields.expiresAtEnabled" class="mr-2" type="checkbox">
         <input
           v-model="fields.localExpiresAt"
           :disabled="!fields.expiresAtEnabled"
           type="datetime-local"
-        />
+        >
       </div>
       <div class="py-2 flex flex-row">
-        <div class="flex-grow">Published (user can vote on the poll)</div>
-        <input type="checkbox" v-model="fields.published" />
+        <div class="flex-grow">
+          Published (user can vote on the poll)
+        </div>
+        <input v-model="fields.published" type="checkbox">
       </div>
       <div class="py-2 flex flex-row">
-        <div class="flex-grow">Active (poll is visible to the user)</div>
-        <input type="checkbox" v-model="fields.active" />
+        <div class="flex-grow">
+          Active (poll is visible to the user)
+        </div>
+        <input v-model="fields.active" type="checkbox">
       </div>
       <div class="mt-4 flex flex-row justify-between gap-2">
-        <button @click="$emit('close')" class="btn-outline btn-rounded w-[120px] flex-shrink">Cancel</button>
-        <button :disabled="!isFormValid" @click="submit()" class="btn-primary btn-rounded w-[120px] flex-shrink">Submit</button>
+        <button class="btn-outline btn-rounded w-[120px] flex-shrink" @click="$emit('close')">
+          Cancel
+        </button>
+        <button class="btn-primary btn-rounded w-[120px] flex-shrink" :disabled="!isFormValid" @click="submit()">
+          Submit
+        </button>
       </div>
-    </DialogPanel>
+    </dialog-panel>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PollCreateInput } from '@/graphql/generated/graphql';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { DialogPanel, DialogTitle } from '@headlessui/vue';
-import { computed, reactive, type PropType } from 'vue';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { DialogPanel, DialogTitle } from '@headlessui/vue'
+import { computed, onMounted, type PropType, reactive } from 'vue'
+
+import type { PollCreateInput } from '@/graphql/generated/graphql'
 
 const props = defineProps({
   poll: {
     type: Object as PropType<PollCreateInput>,
-    required: false
+    required: false,
   },
   locked: {
     type: Boolean,
-    required: true
+    required: true,
   },
   title: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 const emit = defineEmits<{
-  (e: 'submit', object: PollCreateInput): void
-  (e: 'close'): void
+  (e: 'submit', object: PollCreateInput): void;
+  (e: 'close'): void;
 }>()
 
 function convertToLocalDate(date: Date | string) {
@@ -116,28 +133,34 @@ function convertToLocalDate(date: Date | string) {
 }
 
 const fields: Omit<PollCreateInput, 'options' | 'expiresAt'> & {
-  options: string[]
-  localExpiresAt: string
-  expiresAtEnabled: boolean
-} = reactive(
-  props.poll
-    ? {
-        ...props.poll,
-        options: props.poll.options.map((option) => option.option),
-        expiresAtEnabled: props.poll.expiresAt != null,
-        localExpiresAt: convertToLocalDate(props.poll.expiresAt ?? new Date())
-      }
-    : {
-        question: '',
-        published: true,
-        options: [''],
-        active: true,
-        postLink: null,
-        weight: 1,
-        expiresAtEnabled: false,
-        localExpiresAt: convertToLocalDate(new Date())
-      }
-)
+  options: string[];
+  localExpiresAt: string;
+  expiresAtEnabled: boolean;
+} = reactive({
+  question: '',
+  published: true,
+  options: [''],
+  active: true,
+  postLink: null,
+  weight: 1,
+  expiresAtEnabled: false,
+  localExpiresAt: convertToLocalDate(new Date()),
+})
+
+function initializeFields() {
+  if (props.poll) {
+    fields.question = props.poll.question
+    fields.published = props.poll.published
+    fields.options = props.poll.options.map(option => option.option)
+    fields.active = props.poll.active
+    fields.postLink = props.poll.postLink
+    fields.weight = props.poll.weight
+    fields.expiresAtEnabled = props.poll.expiresAt != null
+    fields.localExpiresAt = convertToLocalDate(props.poll.expiresAt ?? new Date())
+  }
+}
+
+onMounted(initializeFields)
 
 function addOption(index: number) {
   fields.options = [...fields.options.slice(0, index + 1), '', ...fields.options.slice(index + 1)]
@@ -153,7 +176,7 @@ const isNumOptionsValid = computed(() => {
 })
 const isFormValid = computed(() => isNumOptionsValid.value)
 
-const submit = () => {
+function submit() {
   const {
     published,
     active,
@@ -162,11 +185,11 @@ const submit = () => {
     expiresAtEnabled,
     localExpiresAt,
     question,
-    options: optionStrings
+    options: optionStrings,
   } = fields
   const options = optionStrings
-    .filter((option) => option.trim().length != 0)
-    .map((option) => ({ option }))
+    .filter(option => option.trim().length !== 0)
+    .map(option => ({ option }))
   emit('submit', {
     published,
     active,
@@ -174,7 +197,7 @@ const submit = () => {
     weight,
     expiresAt: expiresAtEnabled ? new Date(localExpiresAt) : null,
     question,
-    options
+    options,
   })
   emit('close')
 }

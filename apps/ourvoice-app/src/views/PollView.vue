@@ -6,7 +6,7 @@
         class="px-4 w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch justify-items-stretch"
       >
         <div v-for="poll in availablePolls" :key="poll.id" class="w-full h-full">
-          <ActivePollCard :poll="poll" />
+          <active-poll-card :poll="poll" />
         </div>
       </div>
       <div
@@ -14,10 +14,10 @@
         class="w-full p-6 py-10 flex flex-col items-center"
       >
         <img
+          alt=""
           class="lg:mb-4 w-full max-w-[232px] lg:max-w-[400px]"
           src="@/assets/polls_no_active.png"
-          alt=""
-        />
+        >
         <div class="mb-10 text-[14px] lg:text-[28px] text-[#444] font-semibold">
           No polls are running
         </div>
@@ -37,9 +37,11 @@
       <div
         class="px-4 w-full max-w-[1200px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch justify-items-stretch"
       >
-        <h4 class="mb-4 px-4 col-span-full">Polls you have voted on</h4>
+        <h4 class="mb-4 px-4 col-span-full">
+          Polls you have voted on
+        </h4>
         <div v-for="poll in votedPolls" :key="poll.id" class="w-ful h-full">
-          <PollResultCard :poll="poll" />
+          <poll-result-card :poll="poll" />
         </div>
       </div>
     </div>
@@ -47,11 +49,12 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+
 import ActivePollCard from '@/components/poll/ActivePollCard.vue'
 import PollResultCard from '@/components/poll/PollResultCard.vue'
 import { usePollStore } from '@/stores/poll'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
 
 const router = useRouter()
 

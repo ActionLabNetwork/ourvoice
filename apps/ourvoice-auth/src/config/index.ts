@@ -9,5 +9,5 @@ export default {
   apiURL: `${import.meta.env.VITE_APP_API_URL || 'http://api.ourvoice.test'}`,
   appURL: `${import.meta.env.VITE_APP_APP_URL || 'http://demo.ourvoice.test'}`,
   adminURL: `${import.meta.env.VITE_APP_ADMIN_URL || 'http://admin.ourvoice.test'}`,
-  appDomain: `${import.meta.env.VITE_APP_APP_DOMAIN || 'ourvoice.test'}`
+  appDomain: `${import.meta.env.VITE_APP_APP_DOMAIN || 'ourvoice.test'}`,
 }

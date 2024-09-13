@@ -1,17 +1,17 @@
-import { useUserStore } from './../stores/user'
-import { createRouter, createWebHistory } from 'vue-router'
-import {
-  getCurrentDeploymentDomain,
-  checkForSession,
-  checkDeployment,
-  redirectTo,
-} from '../services/session.service'
 import Session from 'supertokens-web-js/recipe/session'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import config from '@/config'
-
 // import YamlContent from '../../../../config/config.yml'
 import { useDeploymentStore } from '@/stores/deployment'
+
+import {
+  checkDeployment,
+  checkForSession,
+  getCurrentDeploymentDomain,
+  redirectTo,
+} from '../services/session.service'
+import { useUserStore } from './../stores/user'
 
 // const deploymentDomain = import.meta.env.VITE_APP_FRONTEND_DOMAIN || 'localhost'
 // const portalURL = import.meta.env.VITE_APP_PORTAL_URL || 'http://localhost:3011'
@@ -22,11 +22,13 @@ const PostsView = () => import('../views/PostsView.vue')
 const NoticeView = () => import('../views/NoticeView.vue')
 const PostPage = () => import('../views/PostPage.vue')
 const CreatePostView = () => import('../views/CreatePostView.vue')
-const PostModerationListView = () =>
-  import('../views/PostModerationListView.vue')
+function PostModerationListView() {
+  return import('../views/PostModerationListView.vue')
+}
 const PostModerationView = () => import('../views/PostModerationView.vue')
-const CommentModerationListView = () =>
-  import('../views/CommentModerationListView.vue')
+function CommentModerationListView() {
+  return import('../views/CommentModerationListView.vue')
+}
 const CommentModerationView = () => import('../views/CommentModerationView.vue')
 const PollView = () => import('../views/PollView.vue')
 const PollModerationView = () => import('../views/PollModerationView.vue')
@@ -196,22 +198,37 @@ router.beforeEach(async (to, from, next) => {
       // if current deployment matches with user then init user store
       if (await checkDeployment(deployment)) {
         if (to.matched.some((record: any) => record.meta.requiresModerator)) {
-          userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin
-            ? next()
-            : redirectTo('/')
-        } else {
+          if (userStore.isModerator || userStore.isAdmin || userStore.isSuperAdmin) {
+            next()
+          }
+          else {
+            redirectTo('/')
+          }
+        }
+        else {
           next()
         }
-      } else {
-        to.name !== 'notice' ? next({ name: 'notice' }) : next()
       }
-    } else {
-      // check if route requires moderator role
-      to.matched.some((record: any) => record.meta.requiresModerator)
-        ? redirectTo(authModURL)
-        : redirectTo(authURL)
+      else {
+        if (to.name !== 'notice') {
+          next({ name: 'notice' })
+        }
+        else {
+          next()
+        }
+      }
     }
-  } else {
+    else {
+      // check if route requires moderator role
+      if (to.matched.some((record: any) => record.meta.requiresModerator)) {
+        redirectTo(authModURL)
+      }
+      else {
+        redirectTo(authURL)
+      }
+    }
+  }
+  else {
     next()
   }
 })

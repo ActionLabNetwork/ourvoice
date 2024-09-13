@@ -37,8 +37,8 @@ authModules:
   - Dashboard
 heroImage:
 logo: /ourvoice_logo_new.png
-deploymentLogo: ourvoice_logo_demo_org.svg
-slogan: 'Welcome to the DEMO ORG OurVoice Community Platform'
+deploymentLogo: ourvoice_logo_nteu_dark.svg
+slogan: 'Welcome to the NTEU OurVoice Community Platform'
 moderatorCount: 1
 postFrequency:
   unit: 'minutes'

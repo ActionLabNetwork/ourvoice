@@ -16,7 +16,7 @@
           </div>
           <div>
             <a class="" href="#">
-              <span class="sr-only">DCA</span>
+              <span class="sr-only">NTEU</span>
               <img
                 alt="Deployment Logo"
                 class="h-11 ml-6 rounded-md"
@@ -45,7 +45,7 @@
         <custom-button
           v-else
           class-name="w-52 h-14 px-2 py-4 rounded-full text-ourvoice-secondary"
-          label="Get Started"
+          label="Continue"
           to="/posts"
           variant="filled"
         />

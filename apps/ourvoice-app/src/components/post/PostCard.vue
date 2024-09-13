@@ -11,7 +11,7 @@
         <span
           v-for="(cat, index) in post?.categories"
           :key="index"
-          class="bg-ourvoice-util-yellow text-xs font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
+          class="bg-ourvoice-util-yellow text-xs text-ourvoice-white font-medium mr-2 px-2.5 py-0.5 rounded h-fit truncate"
         ># {{ cat?.name }}
         </span>
       </div>

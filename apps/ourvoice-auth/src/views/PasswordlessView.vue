@@ -117,7 +117,7 @@
                 <span class="sr-only">OurVocie</span>
                 <img
                   alt="Deployment Logo" class="h-11 ml-6 rounded-md"
-                  src="@/assets/logo/ourvoice_logo_demo_org.svg"
+                  src="@/assets/logo/ourvoice_logo_nteu_dark.svg"
                 >
               </a>
             </div>

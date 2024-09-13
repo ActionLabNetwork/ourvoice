@@ -8,8 +8,8 @@ export function formatDate(
     month: 'long',
     day: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
-  }
+    minute: 'numeric',
+  },
 ): string {
   const date = new Date(dateString)
   return new Intl.DateTimeFormat(locale, options).format(date)
@@ -22,13 +22,13 @@ export function formatTimestampToReadableDate(unixTs: number) {
     month: 'long',
     day: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   })
 }
 
 export function timePassed(dateString: string) {
   return formatDistance(new Date(dateString), new Date(), {
-    addSuffix: true
+    addSuffix: true,
   })
 }
 
@@ -37,7 +37,7 @@ export function indexToColor(index: number) {
     'bg-ourvoice-util-green',
     'bg-ourvoice-util-yellow',
     'bg-ourvoice-util-red',
-    'bg-ourvoice-util-blue'
+    'bg-ourvoice-util-blue',
   ]
   return colors[index % colors.length]
 }

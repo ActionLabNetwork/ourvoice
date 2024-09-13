@@ -29,7 +29,7 @@
               <img
                 alt="Deployment Logo"
                 class="w-24 rounded-md"
-                src="@/assets/logo/ourvoice_logo_demo_org_light.svg"
+                src="@/assets/logo/ourvoice_logo_nteu_light.svg"
               >
             </a>
           </div>
@@ -158,7 +158,7 @@
                   >
                     <div class="flex-auto">
                       <router-link
-                        class="block font-semibold text-ourvoice-black"
+                        class="block font-semibold text-ourvoice-white"
                         :to="item.href"
                         @click.prevent="() => close()"
                       >
@@ -213,7 +213,7 @@
               >
                 <div class="p-4">
                   <div
-                    class="p-4 text-sm block font-semibold rounded-lg text-ourvoice-black cursor-pointer hover:bg-ourvoice-primary-1"
+                    class="p-4 text-sm block font-semibold rounded-lg text-ourvoice-white cursor-pointer hover:bg-ourvoice-primary-1"
                     @click="
                       () => {
                         navigateToSettings()
@@ -229,14 +229,14 @@
                   >
                     <div class="flex-auto">
                       <div
-                        class="block font-semibold text-ourvoice-black cursor-pointer"
+                        class="block font-semibold text-ourvoice-white cursor-pointer"
                         @click="signOut"
                       >
                         Sign Out
                         <span class="absolute inset-0" />
                       </div>
                       <p
-                        class="text-ourvoice-black inline-block my-auto underline underline-offset-4"
+                        class="text-ourvoice-white inline-block my-auto underline underline-offset-4"
                       >
                         {{ userStore.nickname }}
                       </p>

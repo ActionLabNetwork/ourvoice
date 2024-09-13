@@ -37,7 +37,7 @@ authModules:
   - Dashboard
 heroImage:
 logo: /ourvoice_logo_new.png
-deploymentLogo: ourvoice_logo_demo_org.svg
+deploymentLogo: ourvoice_logo_nteu_dark.svg
 slogan: 'Welcome to the DEMO ORG OurVoice Community Platform'
 moderatorCount: 1
 postFrequency:

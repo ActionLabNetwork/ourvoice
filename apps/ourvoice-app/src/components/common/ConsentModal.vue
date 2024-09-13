@@ -1,11 +1,11 @@
 <template>
   <!-- Consent Modal -->
   <div
-    class="fixed inset-0 backdrop-blur-lg overflow-y-auto h-full w-full"
-    id="consent-modal"
     v-show="isConsentModalVisible"
+    id="consent-modal"
+    class="fixed inset-0 backdrop-blur-lg overflow-y-auto h-full w-full"
   >
-    <!-- consent modal content-->
+    <!-- consent modal content -->
     <div
       class="relative top-60 mx-5 p-5 border w-auto shadow-lg rounded-md bg-white max-w-[800px] mx-auto"
     >
@@ -14,10 +14,8 @@
           Consent Form
         </h1>
         <div class="mt-2 px-7 py-3">
-          <Consent class="consent-md" ref="consent" />
-          <a class="text-ourvoice-info hover:underline" href="/consent"
-            >Detailed Consent Agreement</a
-          >
+          <consent ref="consent" class="consent-md" />
+          <a class="text-ourvoice-info hover:underline" href="/consent">Detailed Consent Agreement</a>
         </div>
         <div class="items-center px-4 py-3">
           <button
@@ -33,14 +31,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
 import { mapStores } from 'pinia'
-
-import UserService from '../../services/user-service'
-import { useUserStore } from '../../stores/user'
+import { defineComponent } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import Consent from '../../../../../config/content/consent.md'
-import { useRoute, useRouter } from 'vue-router'
+import UserService from '../../services/user-service'
+import { useUserStore } from '../../stores/user'
 
 export default defineComponent({
   components: {
@@ -57,17 +54,34 @@ export default defineComponent({
   computed: {
     ...mapStores(useUserStore),
   },
+  async mounted() {
+    // get consent effective date
+    try {
+      const effectiveDate = (this.$refs.consent as any)?.frontmatter?.effective_date
+      this.consentEffectiveDate = effectiveDate ? new Date(effectiveDate) : new Date()
+    }
+    catch (error) {
+      console.error('Error parsing consent effective date:', error)
+      this.consentEffectiveDate = new Date()
+    }
+    await this.router.isReady()
+    if (this.route.name === 'consent') {
+      this.isConsentModalVisible = false
+    }
+    else {
+      await this.checkForConsent()
+    }
+  },
   methods: {
-    checkForConsent: async function () {
-      if (!(await this.userStore.isLoggedIn)) return
+    async checkForConsent() {
+      if (!(await this.userStore.isLoggedIn))
+        return
       const userConsent = (await this.userStore.getConsent) as string
       console.log({ userConsent })
-      this.isConsentModalVisible =
-        !userConsent || this.consentEffectiveDate > new Date(userConsent)
-          ? true
-          : false
+      this.isConsentModalVisible
+        = !!(!userConsent || this.consentEffectiveDate > new Date(userConsent))
     },
-    acceptConsent: async function () {
+    async acceptConsent() {
       this.isConsentModalVisible = false
       const response = await UserService.updateUserConsent()
       if (response.status === 200) {
@@ -78,18 +92,6 @@ export default defineComponent({
         }
       }
     },
-  },
-  async mounted() {
-    // get consent effective date
-    this.consentEffectiveDate =
-      new Date((this.$refs['consent'] as any).frontmatter.effective_date) ||
-      null
-    await this.router.isReady()
-    if (this.route.name === 'consent') {
-      this.isConsentModalVisible = false
-    } else {
-      await this.checkForConsent()
-    }
   },
 })
 </script>
