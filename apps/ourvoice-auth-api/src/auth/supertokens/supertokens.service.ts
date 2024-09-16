@@ -1,31 +1,30 @@
-import { Logger, Inject, Injectable } from '@nestjs/common';
-import supertokens from 'supertokens-node';
-import Session from 'supertokens-node/recipe/session';
-import EmailVerification from 'supertokens-node/recipe/emailverification';
-import EmailPassword from 'supertokens-node/recipe/emailpassword';
-import Passwordless from 'supertokens-node/recipe/passwordless';
-import { SMTPService } from 'supertokens-node/recipe/passwordless/emaildelivery';
-import { SMTPService as EmailVerificationSMTPService } from 'supertokens-node/recipe/emailverification/emaildelivery';
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import supertokens from 'supertokens-node'
+import Dashboard from 'supertokens-node/recipe/dashboard'
+import EmailPassword from 'supertokens-node/recipe/emailpassword'
+import EmailVerification from 'supertokens-node/recipe/emailverification'
+import { SMTPService as EmailVerificationSMTPService } from 'supertokens-node/recipe/emailverification/emaildelivery'
+import Passwordless from 'supertokens-node/recipe/passwordless'
+import { SMTPService } from 'supertokens-node/recipe/passwordless/emaildelivery'
+import Session from 'supertokens-node/recipe/session'
+import UserMetadata from 'supertokens-node/recipe/usermetadata'
+import UserRoles from 'supertokens-node/recipe/userroles'
 
 import {
-  ConfigInjectionToken,
   AuthModuleConfig,
+  ConfigInjectionToken,
   SuperTokenAuthBypass,
-} from '../config.interface';
-import Dashboard from 'supertokens-node/recipe/dashboard';
-import UserMetadata from 'supertokens-node/recipe/usermetadata';
-import UserRoles from 'supertokens-node/recipe/userroles';
-
-import { addRoleToUser } from '../roles.service';
-import { isEmailAllowed, isModeratorAllowed } from '../metadata.service';
+} from '../config.interface'
+import { isEmailAllowed, isModeratorAllowed } from '../metadata.service'
+import { addRoleToUser } from '../roles.service'
 
 @Injectable()
 export class SupertokensService {
-  private readonly logger = new Logger('SupertokensService');
+  private readonly logger = new Logger('SupertokensService')
 
   constructor(@Inject(ConfigInjectionToken) private config: AuthModuleConfig) {
     // get configured login options
-    const recipes = this.getAuthModules(config);
+    const recipes = this.getAuthModules(config)
     supertokens.init({
       appInfo: config.appInfo,
       supertokens: {
@@ -43,29 +42,29 @@ export class SupertokensService {
             functions: (originalImplementation) => {
               return {
                 ...originalImplementation,
-                createNewSession: async function (input) {
-                  const userId = input.userId;
-                  const { metadata } =
-                    await UserMetadata.getUserMetadata(userId);
+                async createNewSession(input) {
+                  const userId = input.userId
+                  const { metadata }
+                    = await UserMetadata.getUserMetadata(userId)
                   // This goes in the access token, and is available to read on the frontend.
                   input.accessTokenPayload = {
                     ...input.accessTokenPayload,
                     deployment: metadata.deployment || '',
                     consent: metadata.consent || '',
-                  };
+                  }
 
-                  return originalImplementation.createNewSession(input);
+                  return originalImplementation.createNewSession(input)
                 },
-              };
+              }
             },
           },
         }),
       ],
-    });
+    })
   }
 
   private getAuthModules(config: AuthModuleConfig) {
-    const smtpSettings = config.smtpSettings;
+    const smtpSettings = config.smtpSettings
 
     const recipeList = {
       EmailPassword: EmailPassword.init({
@@ -79,13 +78,14 @@ export class SupertokensService {
               validate: async (email: string) => {
                 // TODO: this should eventually come from admin database
                 if (
-                  !(await isModeratorAllowed(email)) &&
+                  !(await isModeratorAllowed(email))
                   // check if this is app super admin who is login in
-                  config.adminEmail !== email
+                  && config.adminEmail !== email
                 ) {
-                  return 'Sign up disabled. Please contact the admin.';
-                } else {
-                  return undefined;
+                  return 'Sign up disabled. Please contact the admin.'
+                }
+                else {
+                  return undefined
                 }
               },
             },
@@ -95,30 +95,30 @@ export class SupertokensService {
           apis: (originalImplementation) => {
             return {
               ...originalImplementation,
-              signUpPOST: async function (input) {
+              async signUpPOST(input) {
                 if (originalImplementation.signUpPOST === undefined) {
-                  throw Error('Should never come here');
+                  throw new Error('Should never come here')
                 }
 
                 // First we call the original implementation of signUpPOST.
-                const response = await originalImplementation.signUpPOST(input);
+                const response = await originalImplementation.signUpPOST(input)
 
                 // Post sign up response, we check if it was successful
                 if (response.status === 'OK') {
-                  const id = response.user.id;
+                  const id = response.user.id
                   // add `user` role to all registered users
-                  addRoleToUser(id, 'user');
+                  addRoleToUser(id, 'user')
                   // add deployment
                   const deployment = input.formFields.filter((obj) => {
-                    return obj.id === 'deployment';
-                  });
+                    return obj.id === 'deployment'
+                  })
                   await UserMetadata.updateUserMetadata(id, {
                     deployment: deployment[0].value || '',
-                  });
+                  })
                 }
-                return response;
+                return response
               },
-            };
+            }
           },
         },
       }),
@@ -143,36 +143,36 @@ export class SupertokensService {
           apis: (originalImplementation) => {
             return {
               ...originalImplementation,
-              verifyEmailPOST: async function (input) {
+              async verifyEmailPOST(input) {
                 if (originalImplementation.verifyEmailPOST === undefined) {
-                  throw Error('Should never come here');
+                  throw new Error('Should never come here')
                 }
                 // First we call the original implementation
-                const response =
-                  await originalImplementation.verifyEmailPOST(input);
+                const response
+                  = await originalImplementation.verifyEmailPOST(input)
 
                 // Then we check if it was successfully completed
                 if (response.status === 'OK') {
-                  const id = response.user.recipeUserId.getAsString();
-                  const { metadata } = await UserMetadata.getUserMetadata(id);
+                  const id = response.user.recipeUserId.getAsString()
+                  const { metadata } = await UserMetadata.getUserMetadata(id)
                   // add
-                  const sessionHandles =
-                    await Session.getAllSessionHandlesForUser(id);
+                  const sessionHandles
+                    = await Session.getAllSessionHandlesForUser(id)
                   sessionHandles.forEach(async (handle) => {
-                    const currSessionInfo =
-                      await Session.getSessionInformation(handle);
+                    const currSessionInfo
+                      = await Session.getSessionInformation(handle)
                     if (currSessionInfo === undefined) {
-                      return;
+                      return
                     }
 
                     await Session.mergeIntoAccessTokenPayload(handle, {
                       deployment: metadata.deployment || '',
-                    });
-                  });
+                    })
+                  })
                 }
-                return response;
+                return response
               },
-            };
+            }
           },
         },
       }),
@@ -202,36 +202,36 @@ export class SupertokensService {
 
               // here we are only overriding the function that's responsible
               // for signing in / up a user.
-              createCode: async function (input) {
+              async createCode(input) {
                 // TODO: create custom code generation logic
                 // or call the default behaviour as show below
                 // See steps:
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/createCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/CreateCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L62
-                const code: SuperTokenAuthBypass['createCode'] =
-                  await originalImplementation.createCode(input);
+                const code: SuperTokenAuthBypass['createCode']
+                  = await originalImplementation.createCode(input)
 
-                return code;
+                return code
               },
-              consumeCode: async function (input) {
+              async consumeCode(input) {
                 // TODO: create custom code consumption logic
                 // or call the default behaviour as show below
                 // See steps:
                 // 1) https://github.com/supertokens/supertokens-node/blob/master/lib/ts/recipe/passwordless/api/consumeCode.ts
                 // 2) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/webserver/api/passwordless/ConsumeCodeAPI.java
                 // 3) https://github.com/supertokens/supertokens-core/blob/master/src/main/java/io/supertokens/passwordless/Passwordless.java#L165
-                const response =
-                  await originalImplementation.consumeCode(input);
+                const response
+                  = await originalImplementation.consumeCode(input)
 
-                return response;
+                return response
               },
-            };
+            }
           },
           apis: (originalImplementation) => {
             return {
               ...originalImplementation,
-              createCodePOST: async function (input) {
+              async createCodePOST(input) {
                 if ('email' in input) {
                   // const existingUser = await Passwordless.getUserByEmail({
                   //   email: input.email,
@@ -243,77 +243,78 @@ export class SupertokensService {
                     return {
                       status: 'GENERAL_ERROR',
                       message: 'Sign up disabled. Please contact the admin.',
-                    };
+                    }
                   }
                   // }
                 }
-                return await originalImplementation.createCodePOST?.(input);
+                return await originalImplementation.createCodePOST?.(input)
               },
               consumeCodePOST: async (input) => {
                 if (originalImplementation.consumeCodePOST === undefined) {
-                  throw Error('Should never come here');
+                  throw new Error('Should never come here')
                 }
                 // First we call the original implementation of consumeCodePOST.
-                const response =
-                  await originalImplementation.consumeCodePOST(input);
+                const response
+                  = await originalImplementation.consumeCodePOST(input)
                 // Post sign up response, we check if it was successful
                 if (response.status === 'OK') {
                   // const { id, email, phoneNumber } = response.user;
                   if (response.createdNewRecipeUser) {
-                    let deployment = '';
+                    let deployment = ''
                     const request = supertokens.getRequestFromUserContext(
                       input.userContext,
-                    );
+                    )
 
                     if (request !== undefined) {
-                      deployment = request.getHeaderValue('deployment');
-                    } else {
+                      deployment = request.getHeaderValue('deployment')
+                    }
+                    else {
                       /**
                        * This is possible if the function is triggered from the user management dashboard
                        *
                        * In this case set a reasonable default value to use
                        */
-                      deployment = '';
+                      deployment = ''
                     }
 
                     // add `user` role to all registered users
-                    addRoleToUser(response.user.id, 'user');
+                    addRoleToUser(response.user.id, 'user')
 
                     // add deployment to user metadata
                     await UserMetadata.updateUserMetadata(response.user.id, {
                       deployment,
-                    });
-                    const sessionHandles =
-                      await Session.getAllSessionHandlesForUser(
+                    })
+                    const sessionHandles
+                      = await Session.getAllSessionHandlesForUser(
                         response.user.id,
-                      );
+                      )
 
                     // we update all the session's Access Token payloads for this user
                     sessionHandles.forEach(async (handle) => {
-                      const currSessionInfo =
-                        await Session.getSessionInformation(handle);
+                      const currSessionInfo
+                        = await Session.getSessionInformation(handle)
                       if (currSessionInfo === undefined) {
-                        return;
+                        return
                       }
 
                       await Session.mergeIntoAccessTokenPayload(handle, {
                         deployment,
-                      });
-                    });
+                      })
+                    })
                   }
                 }
-                return response;
+                return response
               },
-            };
+            }
           },
         },
       }),
       Dashboard: Dashboard.init({
         apiKey: config.apiKey || 'super-secret-api-key',
       }),
-    };
+    }
     return config.authModules
-      ? config.authModules.map((auth) => recipeList[auth])
-      : Object.values(recipeList);
+      ? config.authModules.map(auth => recipeList[auth])
+      : Object.values(recipeList)
   }
 }

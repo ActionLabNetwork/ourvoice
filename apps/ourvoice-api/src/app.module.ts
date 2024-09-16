@@ -1,33 +1,30 @@
-import { CategoryModule } from './modules/category/category.module';
-import { PostModule } from './modules/post/post.module';
-import { VoteModule } from './modules/vote/vote.module';
-import { CommentModule } from './modules/comment/comment.module';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
+import { join } from 'node:path'
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheControl'
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default'
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { GraphQLModule } from '@nestjs/graphql'
+import { ScheduleModule } from '@nestjs/schedule'
+import { GraphQLError } from 'graphql/error'
 
-import { AuthModule } from './auth/auth.module';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheControl';
-
-import { ContactFormModule } from './modules/contactform/contactform.module';
-import { ModerationModule } from './modules/moderation/moderation.module';
-import { UsersModule } from './modules/users/users.module';
-import { PollModule } from './modules/poll/poll.module';
-
-import deployment from './config/deployment';
-import configuration from './config/configuration';
-
-import { GraphQLError } from 'graphql/error';
-import { SMTPConfig } from './auth/config.interface';
-import { AnalyticsModule } from './analytics/analytics.module';
-import { DateTimeScalar } from './graphql/DatetimeScalar';
+import { AnalyticsModule } from './analytics/analytics.module'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { AuthModule } from './auth/auth.module'
+import { SMTPConfig } from './auth/config.interface'
+import configuration from './config/configuration'
+import deployment from './config/deployment'
+import { DateTimeScalar } from './graphql/DatetimeScalar'
+import { CategoryModule } from './modules/category/category.module'
+import { CommentModule } from './modules/comment/comment.module'
+import { ContactFormModule } from './modules/contactform/contactform.module'
+import { ModerationModule } from './modules/moderation/moderation.module'
+import { PollModule } from './modules/poll/poll.module'
+import { PostModule } from './modules/post/post.module'
+import { UsersModule } from './modules/users/users.module'
+import { VoteModule } from './modules/vote/vote.module'
 
 @Module({
   imports: [
@@ -59,7 +56,7 @@ import { DateTimeScalar } from './graphql/DatetimeScalar';
           cookieDomain: configService.get<string>('supertokens.cookieDomain'),
           globalPepper: configService.get<string>('api.globalPepper'),
           deployment: configService.get<string>('deployment'),
-        };
+        }
       },
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -75,12 +72,12 @@ import { DateTimeScalar } from './graphql/DatetimeScalar';
         outputAs: 'class',
       },
       formatError: (error: GraphQLError) => {
-        const { extensions, message } = error;
-        const { originalError } = extensions;
+        const { extensions, message } = error
+        const { originalError } = extensions
         return {
           message,
           originalError,
-        };
+        }
       },
     }),
     PostModule,
@@ -98,7 +95,7 @@ import { DateTimeScalar } from './graphql/DatetimeScalar';
             pass: configService.get<string>('smtp.password'),
           },
           recaptchaSecret: configService.get<string>('contact.recaptchaSecret'),
-        };
+        }
       },
     }),
     VoteModule,

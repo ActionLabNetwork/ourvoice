@@ -1,54 +1,54 @@
 import {
-  PrismaClient,
   Decision,
   PostStatus,
-} from '@prisma-moderation-db/client';
+  PrismaClient,
+} from '@prisma-moderation-db/client'
 import {
   adjectives,
   animals,
   colors,
   uniqueNamesGenerator,
-} from 'unique-names-generator';
+} from 'unique-names-generator'
 
 const prisma = new PrismaClient({
   datasources: {
     moderation: {
       url:
         process.env.NODE_ENV === 'test'
-          ? process.env.DATABASE_MODERATION_TEST_URL ||
-            'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test'
-          : process.env.DATABASE_MODERATION_URL ||
-            'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer',
+          ? process.env.DATABASE_MODERATION_TEST_URL
+          || 'postgresql://your_db_user:your_db_password@127.0.0.1:5437/ourvoice_db_mod_test'
+          : process.env.DATABASE_MODERATION_URL
+          || 'postgresql://your_db_user:your_db_password@127.0.0.1:5435/ourvoice_db_mod?schema=ourvoice&sslmode=prefer',
     },
   },
-});
+})
 
 async function clearDatabase() {
-  await prisma.commentModeration.deleteMany();
-  await prisma.commentVersion.deleteMany();
-  await prisma.postModeration.deleteMany();
-  await prisma.postVersion.deleteMany();
-  await prisma.comment.deleteMany();
-  await prisma.post.deleteMany();
+  await prisma.commentModeration.deleteMany()
+  await prisma.commentVersion.deleteMany()
+  await prisma.postModeration.deleteMany()
+  await prisma.postVersion.deleteMany()
+  await prisma.comment.deleteMany()
+  await prisma.post.deleteMany()
 
-  await prisma.$executeRaw`ALTER SEQUENCE "Post_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "PostVersion_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "Comment_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "CommentVersion_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "PostModeration_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "CommentModeration_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Post_id_seq" RESTART WITH 1;`
+  await prisma.$executeRaw`ALTER SEQUENCE "PostVersion_id_seq" RESTART WITH 1;`
+  await prisma.$executeRaw`ALTER SEQUENCE "Comment_id_seq" RESTART WITH 1;`
+  await prisma.$executeRaw`ALTER SEQUENCE "CommentVersion_id_seq" RESTART WITH 1;`
+  await prisma.$executeRaw`ALTER SEQUENCE "PostModeration_id_seq" RESTART WITH 1;`
+  await prisma.$executeRaw`ALTER SEQUENCE "CommentModeration_id_seq" RESTART WITH 1;`
 }
 
 async function main() {
-  const decisions = [Decision.ACCEPTED, Decision.REJECTED];
+  const decisions = [Decision.ACCEPTED, Decision.REJECTED]
   const postStatuses = [
     PostStatus.APPROVED,
     PostStatus.PENDING,
     PostStatus.REJECTED,
-  ];
+  ]
 
   for (let i = 0; i < 10; i++) {
-    const authorHash = `user${i + 1}hash`;
+    const authorHash = `user${i + 1}hash`
 
     const post = await prisma.post.create({
       data: {
@@ -77,13 +77,13 @@ async function main() {
             })),
         },
       },
-    });
+    })
 
-    const moderatorHash = `moderator${i + 1}hash`;
+    const moderatorHash = `moderator${i + 1}hash`
 
     // Create multiple comments for a post and child comments for each comment
     for (let j = 0; j < 3; j++) {
-      const commentAuthorHash = `commentAuthor${j + 1}hash`;
+      const commentAuthorHash = `commentAuthor${j + 1}hash`
 
       const comment = await prisma.comment.create({
         data: {
@@ -113,10 +113,10 @@ async function main() {
               })),
           },
         },
-      });
+      })
 
       // Create child comment for the comment
-      const childCommentAuthorHash = `childCommentAuthor${j + 1}hash`;
+      const childCommentAuthorHash = `childCommentAuthor${j + 1}hash`
 
       await prisma.comment.create({
         data: {
@@ -141,7 +141,7 @@ async function main() {
             },
           },
         },
-      });
+      })
 
       await prisma.postModeration.create({
         data: {
@@ -155,7 +155,7 @@ async function main() {
           timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for post ${i + 1}`,
         },
-      });
+      })
 
       await prisma.commentModeration.create({
         data: {
@@ -169,16 +169,16 @@ async function main() {
           timestamp: new Date(`2023-04-${13 + i + j}T10:40:00Z`),
           reason: `Moderation reason for comment on post ${i + 1}`,
         },
-      });
+      })
     }
   }
 
-  await prisma.$disconnect();
+  await prisma.$disconnect()
 }
 
 export async function seedDb() {
-  await clearDatabase();
-  await main();
+  await clearDatabase()
+  await main()
 }
 
 // seedDb();

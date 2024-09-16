@@ -1,5 +1,5 @@
 deployment: demo
-organisation: ourvoice.app
+organisation: monash.edu
 roles:
   - name: user
     permissions:
@@ -25,20 +25,17 @@ roles:
       - delete:all
 allowedEmails:
   - user@ourvoice.app
-  - user1@ourvoice.app
 moderators:
-  - odeployment_admin@ourvoice.app
-  - moderator1@ourvoice.app
-  - moderator2@ourvoice.app
+  - deployment_admin@ourvoice.app
 authModules:
   - EmailPassword
   - Passwordless
   - Verify
   - Dashboard
-heroImage:
+heroImage: /hero-image.jpg
 logo: /ourvoice_logo_new.png
-deploymentLogo: ourvoice_logo_nteu_dark.svg
-slogan: 'Welcome to the DEMO ORG OurVoice Community Platform'
+deploymentLogo: /ourvoice_logo_nteu_dark.svg
+slogan: 'Welcome to the NTEU OurVoice Community Platform'
 moderatorCount: 1
 postFrequency:
   unit: 'minutes'

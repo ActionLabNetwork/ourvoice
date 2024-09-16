@@ -1,5 +1,5 @@
-import { seedMainDb } from './seed';
+import { seedMainDb } from './seed'
 
-console.log('Clearing main database...');
-console.log('Seeding main database...');
-seedMainDb();
+console.log('Clearing main database...')
+console.log('Seeding main database...')
+seedMainDb()

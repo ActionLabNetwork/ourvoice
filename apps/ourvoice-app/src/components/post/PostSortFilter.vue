@@ -6,23 +6,31 @@
     <div
       class="px-8 flex space-x-2 md:space-y-5 overflow-x-auto no-scrollbar md:block md:text-center -mx-10 md:mx-0"
     >
-      <PostSortFilterCategoryButton
+      <post-sort-filter-category-button
         v-if="result?.posts?.totalCount"
-        :count="result.posts.totalCount"
         :active="!sortFilter.selectedCategoryIds"
+        :count="result.posts.totalCount"
         text="All"
         @select="selectCategory(null)"
       />
       <template v-for="category in categories" :key="category.id">
-        <PostSortFilterCategoryButton
+        <post-sort-filter-category-button
           v-if="category.numPosts > 0"
           :active="sortFilter.selectedCategoryIds?.includes(category.id) ?? false"
           :count="category.numPosts"
           :text="category.name"
           @select="selectCategory(category.id)"
         />
+        <post-sort-filter-category-button
+          v-else
+          :active="false"
+          class="bg-ourvoice-grey opacity-50 cursor-not-allowed"
+          :count="0"
+          :disabled="true"
+          :text="category.name"
+        />
       </template>
-      <div v-if="state == 'loading-initial'" class="w-full flex flex-row justify-center space-x-5">
+      <div v-if="state === 'loading-initial'" class="w-full flex flex-row justify-center space-x-5">
         <div v-for="i in 5" :key="i" class="w-[150px] h-10 shrink-0 rounded-full skeleton" />
       </div>
     </div>
@@ -41,7 +49,7 @@
           class="px-2 py-1"
           :class="{
             'font-semibold border-ourvoice-black border-b-4':
-              option.label === selectedTimeRangeOption.label
+              option.label === selectedTimeRangeOption.label,
           }"
           @click="handleTimeRangeSelected(index)"
         >
@@ -49,56 +57,55 @@
         </button>
       </div>
       <div class="flex justify-between">
-        <Listbox class="w-fit" v-model="selectedSortOption">
+        <listbox v-model="selectedSortOption" class="w-fit">
           <div class="relative mt-1">
-            <ListboxButton
+            <listbox-button
               class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 text-sm"
             >
               <span class="block truncate">{{ selectedSortOption.label }}</span>
               <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <chevron-up-down-icon aria-hidden="true" class="h-5 w-5 text-gray-400" />
               </span>
-            </ListboxButton>
+            </listbox-button>
 
             <transition
-              leaveActiveClass="transition duration-100 ease-in"
-              leaveFromClass="opacity-100"
-              leaveToClass="opacity-0"
+              leave-active-class="transition duration-100 ease-in"
+              leave-from-class="opacity-100"
+              leave-to-class="opacity-0"
             >
-              <ListboxOptions
+              <listbox-options
                 class="z-10 absolute mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               >
-                <ListboxOption
-                  v-slot="{ active, selected }"
+                <listbox-option
                   v-for="sortOption in sortOptions"
                   :key="sortOption.label"
-                  :value="sortOption"
+                  v-slot="{ active, selected }"
                   as="template"
+                  :value="sortOption"
                 >
                   <li
-                    :class="[
+                    class="relative cursor-default select-none py-2 pl-10 pr-4" :class="[
                       active ? 'bg-amber-100 text-amber-900' : 'text-gray-900',
-                      'relative cursor-default select-none py-2 pl-10 pr-4'
                     ]"
                   >
-                    <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                    <span class="block truncate" :class="[selected ? 'font-medium' : 'font-normal']">{{
                       sortOption.label
                     }}</span>
                     <span
                       v-if="selected"
                       class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"
                     >
-                      <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                      <check-icon aria-hidden="true" class="h-5 w-5" />
                     </span>
                   </li>
-                </ListboxOption>
-              </ListboxOptions>
+                </listbox-option>
+              </listbox-options>
             </transition>
           </div>
-        </Listbox>
+        </listbox>
         <button class="w-20 text-sm lg:text-md hover:text-gray-500" @click="toggleSortOrder()">
-          <font-awesome-icon :icon="faArrowDownWideShort" v-if="sortAscending" />
-          <font-awesome-icon :icon="faArrowUpWideShort" v-else />
+          <font-awesome-icon v-if="sortAscending" :icon="faArrowDownWideShort" />
+          <font-awesome-icon v-else :icon="faArrowUpWideShort" />
           {{ sortAscending ? 'asc' : 'desc' }}
         </button>
       </div>
@@ -108,24 +115,26 @@
 </template>
 
 <script lang="ts" setup>
+import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 import {
   Listbox,
   // ListboxLabel,
   ListboxButton,
+  ListboxOption,
   ListboxOptions,
-  ListboxOption
 } from '@headlessui/vue'
-import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
-import { faArrowDownWideShort, faArrowUpWideShort } from '@fortawesome/free-solid-svg-icons'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import { useQuery } from '@vue/apollo-composable'
 import { useToggle } from '@vueuse/core'
+import { startOfDay } from 'date-fns'
+import { storeToRefs } from 'pinia'
 import { computed, ref, watch, watchEffect } from 'vue'
+
+import PostSortFilterCategoryButton from '@/components/post/PostSortFilterCategoryButton.vue'
+import { GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
 import { useCategoriesStore } from '@/stores/categories'
 import { usePostsStore } from '@/stores/posts'
-import { storeToRefs } from 'pinia'
-import { startOfDay } from 'date-fns'
-import { GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY } from '@/graphql/queries/getPosts'
-import { useQuery } from '@vue/apollo-composable'
+
 const { result } = useQuery(GET_TOTAL_POST_COUNT_BY_CATEGORY_QUERY)
 const categoriesStore = useCategoriesStore()
 const postsStore = usePostsStore()
@@ -136,35 +145,36 @@ const sortOptions = [
   { label: 'Time Created', value: 'sortByCreatedAt' },
   { label: 'Comments Count', value: 'sortByCommentsCount' },
   { label: 'Down Vote Count', value: 'sortByVotesDown' },
-  { label: 'Up Vote Count', value: 'sortByVotesUp' }
+  { label: 'Up Vote Count', value: 'sortByVotesUp' },
 ]
 const selectedSortOption = ref(sortOptions[0])
 watchEffect(async () => {
   await postsStore.setSortOption(
     selectedSortOption.value.value,
-    sortAscending.value ? 'asc' : 'desc'
+    sortAscending.value ? 'asc' : 'desc',
   )
   postsStore.fetchPosts()
 })
 
 const timeRangeOptions = [
   {
-    label: 'All Time'
+    label: 'All Time',
   },
   {
-    label: 'Latest 3 Days'
-  }
+    label: 'Latest 3 Days',
+  },
 ]
 const selectedTimeRangeOption = ref(timeRangeOptions[0])
 watch(selectedTimeRangeOption, () => {
   if (selectedTimeRangeOption.value.label === 'Latest 3 Days') {
     postsStore.setCreatedAfter(startOfDay(Date.now() - 3 * 24 * 60 * 60 * 1000))
-  } else {
+  }
+  else {
     postsStore.setCreatedAfter(null)
   }
   postsStore.fetchPosts()
 })
-const handleTimeRangeSelected = (index: number) => {
+function handleTimeRangeSelected(index: number) {
   selectedTimeRangeOption.value = timeRangeOptions[index]
 }
 
@@ -173,21 +183,21 @@ if (state.value == 'initial') {
   categoriesStore.fetchCategories()
 }
 const { sortFilter } = storeToRefs(postsStore)
-const selectCategory = (id: number | null) => {
+function selectCategory(id: number | null) {
   postsStore.setSelectedCategoryIds(id ? [id] : null)
 }
 
 const message = computed(() => {
   const selectedCategory = sortFilter.value.selectedCategoryIds?.at(0)
-  const defaultMessage =
-    'Discuss your experience of balancing out your work and personal life in your organization, and any suggestions to improve matters.'
+  const defaultMessage
+    = 'Discuss your experience of balancing out your work and personal life in your organization, and any suggestions to improve matters.'
 
   if (!selectedCategory) {
     return defaultMessage
   }
   return (
-    categories.value.find((category) => category.id === selectedCategory)?.description ??
-    defaultMessage
+    categories.value.find(category => category.id === selectedCategory)?.description
+    ?? defaultMessage
   )
 })
 </script>
