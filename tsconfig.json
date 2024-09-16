@@ -1,22 +1,4 @@
 {
-  // "files": [],
-  // "references": [
-  //   {
-  //     "path": "./tsconfig.web.json"
-  //   },
-  //   {
-  //     "path": "./tsconfig.node.json"
-  //   },
-  //   {
-  //     "path": "./apps/ourvoice-admin/tsconfig.json"
-  //   },
-  //   {
-  //     "path": "./apps/ourvoice-app/tsconfig.json"
-  //   },
-  //   {
-  //     "path": "./apps/ourvoice-portal/tsconfig.json"
-  //   }
-  // ],
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
@@ -36,6 +18,6 @@
     "sourceMap": true,
     "baseUrl": ".",
     "outDir": "dist",
-    "types": ["node", "jest", "jest-extended"]
+    "types": ["node", "jest"]
   }
 }
