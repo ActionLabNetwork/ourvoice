@@ -1,4 +1,4 @@
-deployment: demo
+deployment: monash
 organisation: monash.edu
 roles:
   - name: user
