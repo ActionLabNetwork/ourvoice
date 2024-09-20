@@ -240,7 +240,7 @@ const redirect: ManageRedirectStateService = new ManageRedirectStateService()
 const domain = config.sessionTokenFrontendDomain
 
 // TODO: this list might be coming from the database later
-const organisation = YamlContent.organisation
+const organisation = YamlContent.organisation as string
 const deploymentOrganisation = YamlContent.deployment as string
 
 export default defineComponent({
@@ -348,13 +348,18 @@ export default defineComponent({
         )
     },
 
+    // TODO: FIX IT, shouldn't be implemented on the client side :(
     async sendMagicLink() {
       // check for organisation restrictions
-      if (organisation && this.email.substring(this.email.lastIndexOf('@') + 1) !== organisation) {
-        this.processing = false
-        this.errorMessage = 'Organisation does not match'
-        this.error = true
-        return
+      if (organisation) {
+        const emailDomain = this.email.substring(this.email.lastIndexOf('@') + 1).toLowerCase();
+        console.log(emailDomain)
+        if (emailDomain !== organisation && !emailDomain.endsWith(`.${organisation}`)) {
+              this.processing = false
+              this.errorMessage = 'Organisationzzz does not match'
+              this.error = true
+              return
+        }
       }
 
       try {
